@@ -21,11 +21,19 @@ a{
 <body>
 
 <h1>📚 Kielioppikurssi</h1>
-
+<h2> Ruotsi</h2>
 <ul>
     <li>
         <a href="ruotsi_epäsäännölliset.html">
             🇸🇪 Ruotsin epäsäännölliset verbit
+        </a>
+    </li>
+
+<h3>📚 Venäjä</h3>
+<ul>
+    <li>
+        <a href="venajan_prepositionaali.html">
+            Venäjän prepositonaali
         </a>
     </li>
 </ul>
