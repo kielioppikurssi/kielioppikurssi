@@ -1,16 +1,34 @@
-## Hi there 👋
-No niin
-<!--
-**kielioppikurssi/kielioppikurssi** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>Kielioppikurssi</title>
 
-Here are some ideas to get you started:
+<style>
+body{
+    font-family:Arial,sans-serif;
+    max-width:800px;
+    margin:auto;
+    padding:40px;
+}
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+a{
+    font-size:1.4rem;
+}
+</style>
+
+</head>
+<body>
+
+<h1>📚 Kielioppikurssi</h1>
+
+<ul>
+    <li>
+        <a href="ruotsi_epäsäännölliset.html">
+            🇸🇪 Ruotsin epäsäännölliset verbit
+        </a>
+    </li>
+</ul>
+
+</body>
+</html>
