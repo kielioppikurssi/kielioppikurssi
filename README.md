@@ -28,8 +28,9 @@ a{
             🇸🇪 Ruotsin epäsäännölliset verbit
         </a>
     </li>
+</ul>
 
-<h3>📚 Venäjä</h3>
+<h3>Venäjä</h3>
 <ul>
     <li>
         <a href="venajan_prepositionaali.html">
