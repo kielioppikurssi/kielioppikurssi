@@ -5,28 +5,25 @@
 <title>Kielioppikurssi</title>
 
 <style>
+
+@keyframes pastelGradient {
+
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+
+}
+
 html{
     min-height:100%;
-
-    background:
-        radial-gradient(circle at top left,
-            #fff3a6 0%,
-            transparent 30%),
-
-        radial-gradient(circle at bottom right,
-            #ffe0f0 0%,
-            transparent 30%),
-
-        linear-gradient(
-            -45deg,
-            #c7f0ff,
-            #ffe7f4,
-            #fff3bf,
-            #dfffd8
-        );
-
-    background-size:400% 400%;
-    animation:pastelGradient 20s ease infinite;
 }
 
 body{
@@ -44,30 +41,36 @@ body{
 
     min-height:100vh;
 
-    background:transparent;
+    background:
+        linear-gradient(
+            -45deg,
+            #ffd6e7,
+            #fff0b8,
+            #d6f5ff,
+            #e8d8ff,
+            #d7ffd6
+        );
+
+    background-size:600% 600%;
+
+    animation:
+        pastelGradient 20s ease-in-out infinite;
 }
-    @keyframes pastelGradient {
 
-    0%{
-        background-position:0% 50%;
-    }
-
-    25%{
-        background-position:100% 50%;
-    }
-
-    50%{
-        background-position:100% 100%;
-    }
-
-    75%{
-        background-position:0% 100%;
-    }
-
-    100%{
-        background-position:0% 50%;
-    }
+h1,h2,h3{
+    letter-spacing:0.5px;
+    color:#1f355e;
 }
+
+a{
+    color:#0057b8;
+    text-decoration:none;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
 </style>
 
 </head>
