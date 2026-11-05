@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruotsin epäsäännölliset verbit</title>
+
+<style>
+h1,h2,h3{
+    font-family:
+        "Palatino Linotype",
+        "Book Antiqua",
+        Palatino,
+        serif;
+
+    letter-spacing:0.5px;
+}
+
+body{
+    font-family:
+        "Palatino Linotype",
+        "Book Antiqua",
+        Palatino,
+        serif;
+
+    max-width:1400px;
+    margin:30px auto;
+    padding:20px;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(255,213,0,0.9) 0%,
+            rgba(255,213,0,0.4) 15%,
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at bottom right,
+            rgba(255,213,0,0.9) 0%,
+            rgba(255,213,0,0.4) 15%,
+            transparent 35%
+        ),
+
+        linear-gradient(
+            135deg,
+            #004b87 0%,
+            #0b65b1 50%,
+            #2f87ff 100%
+        );
+
+    min-height:100vh;
+}
+h1{
+    text-align:center;
+}
+#stats,
+table,
+#cheatSheet,
+.mc-question,
+.popup-content{
+
+    background:rgba(255,255,255,0.92);
+
+    backdrop-filter:blur(8px);
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,0.15);
+}
+
+#stats{
+    position:sticky;
+    bottom:10px;
+    z-index:1000;
+
+    background:white;
+    padding:12px;
+    border-radius:10px;
+
+    text-align:center;
+
+    font-size:1.4rem;
+    font-weight:bold;
+}
+#stats{
+    background:white;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:20px;
+    font-size:1.2em;
+    font-weight:bold;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:left;
+}
+th{
+    background:#2d6cdf;
+    color:white;
+}
+input{
+    width:100%;
+    box-sizing:border-box;
+    padding:6px;
+}
+.correct{
+    background:#c8f7c5;
+}
+
+.wrong{
+    background:#ffb3b3;
+    color:#900;
+    font-weight:bold;
+}
+button{
+    margin-top:20px;
+    padding:12px 24px;
+    font-size:1rem;
+    cursor:pointer;
+}
+#feedback{
+    margin-top:15px;
+    font-weight:bold;
+}
+#cheatSheet{
+    margin-top:20px;
+    padding:15px;
+    background:white;
+    border:1px solid #ccc;
+    border-radius:10px;
+    max-height:400px;
+    overflow-y:auto;
+}
+
+#verbList{
+    columns:2;
+}
+
+#verbList div{
+    padding:2px 0;
+    font-size:0.95em;
+}
+
+.mc-question{
+    background:white;
+    padding:8px;
+    margin:6px 0;
+    border-radius:8px;
+}
+
+.mc-options{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-top:4px;
+}
+
+.mc-options label{
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+
+.mc-question{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    padding:8px;
+    background:white;
+    margin:6px 0;
+    border-radius:8px;
+}
+
+.mc-question b{
+    min-width:180px;
+}
+
+.mc-options{
+    display:flex;
+    gap:20px;
+}
+
+.mc-options label{
+    white-space:nowrap;
+}
+
+.mc-options label{
+    padding:4px 8px;
+    border-radius:5px;
+}
+
+.popup{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    justify-content:center;
+    align-items:center;
+}
+
+.popup-content{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    min-width:350px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
+
+</style>
+</head>
+<body>
+
+
+<h1>Ruotsin epäsäännölliset verbit</h1>
+
+
+
+
+Valitse tasosi:  
+<select id="verbLevel" onchange="refreshAll()">
+    <option value="1">Olen ykkösluokkalainen 👶 tavalliset verbit</option>
+    <option value="2">Olen kakkosluokkalainen 👦 etuliitteiset ja vaikeat verbit</option>
+    <option value="all">Olen kovis ja osaan kaiken🎅 kaikki verbit</option>
+</select>
+
+<h2>Monivalinta</h2>
+
+<select id="mcDirection" onchange="createMCQuiz()">
+    <option value="fi-sv">Suomi → ruotsi</option>
+    <option value="sv-fi">Ruotsi → suomi</option>
+</select>
+
+<div id="mcQuiz"></div>
+
+
+<button onclick="checkMC()">
+Tarkista monivalinnat
+</button>
+
+<button onclick="createMCQuiz()">
+Arvo uudet monivalinnat
+</button>
+
+
+
+
+<hr>
+<h2 id="exerciseTitle">Taivutusharjoitus</h2>
+
+<div id="mcResult"></div>
+<select id="exerciseMode" onchange="nextRound()">
+    <option value="sv-forms">suomi → ruotsi</option>
+    <option value="fi-meaning">ruotsi → suomi</option>
+</select>
+
+
+
+<table>
+<thead id="tableHead">
+</thead>
+<tbody id="quizBody"></tbody>
+</table>
+
+<button onclick="checkAnswers()">Tarkista vastaukset</button>
+
+<button onclick="nextRound()">
+Arvo uudet verbit
+</button>
+<button type="button" onclick="toggleCheatSheet()">
+📖 Verbilista
+</button>
+
+<div id="cheatSheet" style="display:none;">
+    <h3>Verbiluettelo</h3>
+
+    <select id="sortMode" onchange="buildVerbList()">
+        <option value="fi">Aakkosjärjestys: suomi</option>
+        <option value="sv">Aakkosjärjestys: ruotsi</option>
+    </select>
+
+    <div id="verbList"></div>
+</div>
+
+
+<div id="feedback"></div>
+
+<div id="stats">
+Yhteispisteet: <span id="totalScore">0</span>
+</div>
+
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <h2 id="popupTitle"></h2>
+        <p id="popupText"></p>
+        <button onclick="closePopup()">Jatka</button>
+    </div>
+</div>
+
+
+<script>
+
+
+const verbs = [
+
+{level:1,fi:"pyytää, rukoilla",forms:["be","ber","bad","bett"]},
+{level:2,fi:"sitoa",forms:["binda","binder","band","bundit"]},
+{level:1,fi:"purra",forms:["bita","biter","bet","bitit"]},
+{level:1,fi:"tarjota (jotain konkreettista)",forms:["bjuda","bjuder","bjöd","bjudit"]},
+{level:2,fi:"tarjota (jotain abstraktia)",forms:["erbjuda","erbjuder","erbjöd","erbjudit"]},
+{level:2,fi:"kieltää",forms:["förbjuda","förbjuder","förbjöd","förbjudit"]},
+{level:1,fi:"tulla joksikin",forms:["bli","blir","blev","blivit"]},
+{level:1,fi:"palaa",forms:["brinna","brinner","brann","brunnit"]},
+{level:1,fi:"mennä rikki, murtua, puuttua",forms:["brista","brister","brast","brustit"]},
+{level:1,fi:"katkaista, murtaa, louhia",forms:["bryta","bryter","bröt","brutit"]},
+{level:2,fi:"keskeyttää",forms:["avbryta","avbryter","avbröt","avbrutit"]},
+{level:1,fi:"kantaa",forms:["bära","bär","bar","burit"]},
+{level:2,fi:"pitää, tulee tehdä jotakin (4 muotoa)",forms:["böra","bör","borde","bort"]},
+{level:1,fi:"vetää",forms:["dra","drar","drog","dragit"]},
+{level:2,fi:"pettää",forms:["bedra","bedrar","bedrog","bedragit"]},
+{level:2,fi:"myötävaikuttaa, avustaa",forms:["bidra","bidrar","bidrog","bidragit"]},
+{level:2,fi:"pitää parempana, suosia",forms:["föredra","föredrar","föredrog","föredragit"]},
+{level:1,fi:"juoda",forms:["dricka","dricker","drack","druckit"]},
+{level:1,fi:"ajaa, ajelehtia",forms:["driva","driver","drev","drivit"]},
+{level:2,fi:"pilailla jonkun kustannuksella",forms:["driva","driver","drev","drivit"]},
+{level:1,fi:"kelvata",forms:["duga","duger","dög","dugt"]},
+{level:1,fi:"sukeltaa",forms:["dyka","dyker","dök","dykt"]},
+{level:1,fi:"ilmaantua, ilmestyä, tulla esiin",forms:["dyka upp","dyker upp","dök upp","dykt upp"]},
+{level:1,fi:"kuolla",forms:["dö","dör","dog","dött"]},
+{level:1,fi:"kätkeä, piilottaa",forms:["dölja","döljer","dolde","dolt"]},
+{level:1,fi:"pudota, kaatua",forms:["falla","faller","föll","fallit"]},
+{level:2,fi:"hyökätä",forms:["anfalla","anfaller","anföll","anfallit"]},
+{level:2,fi:"tuntua, näyttää",forms:["förefalla","förefaller","föreföll","förefallit"]},
+{level:2,fi:"rappeutua",forms:["förfalla","förfaller","förföll","förfallit"]},
+{level:1,fi:"matkustaa, mennä",forms:["fara","far","for","farit"]},
+{level:2,fi:"kokea",forms:["erfara","erfar","erfor","erfarit"]},
+{level:1,fi:"löytää",forms:["finna","finner","fann","funnit"]},
+{level:2,fi:"oleskella, olla",forms:["befinna sig","befinner sig","befann sig","befunnit sig"]},
+{level:2,fi:"keksiä",forms:["uppfinna","uppfinner","uppfann","uppfunnit"]},
+{level:1,fi:"olla olemassa",forms:["finnas","finns","fanns","funnits"]},
+{level:1,fi:"lentää",forms:["flyga","flyger","flög","flugit"]},
+{level:1,fi:"kellua, virrata",forms:["flyta","flyter","flöt","flutit"]},
+{level:2,fi:"kulua (ajasta)",forms:["förflyta","förflyter","förflöt","förflutit"]},
+{level:1,fi:"palella, jäätyä",forms:["frysa","fryser","frös","frusit"]},
+{level:1,fi:"saada",forms:["få","får","fick","fått"]},
+{level:1,fi:"kadota",forms:["försvinna","försvinner","försvann","försvunnit"]},
+{level:1,fi:"antaa",forms:["ge","ger","gav", "gett"]},
+{level:1,fi:"luovuttaa",forms:["ge upp","ger upp","gav upp","gett upp",]},
+{level:2,fi:"myöntää",forms:["medge","medger","medgav","medgett"]},
+{level:2,fi:"julkaista",forms:["utge","utger","utgav","utgett"]},
+{level:1,fi:"hylätä",forms:["överge","överger","övergav","övergett"]},
+{level:2,fi:"valaa, kaataa",forms:["gjuta","gjuter","göt","gjutit"]},
+{level:2,fi:"liukua",forms:["glida","glider","gled","glidit"]},
+{level:2,fi:"ilahduttaa",forms:["glädja","gläder","gladde","glatt"]},
+{level:1,fi:"tarttua",forms:["gripa","griper","grep","gripit"]},
+{level:2,fi:"käsittää",forms:["begripa","begriper","begrep","begripit"]},
+{level:1,fi:"itkeä",forms:["gråta","gråter","grät","gråtit"]},
+{level:1,fi:"kävellä, mennä",forms:["gå","går","gick","gått"]},
+{level:2,fi:"koskea (olla jnk asia)",forms:["angå","angår","angick","angått"]},
+{level:2,fi:"erota, lähteä",forms:["avgå","avgår","avgick","avgått"]},
+{level:2,fi:"tehdä (kielteinen asia)",forms:["begå","begår","begick","begått"]},
+{level:2,fi:"jatkua, olla käynnissä",forms:["pågå","pågår","pågick","pågått"]},
+{level:1,fi:"seurustella, olla tekemisissä",forms:["umgås","umgås","umgicks","umgåtts"]},
+{level:1,fi:"tehdä",forms:["göra","gör","gjorde","gjort"]},
+{level:2,fi:"ratkaista",forms:["avgöra","avgör","avgjorde","avgjort"]},
+{level:2,fi:"muodostaa",forms:["utgöra","utgör","utgjorde","utgjort"]},
+{level:1,fi:"olla, omistaa",forms:["ha","har","hade","haft"]},
+{level:1,fi:"olla nimeltään",forms:["heta","heter","hette","hetat"]},
+{level:1,fi:"ehtiä",forms:["hinna","hinner","hann","hunnit"]},
+{level:2,fi:"hakata",forms:["hugga","hugger","högg","huggit"]},
+{level:1,fi:"pitää (esim. puhe, esitelmä)",forms:["hålla","håller","höll","hållit"]},
+{level:1,fi:"olla tekemässä jotakin",forms:["hålla på","håller på","höll på","hållit på"]},
+{level:2,fi:"kestää, sietää",forms:["hålla ut","håller ut","höll ut","hållit ut"]},
+{level:2,fi:"pidättää",forms:["anhålla","anhåller","anhöll","anhållit"]},
+{level:2,fi:"korostaa",forms:["framhålla","framhåller","framhöll","framhållit"]},
+{level:2,fi:"suhtautua",forms:["förhålla sig","förhåller sig","förhöll sig","förhållit sig"]},
+{level:2,fi:"viihdyttää",forms:["underhålla","underhåller","underhöll","underhållit"]},
+{level:1,fi:"kiivetä, astua",forms:["kliva","kliver","klev","klivit"]},
+{level:1,fi:"solmia",forms:["knyta","knyter","knöt","knutit"]},
+{level:1,fi:"tulla",forms:["komma","kommer","kom","kommit"]},
+{level:2,fi:"esiintyä, ilmetä",forms:["förekomma","förekommer","förekom","förekommit"]},
+{level:2,fi:"menehtyä, saada surmansa",forms:["omkomma","omkommer","omkom","omkommit"]},
+{level:2,fi:"ryömiä",forms:["krypa","kryper","kröp","krupit"]},
+{level:1,fi:"osata, voida",forms:["kunna","kan","kunde","kunnat"]},
+{level:1,fi:"hymyillä",forms:["le","ler","log","lett"]},
+{level:1,fi:"kärsiä, kulua (ajasta)",forms:["lida","lider","led","lidit"]},
+{level:1,fi:"maata, olla, sijaita",forms:["ligga","ligger","låg","legat"]},
+{level:1,fi:"valehdella",forms:["ljuga","ljuger","ljög","ljugit"]},
+{level:1,fi:"antaa, sallia, kuulostaa",forms:["låta","låter","lät","låtit"]},
+{level:1,fi:"antaa anteeksi",forms:["förlåta","förlåter","förlät","förlåtit"]},
+{level:2,fi:"sallia",forms:["tillåta","tillåter","tillät","tillåtit"]},
+{level:2,fi:"luovuttaa (jotakin jollekin)",forms:["överlåta","överlåter","överlät","överlåtit"]},
+{level:1,fi:"asettaa, panna makuulle",forms:["lägga","lägger","lade","lagt"]},
+{level:1,fi:"mennä nukkumaan",forms:["lägga sig","lägger sig","lade sig","lagt sig"]},
+{level:2,fi:"suorittaa (esim. tutkinto)",forms:["avlägga","avlägger","avlade","avlagt"]},
+{level:2,fi:"lisätä",forms:["tillägga","tillägger","tillade","tillagt"]},
+{level:1,fi:"täytyä",forms:["-","måste","måste","-"]},
+{level:1,fi:"nauttia",forms:["njuta","njuter","njöt","njutit"]},
+{level:1,fi:"ratsastaa",forms:["rida","rider","red","ridit"]},
+{level:1,fi:"valua, virrata",forms:["rinna","rinner","rann","runnit"]},
+{level:1,fi:"repiä",forms:["riva","river","rev","rivit"]},
+{level:1,fi:"nähdä",forms:["se","ser","såg","sett"]},
+{level:2,fi:"varoa",forms:["se upp","ser upp","såg upp","sett upp"]},
+{level:1,fi:"näyttää joltakin",forms:["se ut","ser ut","såg ut","sett ut"]},
+{level:1,fi:"olla jotakin mieltä",forms:["anse","anser","ansåg","ansett"]},
+{level:2,fi:"tarkoittaa",forms:["avse","avser","avsåg","avsett"]},
+{level:2,fi:"varustaa",forms:["förse","förser","försåg","försett"]},
+{level:2,fi:"aavistaa",forms:["förutse","förutser","förutsåg","förutsett"]},
+{level:2,fi:"tajuta, oivaltaa",forms:["inse","inser","insåg","insett"]},
+{level:2,fi:"valita, määrätä, nimetä",forms:["utse","utser","utsåg","utsett"]},
+{level:1,fi:"istua",forms:["sitta","sitter","satt","suttit"]},
+{level:1,fi:"laulaa",forms:["sjunga","sjunger","sjöng","sjungit"]},
+{level:1,fi:"upota, laskea",forms:["sjunka","sjunker","sjönk","sjunkit"]},
+{level:1,fi:"paistaa",forms:["skina","skiner","sken","skinit"]},
+{level:1,fi:"ampua, työntää",forms:["skjuta","skjuter","sköt","skjutit"]},
+{level:2,fi:"lykätä, siirtää",forms:["uppskjuta","uppskjuter","uppsköt","uppskjutit"]},
+{level:1,fi:"pitää, tulee tehdä jotakin (2 muotoa)",forms:["-","ska","skulle","-"]},
+{level:1,fi:"kirjoittaa",forms:["skriva","skriver","skrev","skrivit"]},
+{level:1,fi:"huutaa, kirkua",forms:["skrika","skriker","skrek","skrikit"]},
+{level:2,fi:"kuvailla",forms:["beskriva","beskriver","beskrev","beskrivit"]},
+{level:2,fi:"kehua, kerskua",forms:["skryta","skryter","skröt","skrutit"]},
+{level:2,fi:"leikata",forms:["skära","skär","skar","skurit"]},
+{level:2,fi:"päästä tekemästä jotakin",forms:["slippa","slipper","slapp","sluppit"]},
+{level:2,fi:"kuluttaa, repiä, raataa",forms:["slita","sliter","slet","slitit"]},
+{level:1,fi:"sulkea, solmia",forms:["sluta","sluter","slöt","slutit"]},
+{level:1,fi:"lyödä",forms:["slå","slår","slog","slagit"]},
+{level:2,fi:"etsiä sana kirjasta, avata kirja",forms:["slå upp","slår upp","slog upp","slagit upp"]},
+{level:2,fi:"ehdottaa",forms:["föreslå","föreslår","föreslog","föreslagit"]},
+{level:1,fi:"tapella",forms:["slåss","slåss","slogs","slagits"]},
+{level:2,fi:"hiipiä",forms:["smyga","smyger","smög","smugit"]},
+{level:2,fi:"niistää",forms:["snyta","snyter","snöt","snutit"]},
+{level:1,fi:"nukkua",forms:["sova","sover","sov","sovit"]},
+{level:1,fi:"nukkua pommiin",forms:["försova sig","försover sig","försov sig","försovit sig"]},
+{level:1,fi:"haljeta, puhjeta",forms:["spricka","spricker","sprack","spruckit"]},
+{level:1,fi:"levittää",forms:["sprida","sprider","spred","spridit"]},
+{level:1,fi:"juosta",forms:["springa","springer","sprang","sprungit"]},
+{level:1,fi:"pistää, häipyä",forms:["sticka","sticker","stack","stuckit"]},
+{level:1,fi:"nousta, astua",forms:["stiga","stiger","steg","stigit"]},
+{level:2,fi:"jäädä pois (kulkuneuvosta)",forms:["stiga av","stiger av","steg av","stigit av"]},
+{level:1,fi:"varastaa",forms:["stjäla","stjäl","stal","stulit"]},
+{level:2,fi:"taistella, riidellä",forms:["strida","strider","stred","stridit"]},
+{level:1,fi:"silittää",forms:["stryka","stryker","strök","strukit"]},
+{level:2,fi:"alleviivata",forms:["stryka under","stryker under","strök under","strukit under"]},
+{level:2,fi:"korostaa, tähdentää",forms:["understryka","understryker","underströk","understrukit"]},
+{level:1,fi:"seisoa",forms:["stå","står","stod","stått"]},
+{level:2,fi:"luopua",forms:["avstå","avstår","avstod","avstått"]},
+{level:1,fi:"koostua, muodostua jstak, pysyä",forms:["bestå","består","bestod","bestått"]},
+{level:1,fi:"ymmärtää",forms:["förstå","förstår","förstod","förstått"]},
+{level:1,fi:"väittää",forms:["påstå","påstår","påstod","påstått"]},
+{level:2,fi:"syntyä",forms:["uppstå","uppstår","uppstod","uppstått"]},
+{level:2,fi:"kestää, sietää",forms:["utstå","utstår","utstod","utstått"]},
+{level:2,fi:"olla jäljellä",forms:["återstå","återstår","återstod","återstått"]},
+{level:1,fi:"imeä",forms:["suga","suger","sög","sugit"]},
+{level:2,fi:"juopotella, ryypätä",forms:["supa","super","söp","supit"]},
+{level:1,fi:"pettää",forms:["svika","sviker","svek","svikit"]},
+{level:2,fi:"nähdä nälkää",forms:["svälta","svälter","svalt","svultit"]},
+{level:1,fi:"vannoa, kirota",forms:["svära","svär","svor","svurit"]},
+{level:1,fi:"sanoa",forms:["säga","säger","sade","sagt"]},
+{level:1,fi:"myydä",forms:["sälja","säljer","sålde","sålt"]},
+{level:1,fi:"asettaa, panna istumaan",forms:["sätta","sätter","satte","satt"]},
+{level:2,fi:"asettua asumaan",forms:["bosätta sig","bosätter sig","bosatte sig","bosatt sig"]},
+{level:1,fi:"korvata",forms:["ersätta","ersätter","ersatte","ersatt"]},
+{level:1,fi:"jatkaa",forms:["fortsätta","fortsätter","fortsatte","fortsatt"]},
+{level:2,fi:"edellyttää",forms:["förutsätta","förutsätter","förutsatte","förutsatt"]},
+{level:2,fi:"työllistää",forms:["sysselsätta","sysselsätter","sysselsatte","sysselsatt"]},
+{level:2,fi:"määrätä, saattaa alttiiksi",forms:["utsätta","utsätter","utsatte","utsatt"]},
+{level:1,fi:"kääntää (kielestä toiseen)",forms:["översätta","översätter","översatte","översatt"]},
+{level:1,fi:"ottaa",forms:["ta","tar","tog","tagit"]},
+{level:2,fi:"olettaa",forms:["anta","antar","antog","antagit"]},
+{level:2,fi:"vähetä",forms:["avta","avtar","avtog","avtagit"]},
+{level:2,fi:"ottaa osaa, osallistua",forms:["delta","deltar","deltog","deltagit"]},
+{level:2,fi:"lisääntyä, voimistua",forms:["tillta","tilltar","tilltog","tilltagit"]},
+{level:2,fi:"ryhtyä",forms:["vidta","vidtar","vidtog","vidtagit"]},
+{level:2,fi:"vaieta",forms:["tiga","tiger","teg","tigit"]},
+{level:2,fi:"uskaltaa",forms:["töras","törs","tordes","torts"]},
+{level:1,fi:"olla",forms:["vara","är","var","varit"]},
+{level:1,fi:"tietää",forms:["veta","vet","visste","vetat"]},
+{level:1,fi:"taittaa, taitella",forms:["vika","viker","vek","vikit"]},
+{level:2,fi:"poiketa",forms:["avvika","avviker","avvek","avvikit"]},
+{level:2,fi:"välttää",forms:["undvika","undviker","undvek","undvikit"]},
+{level:1,fi:"haluta, tahtoa",forms:["vilja","vill","ville","velat"]},
+{level:1,fi:"voittaa",forms:["vinna","vinner","vann","vunnit"]},
+{level:2,fi:"vääntää",forms:["vrida","vrider","vred","vridit"]},
+{level:1,fi:"valita",forms:["välja","väljer","valde","valt"]},
+{level:1,fi:"totuttaa",forms:["vänja","vänjer","vande","vant"]},
+{level:1,fi:"syödä",forms:["äta","äter","åt","ätit"]}
+];
+
+let totalScore = 0;
+
+
+let mcChecked = false;
+
+let currentSet = [];
+
+function shuffle(arr){
+    return [...arr].sort(()=>Math.random()-0.5);
+}
+
+function getFilteredVerbs(){
+
+    const level =
+        document.getElementById("verbLevel").value;
+
+    if(level==="all"){
+        return verbs;
+    }
+
+    return verbs.filter(
+        v => String(v.level) === level
+    );
+}
+
+function refreshAll(){
+
+    buildVerbList();
+    createMCQuiz();
+    nextRound();
+}
+
+function nextRound(){
+
+    const mode =
+        document.getElementById("exerciseMode").value;
+
+    document.getElementById("tableHead").innerHTML =
+    mode==="sv-forms"
+    ? `
+    <tr>
+        <th>Suomi</th>
+        <th>Infinitiivi</th>
+        <th>Preesens</th>
+        <th>Imperfekti</th>
+        <th>Supiini</th>
+    </tr>
+    `
+    : `
+    <tr>
+        <th>Infinitiivi</th>
+        <th>Preesens</th>
+        <th>Imperfekti</th>
+        <th>Supiini</th>
+        <th>Suomennos</th>
+    </tr>
+    `;
+
+    currentSet =
+        shuffle(getFilteredVerbs()).slice(0,5);
+
+    const tbody =
+        document.getElementById("quizBody");
+
+    tbody.innerHTML = "";
+
+    currentSet.forEach((verb,row)=>{
+
+        let tr = document.createElement("tr");
+
+        let html = "";
+
+        if(mode==="sv-forms"){
+
+            html += `<td>${verb.fi}</td>`;
+
+            for(let i=0;i<4;i++){
+                html +=
+                `<td>
+                    <input
+                        data-row="${row}"
+                        data-col="${i}">
+                </td>`;
+            }
+
+        }else{
+
+            html += `
+                <td>${verb.forms[0]}</td>
+                <td>${verb.forms[1]}</td>
+                <td>${verb.forms[2]}</td>
+                <td>${verb.forms[3]}</td>
+                <td>
+                    <input
+                        data-row="${row}"
+                        data-col="fi">
+                </td>
+            `;
+        }
+
+        tr.innerHTML = html;
+
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById("feedback").textContent="";
+}
+
+function similarity(a,b){
+
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+
+    const matrix = [];
+
+    for(let i=0;i<=b.length;i++){
+        matrix[i] = [i];
+    }
+
+    for(let j=0;j<=a.length;j++){
+        matrix[0][j] = j;
+    }
+
+    for(let i=1;i<=b.length;i++){
+        for(let j=1;j<=a.length;j++){
+
+            if(b.charAt(i-1)===a.charAt(j-1)){
+
+                matrix[i][j]=matrix[i-1][j-1];
+
+            }else{
+
+                matrix[i][j]=Math.min(
+                    matrix[i-1][j-1]+1,
+                    matrix[i][j-1]+1,
+                    matrix[i-1][j]+1
+                );
+            }
+        }
+    }
+
+    const distance =
+        matrix[b.length][a.length];
+
+    return 1-distance/Math.max(a.length,b.length);
+}
+
+const alternatives = {
+
+    "gett": ["givit"],
+    "givit": ["gett"],
+
+    "gett upp": ["givit upp"],
+    "givit upp": ["gett upp"],
+
+    "medgett": ["medgivit"],
+    "medgivit": ["medgett"],
+
+    "utgett": ["utgivit"],
+    "utgivit": ["utgett"],
+
+    "övergett": ["övergivit"],
+    "övergivit": ["övergett"]
+
+};
+
+function checkAnswers(){
+
+    let points = 0;
+
+    const mode =
+        document.getElementById("exerciseMode").value;
+
+    document.querySelectorAll("#quizBody input").forEach(input=>{
+
+        const row = Number(input.dataset.row);
+
+        let correct = "";
+
+        if(mode==="sv-forms"){
+
+            const col = Number(input.dataset.col);
+
+            correct =
+                currentSet[row].forms[col]
+                .trim()
+                .toLowerCase();
+
+        }else{
+
+            correct =
+                currentSet[row].fi
+                .trim()
+                .toLowerCase();
+        }
+
+const user =
+    input.value.trim().toLowerCase();
+
+const sim =
+    similarity(user,correct);
+
+const accepted =
+    [correct].concat(alternatives[correct] || []);
+
+if(accepted.includes(user)){
+
+    input.classList.remove("wrong");
+    input.classList.add("correct");
+
+    points += 1;
+
+}else if(sim >= 0.75){
+
+    input.classList.remove("wrong");
+    input.style.background = "#fff2a8";
+
+    points += 0.5;
+
+    input.value =
+        `${user} → ${correct}`;
+
+}else{
+
+    input.classList.remove("correct");
+    input.classList.add("wrong");
+
+    input.value = correct;
+}
+    });
+
+    totalScore += points;
+
+    document.getElementById("totalScore").textContent =
+        totalScore;
+
+    let maxPoints =
+        mode==="sv-forms" ? 20 : 5;
+
+    let percent =
+        points / maxPoints;
+
+    if(percent === 1){
+
+        showPopup(
+            "🏆 Täydellistä! | Perfekt!",
+            `${points}/${maxPoints}`
+        );
+
+    }else if(percent >= 0.8){
+
+        showPopup(
+            "🌟 Erinomaista! | Utmärkt!",
+            `${points}/${maxPoints}`
+        );
+
+    }else if(percent >= 0.6){
+
+        showPopup(
+            "👍 Hyvä! | Bra jobbat!",
+            `${points}/${maxPoints}`
+        );
+
+    }else if(percent >= 0.4){
+
+        showPopup(
+            "🙂 Jatka harjoittelua | Fortsätt öva",
+            `${points}/${maxPoints}`
+        );
+
+    }else{
+
+        showPopup(
+            "💪 Älä luovuta! | Ge inte upp!",
+            `${points}/${maxPoints}`
+        );
+    }
+
+    document.getElementById("feedback").textContent =
+        `Kierros: ${points}/${maxPoints}`;
+}
+function toggleCheatSheet(){
+
+    const panel = document.getElementById("cheatSheet");
+
+    if(panel.style.display==="none"){
+        panel.style.display="block";
+    }else{
+        panel.style.display="none";
+    }
+}
+
+function buildVerbList(){
+
+    const mode = document.getElementById("sortMode").value;
+
+const sorted = [...getFilteredVerbs()];
+    if(mode==="fi"){
+        sorted.sort((a,b)=>
+            a.fi.localeCompare(b.fi,"fi")
+        );
+    }else{
+        sorted.sort((a,b)=>
+            a.forms[0].localeCompare(b.forms[0],"sv")
+        );
+    }
+
+    const container = document.getElementById("verbList");
+
+    container.innerHTML =
+    `
+    <table>
+        <tr>
+
+        </tr>
+    ` +
+    sorted.map(v=>`
+        <tr>
+            <td>${v.fi}</td>
+            <td>${v.forms[0]}</td>
+            <td>${v.forms[1]}</td>
+            <td>${v.forms[2]}</td>
+            <td>${v.forms[3]}</td>
+        </tr>
+    `).join("")
+    + "</table>";
+}
+
+let currentMC = [];
+let currentDirection = "";
+
+function newMCQuiz(){
+
+    document.getElementById("mcResult").textContent = "";
+
+    createMCQuiz();
+}
+
+function createMCQuiz(){
+
+    const box = document.getElementById("mcQuiz");
+    mcChecked = false;
+currentDirection =
+    document.getElementById("mcDirection").value;
+const filtered = getFilteredVerbs();
+
+if(filtered.length < 3){
+
+    box.innerHTML =
+        "<p>Valitussa luokassa pitää olla vähintään 3 verbiä.</p>";
+
+    return;
+}
+
+currentMC = shuffle(filtered).slice(0,5);
+    let html = "";
+
+    html += `<p><b>${
+        currentDirection === "fi-sv"
+        ? "Suomi → ruotsi"
+        : "Ruotsi → suomi"
+    }</b></p>`;
+
+    currentMC.forEach((verb,i)=>{
+
+        const correct =
+            currentDirection === "fi-sv"
+            ? verb.forms[0]
+            : verb.fi;
+
+        const wrong1 =
+            shuffle(
+    getFilteredVerbs().filter(v=>v!==verb)
+)[0];
+
+        const wrong2 =
+            shuffle(
+    getFilteredVerbs().filter(v=>v!==verb))[1];
+
+        const choices = shuffle([
+            correct,
+            currentDirection==="fi-sv"
+                ? wrong1.forms[0]
+                : wrong1.fi,
+            currentDirection==="fi-sv"
+                ? wrong2.forms[0]
+                : wrong2.fi
+        ]);
+
+        html += `
+<div class="mc-question">
+    <b>${
+        currentDirection==="fi-sv"
+        ? verb.fi
+        : verb.forms[0]
+    }</b>
+
+    <div class="mc-options">
+`;
+
+        choices.forEach(choice=>{
+
+           html += `
+<label>
+    <input type="radio"
+           name="mc${i}"
+           value="${choice}">
+    ${choice}
+</label>`;
+        });
+
+html += `
+    </div>
+</div>`;
+
+    });
+
+    box.innerHTML = html;
+}
+
+function showPopup(title,text){
+
+    document.getElementById("popupTitle").textContent = title;
+    document.getElementById("popupText").textContent = text;
+
+    document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup(){
+
+    document.getElementById("popup").style.display = "none";
+}
+
+
+
+function checkMC(){
+if(mcChecked){
+    return;
+}
+
+mcChecked = true;
+    let points = 0;
+
+    currentMC.forEach((verb,i)=>{
+
+        const correct =
+            currentDirection==="fi-sv"
+            ? verb.forms[0]
+            : verb.fi;
+
+        const radios =
+            document.querySelectorAll(`input[name="mc${i}"]`);
+
+        radios.forEach(radio=>{
+
+            radio.disabled = true;
+
+            const label = radio.parentElement;
+
+            if(radio.value===correct){
+                label.style.background="#c8f7c5";
+            }
+
+            if(radio.checked){
+
+                if(radio.value===correct){
+                    points++;
+                }else{
+                    label.style.background="#ffb3b3";
+                }
+            }
+        });
+
+    });
+
+totalScore += points;
+
+document.getElementById("totalScore").textContent =
+    totalScore;
+
+document.getElementById("mcResult").textContent =
+    `Monivalinta: ${points}/5`;
+}
+
+document.getElementById("totalScore").textContent = totalScore;
+refreshAll();
+
+</script>
+
+
+
+</div>
+</body>
+</html>
