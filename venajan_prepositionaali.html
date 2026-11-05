@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venäjän prepositionaali</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:30px;
+}
+
+.container{
+    max-width:800px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);
+}
+
+h1{
+    margin-top:0;
+}
+
+.word{
+    text-align:center;
+    margin:30px 0;
+}
+
+.russian{
+    font-size:2.2rem;
+    font-weight:bold;
+    color:#1565c0;
+}
+
+.finnish{
+    font-size:1.2rem;
+    color:#666;
+    margin-top:8px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    font-size:1.2rem;
+    box-sizing:border-box;
+}
+
+.buttons{
+    margin-top:15px;
+}
+
+button{
+    padding:10px 20px;
+    margin-right:10px;
+    cursor:pointer;
+    font-size:1rem;
+}
+
+#result{
+    margin-top:20px;
+    font-size:1.1rem;
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+.stats{
+    margin-top:20px;
+    color:#555;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Venäjän prepositionaali</h1>
+
+<p>Kirjoita oikea venäjänkielinen ilmaus.</p>
+
+<div class="word">
+    <div class="russian" id="russian"></div>
+    <div class="finnish" id="finnish"></div>
+</div>
+
+<input id="answer" placeholder="Kirjoita vastaus, esim. в Питере">
+
+<div class="buttons">
+    <button onclick="checkAnswer()">Tarkista</button>
+    <button onclick="nextQuestion()">Seuraava sana</button>
+</div>
+
+<div id="result"></div>
+
+<div class="stats">
+    Oikein: <span id="correctCount">0</span> |
+    Väärin: <span id="wrongCount">0</span>
+</div>
+
+</div>
+
+<script>
+
+const tasks = [
+{base:"Питер",answer:"в Питере",finnish:"Pietarissa"},
+{base:"Москва",answer:"в Москве",finnish:"Moskovassa"},
+{base:"Россия",answer:"в России",finnish:"Venäjällä"},
+{base:"Финляндия",answer:"в Финляндии",finnish:"Suomessa"},
+{base:"Европа",answer:"в Европе",finnish:"Euroopassa"},
+{base:"Азия",answer:"в Азии",finnish:"Aasiassa"},
+
+{base:"город",answer:"в городе",finnish:"kaupungissa"},
+{base:"деревня",answer:"в деревне",finnish:"kylässä"},
+{base:"улица",answer:"на улице",finnish:"kadulla"},
+{base:"площадь",answer:"на площади",finnish:"aukiolla"},
+{base:"район",answer:"в районе",finnish:"kaupunginosassa"},
+{base:"центр",answer:"в центре",finnish:"keskustassa"},
+{base:"парк",answer:"в парке",finnish:"puistossa"},
+{base:"сад",answer:"в саду",finnish:"puutarhassa"},
+{base:"лес",answer:"в лесу",finnish:"metsässä"},
+{base:"поле",answer:"в поле",finnish:"pellolla"},
+
+{base:"дом",answer:"в доме",finnish:"talossa"},
+{base:"квартира",answer:"в квартире",finnish:"asunnossa"},
+{base:"комната",answer:"в комнате",finnish:"huoneessa"},
+{base:"кухня",answer:"на кухне",finnish:"keittiössä"},
+{base:"спальня",answer:"в спальне",finnish:"makuuhuoneessa"},
+{base:"ванная",answer:"в ванной",finnish:"kylpyhuoneessa"},
+{base:"гостиная",answer:"в гостиной",finnish:"olohuoneessa"},
+{base:"балкон",answer:"на балконе",finnish:"parvekkeella"},
+{base:"лифт",answer:"в лифте",finnish:"hississä"},
+
+{base:"школа",answer:"в школе",finnish:"koulussa"},
+{base:"университет",answer:"в университете",finnish:"yliopistossa"},
+{base:"класс",answer:"в классе",finnish:"luokassa"},
+{base:"аудитория",answer:"в аудитории",finnish:"luentosalissa"},
+{base:"кабинет",answer:"в кабинете",finnish:"toimistossa"},
+{base:"библиотека",answer:"в библиотеке",finnish:"kirjastossa"},
+{base:"музей",answer:"в музее",finnish:"museossa"},
+{base:"театр",answer:"в театре",finnish:"teatterissa"},
+{base:"кинотеатр",answer:"в кинотеатре",finnish:"elokuvateatterissa"},
+
+{base:"магазин",answer:"в магазине",finnish:"kaupassa"},
+{base:"рынок",answer:"на рынке",finnish:"torilla"},
+{base:"банк",answer:"в банке",finnish:"pankissa"},
+{base:"аптека",answer:"в аптеке",finnish:"apteekissa"},
+{base:"больница",answer:"в больнице",finnish:"sairaalassa"},
+{base:"поликлиника",answer:"в поликлинике",finnish:"terveysasemalla"},
+{base:"офис",answer:"в офисе",finnish:"toimistossa"},
+{base:"фирма",answer:"в фирме",finnish:"yrityksessä"},
+
+{base:"ресторан",answer:"в ресторане",finnish:"ravintolassa"},
+{base:"кафе",answer:"в кафе",finnish:"kahvilassa"},
+{base:"бар",answer:"в баре",finnish:"baarissa"},
+{base:"столовая",answer:"в столовой",finnish:"ruokalassa"},
+
+{base:"станция",answer:"на станции",finnish:"asemalla"},
+{base:"вокзал",answer:"на вокзале",finnish:"rautatieasemalla"},
+{base:"метро",answer:"в метро",finnish:"metrossa"},
+{base:"автобус",answer:"в автобусе",finnish:"bussissa"},
+{base:"трамвай",answer:"в трамвае",finnish:"raitiovaunussa"},
+{base:"поезд",answer:"в поезде",finnish:"junassa"},
+{base:"самолёт",answer:"в самолёте",finnish:"lentokoneessa"},
+{base:"машина",answer:"в машине",finnish:"autossa"},
+
+{base:"интернет",answer:"в интернете",finnish:"internetissä"},
+{base:"сайт",answer:"на сайте",finnish:"verkkosivulla"},
+{base:"страница",answer:"на странице",finnish:"sivulla"},
+{base:"чат",answer:"в чате",finnish:"chatissa"},
+{base:"группа",answer:"в группе",finnish:"ryhmässä"},
+
+{base:"книга",answer:"в книге",finnish:"kirjassa"},
+{base:"текст",answer:"в тексте",finnish:"tekstissä"},
+{base:"словарь",answer:"в словаре",finnish:"sanakirjassa"},
+{base:"журнал",answer:"в журнале",finnish:"aikakauslehdessä"},
+{base:"газета",answer:"в газете",finnish:"sanomalehdessä"},
+{base:"письмо",answer:"в письме",finnish:"kirjeessä"},
+
+{base:"фотография",answer:"на фотографии",finnish:"valokuvassa"},
+{base:"картина",answer:"на картине",finnish:"maalauksessa"},
+{base:"рисунок",answer:"на рисунке",finnish:"piirroksessa"},
+{base:"карта",answer:"на карте",finnish:"kartalla"},
+
+{base:"стол",answer:"на столе",finnish:"pöydällä"},
+{base:"стул",answer:"на стуле",finnish:"tuolilla"},
+{base:"диван",answer:"на диване",finnish:"sohvalla"},
+{base:"кровать",answer:"на кровати",finnish:"sängyssä"},
+{base:"пол",answer:"на полу",finnish:"lattialla"},
+{base:"потолок",answer:"на потолке",finnish:"katossa"},
+
+{base:"работа",answer:"на работе",finnish:"töissä"},
+{base:"завод",answer:"на заводе",finnish:"tehtaalla"},
+{base:"фабрика",answer:"на фабрике",finnish:"tehtaassa"},
+
+{base:"январь",answer:"в январе",finnish:"tammikuussa"},
+{base:"февраль",answer:"в феврале",finnish:"helmikuussa"},
+{base:"март",answer:"в марте",finnish:"maaliskuussa"},
+{base:"апрель",answer:"в апреле",finnish:"huhtikuussa"},
+{base:"май",answer:"в мае",finnish:"toukokuussa"},
+{base:"июнь",answer:"в июне",finnish:"kesäkuussa"},
+{base:"июль",answer:"в июле",finnish:"heinäkuussa"},
+{base:"август",answer:"в августе",finnish:"elokuussa"},
+{base:"сентябрь",answer:"в сентябре",finnish:"syyskuussa"},
+{base:"октябрь",answer:"в октябре",finnish:"lokakuussa"},
+{base:"ноябрь",answer:"в ноябре",finnish:"marraskuussa"},
+{base:"декабрь",answer:"в декабре",finnish:"joulukuussa"},
+
+{base:"урок",answer:"на уроке",finnish:"tunnilla"},
+{base:"лекция",answer:"на лекции",finnish:"luennolla"},
+{base:"экзамен",answer:"на экзамене",finnish:"kokeessa"},
+{base:"концерт",answer:"на концерте",finnish:"konsertissa"},
+{base:"выставка",answer:"на выставке",finnish:"näyttelyssä"},
+{base:"собрание",answer:"на собрании",finnish:"kokouksessa"},
+
+{base:"море",answer:"на море",finnish:"meren rannalla"},
+{base:"берег",answer:"на берегу",finnish:"rannalla"},
+{base:"озеро",answer:"на озере",finnish:"järvellä"},
+{base:"река",answer:"на реке",finnish:"joen varrella"},
+{base:"остров",answer:"на острове",finnish:"saarella"},
+{base:"пляж",answer:"на пляже",finnish:"rannalla"}
+];
+
+let current;
+let correct = 0;
+let wrong = 0;
+
+function nextQuestion(){
+    current = tasks[Math.floor(Math.random()*tasks.length)];
+    document.getElementById("russian").textContent = current.base;
+    document.getElementById("finnish").textContent = current.finnish;
+    document.getElementById("answer").value = "";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("answer").focus();
+}
+
+function checkAnswer(){
+
+    const user = document
+        .getElementById("answer")
+        .value
+        .trim()
+        .replace(/\s+/g," ")
+        .toLowerCase();
+
+    const correctAnswer = current.answer
+        .toLowerCase();
+
+    if(user === correctAnswer){
+
+        correct++;
+        document.getElementById("correctCount").textContent = correct;
+
+        document.getElementById("result").innerHTML =
+            `<span class="correct">✓ Oikein</span>`;
+
+    }else{
+
+        wrong++;
+        document.getElementById("wrongCount").textContent = wrong;
+
+        document.getElementById("result").innerHTML =
+            `<span class="wrong">✗ Väärin</span><br>
+             Oikea vastaus: <b>${current.answer}</b>`;
+    }
+}
+
+document.getElementById("answer").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+        checkAnswer();
+    }
+});
+
+nextQuestion();
+
+</script>
+
+</body>
+</html>
