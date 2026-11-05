@@ -5,6 +5,30 @@
 <title>Kielioppikurssi</title>
 
 <style>
+html{
+    min-height:100%;
+
+    background:
+        radial-gradient(circle at top left,
+            #fff3a6 0%,
+            transparent 30%),
+
+        radial-gradient(circle at bottom right,
+            #ffe0f0 0%,
+            transparent 30%),
+
+        linear-gradient(
+            -45deg,
+            #c7f0ff,
+            #ffe7f4,
+            #fff3bf,
+            #dfffd8
+        );
+
+    background-size:400% 400%;
+    animation:pastelGradient 20s ease infinite;
+}
+
 body{
     font-family:
         "Palatino Linotype",
@@ -18,22 +42,9 @@ body{
     margin:30px auto;
     padding:20px;
 
-    background:
-        linear-gradient(
-            -45deg,
-            #ffd6e7,
-            #fff0b8,
-            #d6f5ff,
-            #e8d8ff,
-            #d7ffd6
-        );
-
-    background-size:400% 400%;
-
-    animation:
-        pastelGradient 25s ease infinite;
-
     min-height:100vh;
+
+    background:transparent;
 }
 </style>
 
