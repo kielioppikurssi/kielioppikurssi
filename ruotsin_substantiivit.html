@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>Ruotsin substantiiviharjoitin</title>
+
+<style>
+body{
+    font-family:Palatino,"Palatino Linotype","Book Antiqua",Georgia,serif;
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+    background:linear-gradient(135deg,#d6e4ff,#fff5cc);
+}
+
+h1{
+    text-align:center;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+}
+
+input{
+    width:100%;
+    box-sizing:border-box;
+}
+
+.correct{
+    background:#c8f7c5;
+}
+
+.wrong{
+    background:#ffd0d0;
+}
+
+.hint{
+    background:#ffffaa;
+}
+
+button{
+    margin:10px 5px;
+    padding:10px 20px;
+    font-size:16px;
+}
+
+#result{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:15px;
+}
+</style>
+</head>
+<body>
+
+<h1>Ruotsin substantiivien taivutus</h1>
+
+<p>
+Täytä muodot:
+epämääräinen yksikkö,
+määräinen yksikkö,
+epämääräinen monikko,
+määräinen monikko.
+</p>
+
+<table id="exerciseTable">
+<thead>
+<tr>
+<th>Suomi</th>
+<th>Luokka</th>
+<th>Epäm. yks.</th>
+<th>Määr. yks.</th>
+<th>Epäm. mon.</th>
+<th>Määr. mon.</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<button onclick="checkAnswers()">Tarkista</button>
+<button onclick="giveHint()">Vihje</button>
+<button onclick="generateExercise()">Uudet sanat</button>
+
+<div id="result"></div>
+
+<script>
+
+const nouns = [
+
+/* LUOKKA 1 */
+
+  {class:1, fi:"tyttö", forms:["en flicka","flickan","flickor","flickorna"] },
+  {class:1, fi:"kello", forms:["en klocka","klockan","klockor","klockorna"] },
+  {class:1, fi:"koulu", forms:["en skola","skolan","skolor","skolorna"] },
+  {class:1, fi:"katu", forms:["en gata","gatan","gator","gatorna"] },
+  {class:1, fi:"viikko", forms:["en vecka","veckan","veckor","veckorna"] },
+  {class:1, fi:"kukka", forms:["en blomma","blomman","blommor","blommorna"] },
+  {class:1, fi:"lamppu", forms:["en lampa","lampan","lampor","lamporna"] },
+  {class:1, fi:"takki", forms:["en jacka","jackan","jackor","jackorna"] },
+  {class:1, fi:"kamera", forms:["en kamera","kameran","kameror","kamerorna"] },
+  {class:1, fi:"laukku", forms:["en väska","väskan","väskor","väskorna"] },
+  {class:1, fi:"tähti", forms:["en stjärna","stjärnan","stjärnor","stjärnorna"] },
+  {class:1, fi:"nainen", forms:["en kvinna","kvinnan","kvinnor","kvinnorna"] },
+  {class:1, fi:"kirkko", forms:["en kyrka","kyrkan","kyrkor","kyrkorna"] },
+  {class:1, fi:"kurkku", forms:["en gurka","gurkan","gurkor","gurkorna"] },
+  {class:1, fi:"kruunu", forms:["en krona","kronan","kronor","kronorna"] },
+  {class:1, fi:"tasku", forms:["en ficka","fickan","fickor","fickorna"] },
+  {class:1, fi:"tarina", forms:["en saga","sagan","sagor","sagorna"] },
+  {class:1, fi:"kysymys", forms:["en fråga","frågan","frågor","frågorna"] },
+  {class:1, fi:"(pinta-)ala", forms:["en yta","ytan","ytor","ytorna"] },
+  {class:1, fi:"sivu", forms:["en sida","sidan","sidor","sidorna"] },
+  {class:1, fi:"pullo", forms:["en flaska","flaskan","flaskor","flaskorna"] },
+  {class:1, fi:"rako", forms:["en glipa","glipan","glipor","gliporna"] },
+  {class:1, fi:"matka", forms:["en resa","resan","resor","resorna"] },
+
+/* LUOKKA 2 */
+
+{class:2,fi:"auto",forms:["en bil","bilen","bilar","bilarna"]},
+{class:2,fi:"vene",forms:["en båt","båten","båtar","båtarna"]},
+{class:2,fi:"tuoli",forms:["en stol","stolen","stolar","stolarna"]},
+{class:2,fi:"pöytä",forms:["en bordsskiva","bordsskivan","bordsskivor","bordsskivorna"]},
+{class:2,fi:"koira",forms:["en hund","hunden","hundar","hundarna"]},
+{class:2,fi:"hevonen",forms:["en häst","hästen","hästar","hästarna"]},
+{class:2,fi:"päivä",forms:["en dag","dagen","dagar","dagarna"]},
+{class:2,fi:"omena",forms:["ett äpple","äpplet","äpplen","äpplena"]},
+{class:2,fi:"ikkuna",forms:["ett fönster","fönstret","fönster","fönstren"]},
+{class:2,fi:"sormus",forms:["en ring","ringen","ringar","ringarna"]},
+ {class:2, fi:"auto", forms:["en bil","bilen","bilar","bilarna"] },
+  {class:2, fi:"vene", forms:["en båt","båten","båtar","båtarna"] },
+  {class:2, fi:"hevonen", forms:["en häst","hästen","hästar","hästarna"] },
+  {class:2, fi:"koira", forms:["en hund","hunden","hundar","hundarna"] },
+  {class:2, fi:"tuoli", forms:["en stol","stolen","stolar","stolarna"] },
+  {class:2, fi:"purkki", forms:["en burk","burken","burkar","burkarna"] },
+  {class:2, fi:"kuppi", forms:["en kopp","koppen","koppar","kopparna"] },
+  {class:2, fi:"päivä", forms:["en dag","dagen","dagar","dagarna"] },
+  {class:2, fi:"tie", forms:["en väg","vägen","vägar","vägarna"] },
+  {class:2, fi:"oven", forms:["en dörr","dörren","dörrar","dörrarna"] },
+  {class:2, fi:"saari", forms:["en ö","ön","öar","öarna"] },
+  {class:2, fi:"sänky", forms:["en säng","sängen","sängar","sängarna"] },
+  {class:2, fi:"avain", forms:["en nyckel","nyckeln","nycklar","nycklarna"] },
+  {class:2, fi:"sormi", forms:["ett finger","fingret","fingrar","fingrarna"] },
+  {class:2, fi:"tunti", forms:["en timme","timmen","timmar","timmarna"] },
+{class:2, fi:"joki", forms:["en flod","floden","flodar","flodarna"]},
+{class:2, fi:"satama", forms:["en hamn","hamnen","hamnar","hamnarna"]},
+{class:2, fi:"lintu", forms:["en fågel","fågeln","fåglar","fåglarna"]},
+{class:2, fi:"naula", forms:["en spik","spiken","spikar","spikarna"]},
+{class:2, fi:"sali", forms:["en sal","salen","salar","salarna"]},
+{class:2, fi:"halli", forms:["en hall","hallen","hallar","hallarna"]},
+{class:2, fi:"pallo", forms:["en boll","bollen","bollar","bollarna"]},
+{class:2, fi:"vene", forms:["en eka","ekan","ekar","ekarna"]},
+{class:2, fi:"aamu", forms:["en morgon","morgonen","morgnar","morgnarna"]},
+{class:2, fi:"ilta", forms:["en kväll","kvällen","kvällar","kvällarna"]},
+{class:2, fi:"leikki", forms:["en lek","leken","lekar","lekarna"]},
+
+/* LUOKKA 3 */
+
+{class:3,fi:"vieras",forms:["en gäst","gästen","gäster","gästerna"]},
+{class:3,fi:"kaupunki",forms:["en stad","staden","städer","städerna"]},
+{class:3,fi:"käsi",forms:["en hand","handen","händer","händerna"]},
+{class:3,fi:"maa",forms:["ett land","landet","länder","länderna"]},
+{class:3,fi:"yö",forms:["en natt","natten","nätter","nätterna"]},
+{class:3,fi:"hammas",forms:["en tand","tanden","tänder","tänderna"]},
+{class:3,fi:"kirja",forms:["en bok","boken","böcker","böckerna"]},
+{class:3,fi:"veli",forms:["en bror","brodern","bröder","bröderna"]},
+{class:3,fi:"ranta",forms:["en strand","stranden","stränder","stränderna"]},
+{class:3,fi:"kauppa",forms:["en affär","affären","affärer","affärerna"]},
+{class:3, fi:"puhelin", forms:["en telefon","telefonen","telefoner","telefonerna"]},
+{class:3, fi:"asema", forms:["en station","stationen","stationer","stationerna"]},
+{class:3, fi:"banaani", forms:["en banan","bananen","bananer","bananerna"]},
+{class:3, fi:"appelsiini", forms:["en apelsin","apelsinen","apelsiner","apelsinerna"]},
+{class:3, fi:"sitruuna", forms:["en citron","citronen","citroner","citronerna"]},
+{class:3, fi:"minuutti", forms:["en minut","minuten","minuter","minuterna"]},
+{class:3, fi:"sekunti", forms:["en sekund","sekunden","sekunder","sekunderna"]},
+{class:3, fi:"teksti", forms:["en text","texten","texter","texterna"]},
+{class:3, fi:"kommentti", forms:["en kommentar","kommentaren","kommentarer","kommentarerna"]},
+{class:3, fi:"pankki", forms:["en bank","banken","banker","bankerna"]},
+{class:3, fi:"hotelli", forms:["ett hotell","hotellet","hoteller","hotellerna"]},
+{class:3, fi:"museo", forms:["ett museum","museet","museer","museerna"]},
+{class:3, fi:"raketti", forms:["en raket","raketen","raketer","raketerna"]},
+{class:3, fi:"paketti", forms:["ett paket","paketet","paketer","paketerna"]},
+{class:3, fi:"poliisi", forms:["en polis","polisen","poliser","poliserna"]},
+{class:3, fi:"insinööri", forms:["en ingenjör","ingenjören","ingenjörer","ingenjörerna"]},
+{class:3, fi:"tohtori", forms:["en doktor","doktorn","doktorer","doktorerna"]},
+{class:3, fi:"professori", forms:["en professor","professorn","professorer","professorerna"]},
+{class:3, fi:"moottori", forms:["en motor","motorn","motorer","motorerna"]},
+{class:3, fi:"traktori", forms:["en traktor","traktorn","traktorer","traktorerna"]},
+{class:3, fi:"vektori", forms:["en vektor","vektorn","vektorer","vektorerna"]},
+{class:3, fi:"reaktori", forms:["en reaktor","reaktorn","reaktorer","reaktorerna"]},
+{class:3, fi:"radiokanava", forms:["en kanal","kanalen","kanaler","kanalerna"]},
+{class:3, fi:"karakteri", forms:["en karaktär","karaktären","karaktärer","karaktärerna"]},
+{class:3, fi:"passi", forms:["ett pass","passet","passer","passerna"]},
+{class:3, fi:"protesti", forms:["en protest","protesten","protester","protesterna"]},
+{class:3, fi:"raportti", forms:["en rapport","rapporten","rapporter","rapporterna"]},
+{class:3, fi:"metodi", forms:["en metod","metoden","metoder","metoderna"]},
+{class:3, fi:"periodi", forms:["en period","perioden","perioder","perioderna"]},
+{class:3, fi:"symboli", forms:["en symbol","symbolen","symboler","symbolerna"]},
+{class:3, fi:"signaali", forms:["en signal","signalen","signaler","signalerna"]},
+{class:3, fi:"teoria", forms:["en teori","teorin","teorier","teorierna"]},
+{class:3, fi:"energia", forms:["en energi","energin","energier","energierna"]},
+{class:3, fi:"kopio", forms:["en kopia","kopian","kopior","kopiorna"]},
+{class:3, fi:"idea", forms:["en idé","idén","idéer","idéerna"]},
+{class:3, fi:"malli", forms:["en modell","modellen","modeller","modellerna"]},
+{class:3, fi:"kontrolli", forms:["en kontroll","kontrollen","kontroller","kontrollerna"]},
+
+/* LUOKKA 4 */
+
+{class:4, fi:"omena", forms:["ett äpple","äpplet","äpplen","äpplena"]},
+{class:4, fi:"sydän", forms:["ett hjärta","hjärtat","hjärtan","hjärtana"]},
+{class:4, fi:"korva", forms:["ett öra","örat","öron","öronen"]},
+{class:4, fi:"silmä", forms:["ett öga","ögat","ögon","ögonen"]},
+{class:4, fi:"polvi", forms:["ett knä","knät","knän","knäna"]},
+{class:4, fi:"kirje", forms:["ett brev","brevet","brev","breven"]},
+{class:4, fi:"mehiläinen", forms:["ett bi","biet","bin","bina"]},
+{class:4, fi:"siemen", forms:["ett frö","fröet","frön","fröna"]},
+{class:4,fi:"kasvot",forms:["ett ansikte","ansiktet","ansikten","ansiktena"]},
+{class:4,fi:"työ",forms:["ett arbete","arbetet","arbeten","arbetena"]},
+
+
+/* LUOKKA 5 */
+
+{class:5,fi:"talo",forms:["ett hus","huset","hus","husen"]},
+{class:5,fi:"lapsi",forms:["ett barn","barnet","barn","barnen"]},
+{class:5,fi:"eläin",forms:["ett djur","djuret","djur","djuren"]},
+{class:5,fi:"lasi",forms:["ett glas","glaset","glas","glasen"]},
+{class:5,fi:"vuosi",forms:["ett år","året","år","åren"]},
+{class:5,fi:"sana",forms:["ett ord","ordet","ord","orden"]},
+{class:5,fi:"ongelma",forms:["ett problem","problemet","problem","problemen"]},
+{class:5,fi:"esine",forms:["ett föremål","föremålet","föremål","föremålen"]},
+{class:5, fi:"kirje", forms:["ett brev","brevet","brev","breven"]},
+{class:5, fi:"ikkuna", forms:["ett fönster","fönstret","fönster","fönstren"]},
+{class:5, fi:"numero", forms:["ett nummer","numret","nummer","numren"]},
+{class:5, fi:"paperi", forms:["ett papper","pappret","papper","pappren"]},
+{class:5, fi:"huone", forms:["ett rum","rummet","rum","rummen"]},
+
+];
+
+let currentWords = [];
+let hintedCells = new Set();
+
+function shuffle(a){
+    return [...a].sort(()=>Math.random()-0.5);
+}
+
+function generateExercise(){
+
+    hintedCells.clear();
+
+    currentWords = shuffle(nouns).slice(0,5);
+
+    const tbody=document.querySelector("#exerciseTable tbody");
+    tbody.innerHTML="";
+
+    currentWords.forEach((word,row)=>{
+
+        let tr=document.createElement("tr");
+
+        tr.innerHTML=`
+        <td>${word.fi}</td>
+        <td>${word.class}</td>
+        <td><input></td>
+        <td><input></td>
+        <td><input></td>
+        <td><input></td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById("result").textContent="";
+}
+
+function checkAnswers(){
+
+    let score=0;
+    let max=0;
+
+    document.querySelectorAll("#exerciseTable tbody tr").forEach((tr,row)=>{
+
+        const inputs=tr.querySelectorAll("input");
+
+        inputs.forEach((input,col)=>{
+
+            const key=`${row}-${col}`;
+            const answer=currentWords[row].forms[col];
+            const user=input.value.trim();
+
+            if(!hintedCells.has(key)){
+                max++;
+            }
+
+            if(user===""){
+
+                input.value=answer;
+                input.style.background="#fff59d"; // keltainen
+
+                hintedCells.add(key);
+
+                max--;
+
+                return;
+            }
+
+            if(user.toLowerCase()===answer.toLowerCase()){
+
+                if(!hintedCells.has(key)){
+                    score++;
+                }
+
+                input.className="correct";
+            }
+            else{
+
+                input.className="wrong";
+                input.title=`Oikea vastaus: ${answer}`;
+            }
+        });
+
+    });
+
+    document.getElementById("result").textContent=
+        `Pisteet: ${score} / ${max}`;
+}
+function giveHint(){
+
+    let candidates=[];
+
+    document.querySelectorAll("#exerciseTable tbody tr").forEach((tr,row)=>{
+
+        tr.querySelectorAll("input").forEach((input,col)=>{
+
+            if(input.value.trim()===""){
+                candidates.push({row,col,input});
+            }
+        });
+    });
+
+    if(candidates.length===0) return;
+
+    let choice=
+        candidates[Math.floor(Math.random()*candidates.length)];
+
+    choice.input.value=
+        currentWords[choice.row].forms[choice.col];
+
+    choice.input.classList.add("hint");
+
+    hintedCells.add(`${choice.row}-${choice.col}`);
+}
+
+generateExercise();
+
+</script>
+
+</body>
+</html>
