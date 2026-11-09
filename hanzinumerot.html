@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiinalainen Numeropulma - Hanzi Trainer</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 25px;
+    max-width: 1150px;
+    width: 100%;
+}
+
+@media (max-width: 850px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Pääpaneeli */
+.main-panel {
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* Tehtäväalue */
+.target-box {
+    background: #f8f9fa;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    animation: pulseGlow 3s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    0% { border-color: #cbd5e1; box-shadow: 0 0 0 rgba(79, 70, 229, 0); }
+    100% { border-color: #818cf8; box-shadow: 0 0 15px rgba(79, 70, 229, 0.15); }
+}
+
+.target-hanzi {
+    font-size: 55px;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 5px;
+    letter-spacing: 4px;
+}
+
+.target-pinyin {
+    font-size: 20px;
+    color: #6366f1;
+    font-weight: 600;
+}
+
+/* Vastauskenttä (Slots) */
+.answer-slots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    min-height: 70px;
+    align-items: center;
+}
+
+.slot {
+    width: 60px;
+    height: 70px;
+    border: 3px solid #e2e8f0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    background: #f8fafc;
+    color: #1e293b;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slot.filled {
+    border-color: #6366f1;
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+.slot.correct {
+    border-color: #22c55e;
+    background: #f0fdf4;
+    color: #16a34a;
+    animation: successPop 0.5s ease;
+}
+
+.slot.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+    animation: shake 0.4s ease;
+}
+
+/* Palikkalaari (Pool) */
+.pool-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pool {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 400px;
+    margin: 0 auto 25px auto;
+}
+
+.block {
+    height: 60px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.block:hover:not(.used) {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+}
+
+.block:active:not(.used) {
+    transform: translateY(2px);
+}
+
+.block.used {
+    background: #e2e8f0;
+    color: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: scale(0.95);
+    opacity: 0.6;
+}
+
+/* Kontrollit ja palaute */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button.action-btn {
+    padding: 10px 20px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button.action-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.feedback {
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 30px;
+    margin-bottom: 15px;
+    transition: opacity 0.3s;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Oikea sivupaneeli (Hanzi-lista) */
+.sidebar {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    color: #1e293b;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 8px;
+}
+
+.hanzi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hanzi-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+
+.hanzi-item:hover {
+    background: #eef2ff;
+}
+
+.hanzi-char {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4f46e5;
+    width: 35px;
+}
+
+.hanzi-pinyin {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.hanzi-num {
+    background: #e2e8f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #334155;
+}
+
+/* Animaatiot */
+@keyframes successPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(3deg); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.fly-in {
+    animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes flyIn {
+    0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- PÄÄPELIALUE -->
+    <div class="main-panel">
+        <h1>🀄 Kiinalainen Numeropulma</h1>
+        <p class="subtitle">Klikkaa palikoita oikeassa järjestyksessä muodostaaksesi luku!</p>
+
+        <div class="target-box">
+            <div id="targetHanzi" class="target-hanzi">三十七</div>
+            <div id="targetPinyin" class="target-pinyin">sān shí qī</div>
+        </div>
+
+        <!-- Vastauskenttä paikat -->
+        <div id="answerSlots" class="answer-slots">
+            <!-- Luodaan dynaamisesti -->
+        </div>
+
+        <div class="pool-label">Valitse oikeat palikat (8 kpl):</div>
+        <!-- 8 Palikan laari -->
+        <div id="blockPool" class="pool">
+            <!-- Luodaan dynaamisesti -->
+        </div>
+
+        <div class="controls">
+            <button class="action-btn" onclick="clearAnswer()">Tyhjennä rivi</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+
+        <div class="stats">
+            <div>Pisteet: <span id="score">0</span></div>
+            <div>Putki: <span id="streak">0</span></div>
+        </div>
+    </div>
+
+    <!-- OIKEA SIVUPANEELI: HANZI-NUMEROT -->
+    <div class="sidebar">
+        <h2>📜 Kiinan numerot</h2>
+        <div class="hanzi-list">
+            <div class="hanzi-item"><span class="hanzi-num">1</span><span class="hanzi-char">一</span><span class="hanzi-pinyin">yī</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">2</span><span class="hanzi-char">二</span><span class="hanzi-pinyin">èr</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">3</span><span class="hanzi-char">三</span><span class="hanzi-pinyin">sān</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">4</span><span class="hanzi-char">四</span><span class="hanzi-pinyin">sì</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">5</span><span class="hanzi-char">五</span><span class="hanzi-pinyin">wǔ</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">6</span><span class="hanzi-char">六</span><span class="hanzi-pinyin">liù</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">7</span><span class="hanzi-char">七</span><span class="hanzi-pinyin">qī</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">8</span><span class="hanzi-char">八</span><span class="hanzi-pinyin">bā</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">9</span><span class="hanzi-char">九</span><span class="hanzi-pinyin">jiǔ</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">10</span><span class="hanzi-char">十</span><span class="hanzi-pinyin">shí</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">100</span><span class="hanzi-char">百</span><span class="hanzi-pinyin">bǎi</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const hanziMap = {1:'一', 2:'二', 3:'三', 4:'四', 5:'五', 6:'六', 7:'七', 8:'八', 9:'九', 10:'十'};
+const pinyinMap = {1:'yī', 2:'èr', 3:'sān', 4:'sì', 5:'wǔ', 6:'liù', 7:'qī', 8:'bā', 9:'jiǔ', 10:'shí'};
+
+let currentNumber = 0;
+let targetString = "";
+let currentSlots = [];
+let poolBlocks = [];
+let score = 0;
+let streak = 0;
+let isLocked = false;
+
+// Muunnetaan luku (1-99) kiinaksi
+function numberToChinese(n) {
+    if (n <= 10) return { hanzi: hanziMap[n], pinyin: pinyinMap[n] };
+    let t = Math.floor(n / 10);
+    let u = n % 10;
+    let hz = '';
+    let py = '';
+    if (t > 1) hz += hanziMap[t];
+    hz += '十';
+    if (t > 1) py += pinyinMap[t] + ' ';
+    py += 'shí';
+    if (u > 0) {
+        hz += hanziMap[u];
+        py += ' ' + pinyinMap[u];
+    }
+    return { hanzi: hz, pinyin: py };
+}
+
+function nextTask() {
+    isLocked = false;
+    document.getElementById('feedback').innerHTML = '';
+    
+    // Arvotaan luku 1 - 99 väliltä
+    currentNumber = Math.floor(Math.random() * 99) + 1;
+    targetString = currentNumber.toString();
+
+    // Päivitetään näkymä
+    const res = numberToChinese(currentNumber);
+    document.getElementById('targetHanzi').textContent = res.hanzi;
+    document.getElementById('targetPinyin').textContent = res.pinyin;
+
+    // Luodaan vastauspaikat (slotit) vastauksen pituuden mukaan
+    currentSlots = new Array(targetString.length).fill(null);
+    renderSlots();
+
+    // Luodaan 8 palikkaa laariin: oikeat numerot + satunnaisia vääriä numeroita
+    let poolDigits = targetString.split('');
+    while(poolDigits.length < 8) {
+        let randomDigit = Math.floor(Math.random() * 10).toString();
+        poolDigits.push(randomDigit);
+    }
+    // Sekoitetaan palikat satunnaiseen järjestykseen
+    poolBlocks = poolDigits
+        .map(val => ({ val, id: Math.random(), used: false }))
+        .sort(() => Math.random() - 0.5);
+
+    renderPool();
+}
+
+function renderSlots() {
+    const container = document.getElementById('answerSlots');
+    container.innerHTML = '';
+    currentSlots.forEach((val, idx) => {
+        const slot = document.createElement('div');
+        slot.className = 'slot' + (val !== null ? ' filled fly-in' : '');
+        slot.textContent = val !== null ? val : '';
+        container.appendChild(slot);
+    });
+}
+
+function renderPool() {
+    const container = document.getElementById('blockPool');
+    container.innerHTML = '';
+    poolBlocks.forEach((block, idx) => {
+        const el = document.createElement('div');
+        el.className = 'block' + (block.used ? ' used' : ' fly-in');
+        el.textContent = block.val;
+        if (!block.used) {
+            el.onclick = () => selectBlock(idx);
+        }
+        container.appendChild(el);
+    });
+}
+
+function selectBlock(poolIndex) {
+    if (isLocked) return;
+
+    // Etsitään ensimmäinen tyhjä paikka slot-riviltä
+    const emptySlotIdx = currentSlots.indexOf(null);
+    if (emptySlotIdx === -1) return; // Rivi on jo täynnä
+
+    // Siirretään palikan arvo slottiin
+    currentSlots[emptySlotIdx] = poolBlocks[poolIndex].val;
+    poolBlocks[poolIndex].used = true;
+
+    renderSlots();
+    renderPool();
+
+    // Tarkistetaan heti, kun kaikki slotit on täytetty!
+    if (!currentSlots.includes(null)) {
+        checkAnswer();
+    }
+}
+
+function clearAnswer() {
+    if (isLocked) return;
+    currentSlots.fill(null);
+    poolBlocks.forEach(b => b.used = false);
+    renderSlots();
+    renderPool();
+    document.getElementById('feedback').innerHTML = '';
+}
+
+function checkAnswer() {
+    isLocked = true;
+    const userAnswer = currentSlots.join('');
+    const slotsEls = document.querySelectorAll('.slot');
+    const fb = document.getElementById('feedback');
+
+    if (userAnswer === targetString) {
+        // OIKEA VASTAUS
+        slotsEls.forEach(s => s.classList.add('correct'));
+        score += 10;
+        streak += 1;
+        fb.innerHTML = '<span style="color: #22c55e;">✨ Oikein! Loistavaa!</span>';
+        updateStats();
+
+        // 2 sekunnin viive ja siirry seuraavaan
+        setTimeout(() => {
+            nextTask();
+        }, 2000);
+    } else {
+        // VÄÄRÄ VASTAUS
+        slotsEls.forEach(s => s.classList.add('error'));
+        streak = 0;
+        fb.innerHTML = '<span style="color: #ef4444;">❌ Hups, väärä järjestys! Yritä uudelleen.</span>';
+        updateStats();
+
+        // 1 sekunnin kuluttua tyhjennetään rivi automaattisesti, jotta voi yrittää uudelleen
+        setTimeout(() => {
+            clearAnswer();
+        }, 1200);
+    }
+}
+
+function updateStats() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('streak').textContent = streak;
+}
+
+// Käynnistä peli heti latauksella
+nextTask();
+</script>
+
+</body>
+</html>
