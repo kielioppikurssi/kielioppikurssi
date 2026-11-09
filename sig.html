@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ruotsin refleksiivipronominit</title>
+
+<style>
+body{
+    font-family:Palatino,"Palatino Linotype","Book Antiqua",Georgia,serif;
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+    background:linear-gradient(135deg,#d6e4ff,#fff5cc);
+}
+
+h1{
+    text-align:center;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.15);
+}
+
+select,input{
+    font-size:20px;
+    padding:10px;
+    margin:10px 0;
+}
+
+input{
+    width:250px;
+}
+
+
+
+button{
+    padding:10px 20px;
+    font-size:18px;
+    margin:5px;
+    cursor:pointer;
+}
+
+#sentence{
+    font-size:24px;
+    margin:20px 0;
+}
+
+#translation{
+    margin:15px 0;
+    font-size:20px;
+    color:#333;
+}
+
+#hint{
+    margin:15px 0;
+    font-style:italic;
+    color:#444;
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+#result{
+    margin-top:20px;
+    font-size:22px;
+}
+
+.score{
+    margin-top:20px;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.home-button{
+    position:fixed;
+    top:15px;
+    left:15px;
+    background:#003399;
+    color:white;
+    text-decoration:none;
+    padding:10px 16px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.home-button:hover{
+    background:#0055cc;
+}
+
+@media(max-width:700px){
+
+    .home-button{
+        position:static;
+        display:inline-block;
+        margin-bottom:15px;
+    }
+
+    input{
+        width:100%;
+        box-sizing:border-box;
+    }
+
+    #sentence{
+        font-size:20px;
+    }
+}
+
+.inline-answer{
+    width:220px;
+    font-size:24px;
+    border:none;
+    border-bottom:3px solid #000;
+    background:transparent;
+    text-align:center;
+    font-family:inherit;
+    margin:0 8px;
+}
+
+.inline-answer:focus{
+    outline:none;
+    border-bottom:3px solid #0055cc;
+
+}
+
+.pron-jag,
+.pron-du,
+.pron-sig,
+.pron-vi,
+.pron-ni,
+.pron-mig,
+.pron-dig,
+.pron-oss,
+.pron-er{
+    color:black;
+    font-weight:bold;
+    padding:2px 6px;
+    border-radius:6px;
+}
+
+.pron-jag,
+.pron-mig{
+    background:#90caf9;
+}
+
+.pron-du,
+.pron-dig{
+    background:#a5d6a7;
+}
+
+.pron-sig{
+    background:#ef9a9a;
+}
+
+.pron-vi,
+.pron-oss{
+    background:#ce93d8;
+}
+
+.pron-ni,
+.pron-er{
+    background:#ffcc80;
+}
+</style>
+</head>
+<body>
+
+<a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-button">
+← Päävalikko
+</a>
+
+<h1>Ruotsin refleksiivipronominit</h1>
+
+<div class="card">
+
+<label><strong>Valitse aikamuoto:</strong></label><br>
+
+<select id="tense" onchange="newTask()">
+<option value="presens">Preesens</option>
+<option value="preteritum">Imperfekti</option>
+<option value="perfekt">Perfekti</option>
+<option value="pluskvamperfekt">Pluskvamperfekti</option>
+</select>
+
+<div id="sentence"></div>
+
+<br>
+
+<button onclick="checkAnswer()">Tarkista</button>
+<button onclick="newTask()">Uusi lause</button>
+<button onclick="toggleHelp()">Apu</button>
+
+<div id="hint"></div>
+<div id="translation"></div>
+<div id="result"></div>
+
+<div class="score">
+Pisteet: <span id="score">0</span> /
+<span id="total">0</span>
+</div>
+
+</div>
+
+<script>
+
+const reflexive={
+"jag":"mig",
+"du":"dig",
+"han":"sig",
+"hon":"sig",
+"vi":"oss",
+"ni":"er",
+"de":"sig"
+};
+
+const subjects=[
+"jag",
+"du",
+"han",
+"hon",
+"vi",
+"ni",
+"de"
+];
+
+const templates=[
+
+{
+verb:"tvätta",
+fi:"pestä",
+text:"___ ___ varje morgon."
+},
+
+{
+verb:"klä",
+fi:"pukea",
+text:"___ ___ snabbt."
+},
+
+{
+verb:"raka",
+fi:"ajaa parta",
+text:"___ ___ före jobbet."
+},
+
+{
+verb:"sätta",
+fi:"istuutua",
+text:"___ ___ på stolen."
+},
+
+{
+verb:"lägga",
+fi:"asettaa",
+text:"___ ___ i sängen."
+},
+
+{
+verb:"känna",
+fi:"tuntea olonsa",
+text:"___ ___ trött."
+},
+
+{
+verb:"förbereda",
+fi:"valmistautua",
+text:"___ ___ inför provet."
+},
+
+{
+verb:"oroa",
+fi:"huolestua",
+text:"___ ___ för mycket."
+},
+
+{
+verb:"skynda",
+fi:"kiirehtiä",
+text:"___ ___."
+},
+
+{
+verb:"gifta",
+fi:"mennä naimisiin",
+text:"___ ___ nästa år."
+},
+
+{
+verb:"bestämma",
+fi:"päättää",
+text:"___ ___ för att resa."
+},
+
+{
+verb:"duscha",
+fi:"käydä suihkussa",
+text:"___ ___ efter träningen."
+},
+
+{
+verb:"kamma",
+fi:"kammata",
+text:"___ ___ framför spegeln."
+},
+
+{
+verb:"sminka",
+fi:"meikata",
+text:"___ ___ på morgonen."
+},
+
+{
+verb:"presentera",
+fi:"esittäytyä",
+text:"___ ___ för gruppen."
+},
+
+{
+verb:"försvara",
+fi:"puolustautua",
+text:"___ ___ mot kritiken."
+},
+
+{
+verb:"bete",
+fi:"käyttäytyä",
+text:"___ ___ väl i skolan."
+},
+
+{
+verb:"lugna",
+fi:"rauhoittua",
+text:"___ ___ snabbt."
+},
+
+{
+verb:"anstränga",
+fi:"ponnistella",
+text:"___ ___ mycket."
+},
+
+{
+verb:"uttrycka",
+fi:"ilmaista",
+text:"___ ___ tydligt."
+},
+
+{
+verb:"skämma",
+fi:"hävetä",
+text:"___ ___ för misstaget."
+},
+
+{
+verb:"påminna",
+fi:"muistuttaa",
+text:"___ ___ om mötet."
+},
+
+{
+verb:"koncentrera",
+fi:"keskittyä",
+text:"___ ___ på uppgiften."
+},
+
+{
+verb:"förbättra",
+fi:"parantua",
+text:"___ ___ varje dag."
+},
+
+{
+verb:"utveckla",
+fi:"kehittää",
+text:"___ ___ professionellt."
+},
+
+{
+verb:"ändra",
+fi:"muuttua",
+text:"___ ___ med tiden."
+}
+
+];
+
+let current=null;
+let points=0;
+let total=0;
+let waitingForNext = false;
+
+function conjugate(subject,verb,tense){
+
+const refl=reflexive[subject];
+
+let forms={
+
+tvätta:{
+presens:"tvättar",
+preteritum:"tvättade",
+supinum:"tvättat"
+},
+
+klä:{
+presens:"klär",
+preteritum:"klädde",
+supinum:"klätt"
+},
+
+raka:{
+presens:"rakar",
+preteritum:"rakade",
+supinum:"rakat"
+},
+
+sätta:{
+presens:"sätter",
+preteritum:"satte",
+supinum:"satt"
+},
+
+lägga:{
+presens:"lägger",
+preteritum:"lade",
+supinum:"lagt"
+},
+
+känna:{
+presens:"känner",
+preteritum:"kände",
+supinum:"känt"
+},
+
+förbereda:{
+presens:"förbereder",
+preteritum:"förberedde",
+supinum:"förberett"
+},
+
+oroa:{
+presens:"oroar",
+preteritum:"oroade",
+supinum:"oroat"
+},
+
+skynda:{
+presens:"skyndar",
+preteritum:"skyndade",
+supinum:"skyndat"
+},
+
+bestämma:{
+presens:"bestämmer",
+preteritum:"bestämde",
+supinum:"bestämt"
+},
+
+gifta:{
+presens:"gifter",
+preteritum:"gifte",
+supinum:"gift"
+},
+
+duscha:{
+presens:"duschar",
+preteritum:"duschade",
+supinum:"duschat"
+},
+
+kamma:{
+presens:"kammar",
+preteritum:"kammade",
+supinum:"kammat"
+},
+
+sminka:{
+presens:"sminkar",
+preteritum:"sminkade",
+supinum:"sminkat"
+},
+
+presentera:{
+presens:"presenterar",
+preteritum:"presenterade",
+supinum:"presenterat"
+},
+
+försvara:{
+presens:"försvarar",
+preteritum:"försvarade",
+supinum:"försvarat"
+},
+
+bete:{
+presens:"beter",
+preteritum:"betedde",
+supinum:"bettett"
+},
+
+lugna:{
+presens:"lugnar",
+preteritum:"lugnade",
+supinum:"lugnat"
+},
+
+anstränga:{
+presens:"anstränger",
+preteritum:"ansträngde",
+supinum:"ansträngt"
+},
+
+uttrycka:{
+presens:"uttrycker",
+preteritum:"uttryckte",
+supinum:"uttryckt"
+},
+
+skämma:{
+presens:"skäms",
+preteritum:"skämdes",
+supinum:"skämts"
+},
+
+påminna:{
+presens:"påminner",
+preteritum:"påminde",
+supinum:"påmint"
+},
+
+koncentrera:{
+presens:"koncentrerar",
+preteritum:"koncentrerade",
+supinum:"koncentrerat"
+},
+
+förbättra:{
+presens:"förbättrar",
+preteritum:"förbättrade",
+supinum:"förbättrat"
+},
+
+utveckla:{
+presens:"utvecklar",
+preteritum:"utvecklade",
+supinum:"utvecklat"
+},
+
+ändra:{
+presens:"ändrar",
+preteritum:"ändrade",
+supinum:"ändrat"
+},
+
+};
+
+const f=forms[verb];
+
+if(tense==="presens")
+return `${f.presens} ${refl}`;
+
+if(tense==="preteritum")
+return `${f.preteritum} ${refl}`;
+
+if(tense==="perfekt")
+return `har ${f.supinum} ${refl}`;
+
+if(tense==="pluskvamperfekt")
+return `hade ${f.supinum} ${refl}`;
+}
+
+function tenseFinnish(t){
+
+if(t==="presens") return "Preesens";
+if(t==="preteritum") return "Imperfekti";
+if(t==="perfekt") return "Perfekti";
+return "Pluskvamperfekti";
+}
+
+
+const subjectClasses = {
+    jag:"pron-jag",
+    du:"pron-du",
+    han:"pron-sig",
+    hon:"pron-sig",
+    de:"pron-sig",
+    vi:"pron-vi",
+    ni:"pron-ni"
+};
+
+function newTask(){
+
+const subject=
+subjects[Math.floor(Math.random()*subjects.length)];
+
+const template=
+templates[Math.floor(Math.random()*templates.length)];
+
+const tense=
+document.getElementById("tense").value;
+
+current={
+    subject,
+    template,
+    tense,
+    answer:conjugate(subject,template.verb,tense)
+};
+
+const displaySubject =
+    subject.charAt(0).toUpperCase() + subject.slice(1);
+
+const ending =
+    template.text.replace("___ ___","");
+
+document.getElementById("sentence").innerHTML =
+`
+<span class="${subjectClasses[subject]}">
+${displaySubject}
+</span>
+<input id="answer" class="inline-answer" autocomplete="off">
+${ending}
+`;
+
+document.getElementById("hint").innerHTML =
+`Vihje: verbi <strong>${template.verb}</strong>`;
+
+document.getElementById("translation").innerHTML =
+`Suomeksi: ${template.fi}`;
+
+document.getElementById("result").textContent="";
+
+waitingForNext = false;
+
+setTimeout(() => {
+    document.getElementById("answer").focus();
+}, 10);
+
+
+}
+function checkAnswer(){
+
+const user =
+document.getElementById("answer").value
+.trim()
+.toLowerCase();
+
+const correct =
+current.answer.toLowerCase();
+
+total++;
+document.getElementById("total").textContent = total;
+
+if(user === correct){
+
+    points++;
+    document.getElementById("score").textContent = points;
+
+    document.getElementById("result").innerHTML =
+    `<span class="correct">✓ Oikein! Paina Enter jatkaaksesi.</span>`;
+
+}else{
+
+    document.getElementById("result").innerHTML =
+    `<span class="wrong">
+    ✗ Väärin. Oikea vastaus: ${current.answer}<br>
+    Paina Enter jatkaaksesi.
+    </span>`;
+}
+
+waitingForNext = true;
+}
+document.addEventListener("keydown", function(e){
+
+    if(e.key !== "Enter") return;
+
+    e.preventDefault();
+
+    if(waitingForNext){
+        newTask();
+    }else{
+        checkAnswer();
+    }
+});
+
+newTask();
+
+function toggleHelp(){
+
+    const popup =
+        document.getElementById("helpPopup");
+
+    popup.style.display =
+        popup.style.display === "block"
+        ? "none"
+        : "block";
+waitingForNext = false;
+
+};
+
+</script>
+
+<div id="helpPopup" style="
+display:none;
+position:fixed;
+top:50%;
+left:auto;
+right:30px;
+transform:translateY(-50%);background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 0 20px rgba(0,0,0,0.3);
+z-index:9999;
+max-width:350px;
+width:90%;
+">
+
+<h2>Refleksiivipronominit</h2>
+
+
+
+<p>
+
+<span class="pron-jag">Jag</span>
+→
+<span class="pron-mig">mig</span>
+
+<br><br>
+
+<span class="pron-du">Du</span>
+→
+<span class="pron-dig">dig</span>
+
+<br><br>
+
+<span class="pron-sig">Han</span>
+→
+<span class="pron-sig">sig</span>
+
+<br><br>
+
+<span class="pron-sig">Hon</span>
+→
+<span class="pron-sig">sig</span>
+
+<br><br>
+
+<span class="pron-sig">Hen</span>
+→
+<span class="pron-sig">sig</span>
+
+<br><br>
+
+<span class="pron-vi">Vi</span>
+→
+<span class="pron-oss">oss</span>
+
+<br><br>
+
+<span class="pron-ni">Ni</span>
+→
+<span class="pron-er">er</span>
+
+<br><br>
+
+<span class="pron-sig">De</span>
+→
+<span class="pron-sig">sig</span>
+
+</p>
+<button onclick="toggleHelp()">Sulje</button>
+
+</div>
+
+</body>
+</html>
