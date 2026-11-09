@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiinan kielen jättimuistipeli</title>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #1e293b;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Kelluvat tausta-animaatiot */
+.bg-decor {
+    position: absolute;
+    font-size: 140px;
+    color: rgba(99, 102, 241, 0.03);
+    z-index: 0;
+    user-select: none;
+    animation: floatAnim 12s infinite alternate ease-in-out;
+}
+.bg-decor:nth-child(1) { top: 5%; left: 3%; animation-duration: 14s; }
+.bg-decor:nth-child(2) { bottom: 5%; right: 3%; animation-duration: 16s; }
+
+@keyframes floatAnim {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-40px) rotate(15deg); }
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    width: 100%;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 32px;
+    color: #312e81;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 15px;
+}
+
+.päävalikko-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #4f46e5;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+}
+
+.päävalikko-btn:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    background: #ffffff;
+    padding: 10px 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.score-board span {
+    color: #4f46e5;
+    font-size: 18px;
+}
+
+/* Pelilauta (24 korttia = 6 saraketta x 4 riviä) */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    perspective: 1000px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+}
+
+/* Kortti ja 3D-kääntöanimaatio */
+.card {
+    aspect-ratio: 1;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    perspective: 1000px;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card.matched .card-inner {
+    transform: rotateY(180deg);
+    animation: matchPulse 0.5s ease;
+}
+
+@keyframes matchPulse {
+    0% { transform: rotateY(180deg) scale(1); }
+    50% { transform: rotateY(180deg) scale(1.1); }
+    100% { transform: rotateY(180deg) scale(1); }
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    user-select: none;
+}
+
+.card-front {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+}
+
+.card-front::after {
+    content: '🀄';
+    font-size: 24px;
+    opacity: 0.8;
+}
+
+.card-back {
+    background: #ffffff;
+    color: #1e293b;
+    transform: rotateY(180deg);
+    border: 2px solid #e2e8f0;
+}
+
+.card.matched .card-back {
+    background: #f0fdf4;
+    border-color: #22c55e;
+    color: #15803d;
+}
+
+.card-hanzi {
+    font-size: 24px;
+    font-weight: bold;
+    color: #4f46e5;
+    margin-bottom: 2px;
+}
+
+.card-pinyin {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.card-meaning {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Kontrollit ja napit */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+button.action-btn {
+    padding: 12px 24px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    transition: all 0.2s;
+}
+
+button.action-btn:hover {
+    background: #4338ca;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+/* Voittoruutu / Modaali */
+.win-message {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.win-modal {
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    max-width: 400px;
+    width: 90%;
+    transform: scale(0.8);
+    animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popUp { to { transform: scale(1); } }
+
+.win-modal h2 {
+    font-size: 28px;
+    color: #16a34a;
+    margin-bottom: 10px;
+}
+
+.win-modal p {
+    color: #64748b;
+    margin-bottom: 25px;
+    font-size: 16px;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-decor">學</div>
+<div class="bg-decor">习</div>
+
+<div class="container">
+    <header>
+        <a href="index.html" class="päävalikko-btn">
+            ← Päävalikkoon
+        </a>
+        <h1>🀄 Kiinan Jättimuistipeli (45+ sanaa)</h1>
+        <p class="subtitle">Etsi kiinalainen merkki ja sen suomenkielinen merkitys laajasta sanastosta!</p>
+    </header>
+
+    <div class="score-board">
+        <div>Yritykset: <span id="moves">0</span></div>
+        <div>Parit löydetty: <span id="matches">0</span> / <span id="totalPairs">12</span></div>
+    </div>
+
+    <div id="gameGrid" class="grid"></div>
+
+    <div class="controls">
+        <button class="action-btn" onclick="initGame()">Uusi peli / Sekoita</button>
+    </div>
+</div>
+
+<div id="winModal" class="win-message">
+    <div class="win-modal">
+        <h2>🎉 Upeaa työtä!</h2>
+        <p>Läpäisit jättimuistipelin <span id="finalMoves">0</span> yrityksellä!</p>
+        <button class="action-btn" onclick="initGame(); closeWinModal();">Pelaa uudelleen</button>
+    </div>
+</div>
+
+<script>
+// Laajennettu massiivinen sanasto (45 sanaa)
+const vocabList = [
+    { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Hei" },
+    { hanzi: "谢谢", pinyin: "xièxie", meaning: "Kiitos" },
+    { hanzi: "再见", pinyin: "zàijiàn", meaning: "Näkemiin" },
+    { hanzi: "水", pinyin: "shuǐ", meaning: "Vesi" },
+    { hanzi: "茶", pinyin: "chá", meaning: "Tee" },
+    { hanzi: "猫", pinyin: "māo", meaning: "Kissa" },
+    { hanzi: "狗", pinyin: "gǒu", meaning: "Koira" },
+    { hanzi: "书", pinyin: "shū", meaning: "Kirja" },
+    { hanzi: "苹果", pinyin: "píngguǒ", meaning: "Omena" },
+    { hanzi: "月", pinyin: "yuè", meaning: "Kuu / Kuukausi" },
+    { hanzi: "日", pinyin: "rì", meaning: "Päivä / Aurinko" },
+    { hanzi: "火", pinyin: "huǒ", meaning: "Tuli" },
+    { hanzi: "山", pinyin: "shān", meaning: "Vuori" },
+    { hanzi: "饭", pinyin: "fàn", meaning: "Ruoka / Riisi" },
+    { hanzi: "车", pinyin: "chē", meaning: "Auto / Ajoneuvo" },
+    { hanzi: "人", pinyin: "rén", meaning: "Ihmiset / Henkilö" },
+    { hanzi: "大", pinyin: "dà", meaning: "Iso / Suuri" },
+    { hanzi: "小", pinyin: "xiǎo", meaning: "Pieni" },
+    { hanzi: "中国", pinyin: "zhōngguó", meaning: "Kiina" },
+    { hanzi: "老师", pinyin: "lǎoshī", meaning: "Opettaja" },
+    { hanzi: "学生", pinyin: "xuésheng", meaning: "Opiskelija" },
+    { hanzi: "朋友", pinyin: "péngyou", meaning: "Ystävä" },
+    { hanzi: "爸爸", pinyin: "bàba", meaning: "Isä" },
+    { hanzi: "妈妈", pinyin: "māma", meaning: "Äiti" },
+    { hanzi: "天气", pinyin: "tiānqì", meaning: "Sää" },
+    { hanzi: "雨", pinyin: "yǔ", meaning: "Sade" },
+    { hanzi: "飞机", pinyin: "fēijī", meaning: "Lentokone" },
+    { hanzi: "电脑", pinyin: "diànnǎo", meaning: "Tietokone" },
+    { hanzi: "手机", pinyin: "shǒujī", meaning: "Matkapuhelin" },
+    { hanzi: "钱", pinyin: "qián", meaning: "Raha" },
+    { hanzi: "鱼", pinyin: "yú", meaning: "Kala" },
+    { hanzi: "鸟", pinyin: "niǎo", meaning: "Lintu" },
+    { hanzi: "树", pinyin: "shù", meaning: "Puu" },
+    { hanzi: "花", pinyin: "huā", meaning: "Kukka" },
+    { hanzi: "门", pinyin: "mén", meaning: "Ovi" },
+    { hanzi: "心", pinyin: "xīn", meaning: "Sydän" },
+    { hanzi: "手", pinyin: "shǒu", meaning: "Käsi" },
+    { hanzi: "口", pinyin: "kǒu", meaning: "Suu" },
+    { hanzi: "星", pinyin: "xīng", meaning: "Tähti" },
+    { hanzi: "海", pinyin: "hǎi", meaning: "Meri" },
+    { hanzi: "家", pinyin: "jiā", meaning: "Koti / Perhe" },
+    { hanzi: "学校", pinyin: "xuéxiào", meaning: "Koulu" },
+    { hanzi: "医院", pinyin: "yīyuàn", meaning: "Sairaala" },
+    { hanzi: "商店", pinyin: "shāngdiàn", meaning: "Kauppa" },
+    { hanzi: "时间", pinyin: "shíjiān", meaning: "Aika" }
+];
+
+let cards = [];
+let flippedCards = [];
+let matchedPairs = 0;
+let moves = 0;
+let isLocked = false;
+const pairsPerGame = 12; // 12 paria = 24 korttia (täyttää hienosti ruudukon)
+
+function initGame() {
+    closeWinModal();
+    const grid = document.getElementById('gameGrid');
+    grid.innerHTML = '';
+    flippedCards = [];
+    matchedPairs = 0;
+    moves = 0;
+    isLocked = false;
+    document.getElementById('moves').textContent = moves;
+    document.getElementById('matches').textContent = matchedPairs;
+    document.getElementById('totalPairs').textContent = pairsPerGame;
+
+    // Arvotaan sanastosta satunnaiset parit tälle pelikerralle
+    let shuffledVocab = [...vocabList].sort(() => Math.random() - 0.5).slice(0, pairsPerGame);
+    
+    cards = [];
+    shuffledVocab.forEach((item, index) => {
+        // Kortti 1: Hanzi + Pinyin
+        cards.push({
+            id: index,
+            type: 'hanzi',
+            content: `<div class="card-hanzi">${item.hanzi}</div><div class="card-pinyin">${item.pinyin}</div>`,
+            matchId: index
+        });
+        // Kortti 2: Suomennos
+        cards.push({
+            id: index,
+            type: 'meaning',
+            content: `<div class="card-meaning">${item.meaning}</div>`,
+            matchId: index
+        });
+    });
+
+    // Sekoitetaan korttipakka
+    cards.sort(() => Math.random() - 0.5);
+
+    // Luodaan DOM-elementit
+    cards.forEach((cardData, idx) => {
+        const cardBtn = document.createElement('button');
+        cardBtn.className = 'card';
+        cardBtn.dataset.index = idx;
+        cardBtn.dataset.matchId = cardData.matchId;
+
+        cardBtn.innerHTML = `
+            <div class="card-inner">
+                <div class="card-front"></div>
+                <div class="card-back">${cardData.content}</div>
+            </div>
+        `;
+
+        cardBtn.onclick = () => flipCard(cardBtn, cardData);
+        grid.appendChild(cardBtn);
+    });
+}
+
+function flipCard(cardElement, cardData) {
+    if (isLocked) return;
+    if (cardElement.classList.contains('flipped') || cardElement.classList.contains('matched')) return;
+
+    cardElement.classList.add('flipped');
+    flippedCards.push({ element: cardElement, data: cardData });
+
+    if (flippedCards.length === 2) {
+        moves++;
+        document.getElementById('moves').textContent = moves;
+        checkMatch();
+    }
+}
+
+function checkMatch() {
+    const [card1, card2] = flippedCards;
+
+    if (card1.data.matchId === card2.data.matchId) {
+        // Osuma!
+        card1.element.classList.add('matched');
+        card2.element.classList.add('matched');
+        matchedPairs++;
+        document.getElementById('matches').textContent = matchedPairs;
+        flippedCards = [];
+
+        if (matchedPairs === pairsPerGame) {
+            setTimeout(showWinModal, 600);
+        }
+    } else {
+        // Väärin, käännetään takaisin piiloon pienellä viiveellä
+        isLocked = true;
+        setTimeout(() => {
+            card1.element.classList.remove('flipped');
+            card2.element.classList.remove('flipped');
+            flippedCards = [];
+            isLocked = false;
+        }, 850);
+    }
+}
+
+function showWinModal() {
+    document.getElementById('finalMoves').textContent = moves;
+    document.getElementById('winModal').style.display = 'flex';
+}
+
+function closeWinModal() {
+    document.getElementById('winModal').style.display = 'none';
+}
+
+// Käynnistetään peli heti sivun latauduttua
+initGame();
+</script>
+
+</body>
+</html>
