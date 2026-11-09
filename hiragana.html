@@ -191,60 +191,76 @@ Tarkkuus: <span id="accuracy">0</span>%
 
 <h2>Hiragana-taulukko</h2>
 
-<table>
-<tr><th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th></tr>
-<tr class="a"><td>あ</td><td>あ</td><td>い</td><td>う</td><td>え</td><td>お</td></tr>
-<tr class="k"><td>か</td><td>か</td><td>き</td><td>く</td><td>け</td><td>こ</td></tr>
-<tr class="s"><td>さ</td><td>さ</td><td>し</td><td>す</td><td>せ</td><td>そ</td></tr>
-<tr class="t"><td>た</td><td>た</td><td>ち</td><td>つ</td><td>て</td><td>と</td></tr>
-<tr class="n"><td>な</td><td>な</td><td>に</td><td>ぬ</td><td>ね</td><td>の</td></tr>
-<tr class="h"><td>は</td><td>は</td><td>ひ</td><td>ふ</td><td>へ</td><td>ほ</td></tr>
-<tr class="m"><td>ま</td><td>ま</td><td>み</td><td>む</td><td>め</td><td>も</td></tr>
-<tr class="y"><td>や</td><td>や</td><td></td><td>ゆ</td><td></td><td>よ</td></tr>
-<tr class="r"><td>ら</td><td>ら</td><td>り</td><td>る</td><td>れ</td><td>ろ</td></tr>
-<tr class="w"><td>わ</td><td>わ</td><td></td><td></td><td></td><td>を</td></tr>
+<<table class="hiraganaTable">
+<thead>
+<tr>
+<th></th>
+<th>a</th>
+<th>i</th>
+<th>u</th>
+<th>e</th>
+<th>o</th>
+</tr>
+</thead>
+
+<tbody>
+<tr class="a">
+<td>∅</td>
+<td>あ</td><td>い</td><td>う</td><td>え</td><td>お</td>
+</tr>
+
+<tr class="k">
+<td>k</td>
+<td>か</td><td>き</td><td>く</td><td>け</td><td>こ</td>
+</tr>
+
+<tr class="s">
+<td>s</td>
+<td>さ</td><td>し</td><td>す</td><td>せ</td><td>そ</td>
+</tr>
+
+<tr class="t">
+<td>t</td>
+<td>た</td><td>ち</td><td>つ</td><td>て</td><td>と</td>
+</tr>
+
+<tr class="n">
+<td>n</td>
+<td>な</td><td>に</td><td>ぬ</td><td>ね</td><td>の</td>
+</tr>
+
+<tr class="h">
+<td>h</td>
+<td>は</td><td>ひ</td><td>ふ</td><td>へ</td><td>ほ</td>
+</tr>
+
+<tr class="m">
+<td>m</td>
+<td>ま</td><td>み</td><td>む</td><td>め</td><td>も</td>
+</tr>
+
+<tr class="y">
+<td>y</td>
+<td>や</td><td>–</td><td>ゆ</td><td>–</td><td>よ</td>
+</tr>
+
+<tr class="r">
+<td>r</td>
+<td>ら</td><td>り</td><td>る</td><td>れ</td><td>ろ</td>
+</tr>
+
+<tr class="w">
+<td>w</td>
+<td>わ</td><td>–</td><td>–</td><td>–</td><td>を</td>
+</tr>
+
+<tr style="background:#ddd;">
+<td>n</td>
+<td colspan="5">ん</td>
+</tr>
+
+</tbody>
 </table>
-
-<br>
-<button class="closeBtn" onclick="hideTable()">Sulje</button>
-
-</div>
-</div>
-
-<script>
-
-const rows = {
-a:[
-["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"]
-],
-k:[
-["か","ka"],["き","ki"],["く","ku"],["け","ke"],["こ","ko"]
-],
-s:[
-["さ","sa"],["し","shi"],["す","su"],["せ","se"],["そ","so"]
-],
-t:[
-["た","ta"],["ち","chi"],["つ","tsu"],["て","te"],["と","to"]
-],
-n:[
-["な","na"],["に","ni"],["ぬ","nu"],["ね","ne"],["の","no"]
-],
-h:[
-["は","ha"],["ひ","hi"],["ふ","fu"],["へ","he"],["ほ","ho"]
-],
-m:[
-["ま","ma"],["み","mi"],["む","mu"],["め","me"],["も","mo"]
-],
-y:[
-["や","ya"],["ゆ","yu"],["よ","yo"]
-],
-r:[
-["ら","ra"],["り","ri"],["る","ru"],["れ","re"],["ろ","ro"]
-],
-w:[
-["わ","wa"],["を","wo"]
-]
-};
 
 let pool=[];
 let current;
