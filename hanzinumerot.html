@@ -140,6 +140,7 @@ h1 {
     background: #f8fafc;
     color: #1e293b;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
 }
 
 .slot.filled {
@@ -412,3 +413,170 @@ function numberToChinese(n) {
     
     let hz = '';
     let py = '';
+
+    let hundreds = Math.floor(n / 100);
+    let tens = Math.floor((n % 100) / 10);
+    let units = n % 10;
+
+    // Sadasosat
+    if (hundreds > 0) {
+        hz += (hundreds === 2 ? '两' : hanziMap[hundreds]) + '百';
+        py += (hundreds === 2 ? 'liǎng' : pinyinMap[hundreds]) + ' bǎi';
+    }
+
+    // Kymmenosa
+    if (tens > 0) {
+        if (hundreds > 0) {
+            hz += hanziMap[tens] + '十';
+            py += ' ' + pinyinMap[tens] + ' shí';
+        } else {
+            if (tens === 1) {
+                hz += '十';
+                py += 'shí';
+            } else {
+                hz += hanziMap[tens] + '十';
+                py += pinyinMap[tens] + ' shí';
+            }
+        }
+    } else if (hundreds > 0 && units > 0) {
+        hz += '零';
+        py += ' líng';
+    }
+
+    // Ykkösosa
+    if (units > 0) {
+        if (py.length > 0) py += ' ';
+        hz += hanziMap[units];
+        py += pinyinMap[units];
+    }
+
+    return { hanzi: hz, pinyin: py };
+}
+
+function newRound() {
+    isLocked = false;
+    currentSlots = [];
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').style.color = '#333';
+
+    // Arvotaan luku 1-1000
+    currentNumber = Math.floor(Math.random() * 1000) + 1;
+    const result = numberToChinese(currentNumber);
+    targetHanziStr = result.hanzi;
+
+    document.getElementById('targetNumber').textContent = currentNumber;
+    document.getElementById('targetPinyin').textContent = result.pinyin;
+
+    // Muodostetaan palikapooli (oikeat merkit + satunnaisia täytepalikoita 8 kpl asti)
+    let neededChars = targetHanziStr.split('');
+    let pool = [...neededChars];
+
+    while (pool.length < 8) {
+        let randChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
+        pool.push(randChar);
+    }
+
+    // Sekoitetaan palikat
+    pool.sort(() => Math.random() - 0.5);
+    poolBlocks = pool.map((char, index) => ({ id: index, char: char, used: false }));
+
+    renderBoard();
+}
+
+function renderBoard() {
+    // Vastausruudut
+    const slotsContainer = document.getElementById('answerSlots');
+    slotsContainer.innerHTML = '';
+    
+    const targetLen = targetHanziStr.length;
+    for (let i = 0; i < targetLen; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot' + (currentSlots[i] ? ' filled' : '');
+        slot.textContent = currentSlots[i] ? currentSlots[i].char : '';
+        slot.onclick = () => removeSlot(i);
+        slotsContainer.appendChild(slot);
+    }
+
+    // Valintapalikat
+    const poolContainer = document.getElementById('blockPool');
+    poolContainer.innerHTML = '';
+    
+    poolBlocks.forEach(block => {
+        const blockEl = document.createElement('div');
+        blockEl.className = 'block' + (block.used ? ' used' : '');
+        blockEl.textContent = block.char;
+        blockEl.onclick = () => selectBlock(block.id);
+        poolContainer.appendChild(blockEl);
+    });
+}
+
+function selectBlock(id) {
+    if (isLocked) return;
+    const block = poolBlocks.find(b => b.id === id);
+    if (!block || block.used) return;
+    if (currentSlots.length >= targetHanziStr.length) return;
+
+    block.used = true;
+    currentSlots.push(block);
+    renderBoard();
+
+    if (currentSlots.length === targetHanziStr.length) {
+        checkAnswer();
+    }
+}
+
+function removeSlot(index) {
+    if (isLocked || !currentSlots[index]) return;
+    const removedBlock = currentSlots.splice(index, 1)[0];
+    const block = poolBlocks.find(b => b.id === removedBlock.id);
+    if (block) block.used = false;
+    renderBoard();
+}
+
+function userClear() {
+    if (isLocked) return;
+    currentSlots = [];
+    poolBlocks.forEach(b => b.used = false);
+    renderBoard();
+}
+
+function checkAnswer() {
+    const userStr = currentSlots.map(s => s.char).join('');
+    const slots = document.querySelectorAll('.slot');
+
+    if (userStr === targetHanziStr) {
+        isLocked = true;
+        score += 10;
+        streak += 1;
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('correct'));
+        const fb = document.getElementById('feedback');
+        fb.textContent = 'Oikein! 🎉 Great job!';
+        fb.style.color = '#16a34a';
+
+        setTimeout(() => {
+            newRound();
+        }, 1600);
+    } else {
+        streak = 0;
+        document.getElementById('streak').textContent = streak;
+        slots.forEach(slot => slot.classList.add('error'));
+        
+        const fb = document.getElementById('feedback');
+        fb.textContent = 'Väärin, yritä uudelleen!';
+        fb.style.color = '#ef4444';
+
+        setTimeout(() => {
+            slots.forEach(slot => slot.classList.remove('error'));
+        }, 500);
+    }
+}
+
+// Käynnistetään peli
+newRound();
+</script>
+
+</body>
+</html>
