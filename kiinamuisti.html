@@ -315,7 +315,14 @@ h1 {
     padding: 8px;
     box-shadow: 0 4px 10px rgba(34, 197, 94, 0.15);
     flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
     animation: popUpCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.collected-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(34, 197, 94, 0.25);
 }
 
 @keyframes popUpCard {
@@ -428,11 +435,11 @@ button.action-btn:hover {
         <a href="index.html" class="päävalikko-btn">
             ← Päävalikkoon
         </a>
-        <h1>🀄 Kiinan muistipeli</h1>
-        <p class="subtitle">Yhdistä parit – löydetyt sanat siirtyvät siistiin kokoelmaan alle! Kertaa ne vielä lopuksi.</p>
+        <h1>🀄 Kiinan Muistipeli</h1>
+        <p class="subtitle">Yhdistä parit – kuulet ääntämyksen ja löydökset kerääntyvät alas (klikkaa alhaalla kuullaksesi uudelleen)!</p>
     </header>
 
-   <!-- Parivalitsin (4, 6, 8, 10, 12 paria) -->
+    <!-- Parivalitsin (4, 6, 8, 10, 12 paria) -->
     <div class="size-selector">
         <button class="size-btn" onclick="setPairs(4)">4 paria</button>
         <button class="size-btn" onclick="setPairs(6)">6 paria</button>
@@ -440,7 +447,6 @@ button.action-btn:hover {
         <button class="size-btn" onclick="setPairs(10)">10 paria</button>
         <button class="size-btn" onclick="setPairs(12)">12 paria</button>
     </div>
-
 
     <div class="score-board">
         <div>Yritykset: <span id="moves">0</span></div>
@@ -453,7 +459,7 @@ button.action-btn:hover {
     <!-- Sivun alareunan kerätyt kortit / kokoelma -->
     <div class="collection-section">
         <div class="collection-title">
-            <span>✨ Kerätyt sanaparit</span>
+            <span>✨ Kerätyt sanaparit (klikkaa kuullaksesi)</span>
             <span id="collectionCount" style="font-size: 13px; color: #64748b;">0 kpl</span>
         </div>
         <div id="collectionScroll" class="collection-scroll">
@@ -475,6 +481,7 @@ button.action-btn:hover {
 </div>
 
 <script>
+// 100 sanan sanasto
 const vocabList = [
     { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Hei" },
     { hanzi: "谢谢", pinyin: "xièxie", meaning: "Kiitos" },
@@ -578,19 +585,38 @@ const vocabList = [
     { hanzi: "说", pinyin: "shuō", meaning: "Puhua / Sanoa" }
 ];
 
-
 let cards = [];
 let flippedCards = [];
 let matchedPairs = 0;
 let moves = 0;
 let isLocked = false;
-let pairsPerGame = 8; // Oletuksena 8 paria
-let activeVocabMap = new Map(); // <--- TÄMÄ PUUTTUI JA AIHEUTTI VIRHEEN
+let pairsPerGame = 8;
+let activeVocabMap = new Map();
+
+// Puhesynteesi (Web Speech API)
+function playAudio(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Pysäytetään edellinen puhe heti
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-CN'; // Mandariinikiina
+        utterance.rate = 0.85;    // Hieman hitaampi puherytmi oppimisen tueksi
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+// Aidosti satunnainen Fisher-Yates -sekoitusalgoritmi
+function shuffleArray(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
 
 function setPairs(num) {
     pairsPerGame = num;
     
-    // Päivitetään aktiivinen nappi ulkoasussa
     document.querySelectorAll('.size-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.textContent.includes(`${num} paria`)) {
@@ -601,13 +627,11 @@ function setPairs(num) {
     initGame();
 }
 
-
 function initGame() {
     closeWinModal();
     const grid = document.getElementById('gameGrid');
     grid.innerHTML = '';
     
-    // Tyhjennetään alasivun kokoelma
     updateCollectionDisplay([]);
 
     flippedCards = [];
@@ -620,12 +644,12 @@ function initGame() {
     document.getElementById('matches').textContent = matchedPairs;
     document.getElementById('totalPairs').textContent = pairsPerGame;
 
-    // Arvotaan sanastosta satunnaiset parit valitun koon mukaan
-    let shuffledVocab = [...vocabList].sort(() => Math.random() - 0.5).slice(0, pairsPerGame);
+    // Sekoitetaan koko 100 sanan lista perusteellisesti ja otetaan sieltä satunnaiset parit
+    let randomizedVocab = shuffleArray(vocabList);
+    let selectedVocab = randomizedVocab.slice(0, pairsPerGame);
     
     cards = [];
-    shuffledVocab.forEach((item, index) => {
-        // Tallennetaan sanan tiedot map-rakenteeseen alasveiviä varten
+    selectedVocab.forEach((item, index) => {
         activeVocabMap.set(index, item);
 
         // Kortti 1: Hanzi + Pinyin
@@ -644,77 +668,8 @@ function initGame() {
         });
     });
 
-    // Sekoitetaan korttipakka
-    // Aito ja satunnainen Fisher-Yates -sekoitusalgoritmi
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
-function initGame() {
-    closeWinModal();
-    const grid = document.getElementById('gameGrid');
-    grid.innerHTML = '';
-    
-    updateCollectionDisplay([]);
-
-    flippedCards = [];
-    matchedPairs = 0;
-    moves = 0;
-    isLocked = false;
-    activeVocabMap.clear();
-
-    document.getElementById('moves').textContent = moves;
-    document.getElementById('matches').textContent = matchedPairs;
-    document.getElementById('totalPairs').textContent = pairsPerGame;
-
-    // Arvotaan sanastosta satunnaiset parit aidosti satunnaistetusta listasta
-    let shuffledVocab = shuffleArray([...vocabList]).slice(0, pairsPerGame);
-    
-    cards = [];
-    shuffledVocab.forEach((item, index) => {
-        activeVocabMap.set(index, item);
-
-        // Kortti 1: Hanzi + Pinyin
-        cards.push({
-            id: index,
-            type: 'hanzi',
-            content: `<div class="card-hanzi">${item.hanzi}</div><div class="card-pinyin">${item.pinyin}</div>`,
-            matchId: index
-        });
-        // Kortti 2: Suomennos
-        cards.push({
-            id: index,
-            type: 'meaning',
-            content: `<div class="card-meaning">${item.meaning}</div>`,
-            matchId: index
-        });
-    });
-
-    // Sekoitetaan korttipakka lopuksi aidolla sekoituksella
-    shuffleArray(cards);
-
-    // Luodaan DOM-elementit
-    cards.forEach((cardData, idx) => {
-        const cardBtn = document.createElement('button');
-        cardBtn.className = 'card';
-        cardBtn.dataset.index = idx;
-        cardBtn.dataset.matchId = cardData.matchId;
-
-        cardBtn.innerHTML = `
-            <div class="card-inner">
-                <div class="card-front"></div>
-                <div class="card-back">${cardData.content}</div>
-            </div>
-        `;
-
-        cardBtn.onclick = () => flipCard(cardBtn, cardData);
-        grid.appendChild(cardBtn);
-    });
-}
+    // Sekoitetaan korttipakka lopuksi vielä uudelleen
+    cards = shuffleArray(cards);
 
     // Luodaan DOM-elementit
     cards.forEach((cardData, idx) => {
@@ -753,7 +708,6 @@ function checkMatch() {
     const [card1, card2] = flippedCards;
 
     if (card1.data.matchId === card2.data.matchId) {
-        // Osuma!
         card1.element.classList.add('matched');
         card2.element.classList.add('matched');
         matchedPairs++;
@@ -762,12 +716,12 @@ function checkMatch() {
         const matchId = card1.data.matchId;
         const itemData = activeVocabMap.get(matchId);
 
-        // Lisätään animaatiolla ja poistetaan laudalta hetken kuluttua
+        // Luetaan sana ääneen puhesynteesillä heti osuman jälkeen
+        playAudio(itemData.hanzi);
+
         setTimeout(() => {
             card1.element.classList.add('fade-out');
             card2.element.classList.add('fade-out');
-            
-            // Lisätään yhdistetty kortti alas kokoelmaan
             addCardToCollection(itemData);
         }, 400);
 
@@ -777,7 +731,6 @@ function checkMatch() {
             setTimeout(showWinModal, 900);
         }
     } else {
-        // Väärin, käännetään takaisin piiloon pienellä viiveellä
         isLocked = true;
         setTimeout(() => {
             card1.element.classList.remove('flipped');
@@ -791,27 +744,26 @@ function checkMatch() {
 function addCardToCollection(item) {
     const scrollContainer = document.getElementById('collectionScroll');
     
-    // Poistetaan "ei vielä löydettyjä" -teksti, jos kyseessä on ensimmäinen pari
     const emptyMsg = scrollContainer.querySelector('.collection-empty');
     if (emptyMsg) {
         emptyMsg.remove();
     }
 
-    // Luodaan uusi yhdistetty kortti alapalkkiin
     const collectedEl = document.createElement('div');
     collectedEl.className = 'collected-card';
+    collectedEl.title = "Klikkaa kuullaksesi ääntämys uudelleen 🔊";
     collectedEl.innerHTML = `
         <div class="collected-hanzi">${item.hanzi}</div>
         <div class="collected-pinyin">${item.pinyin}</div>
         <div class="collected-meaning" title="${item.meaning}">${item.meaning}</div>
     `;
 
+    // Klikkaamalla kerättyä korttia alhaalla kone toistaa sanan
+    collectedEl.onclick = () => playAudio(item.hanzi);
+
     scrollContainer.appendChild(collectedEl);
-    
-    // Päivitetään laskuri
     document.getElementById('collectionCount').textContent = `${matchedPairs} kpl`;
 
-    // Vieritetään automaattisesti oikeaan reunaan, jotta uusin kortti näkyy heti
     scrollContainer.scrollTo({
         left: scrollContainer.scrollWidth,
         behavior: 'smooth'
@@ -833,11 +785,9 @@ function closeWinModal() {
     document.getElementById('winModal').style.display = 'none';
 }
 
-// Käynnistetään peli oletuskoolla
+// Käynnistetään peli heti
 initGame();
 </script>
 
 </body>
 </html>
-
-
