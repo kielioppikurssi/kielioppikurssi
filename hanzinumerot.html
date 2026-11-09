@@ -12,7 +12,7 @@
     padding: 0;
 }
 
-    /* Päävalikko-nappi tyyli */
+/* Päävalikko-nappi tyyli */
 .päävalikko-btn {
     display: inline-flex;
     align-items: center;
@@ -42,7 +42,6 @@
     height: 18px;
     fill: currentColor;
 }
-
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -121,21 +120,22 @@ h1 {
 .answer-slots {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 25px;
     min-height: 75px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .slot {
-    width: 65px;
-    height: 75px;
+    width: 55px;
+    height: 70px;
     border: 3px solid #e2e8f0;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 30px;
     font-weight: bold;
     background: #f8fafc;
     color: #1e293b;
@@ -173,20 +173,20 @@ h1 {
 .pool {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    max-width: 400px;
+    gap: 10px;
+    max-width: 420px;
     margin: 0 auto 25px auto;
 }
 
 .block {
-    height: 65px;
+    height: 60px;
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
+    font-size: 26px;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
@@ -339,21 +339,20 @@ button.action-btn:hover {
 
 <body>
 
-
 <div class="container">
     <div class="main-panel">
-        <h1>🀄 Hanzi-numeropulma</h1>
+        <h1>🀄 Hanzi-numeropulma (1–1000)</h1>
         <a href="index.html" class="päävalikko-btn">
-    <svg viewBox="0 0 24 24">
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-    </svg>
-    Päävalikkoon
+            <svg viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            Päävalikkoon
         </a>
         <p class="subtitle">Muodosta luku kiinalaisilla merkeillä!</p>
 
         <div class="target-box">
-            <div id="targetNumber" class="target-number">59</div>
-            <div id="targetPinyin" class="target-pinyin">wǔ shí jiǔ</div>
+            <div id="targetNumber" class="target-number">100</div>
+            <div id="targetPinyin" class="target-pinyin">yī bǎi</div>
         </div>
 
         <div id="answerSlots" class="answer-slots"></div>
@@ -377,7 +376,8 @@ button.action-btn:hover {
         <h2>📜 Kiinan numerot</h2>
         <div class="hanzi-list">
             <div class="hanzi-item"><span class="hanzi-num">1</span><span class="hanzi-char">一</span><span class="hanzi-pinyin">yī</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">2</span><span class="hanzi-char">二</span><span class="hanzi-pinyin">èr</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">2 (määrä)</span><span class="hanzi-char">两</span><span class="hanzi-pinyin">liǎng</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">2 (luku)</span><span class="hanzi-char">二</span><span class="hanzi-pinyin">èr</span></div>
             <div class="hanzi-item"><span class="hanzi-num">3</span><span class="hanzi-char">三</span><span class="hanzi-pinyin">sān</span></div>
             <div class="hanzi-item"><span class="hanzi-num">4</span><span class="hanzi-char">四</span><span class="hanzi-pinyin">sì</span></div>
             <div class="hanzi-item"><span class="hanzi-num">5</span><span class="hanzi-char">五</span><span class="hanzi-pinyin">wǔ</span></div>
@@ -386,14 +386,16 @@ button.action-btn:hover {
             <div class="hanzi-item"><span class="hanzi-num">8</span><span class="hanzi-char">八</span><span class="hanzi-pinyin">bā</span></div>
             <div class="hanzi-item"><span class="hanzi-num">9</span><span class="hanzi-char">九</span><span class="hanzi-pinyin">jiǔ</span></div>
             <div class="hanzi-item"><span class="hanzi-num">10</span><span class="hanzi-char">十</span><span class="hanzi-pinyin">shí</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">100</span><span class="hanzi-char">百</span><span class="hanzi-pinyin">bǎi</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">0</span><span class="hanzi-char">零</span><span class="hanzi-pinyin">líng</span></div>
         </div>
     </div>
 </div>
 
 <script>
-const hanziMap = {1:'一', 2:'二', 3:'三', 4:'四', 5:'五', 6:'六', 7:'七', 8:'八', 9:'九', 10:'十'};
-const pinyinMap = {1:'yī', 2:'èr', 3:'sān', 4:'sì', 5:'wǔ', 6:'liù', 7:'qī', 8:'bā', 9:'jiǔ', 10:'shí'};
-const allPossibleHanzis = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+const hanziMap = {0:'零', 1:'一', 2:'二', 3:'三', 4:'四', 5:'五', 6:'六', 7:'七', 8:'八', 9:'九', 10:'十'};
+const pinyinMap = {0:'líng', 1:'yī', 2:'èr', 3:'sān', 4:'sì', 5:'wǔ', 6:'liù', 7:'qī', 8:'bā', 9:'jiǔ', 10:'shí'};
+const allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百'];
 
 let currentNumber = 0;
 let targetHanziStr = "";
@@ -404,19 +406,55 @@ let streak = 0;
 let isLocked = false;
 
 function numberToChinese(n) {
-    if (n <= 10) return { hanzi: hanziMap[n], pinyin: pinyinMap[n] };
-    let t = Math.floor(n / 10);
-    let u = n % 10;
+    if (n === 1000) return { hanzi: '一千', pinyin: 'yī qiān' };
+    
     let hz = '';
     let py = '';
-    if (t > 1) hz += hanziMap[t];
-    hz += '十';
-    if (t > 1) py += pinyinMap[t] + ' ';
-    py += 'shí';
-    if (u > 0) {
-        hz += hanziMap[u];
-        py += ' ' + pinyinMap[u];
+    
+    // Sadat
+    let hundreds = Math.floor(n / 100);
+    let remainder = n % 100;
+    
+    if (hundreds > 0) {
+        // Käytetään satojen kohdalla kielioppisääntöä: 200 on 两百 (liǎng bǎi)
+        if (hundreds === 2) {
+            hz += '两百';
+            py += 'liǎng bǎi';
+        } else {
+            hz += (hundreds > 1 ? hanziMap[hundreds] : '') + '百';
+            py += (hundreds > 1 ? pinyinMap[hundreds] + ' ' : '') + 'bǎi';
+        }
+        
+        if (remainder > 0 && remainder < 10) {
+            hz += '零';
+            py += ' líng';
+        }
     }
+    
+    // Kymmenet
+    let tens = Math.floor(remainder / 10);
+    let units = remainder % 10;
+    
+    if (tens > 0) {
+        if (hundreds > 0 || tens > 1) {
+            hz += hanziMap[tens];
+            py += ' ' + pinyinMap[tens];
+        }
+        hz += '十';
+        py += ' shí';
+    }
+    
+    // Ykköset
+    if (units > 0) {
+        hz += hanziMap[units];
+        py += (tens > 0 || hundreds > 0 ? ' ' : '') + pinyinMap[units];
+    }
+    
+    if (n <= 10) {
+        hz = hanziMap[n];
+        py = pinyinMap[n];
+    }
+    
     return { hanzi: hz, pinyin: py };
 }
 
@@ -424,7 +462,7 @@ function nextTask() {
     isLocked = false;
     document.getElementById('feedback').innerHTML = '';
     
-    currentNumber = Math.floor(Math.random() * 99) + 1;
+    currentNumber = Math.floor(Math.random() * 1000) + 1;
     const res = numberToChinese(currentNumber);
     targetHanziStr = res.hanzi;
 
@@ -434,7 +472,6 @@ function nextTask() {
     currentSlots = new Array(targetHanziStr.length).fill(null);
     renderSlots();
 
-    // Luodaan 8 palikkaa (tarvittavat merkit + satunnaisia vääriä merkkejä)
     let poolChars = targetHanziStr.split('');
     while(poolChars.length < 8) {
         let randomChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
@@ -479,14 +516,12 @@ function selectBlock(poolIndex) {
     const emptySlotIdx = currentSlots.indexOf(null);
     if (emptySlotIdx === -1) return;
 
-    // Asetetaan valittu palikka slottiin
     currentSlots[emptySlotIdx] = poolBlocks[poolIndex];
     poolBlocks[poolIndex].used = true;
 
     renderSlots();
     renderPool();
 
-    // Jos kaikki paikat on täytetty, tarkistetaan vastaus!
     if (!currentSlots.includes(null)) {
         checkAnswer();
     }
@@ -508,12 +543,10 @@ function resetSlots() {
 function checkAnswer() {
     isLocked = true;
     
-    // Yhdistetään merkkeinä käyttäjän valitsevat palikat
     const userAnswerStr = currentSlots.map(s => s.val).join('');
     const slotsEls = document.querySelectorAll('.slot');
     const fb = document.getElementById('feedback');
 
-    // Pelkkä merkkien merkkijono ratkaisee, onko vastaus oikein (riippumatta siitä mitä 2 samanlaisesta palikasta käytettiin)
     if (userAnswerStr === targetHanziStr) {
         slotsEls.forEach(s => s.classList.add('correct'));
         score += 10;
