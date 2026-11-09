@@ -437,13 +437,15 @@ button.action-btn:hover {
         <p class="subtitle">Yhdistä parit – löydetyt sanat siirtyvät siistiin kokoelmaan alle! Kertaa ne vielä lopuksi.</p>
     </header>
 
-    <!-- Parivalitsin -->
+   <!-- Parivalitsin (4, 6, 8, 10, 12 paria) -->
     <div class="size-selector">
-        <button class="size-btn" onclick="setPairs(8)">8 paria (16 korttia)</button>
-        <button class="size-btn active" onclick="setPairs(12)">12 paria (24 korttia)</button>
-        <button class="size-btn" onclick="setPairs(16)">16 paria (32 korttia)</button>
-        <button class="size-btn" onclick="setPairs(20)">20 paria (40 korttia)</button>
+        <button class="size-btn" onclick="setPairs(4)">4 paria</button>
+        <button class="size-btn" onclick="setPairs(6)">6 paria</button>
+        <button class="size-btn active" onclick="setPairs(8)">8 paria</button>
+        <button class="size-btn" onclick="setPairs(10)">10 paria</button>
+        <button class="size-btn" onclick="setPairs(12)">12 paria</button>
     </div>
+
 
     <div class="score-board">
         <div>Yritykset: <span id="moves">0</span></div>
@@ -587,11 +589,9 @@ let flippedCards = [];
 let matchedPairs = 0;
 let moves = 0;
 let isLocked = false;
-let pairsPerGame = 12; // Oletuksena 12 paria
-let activeVocabMap = new Map(); // Tallennetaan parin tiedot matchId:n mukaan
+let pairsPerGame = 8; // Oletuksena 8 paria
 
 function setPairs(num) {
-    pairsPerGroup = num;
     pairsPerGame = num;
     
     // Päivitetään aktiivinen nappi ulkoasussa
@@ -604,6 +604,7 @@ function setPairs(num) {
 
     initGame();
 }
+
 
 function initGame() {
     closeWinModal();
