@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiragana Trainer</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f7fb;
+    margin:0;
+    padding:20px;
+    text-align:center;
+}
+
+h1{
+    margin-top:0;
+}
+
+.panel{
+    background:white;
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+
+.options{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:20px;
+}
+
+label{
+    padding:8px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+input[type=checkbox]{
+    margin-right:5px;
+}
+
+.a{background:#ffb3b3;}
+.k{background:#b3d1ff;}
+.s{background:#b8f5b8;}
+.t{background:#ffd2a6;}
+.n{background:#dab6ff;}
+.h{background:#b8fff4;}
+.m{background:#d6bc9a;}
+.y{background:#ffc9ec;}
+.r{background:#fff0a8;}
+.w{background:#d9d9d9;}
+
+#card{
+    width:220px;
+    height:220px;
+    margin:20px auto;
+    border-radius:25px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:110px;
+    font-weight:bold;
+}
+
+#answer{
+    font-size:28px;
+    text-align:center;
+    width:200px;
+    padding:10px;
+}
+
+button{
+    padding:10px 20px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#2563eb;
+    color:white;
+    margin:5px;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.stats{
+    margin-top:15px;
+    font-size:20px;
+}
+
+#feedback{
+    min-height:70px;
+    font-size:24px;
+    margin-top:15px;
+}
+
+.correct{
+    color:green;
+}
+
+.wrong{
+    color:red;
+}
+
+#tablePopup{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.65);
+}
+
+.popupContent{
+    background:white;
+    width:90%;
+    max-width:900px;
+    margin:40px auto;
+    padding:20px;
+    border-radius:20px;
+    overflow:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+td,th{
+    border:1px solid #ccc;
+    padding:10px;
+    font-size:28px;
+}
+
+.closeBtn{
+    background:#dc2626;
+}
+</style>
+</head>
+<body>
+
+<div class="panel">
+
+<h1>ひらがな Trainer</h1>
+
+<h2>Valitse rivit</h2>
+
+<div class="options">
+<label class="a"><input type="checkbox" value="a" checked>あ-rivi</label>
+<label class="k"><input type="checkbox" value="k" checked>か-rivi</label>
+<label class="s"><input type="checkbox" value="s" checked>さ-rivi</label>
+<label class="t"><input type="checkbox" value="t" checked>た-rivi</label>
+<label class="n"><input type="checkbox" value="n" checked>な-rivi</label>
+<label class="h"><input type="checkbox" value="h" checked>は-rivi</label>
+<label class="m"><input type="checkbox" value="m" checked>ま-rivi</label>
+<label class="y"><input type="checkbox" value="y" checked>や-rivi</label>
+<label class="r"><input type="checkbox" value="r" checked>ら-rivi</label>
+<label class="w"><input type="checkbox" value="w" checked>わ-rivi</label>
+</div>
+
+<button onclick="startGame()">Aloita</button>
+<button onclick="showTable()">Näytä taulukko</button>
+
+<div id="card"></div>
+
+<input id="answer" autocomplete="off" placeholder="romaji">
+
+<br><br>
+
+<button onclick="checkAnswer()">Tarkista</button>
+
+<div id="feedback"></div>
+
+<div class="stats">
+Pisteet: <span id="score">0</span> |
+Putki: <span id="streak">0</span> |
+Paras: <span id="best">0</span> |
+Tarkkuus: <span id="accuracy">0</span>%
+</div>
+
+</div>
+
+<div id="tablePopup">
+<div class="popupContent">
+
+<h2>Hiragana-taulukko</h2>
+
+<table>
+<tr><th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th></tr>
+<tr class="a"><td>あ</td><td>あ</td><td>い</td><td>う</td><td>え</td><td>お</td></tr>
+<tr class="k"><td>か</td><td>か</td><td>き</td><td>く</td><td>け</td><td>こ</td></tr>
+<tr class="s"><td>さ</td><td>さ</td><td>し</td><td>す</td><td>せ</td><td>そ</td></tr>
+<tr class="t"><td>た</td><td>た</td><td>ち</td><td>つ</td><td>て</td><td>と</td></tr>
+<tr class="n"><td>な</td><td>な</td><td>に</td><td>ぬ</td><td>ね</td><td>の</td></tr>
+<tr class="h"><td>は</td><td>は</td><td>ひ</td><td>ふ</td><td>へ</td><td>ほ</td></tr>
+<tr class="m"><td>ま</td><td>ま</td><td>み</td><td>む</td><td>め</td><td>も</td></tr>
+<tr class="y"><td>や</td><td>や</td><td></td><td>ゆ</td><td></td><td>よ</td></tr>
+<tr class="r"><td>ら</td><td>ら</td><td>り</td><td>る</td><td>れ</td><td>ろ</td></tr>
+<tr class="w"><td>わ</td><td>わ</td><td></td><td></td><td></td><td>を</td></tr>
+</table>
+
+<br>
+<button class="closeBtn" onclick="hideTable()">Sulje</button>
+
+</div>
+</div>
+
+<script>
+
+const rows = {
+a:[
+["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"]
+],
+k:[
+["か","ka"],["き","ki"],["く","ku"],["け","ke"],["こ","ko"]
+],
+s:[
+["さ","sa"],["し","shi"],["す","su"],["せ","se"],["そ","so"]
+],
+t:[
+["た","ta"],["ち","chi"],["つ","tsu"],["て","te"],["と","to"]
+],
+n:[
+["な","na"],["に","ni"],["ぬ","nu"],["ね","ne"],["の","no"]
+],
+h:[
+["は","ha"],["ひ","hi"],["ふ","fu"],["へ","he"],["ほ","ho"]
+],
+m:[
+["ま","ma"],["み","mi"],["む","mu"],["め","me"],["も","mo"]
+],
+y:[
+["や","ya"],["ゆ","yu"],["よ","yo"]
+],
+r:[
+["ら","ra"],["り","ri"],["る","ru"],["れ","re"],["ろ","ro"]
+],
+w:[
+["わ","wa"],["を","wo"]
+]
+};
+
+let pool=[];
+let current;
+let score=0;
+let streak=0;
+let best=0;
+let total=0;
+let correct=0;
+
+function startGame(){
+
+pool=[];
+
+document.querySelectorAll('input[type=checkbox]:checked')
+.forEach(cb=>{
+pool.push(...rows[cb.value].map(x=>({...Object.assign([],x),row:cb.value})));
+});
+
+nextQuestion();
+document.getElementById("answer").focus();
+}
+
+function nextQuestion(){
+
+if(pool.length===0)return;
+
+current=pool[Math.floor(Math.random()*pool.length)];
+
+const card=document.getElementById("card");
+
+card.textContent=current[0];
+card.className="";
+card.classList.add(current.row);
+
+document.getElementById("feedback").innerHTML="";
+document.getElementById("answer").value="";
+}
+
+function checkAnswer(){
+
+if(!current)return;
+
+const user=document.getElementById("answer").value.trim().toLowerCase();
+
+total++;
+
+if(user===current[1]){
+
+score++;
+correct++;
+streak++;
+
+if(streak>best) best=streak;
+
+document.getElementById("feedback").innerHTML=
+`<div class="correct">
+✅ ${current[0]} = ${current[1]}
+</div>`;
+
+}else{
+
+streak=0;
+
+pool.push(current);
+
+document.getElementById("feedback").innerHTML=
+`<div class="wrong">
+❌ Oikea vastaus: ${current[1]}
+</div>`;
+}
+
+updateStats();
+
+setTimeout(nextQuestion,1200);
+}
+
+function updateStats(){
+document.getElementById("score").textContent=score;
+document.getElementById("streak").textContent=streak;
+document.getElementById("best").textContent=best;
+document.getElementById("accuracy").textContent=
+Math.round(correct/total*100)||0;
+}
+
+document.getElementById("answer").addEventListener("keydown",e=>{
+if(e.key==="Enter") checkAnswer();
+});
+
+function showTable(){
+document.getElementById("tablePopup").style.display="block";
+}
+
+function hideTable(){
+document.getElementById("tablePopup").style.display="none";
+}
+
+</script>
+</body>
+</html>
