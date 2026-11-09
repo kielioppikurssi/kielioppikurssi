@@ -277,7 +277,7 @@ const base=[
 ['ま','ma','m'],['み','mi','m'],['む','mu','m'],['め','me','m'],['も','mo','m'],
 ['や','ya','y'],['ゆ','yu','y'],['よ','yo','y'],
 ['ら','ra','r'],['り','ri','r'],['る','ru','r'],['れ','re','r'],['ろ','ro','r'],
-['わ','wa','w'],['を','wo','w'],['ん','n','w']
+['わ','wa','w'],['を','wo','w'],['ん','n','n']
 ];
 
 const dak=[
@@ -299,71 +299,78 @@ let total=0;
 let right=0;
 
 function startGame(){
+    pool=[];
 
-pool=[];
+    const sel = Array.from(document.querySelectorAll('.opts input[type=checkbox]:checked'))
+        .map(x => x.value);
 
-const sel=[...document.querySelectorAll('input[type=checkbox]checked')]
-.map(x=>x.value);
+    for(const x of base){
+        if(sel.includes(x[2])) pool.push(x);
+    }
 
-for(const x of base){
-if(sel.includes(x[2])) pool.push(x);
-}
+    if(document.getElementById('dak').checked) pool.push(...dak);
+    if(document.getElementById('handa').checked) pool.push(...hand);
 
-if(dak.checked) pool.push(...dak);
-if(handa.checked) pool.push(...hand);
+    if(pool.length === 0){
+        alert('Valitse vähintään yksi merkistö!');
+        return;
+    }
 
-next();
+    score = 0;
+    streak = 0;
+    total = 0;
+    right = 0;
+    sc.textContent = score;
+    st.textContent = streak;
+    ac.textContent = 0;
+    fb.innerHTML = '';
+
+    next();
 }
 
 function next(){
+    if(!pool.length) return;
 
-if(!pool.length) return;
+    cur = pool[Math.floor(Math.random()*pool.length)];
 
-cur=pool[Math.floor(Math.random()*pool.length)];
+    card.textContent = cur[0];
+    card.className = 'card ' + cur[2];
 
-card.textContent=cur[0];
-card.className='card '+cur[2];
-
-ans.value='';
-ans.focus();
+    ans.value = '';
+    ans.focus();
 }
 
 function checkAnswer(){
+    if(!cur) return;
 
-if(!cur) return;
+    total++;
 
-total++;
+    if(ans.value.trim().toLowerCase() === cur[1]){
+        score++;
+        right++;
+        streak++;
+        fb.innerHTML = '<div class="ok">✅ ' + cur[0] + ' = ' + cur[1] + '</div>';
+    } else {
+        streak = 0;
+        pool.push(cur);
+        fb.innerHTML = '<div class="bad">❌ Oikea vastaus: ' + cur[1] + '</div>';
+    }
 
-if(ans.value.trim().toLowerCase()===cur[1]){
+    sc.textContent = score;
+    st.textContent = streak;
+    ac.textContent = Math.round(right * 100 / total) || 0;
 
-score++;
-right++;
-streak++;
-
-fb.innerHTML=
-'<div class="ok">✅ '+cur[0]+' = '+cur[1]+'</div>';
-
-}else{
-
-streak=0;
-pool.push(cur);
-
-fb.innerHTML=
-'<div class="bad">❌ Oikea vastaus: '+cur[1]+'</div>';
+    setTimeout(next, 900);
 }
 
-sc.textContent=score;
-st.textContent=streak;
-ac.textContent=Math.round(right*100/total)||0;
-
-setTimeout(next,900);
-}
-
-ans.addEventListener('keydown',e=>{
-if(e.key==='Enter') checkAnswer();
+ans.addEventListener('keydown', e => {
+    if(e.key === 'Enter') checkAnswer();
 });
 
+// Käynnistetään peli kerran heti sivun latauduttua
+startGame();
 </script>
 
 </body>
 </html>
+
