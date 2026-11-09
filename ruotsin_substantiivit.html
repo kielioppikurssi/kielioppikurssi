@@ -281,8 +281,13 @@ function generateExercise(){
 
     hintedCells.clear();
 
-    currentWords = shuffle(nouns).slice(0,5);
-
+currentWords = [
+    shuffle(nouns.filter(n => n.class === 1))[0],
+    shuffle(nouns.filter(n => n.class === 2))[0],
+    shuffle(nouns.filter(n => n.class === 3))[0],
+    shuffle(nouns.filter(n => n.class === 4))[0],
+    shuffle(nouns.filter(n => n.class === 5))[0]
+];
     const tbody=document.querySelector("#exerciseTable tbody");
     tbody.innerHTML="";
 
