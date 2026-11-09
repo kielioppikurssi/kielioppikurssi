@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Komparatiivi & Superlatiivi</title>
+<style>
+body{margin:0;overflow:hidden;font-family:Palatino,"Palatino Linotype",serif;background:linear-gradient(135deg,#0d47a1,#1565c0,#42a5f5);color:white}
+#header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;font-size:1.2rem;font-weight:bold}
+#header > div:first-child{
+    margin-left:140px;
+}
+#modeSelect h1{margin-top:120px}
+button{padding:12px 25px;margin:10px;font-size:1.1rem;cursor:pointer;border:none;border-radius:10px}
+#game{display:none}#inputArea{position:fixed;bottom:25px;left:50%;transform:translateX(-50%)}
+#answer{font-size:2rem;text-align:center;width:260px;padding:10px;border-radius:10px;border:none}
+.word{position:absolute;left:50%;transform:translateX(-50%);font-size:2.4rem;background:rgba(255,255,255,.15);padding:10px 20px;border-radius:12px;backdrop-filter:blur(4px)}
+.shake{animation:shake .35s;background:#d50000!important}
+@keyframes shake{0%{transform:translateX(-50%)}20%{transform:translateX(-60%)}40%{transform:translateX(-40%)}60%{transform:translateX(-60%)}80%{transform:translateX(-40%)}100%{transform:translateX(-50%)}}
+.popup{position:fixed;top:80px;right:20px;background:#43a047;color:white;padding:15px 25px;border-radius:12px;font-size:1.4rem;opacity:1;animation:fadeout 2s forwards}
+@keyframes fadeout{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
+.correctAnswer{color:#ffeb3b;font-weight:bold}
+.home-btn{position:fixed;top:15px;left:15px;z-index:9999;background:white;color:#0d47a1;text-decoration:none;font-size:1rem;font-weight:bold;padding:10px 16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+</style></head><body>
+<a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-btn">← Päävalikko</a>
+<div id="modeSelect"><h1>Valitse peli</h1><button onclick="startGame('comp')">Komparatiivi</button><button onclick="startGame('sup')">Superlatiivi</button></div>
+<div id="game"><div id="header"><div><button onclick="changeMode('comp')">Komparatiivi</button><button onclick="changeMode('sup')">Superlatiivi</button></div><div>
+    <div>
+        Pisteet: <span id="score">0</span>
+    </div>
+
+    <div style="margin-top:8px;">
+        Nopeus
+        <input type="range"
+               id="speedSlider"
+               min="0.5"
+               max="5"
+               step="0.1"
+               value="1.4">
+
+        <span id="speedValue">1.4</span>
+    </div>
+</div></div><div id="wordContainer"></div><div id="inputArea"><input id="answer" autocomplete="off"></div></div>
+<script>
+const adjectives = [
+["stor","större","störst"],
+["liten","mindre","minst"],
+["gammal","äldre","äldst"],
+["ung","yngre","yngst"],
+["bra","bättre","bäst"],
+["dålig","sämre","sämst"],
+["många","fler","flest"],
+// yleiset säännölliset
+["snabb","snabbare","snabbast"],
+["lång","längre","längst"],
+["kort","kortare","kortast"],
+["dyr","dyrare","dyrast"],
+["billig","billigare","billigast"],
+["stark","starkare","starkast"],
+["svag","svagare","svagast"],
+["hög","högre","högst"],
+["låg","lägre","lägst"],
+["varm","varmare","varmast"],
+["kall","kallare","kallast"],
+["glad","gladare","gladast"],
+["ledsen","ledsnare","ledsnast"],
+["vacker","vackrare","vackrast"],
+["ful","fulare","fulast"],
+["rik","rikare","rikast"],
+["fattig","fattigare","fattigast"],
+["intressant","intressantare","intressantast"],
+["viktig","viktigare","viktigast"],
+["rolig","roligare","roligast"],
+["tråkig","tråkigare","tråkigast"],
+["enkel","enklare","enklast"],
+["svår","svårare","svårast"],
+["lätt","lättare","lättast"],
+["mörk","mörkare","mörkast"],
+["ljus","ljusare","ljusast"],
+["ren","renare","renast"],
+["smutsig","smutsigare","smutsigast"],
+["frisk","friskare","friskast"],
+["sjuk","sjukare","sjukast"],
+["snygg","snyggare","snyggast"],
+["stilig","stiligare","stiligast"],
+["trevlig","trevligare","trevligast"],
+["vänlig","vänligare","vänligast"],
+["arg","argare","argast"],
+["lugn","lugnare","lugnast"],
+["tyst","tystare","tystast"],
+["högljudd","högljuddare","högljuddast"],
+["modern","modernare","modernast"],
+["gammaldags","gammaldagsare","gammaldagsast"],
+["hård","hårdare","hårdast"],
+["mjuk","mjukare","mjukast"],
+["bred","bredare","bredast"],
+["smal","smalare","smalast"],
+["tjock","tjockare","tjockast"],
+["tunn","tunnare","tunnast"],
+["snäll","snällare","snällast"],
+["elak","elakare","elakast"],
+["säker","säkrare","säkrast"],
+["farlig","farligare","farligast"],
+["vacker","vackrare","vackrast"],
+["stökig","stökigare","stökigast"],
+["ordentlig","ordentligare","ordentligast"],
+["snål","snålare","snålast"],
+["generös","generösare","generösast"],
+["tom","tommare","tommast"],
+["full","fullare","fullast"],
+["fri","friare","friast"],
+["upptagen","upptagnare","upptagnast"],
+
+// värit
+["röd","rödare","rödast"],
+["blå","blåare","blåast"],
+["grön","grönare","grönast"],
+["gul","gulare","gulast"],
+["svart","svartare","svartast"],
+["vit","vitare","vitast"],
+["grå","gråare","gråast"],
+["brun","brunare","brunast"],
+
+// taajuudeltaan yleisiä
+["vanlig","vanligare","vanligast"],
+["ovanlig","ovanligare","ovanligast"],
+["populär","populärare","populärast"],
+["praktisk","praktiskare","praktiskast"],
+["teoretisk","teoretiskare","teoretiskast"],
+["positiv","positivare","positivast"],
+["negativ","negativare","negativast"],
+["aktiv","aktivare","aktivast"],
+["passiv","passivare","passivast"],
+["effektiv","effektivare","effektivast"]
+];
+const praises=["Bra!","Snyggt!","Fantastiskt!","Strålande!","Perfekt!","Utmärkt!"];
+let mode='',score=0,currentWord=null,currentData=null,pos=0,speed=1.4,moveInterval=null;
+function startGame(type){mode=type;document.getElementById('modeSelect').style.display='none';document.getElementById('game').style.display='block';document.getElementById('answer').value='';document.getElementById('answer').focus();spawnWord();}
+function spawnWord(){clearInterval(moveInterval);currentData=adjectives[Math.floor(Math.random()*adjectives.length)];currentWord=document.createElement('div');currentWord.className='word';currentWord.textContent=currentData[0];currentWord.style.top='60px';document.getElementById('wordContainer').innerHTML='';document.getElementById('wordContainer').appendChild(currentWord);pos=60;moveInterval=setInterval(()=>{pos+=speed;currentWord.style.top=pos+'px';if(pos>window.innerHeight-180){clearInterval(moveInterval);currentWord.classList.add('correctAnswer');currentWord.textContent=currentData[0]+' → '+(mode==='comp'?currentData[1]:currentData[2]);setTimeout(spawnWord,1400);}},20)}
+document.getElementById('answer').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const value=e.target.value.trim().toLowerCase();const correct=mode==='comp'?currentData[1]:currentData[2];if(value===correct.toLowerCase()){score++;document.getElementById('score').textContent=score;const pop=document.createElement('div');pop.className='popup';pop.textContent=praises[Math.floor(Math.random()*praises.length)]+' +1';document.body.appendChild(pop);setTimeout(()=>pop.remove(),2000);e.target.value='';spawnWord();}else{currentWord.classList.add('shake');setTimeout(()=>currentWord.classList.remove('shake'),350);}});
+function changeMode(newMode){mode=newMode;document.getElementById('answer').value='';document.getElementById('answer').focus();spawnWord();}
+
+document.getElementById("speedSlider").addEventListener("input", function() {
+    speed = parseFloat(this.value);
+    document.getElementById("speedValue").textContent = this.value;
+});
+</script></body></html>
