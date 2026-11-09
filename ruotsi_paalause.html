@@ -1,7 +1,15 @@
-<!DOCTYPE html><html lang="fi"><head><meta charset="UTF-8"><title>Ruotsin sanajärjestys v3</title><style>
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>Ruotsin sanajärjestys</title>
+<style>
 body{font-family:Palatino,"Palatino Linotype",Georgia,serif;max-width:1200px;margin:auto;padding:20px;background:linear-gradient(135deg,#d6e4ff,#fff5cc)}
 h1{text-align:center}.home-button{position:fixed;top:15px;left:15px;background:#003399;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-weight:bold}
-.area{background:white;border-radius:12px;padding:15px;margin:15px 0}#wordbank,#answer{display:flex;flex-wrap:wrap;gap:10px;min-height:80px}#answer{border:3px dashed #557}.word{background:#003399;color:white;padding:10px 16px;border-radius:10px;cursor:pointer;transition:.25s;user-select:none}.word:hover{transform:scale(1.06)}.move{animation:pop .3s}@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}button{padding:10px 20px;font-size:16px;margin:5px}#result{font-size:22px;font-weight:bold}.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55)}.popup-content{background:white;max-width:800px;margin:80px auto;padding:25px;border-radius:12px}.bad{background:#ffd0d0;padding:4px 6px;border-radius:5px}.good{background:#c8f7c5;padding:4px 6px;border-radius:5px}</style></head><body>
+.area{background:white;border-radius:12px;padding:15px;margin:15px 0}#wordbank,#answer{display:flex;flex-wrap:wrap;gap:10px;min-height:80px}#answer{border:3px dashed #557}.word{background:#003399;color:white;padding:10px 16px;border-radius:10px;cursor:pointer;transition:.25s;user-select:none}.word:hover{transform:scale(1.06)}.move{animation:pop .3s}@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}button{padding:10px 20px;font-size:16px;margin:5px}#result{font-size:22px;font-weight:bold}.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55)}.popup-content{background:white;max-width:800px;margin:80px auto;padding:25px;border-radius:12px}.bad{background:#ffd0d0;padding:4px 6px;border-radius:5px}.good{background:#c8f7c5;padding:4px 6px;border-radius:5px}
+</style>
+</head>
+<body>
 <a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-button">← Päävalikko</a>
 <h1>Ruotsin päälauseen sanajärjestys</h1>
 <div id="hint"></div>
@@ -12,118 +20,147 @@ h1{text-align:center}.home-button{position:fixed;top:15px;left:15px;background:#
 <div id="result">Pisteet: 0</div>
 <div class="popup" id="popup"><div class="popup-content"><div id="popupText"></div></div></div>
 <script>
-
 const sentences=[
+{hint:'Aikamääre ensin',fi:'Tänään luen kirjaa.',correct:['Idag','läser','jag','en bok']},
+{hint:'Paikkamääre ensin',fi:'Koulussa oppilaat syövät lounasta.',correct:['I skolan','äter','eleverna','lunch']},
+{hint:'Tavallinen SVO',fi:'Siskoni ostaa huomenna uuden auton.',correct:['Min syster','köper','en ny bil','imorgon']},
+{hint:'Adverbi mukana',fi:'Syön usein pizzaa perjantaisin.',correct:['Jag','äter','ofta','pizza','på fredagar']},
+{hint:'V2-sääntö',fi:'Illalla katsomme televisiota.',correct:['På kvällen','tittar','vi','på tv']},
+{hint:'Aikamääre ensin',fi:'Huomenna pelaamme jalkapalloa.',correct:['Imorgon','ska','vi','spela fotboll']},
+{hint:'Paikkamääre ensin',fi:'Kirjastossa hän lukee sanomalehteä.',correct:['I biblioteket','läser','hon','en tidning']},
+{hint:'Aikamääre ensin',fi:'Maanantaina kurssi alkaa jälleen.',correct:['På måndag','börjar','kursen','igen']},
+{hint:'Paikkamääre ensin',fi:'Kotona katson televisiota.',correct:['Hemma','tittar','jag','på tv']},
+{hint:'Tavallinen SVO',fi:'Isäni juo kahvia joka aamu.',correct:['Min pappa','dricker','kaffe','varje morgon']},
+{hint:'Tavallinen SVO',fi:'Oppilaat tekevät kokeen tänään.',correct:['Eleverna','skriver','ett prov','idag']},
+{hint:'Adverbi mukana',fi:'Pyöräilen aina kouluun.',correct:['Jag','brukar','alltid','cykla','till skolan']},
+{hint:'Adverbi mukana',fi:'Hän tulee usein myöhässä.',correct:['Hon','kommer','ofta','för sent']},
+{hint:'V2-sääntö',fi:'Koulun jälkeen lapset syövät jäätelöä.',correct:['Efter skolan','äter','barnen','glass']},
+{hint:'V2-sääntö',fi:'Talvella laskettelemme.',correct:['På vintern','åker','vi','skidor']},
+{hint:'Paikkamääre ensin',fi:'Bussissa hän kuuntelee musiikkia.',correct:['På bussen','lyssnar','han','på musik']},
+{hint:'Aikamääre ensin',fi:'Eilen ostin uuden tietokoneen.',correct:['I går','köpte','jag','en ny dator']},
+{hint:'Paikkamääre ensin',fi:'Suomessa monet puhuvat ruotsia.',correct:['I Finland','talar','många','svenska']},
+{hint:'Tavallinen SVO',fi:'Ystäväni soittaa kitaraa erittäin hyvin.',correct:['Min vän','spelar','gitarr','mycket bra']},
+{hint:'Adverbi mukana',fi:'Syömme harvoin karkkia arkipäivisin.',correct:['Vi','äter','sällan','godis','på vardagar']},
+{hint:'V2-sääntö',fi:'Tunnin jälkeen oppilaat menevät kotiin.',correct:['Efter lektionen','går','eleverna','hem']},
+{hint:'V2-sääntö',fi:'Joka aamu hän lukee sanomalehden.',correct:['Varje morgon','läser','hon','tidningen']},
+{hint:'Paikkamääre ensin',fi:'Rannalla lapset rakentavat hiekkalinnan.',correct:['På stranden','bygger','barnen','ett sandslott']},
+{hint:'Aikamääre ensin',fi:'Ensi viikolla he matkustavat Ruotsiin.',correct:['Nästa vecka','reser','de','till Sverige']},
+{hint:'Tavallinen SVO',fi:'Opettaja selittää kielioppia selkeästi.',correct:['Läraren','förklarar','grammatiken','tydligt']},
+{hint:'Adverbi mukana',fi:'Olen jo tehnyt läksyn.',correct:['Jag','har','redan','gjort','läxan']},
+{hint:'Paikkamääre ensin',fi:'Luokassa keskustelemme tehtävästä.',correct:['I klassrummet','diskuterar','vi','uppgiften']},
+{hint:'V2-sääntö',fi:'Perjantaina hän tapaa ystävänsä.',correct:['På fredag','träffar','hon','sina vänner']},
+{hint:'Aikamääre ensin',fi:'Viime kesänä hän työskenteli Norjassa.',correct:['I somras','arbetade','han','i Norge']},
+{hint:'Tavallinen SVO',fi:'Tyttö avaa ikkunan varovasti.',correct:['Flickan','öppnar','fönstret','försiktigt']},
+{hint:'Aikamääre ensin',fi:'Maanantaina kurssi alkaa jälleen.',correct:['På måndag','börjar','kursen','igen']},
+{hint:'Paikkamääre ensin',fi:'Kotona katson televisiota.',correct:['Hemma','tittar','jag','på tv']},
+{hint:'Tavallinen SVO',fi:'Isäni juo kahvia joka aamu.',correct:['Min pappa','dricker','kaffe','varje morgon']},
+{hint:'Tavallinen SVO',fi:'Oppilaat tekevät kokeen tänään.',correct:['Eleverna','skriver','ett prov','idag']},
+{hint:'Adverbi mukana',fi:'Pyöräilen aina kouluun.',correct:['Jag','brukar','alltid','cykla','till skolan']},
+{hint:'Adverbi mukana',fi:'Hän tulee usein myöhässä.',correct:['Hon','kommer','ofta','för sent']},
+{hint:'V2-sääntö',fi:'Koulun jälkeen lapset syövät jäätelöä.',correct:['Efter skolan','äter','barnen','glass']},
+{hint:'V2-sääntö',fi:'Talvella laskettelemme.',correct:['På vintern','åker','vi','skidor']},
+{hint:'Paikkamääre ensin',fi:'Bussissa hän kuuntelee musiikkia.',correct:['På bussen','lyssnar','han','på musik']},
+{hint:'Aikamääre ensin',fi:'Eilen ostin uuden tietokoneen.',correct:['I går','köpte','jag','en ny dator']},
+{hint:'Paikkamääre ensin',fi:'Suomessa monet puhuvat ruotsia.',correct:['I Finland','talar','många','svenska']},
+{hint:'Tavallinen SVO',fi:'Ystäväni soittaa kitaraa erittäin hyvin.',correct:['Min vän','spelar','gitarr','mycket bra']},
+{hint:'Adverbi mukana',fi:'Syömme harvoin karkkia arkipäivisin.',correct:['Vi','äter','sällan','godis','på vardagar']},
+{hint:'V2-sääntö',fi:'Tunnin jälkeen oppilaat menevät kotiin.',correct:['Efter lektionen','går','eleverna','hem']},
+{hint:'V2-sääntö',fi:'Joka aamu hän lukee sanomalehden.',correct:['Varje morgon','läser','hon','tidningen']},
+{hint:'Paikkamääre ensin',fi:'Rannalla lapset rakentavat hiekkalinnan.',correct:['På stranden','bygger','barnen','ett sandslott']},
+{hint:'Aikamääre ensin',fi:'Ensi viikolla he matkustavat Ruotsiin.',correct:['Nästa vecka','reser','de','till Sverige']},
+{hint:'Tavallinen SVO',fi:'Opettaja selittää kielioppia selkeästi.',correct:['Läraren','förklarar','grammatiken','tydligt']},
+{hint:'Adverbi mukana',fi:'Olen jo tehnyt läksyn.',correct:['Jag','har','redan','gjort','läxan']},
+{hint:'Paikkamääre ensin',fi:'Luokassa keskustelemme tehtävästä.',correct:['I klassrummet','diskuterar','vi','uppgiften']},
+{hint:'V2-sääntö',fi:'Perjantaina hän tapaa ystävänsä.',correct:['På fredag','träffar','hon','sina vänner']},
+{hint:'Aikamääre ensin',fi:'Viime kesänä hän työskenteli Norjassa.',correct:['I somras','arbetade','han','i Norge']},
+{hint:'Tavallinen SVO',fi:'Tyttö avaa ikkunan varovasti.',correct:['Flickan','öppnar','fönstret','försiktigt']},
+{hint:'Paikkamääre ensin',fi:'Järven rannalla he kalastavat.',correct:['Vid sjön','fångar','de','fisk']},
+{hint:'Adverbi mukana',fi:'Hän ei voi tulla tänään.',correct:['Han','kan','inte','komma','idag']},
+{hint:'V2-sääntö',fi:'Töiden jälkeen isä laittaa ruokaa.',correct:['Efter jobbet','lagar','pappa','middag']},
+{hint:'Aikamääre ensin',fi:'Pian bussi saapuu pysäkille.',correct:['Snart','kommer','bussen','till hållplatsen']},
+{hint:'Paikkamääre ensin',fi:'Ruokalassa oppilaat syövät lounasta.',correct:['I matsalen','äter','eleverna','lunch']},
+{hint:'V2-sääntö',fi:'Illalla hän lukee romaania.',correct:['På kvällen','läser','hon','en roman']},
+{hint:'Tavallinen SVO',fi:'Lapset pelaavat salibandya koulun jälkeen.',correct:['Barnen','spelar','innebandy','efter skolan']},
+{hint:'Paikkamääre ensin',fi:'Metsässä perhe kerää sieniä.',correct:['I skogen','plockar','familjen','svamp']},
+{hint:'Adverbi mukana',fi:'Katsomme usein elokuvia viikonloppuna.',correct:['Vi','ser','ofta','filmer','på helgen']},
+{hint:'Aikamääre ensin',fi:'Kello kahdeksalta oppitunti alkaa.',correct:['Klockan åtta','börjar','lektionen']},
+{hint:'V2-sääntö',fi:'Illallisen jälkeen tiskaan lautaset.',correct:['Efter middagen','diskar','jag','tallrikarna']},
+{hint:'Tavallinen SVO',fi:'Veljeni opiskelee ruotsia koulussa.',correct:['Min bror','studerar','svenska','i skolan']},
+{hint:'Paikkamääre ensin',fi:'Toimistossa äiti työskentelee koko päivän.',correct:['På kontoret','arbetar','mamma','hela dagen']},
+{hint:'Adverbi mukana',fi:'Hän haluaa mielellään oppia ruotsia.',correct:['Hon','vill','gärna','lära sig','svenska']},
+{hint:'V2-sääntö',fi:'Huomenna aamulla matkustamme Helsinkiin.',correct:['I morgon bitti','åker','vi','till Helsingfors']},
+{hint:'Aikamääre ensin',fi:'Tänään kirjoitamme kokeen.',correct:['I dag','skriver','vi','ett prov']},
+{hint:'Aikamääre ensin',fi:'Tänä iltana tapaan ystäväni.',correct:['I kväll','träffar','jag','mina vänner']},
+{hint:'Aikamääre ensin',fi:'Lauantaina perhe siivoaa talon.',correct:['På lördag','städar','familjen','huset']},
+{hint:'Aikamääre ensin',fi:'Ensi vuonna hän muuttaa Tukholmaan.',correct:['Nästa år','flyttar','hon','till Stockholm']},
+{hint:'Aikamääre ensin',fi:'Tänä aamuna hän myöhästyi bussista.',correct:['I morse','missade','han','bussen']},
 
-{hint:'Aikamääre ensin',correct:['Idag','läser','jag','en bok']},
-{hint:'Paikkamääre ensin',correct:['I skolan','äter','eleverna','lunch']},
-{hint:'Tavallinen SVO',correct:['Min syster','köper','en ny bil','imorgon']},
-{hint:'Adverbi mukana',correct:['Jag','äter','ofta','pizza','på fredagar']},
-{hint:'V2-sääntö',correct:['På kvällen','tittar','vi','på tv']},
-{hint:'Aikamääre ensin',correct:['Imorgon','ska','vi','spela fotboll']},
-{hint:'Paikkamääre ensin',correct:['I biblioteket','läser','hon','en tidning']},
-{hint:'Aikamääre ensin',correct:['På måndag','börjar','kursen','igen']},
-{hint:'Paikkamääre ensin',correct:['Hemma','tittar','jag','på tv']},
-{hint:'Tavallinen SVO',correct:['Min pappa','dricker','kaffe','varje morgon']},
-{hint:'Tavallinen SVO',correct:['Eleverna','skriver','ett prov','idag']},
-{hint:'Adverbi mukana',correct:['Jag','brukar','alltid','cykla','till skolan']},
-{hint:'Adverbi mukana',correct:['Hon','kommer','ofta','för sent']},
-{hint:'V2-sääntö',correct:['Efter skolan','äter','barnen','glass']},
-{hint:'V2-sääntö',correct:['På vintern','åker','vi','skidor']},
+{hint:'Paikkamääre ensin',fi:'Pihalla lapset leikkivät koko päivän.',correct:['På gården','leker','barnen','hela dagen']},
+{hint:'Paikkamääre ensin',fi:'Uimahallissa hän harjoittelee joka viikko.',correct:['I simhallen','tränar','hon','varje vecka']},
+{hint:'Paikkamääre ensin',fi:'Sairaalassa äitini työskentelee lääkärinä.',correct:['På sjukhuset','arbetar','min mamma','som läkare']},
+{hint:'Paikkamääre ensin',fi:'Kaupassa he ostavat tuoretta leipää.',correct:['I affären','köper','de','färskt bröd']},
+{hint:'Paikkamääre ensin',fi:'Olohuoneessa kissa nukkuu sohvalla.',correct:['I vardagsrummet','sover','katten','på soffan']},
 
-{hint:'Paikkamääre ensin',correct:['På bussen','lyssnar','han','på musik']},
-{hint:'Aikamääre ensin',correct:['I går','köpte','jag','en ny dator']},
-{hint:'Paikkamääre ensin',correct:['I Finland','talar','många','svenska']},
-{hint:'Tavallinen SVO',correct:['Min vän','spelar','gitarr','mycket bra']},
-{hint:'Adverbi mukana',correct:['Vi','äter','sällan','godis','på vardagar']},
-{hint:'V2-sääntö',correct:['Efter lektionen','går','eleverna','hem']},
-{hint:'V2-sääntö',correct:['Varje morgon','läser','hon','tidningen']},
-{hint:'Paikkamääre ensin',correct:['På stranden','bygger','barnen','ett sandslott']},
-{hint:'Aikamääre ensin',correct:['Nästa vecka','reser','de','till Sverige']},
-{hint:'Tavallinen SVO',correct:['Läraren','förklarar','grammatiken','tydligt']},
+{hint:'V2-sääntö',fi:'Aamiaisen jälkeen harjaan hampaani.',correct:['Efter frukosten','borstar','jag','tänderna']},
+{hint:'V2-sääntö',fi:'Koulun jälkeen hän harjoittelee jääkiekkoa.',correct:['Efter skolan','tränar','han','ishockey']},
+{hint:'V2-sääntö',fi:'Sunnuntaisin käymme mummon luona.',correct:['På söndagar','besöker','vi','mormor']},
+{hint:'V2-sääntö',fi:'Kesällä hän työskentelee kahvilassa.',correct:['Under sommaren','jobbar','hon','på café']},
+{hint:'V2-sääntö',fi:'Välitunnilla oppilaat keskustelevat keskenään.',correct:['På rasten','pratar','eleverna','med varandra']},
 
-{hint:'Adverbi mukana',correct:['Jag','har','redan','gjort','läxan']},
-{hint:'Paikkamääre ensin',correct:['I klassrummet','diskuterar','vi','uppgiften']},
-{hint:'V2-sääntö',correct:['På fredag','träffar','hon','sina vänner']},
-{hint:'Aikamääre ensin',correct:['I somras','arbetade','han','i Norge']},
-{hint:'Tavallinen SVO',correct:['Flickan','öppnar','fönstret','försiktigt']},
-{hint:'Paikkamääre ensin',correct:['Vid sjön','fångar','de','fisk']},
-{hint:'Adverbi mukana',correct:['Han','kan','inte','komma','idag']},
-{hint:'V2-sääntö',correct:['Efter jobbet','lagar','pappa','middag']},
-{hint:'Aikamääre ensin',correct:['Snart','kommer','bussen','till hållplatsen']},
-{hint:'Paikkamääre ensin',correct:['I matsalen','äter','eleverna','lunch']},
+{hint:'Adverbi mukana',fi:'Juon aina teetä illalla.',correct:['Jag','dricker','alltid','te','på kvällen']},
+{hint:'Adverbi mukana',fi:'Hän pelaa usein shakkia kotona.',correct:['Hon','spelar','ofta','schack','hemma']},
+{hint:'Adverbi mukana',fi:'Syömme harvoin ulkona talvella.',correct:['Vi','äter','sällan','ute','på vintern']},
+{hint:'Adverbi mukana',fi:'Hän tulee melkein aina ajoissa.',correct:['Han','kommer','nästan alltid','i tid']},
+{hint:'Adverbi mukana',fi:'Kuuntelen mielelläni musiikkia lukiessani.',correct:['Jag','lyssnar','gärna','på musik','när jag läser']},
+{hint:'Tavallinen SVO',fi:'Opettaja korjaa kokeet illalla.',correct:['Läraren','rättar','proven','på kvällen']},
+{hint:'Tavallinen SVO',fi:'Naapurini kasvattaa tomaatteja puutarhassa.',correct:['Min granne','odlar','tomater','i trädgården']},
+{hint:'Tavallinen SVO',fi:'Oppilas vastaa kysymykseen heti.',correct:['Eleven','svarar','på frågan','direkt']},
+{hint:'Tavallinen SVO',fi:'Pojat rakentavat majan metsään.',correct:['Pojkarna','bygger','en koja','i skogen']},
+{hint:'Tavallinen SVO',fi:'Isoisäni lukee sanomalehteä joka aamu.',correct:['Min farfar','läser','tidningen','varje morgon']},
 
-{hint:'V2-sääntö',correct:['På kvällen','läser','hon','en roman']},
-{hint:'Tavallinen SVO',correct:['Barnen','spelar','innebandy','efter skolan']},
-{hint:'Paikkamääre ensin',correct:['I skogen','plockar','familjen','svamp']},
-{hint:'Adverbi mukana',correct:['Vi','ser','ofta','filmer','på helgen']},
-{hint:'Aikamääre ensin',correct:['Klockan åtta','börjar','lektionen']},
-{hint:'V2-sääntö',correct:['Efter middagen','diskar','jag','tallrikarna']},
-{hint:'Tavallinen SVO',correct:['Min bror','studerar','svenska','i skolan']},
-{hint:'Paikkamääre ensin',correct:['På kontoret','arbetar','mamma','hela dagen']},
-{hint:'Adverbi mukana',correct:['Hon','vill','gärna','lära sig','svenska']},
-{hint:'V2-sääntö',correct:['I morgon bitti','åker','vi','till Helsingfors']},
-{hint:'Aikamääre ensin',correct:['I dag','skriver','vi','ett prov']},
-{hint:'Aikamääre ensin',correct:['I kväll','träffar','jag','mina vänner']},
-{hint:'Aikamääre ensin',correct:['På lördag','städar','familjen','huset']},
-{hint:'Aikamääre ensin',correct:['Nästa år','flyttar','hon','till Stockholm']},
-{hint:'Aikamääre ensin',correct:['I morse','missade','han','bussen']},
+{hint:'V2-sääntö',fi:'Konsertin jälkeen otimme paljon kuvia.',correct:['Efter konserten','tog','vi','många bilder']},
+{hint:'V2-sääntö',fi:'Talvella monet juovat kuumaa kaakaota.',correct:['På vintern','dricker','många','varm choklad']},
+{hint:'V2-sääntö',fi:'Kesäkuussa koulu päättyy kesäksi.',correct:['I juni','slutar','skolan','för sommaren']},
+{hint:'V2-sääntö',fi:'Tunnilla oppilaat esittävät paljon kysymyksiä.',correct:['Under lektionen','ställer','eleverna','många frågor']},
+{hint:'V2-sääntö',fi:'Iltapäivällä lapset pelaavat tietokonepelejä.',correct:['På eftermiddagen','spelar','barnen','dataspel']},
 
-{hint:'Paikkamääre ensin',correct:['På gården','leker','barnen','hela dagen']},
-{hint:'Paikkamääre ensin',correct:['I simhallen','tränar','hon','varje vecka']},
-{hint:'Paikkamääre ensin',correct:['På sjukhuset','arbetar','min mamma','som läkare']},
-{hint:'Paikkamääre ensin',correct:['I affären','köper','de','färskt bröd']},
-{hint:'Paikkamääre ensin',correct:['I vardagsrummet','sover','katten','på soffan']},
+{hint:'Adverbi mukana',fi:'Hän on jo syönyt aamiaisen.',correct:['Hon','har','redan','ätit','frukost']},
+{hint:'Adverbi mukana',fi:'Emme voi jäädä pitkäksi aikaa.',correct:['Vi','kan','inte','stanna','länge']},
+{hint:'Adverbi mukana',fi:'Hän todella haluaa vierailla Islannissa.',correct:['Han','vill','verkligen','besöka','Island']},
+{hint:'Adverbi mukana',fi:'En ole koskaan nähnyt karhua.',correct:['Jag','har','aldrig','sett','en björn']},
+{hint:'Adverbi mukana',fi:'He eivät ehdi tehdä kaikkea tänään.',correct:['De','hinner','inte','göra','allt idag']},
 
-{hint:'V2-sääntö',correct:['Efter frukosten','borstar','jag','tänderna']},
-{hint:'V2-sääntö',correct:['Efter skolan','tränar','han','ishockey']},
-{hint:'V2-sääntö',correct:['På söndagar','besöker','vi','mormor']},
-{hint:'V2-sääntö',correct:['Under sommaren','jobbar','hon','på café']},
-{hint:'V2-sääntö',correct:['På rasten','pratar','eleverna','med varandra']},
+{hint:'Paikkamääre ensin',fi:'Suomessa asuu noin viisi miljoonaa ihmistä.',correct:['I Finland','bor','ungefär fem miljoner människor']},
+{hint:'Paikkamääre ensin',fi:'Torilla maanviljelijä myy vihanneksia.',correct:['På torget','säljer','bonden','grönsaker']},
+{hint:'Paikkamääre ensin',fi:'Malmössä serkkuni opiskelee taloustiedettä.',correct:['I Malmö','studerar','min kusin','ekonomi']},
+{hint:'Paikkamääre ensin',fi:'Hotellissa vieraat odottavat bussia.',correct:['På hotellet','väntar','gästerna','på bussen']},
+{hint:'Paikkamääre ensin',fi:'Puutarhassa kasvaa paljon kukkia.',correct:['I trädgården','växer','många blommor']},
 
-{hint:'Adverbi mukana',correct:['Jag','dricker','alltid','te','på kvällen']},
-{hint:'Adverbi mukana',correct:['Hon','spelar','ofta','schack','hemma']},
-{hint:'Adverbi mukana',correct:['Vi','äter','sällan','ute','på vintern']},
-{hint:'Adverbi mukana',correct:['Han','kommer','nästan alltid','i tid']},
-{hint:'Adverbi mukana',correct:['Jag','lyssnar','gärna','på musik','när jag läser']},
+{hint:'Aikamääre ensin',fi:'Pian elokuva alkaa televisiossa.',correct:['Snart','börjar','filmen','på tv']},
+{hint:'Aikamääre ensin',fi:'Ensi kuussa ostamme uuden auton.',correct:['Nästa månad','köper','vi','en ny bil']},
+{hint:'Aikamääre ensin',fi:'Joka päivä hän liikkuu tunnin.',correct:['Varje dag','motionerar','hon','en timme']},
+{hint:'Aikamääre ensin',fi:'Tulevaisuudessa haluan lääkäriksi.',correct:['I framtiden','vill','jag','bli läkare']},
+{hint:'Aikamääre ensin',fi:'Eilen illalla isä teki lasagnea.',correct:['I går kväll','lagade','pappa','lasagne']}
 
-{hint:'Tavallinen SVO',correct:['Läraren','rättar','proven','på kvällen']},
-{hint:'Tavallinen SVO',correct:['Min granne','odlar','tomater','i trädgården']},
-{hint:'Tavallinen SVO',correct:['Eleven','svarar','på frågan','direkt']},
-{hint:'Tavallinen SVO',correct:['Pojkarna','bygger','en koja','i skogen']},
-{hint:'Tavallinen SVO',correct:['Min farfar','läser','tidningen','varje morgon']},
-
-{hint:'V2-sääntö',correct:['Efter konserten','tog','vi','många bilder']},
-{hint:'V2-sääntö',correct:['På vintern','dricker','många','varm choklad']},
-{hint:'V2-sääntö',correct:['I juni','slutar','skolan','för sommaren']},
-{hint:'V2-sääntö',correct:['Under lektionen','ställer','eleverna','många frågor']},
-{hint:'V2-sääntö',correct:['På eftermiddagen','spelar','barnen','dataspel']},
-
-{hint:'Adverbi mukana',correct:['Hon','har','redan','ätit','frukost']},
-{hint:'Adverbi mukana',correct:['Vi','kan','inte','stanna','länge']},
-{hint:'Adverbi mukana',correct:['Han','vill','verkligen','besöka','Island']},
-{hint:'Adverbi mukana',correct:['Jag','har','aldrig','sett','en björn']},
-{hint:'Adverbi mukana',correct:['De','hinner','inte','göra','allt idag']},
-
-{hint:'Paikkamääre ensin',correct:['I Finland','bor','ungefär fem miljoner människor']},
-{hint:'Paikkamääre ensin',correct:['På torget','säljer','bonden','grönsaker']},
-{hint:'Paikkamääre ensin',correct:['I Malmö','studerar','min kusin','ekonomi']},
-{hint:'Paikkamääre ensin',correct:['På hotellet','väntar','gästerna','på bussen']},
-{hint:'Paikkamääre ensin',correct:['I trädgården','växer','många blommor']},
-
-{hint:'Aikamääre ensin',correct:['Snart','börjar','filmen','på tv']},
-{hint:'Aikamääre ensin',correct:['Nästa månad','köper','vi','en ny bil']},
-{hint:'Aikamääre ensin',correct:['Varje dag','motionerar','hon','en timme']},
-{hint:'Aikamääre ensin',correct:['I framtiden','vill','jag','bli läkare']},
-{hint:'Aikamääre ensin',correct:['I går kväll','lagade','pappa','lasagne']}
 ];
-let current,score=0;
-const shuffle=a=>[...a].sort(()=>Math.random()-.5);
-function createWord(t){let d=document.createElement('div');d.className='word';d.textContent=t;d.onclick=()=>moveWord(d);return d;}
+let current,score=0;const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+function createWord(t){const d=document.createElement('div');d.className='word';d.textContent=t;d.onclick=()=>moveWord(d);return d;}
 function moveWord(el){const target=el.parentElement.id==='wordbank'?answer:wordbank;target.appendChild(el);el.classList.remove('move');void el.offsetWidth;el.classList.add('move');}
 function newSentence(){current=sentences[Math.floor(Math.random()*sentences.length)];hint.innerHTML='<b>Vihje:</b> '+current.hint;wordbank.innerHTML='';answer.innerHTML='';shuffle(current.correct).forEach(w=>wordbank.appendChild(createWord(w)));}
 function resetSentence(){while(answer.firstChild)wordbank.appendChild(answer.firstChild);}
 function nextSentence(){popup.style.display='none';newSentence();}
-function checkAnswer(){const user=[...answer.children].map(x=>x.textContent);if(user.length!==current.correct.length)return;let wrong=[];for(let i=0;i<current.correct.length;i++){if(user[i]!==current.correct[i])wrong.push([user[i],current.correct[i]]);}if(!wrong.length){score++;result.textContent='Pisteet: '+score;popupText.innerHTML=`<h2 style="color:green">✓ Oikein!</h2><p><b>${current.correct.join(' ')}</b></p><button onclick="nextSentence()">Seuraava lause</button>`;popup.style.display='block';return;}let h='<h2>Väärin</h2><p><b>Oikea sanajärjestys:</b><br>'+current.correct.join(' | ')+'</p><hr><b>Virheet:</b><br>';wrong.forEach(w=>h+=`<span class="bad">${w[0]}</span> → <span class="good">${w[1]}</span><br>`);h+='<br><button onclick="nextSentence()">Seuraava lause</button>';popupText.innerHTML=h;popup.style.display='block';}
-document.addEventListener('keydown',e=>{if(e.key==='Enter')checkAnswer();});newSentence();
-</script></body></html>
+function checkAnswer(){const user=[...answer.children].map(x=>x.textContent);if(user.length!==current.correct.length)return;let wrong=[];for(let i=0;i<current.correct.length;i++){if(user[i]!==current.correct[i])wrong.push([user[i],current.correct[i]]);}if(!wrong.length){score++;result.textContent='Pisteet: '+score;popupText.innerHTML=`<h2 style="color:green">✓ Oikein!</h2><p><b>Ruotsi:</b><br>${current.correct.join(' ')}</p><p><b>Suomi:</b><br>${current.fi}</p><button onclick="nextSentence()">Seuraava lause (Enter)</button>`;popup.style.display='block';return;}let h=`<h2>Väärin</h2><p><b>Ruotsi:</b><br>${current.correct.join(' ')}</p><p><b>Suomi:</b><br>${current.fi}</p><hr><b>Virheet:</b><br>`;wrong.forEach(w=>h+=`<span class="bad">${w[0]}</span> → <span class="good">${w[1]}</span><br>`);h+='<br><button onclick="nextSentence()">Seuraava lause (Enter)</button>';popupText.innerHTML=h;popup.style.display='block';}
+document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter') return;
+
+    if(popup.style.display==='block'){
+        nextSentence();
+    }else{
+        checkAnswer();
+    }
+});
+
+newSentence();
+</script>
+</body>
+</html>
