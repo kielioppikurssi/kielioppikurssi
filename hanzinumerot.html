@@ -156,6 +156,15 @@ h1 {
     animation: successPop 0.5s ease;
 }
 
+/* Puhesynteesin aikainen lukukorostus */
+.slot.speaking {
+    border-color: #f59e0b !important;
+    background: #fef3c7 !important;
+    color: #d97706 !important;
+    transform: scale(1.15) !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+
 .slot.error {
     border-color: #ef4444;
     background: #fef2f2;
@@ -398,7 +407,7 @@ button.action-btn:hover {
 
 const hanziMap = {
     0: '零', 1: '一', 2: '二', 3: '三', 4: '四',
-    5: '五', 6: '六', 7: '七', 8: '八', 9: '九'
+    5: '五', 6: '六', 7: '七', 8: '八', 9: 'jiǔ'
 };
 
 const pinyinMap = {
@@ -418,6 +427,28 @@ let poolBlocks = [];
 let score = 0;
 let streak = 0;
 let isLocked = false;
+
+// --- PUHESYNTEESI (Web Speech API) ---
+function speakText(text, onEndCallback) {
+    if (!('speechSynthesis' in window)) {
+        if (onEndCallback) onEndCallback();
+        return;
+    }
+
+    // Pysäytetään mahdollisesti kesken oleva puhe
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN'; // Kiinan kieli
+    utterance.rate = 0.85;   // Hieman normaalia hitaampi puherytmi oppimisen tueksi
+
+    if (onEndCallback) {
+        utterance.onend = onEndCallback;
+        utterance.onerror = onEndCallback;
+    }
+
+    window.speechSynthesis.speak(utterance);
+}
 
 // Muuntaa luvun kiinalaisiksi merkeiksi ja pinyiniksi.
 function numberToChinese(n) {
@@ -539,6 +570,7 @@ function renderBoard() {
         const slot = document.createElement('div');
 
         slot.className = 'slot';
+        slot.dataset.index = i;
 
         if (currentSlots[i]) {
             slot.classList.add('filled');
@@ -579,6 +611,9 @@ function selectBlock(id) {
     if (!block || block.used) return;
 
     if (currentSlots.length >= targetHanziStr.length) return;
+
+    // 1) LUE NUMERO KIINAKSI AINA KUN PELAAJA KLIKKAA PALIKKAA
+    speakText(block.char);
 
     block.used = true;
     currentSlots.push(block);
@@ -632,7 +667,30 @@ function clearFeedback() {
     feedback.style.color = '#333';
 
     document.querySelectorAll('.slot').forEach(slot => {
-        slot.classList.remove('error', 'correct');
+        slot.classList.remove('error', 'correct', 'speaking');
+    });
+}
+
+// Lukee vastauksen merkit yksitellen korostaen ne vuorotellen.
+function playFullAnswerWithHighlight(index, slots, onComplete) {
+    if (index >= targetHanziStr.length) {
+        if (onComplete) onComplete();
+        return;
+    }
+
+    // Poistetaan edellinen korostus
+    slots.forEach(s => s.classList.remove('speaking'));
+
+    // Lisätään korostus nykyiseen merkkiin
+    slots[index].classList.add('speaking');
+    const charToSpeak = targetHanziStr[index];
+
+    // Luetaan merkki ja siirrytään seuraavaan sen valmistuttua
+    speakText(charToSpeak, () => {
+        // Pieni tauko merkkien välissä selkeyden vuoksi
+        setTimeout(() => {
+            playFullAnswerWithHighlight(index + 1, slots, onComplete);
+        }, 300);
     });
 }
 
@@ -657,9 +715,15 @@ function checkAnswer() {
         feedback.textContent = 'Oikein! 🎉 Great job!';
         feedback.style.color = '#16a34a';
 
+        // 2) KÄYNNISTETÄÄN VASTAUKSEN LUKU RAUHALLISESTI KOROSTUKSEN KANSSA
         setTimeout(() => {
-            newRound();
-        }, 1600);
+            playFullAnswerWithHighlight(0, slots, () => {
+                // Odotetaan vielä hetki lukemisen päättymisen jälkeen ennen uutta kierrosta
+                setTimeout(() => {
+                    newRound();
+                }, 800);
+            });
+        }, 300);
 
     } else {
         streak = 0;
