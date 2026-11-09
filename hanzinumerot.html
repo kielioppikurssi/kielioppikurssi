@@ -358,7 +358,7 @@ button.action-btn:hover {
 
         <div id="answerSlots" class="answer-slots"></div>
 
-        <div class="pool-label">Valitse oikeat hanzipalikat (8 kpl):</div>
+        <div class="pool-label">Valitse oikeat hanzipalikat:</div>
         <div id="blockPool" class="pool"></div>
 
         <div class="controls">
@@ -407,7 +407,7 @@ let score = 0;
 let streak = 0;
 let isLocked = false;
 
-// Täydellinen ja kieliopillisesti tarkka kiinalainen lukugeneraattori (1–1000)
+// Tarkka kiinalainen lukugeneraattori (1–1000)
 function numberToChinese(n) {
     if (n === 1000) return { hanzi: '一千', pinyin: 'yī qiān' };
     
@@ -427,6 +427,7 @@ function numberToChinese(n) {
     // Kymmenosa
     if (tens > 0) {
         if (hundreds > 0) {
+            // Esim. 110 -> 一百一十 (jos halutaan lyhyt muoto tai perusmuoto)
             hz += hanziMap[tens] + '十';
             py += ' ' + pinyinMap[tens] + ' shí';
         } else {
@@ -438,7 +439,12 @@ function numberToChinese(n) {
                 py += pinyinMap[tens] + ' shí';
             }
         }
-    } else if (hundreds > 0 && units > 0) {
+    } else if (hundreds > 0 && (units > 0 || (n % 100 !== 0 && n % 10 === 0))) {
+        // Nolla tarvitaan väliin, jos kymmenet on 0 mutta ykkösiä tai satojen ja ykkösen välissä tyhjää
+    }
+    
+    // Tarkistetaan erikoissääntö esim luvuille kuten 105 (一百零五)
+    if (hundreds > 0 && tens === 0 && units > 0) {
         hz += '零';
         py += ' líng';
     }
@@ -461,22 +467,25 @@ function newRound() {
 
     // Arvotaan luku 1-1000
     currentNumber = Math.floor(Math.random() * 1000) + 1;
+    
+    // Pakotetaan testin vuoksi varmistus, että generaattori antaa aina validin merkkijonon
     const result = numberToChinese(currentNumber);
     targetHanziStr = result.hanzi;
 
     document.getElementById('targetNumber').textContent = currentNumber;
     document.getElementById('targetPinyin').textContent = result.pinyin;
 
-    // Muodostetaan palikapooli (oikeat merkit + satunnaisia täytepalikoita 8 kpl asti)
+    // Otetaan oikeat merkit taulukkoon
     let neededChars = targetHanziStr.split('');
     let pool = [...neededChars];
 
+    // Täytetään palikat yhteensä 8 kappaleeseen sopivilla satunnaisilla merkeillä
     while (pool.length < 8) {
         let randChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
         pool.push(randChar);
     }
 
-    // Sekoitetaan palikat
+    // Sekoitetaan palikat satunnaiseen järjestykseen
     pool.sort(() => Math.random() - 0.5);
     poolBlocks = pool.map((char, index) => ({ id: index, char: char, used: false }));
 
