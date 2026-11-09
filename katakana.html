@@ -6,32 +6,109 @@
 <title>Katakana Trainer</title>
 
 <style>
-body{
-    font-family:Arial,sans-serif;
-    background:#f4f6fa;
-    text-align:center;
-    padding:20px;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-.panel{
-    background:#fff;
-    max-width:1100px;
-    margin:auto;
-    padding:20px;
-    border-radius:16px;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
 }
 
-.opts{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    justify-content:center;
+.container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    max-width: 750px;
+    width: 100%;
 }
 
-.opts label{
-    padding:6px 10px;
-    border-radius:8px;
-    font-weight:bold;
+.main-panel {
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+/* Päävalikko-nappi tyyli */
+.päävalikko-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #4f46e5;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    margin-bottom: 20px;
+}
+
+.päävalikko-btn:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+
+.päävalikko-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.opts label {
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.1s;
+}
+
+.opts label:hover {
+    transform: scale(1.05);
+}
+
+.settings-group {
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.settings-group label {
+    margin: 0 10px;
+    cursor: pointer;
 }
 
 .a{background:#ffb3b3}
@@ -51,61 +128,110 @@ body{
 .b{background:#7de7d7}
 .p{background:#4fd1c5;color:black}
 
-.card{
-    width:220px;
-    height:220px;
-    margin:20px auto;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:110px;
-    border-radius:24px;
-    font-weight:bold;
+.card {
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 100px;
+    border-radius: 24px;
+    font-weight: bold;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
-.stats{
-    margin:10px;
+.stats {
+    margin: 15px 0 0 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #475569;
 }
 
-input{
-    font-size:28px;
-    padding:8px;
-    text-align:center;
+input[type="text"] {
+    font-size: 24px;
+    padding: 10px;
+    text-align: center;
+    width: 200px;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-button{
-    padding:10px 15px;
-    margin:4px;
-    font-size:16px;
-    cursor:pointer;
+input[type="text"]:focus {
+    border-color: #6366f1;
 }
 
-.popup{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.7);
+button.action-btn {
+    padding: 10px 20px;
+    background: #6366f1;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    margin: 5px;
 }
 
-.content{
-    background:#fff;
-    width:95%;
-    max-width:950px;
-    margin:20px auto;
-    padding:20px;
-    max-height:90vh;
-    overflow:auto;
+button.action-btn:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
 }
 
-table{
-    border-collapse:collapse;
-    width:100%;
+button.secondary-btn {
+    padding: 10px 20px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 16px;
+    margin: 5px;
 }
 
-td,th{
-    border:1px solid #777;
-    padding:8px;
-    text-align:center;
+button.secondary-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+}
+
+.content {
+    background: #fff;
+    width: 95%;
+    max-width: 950px;
+    margin: 40px auto;
+    padding: 30px;
+    max-height: 85vh;
+    overflow: auto;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: left;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+}
+
+td, th {
+    border: 1px solid #cbd5e1;
+    padding: 10px;
+    text-align: center;
 }
 
 .katakanaTable tr.a td{background:#ffb3b3}
@@ -125,148 +251,94 @@ td,th{
 .katakanaTable tr.b td{background:#7de7d7}
 .katakanaTable tr.p td{background:#4fd1c5}
 
-.ok{color:green}
-.bad{color:red}
+.ok { color: #16a34a; font-weight: bold; margin-top: 10px; }
+.bad { color: #dc2626; font-weight: bold; margin-top: 10px; }
 </style>
 </head>
 
 <body>
 
-<div class="panel">
+<div class="container">
+    <div class="main-panel">
+        <h1>カタカナ Trainer</h1>
+        <a href="index.html" class="päävalikko-btn">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            Päävalikkoon
+        </a>
 
-<h1>カタカナ Trainer</h1>
+        <div class="opts">
+            <label class="a"><input type="checkbox" value="a" checked> ア</label>
+            <label class="k"><input type="checkbox" value="k" checked> カ</label>
+            <label class="s"><input type="checkbox" value="s" checked> サ</label>
+            <label class="t"><input type="checkbox" value="t" checked> タ</label>
+            <label class="n"><input type="checkbox" value="n" checked> ナ</label>
+            <label class="h"><input type="checkbox" value="h" checked> ハ</label>
+            <label class="m"><input type="checkbox" value="m" checked> マ</label>
+            <label class="y"><input type="checkbox" value="y" checked> ヤ</label>
+            <label class="r"><input type="checkbox" value="r" checked> ラ</label>
+            <label class="w"><input type="checkbox" value="w" checked> ワ</label>
+        </div>
 
-<div class="opts">
-<label class="a"><input type="checkbox" value="a" checked>ア</label>
-<label class="k"><input type="checkbox" value="k" checked>カ</label>
-<label class="s"><input type="checkbox" value="s" checked>サ</label>
-<label class="t"><input type="checkbox" value="t" checked>タ</label>
-<label class="n"><input type="checkbox" value="n" checked>ナ</label>
-<label class="h"><input type="checkbox" value="h" checked>ハ</label>
-<label class="m"><input type="checkbox" value="m" checked>マ</label>
-<label class="y"><input type="checkbox" value="y" checked>ヤ</label>
-<label class="r"><input type="checkbox" value="r" checked>ラ</label>
-<label class="w"><input type="checkbox" value="w" checked>ワ</label>
-</div>
+        <div class="settings-group">
+            <label><input id="dak" type="checkbox" checked> Dakuten</label>
+            <label><input id="handa" type="checkbox" checked> Handakuten</label>
+        </div>
 
-<p>
-<label><input id="dak" type="checkbox" checked> Dakuten</label>
-<label><input id="handa" type="checkbox" checked> Handakuten</label>
-</p>
+        <div>
+            <button class="action-btn" onclick="startGame()">Aloita</button>
+            <button class="secondary-btn" onclick="document.getElementById('p').style.display='block'">Näytä taulukko</button>
+        </div>
 
-<button onclick="startGame()">Aloita</button>
-<button onclick="document.getElementById('p').style.display='block'">Näytä taulukko</button>
+        <div id="card" class="card a">ア</div>
 
-<div id="card" class="card a">ア</div>
+        <input id="ans" type="text" placeholder="romaji" autocomplete="off">
 
-<input id="ans" placeholder="romaji">
+        <br><br>
 
-<br><br>
+        <button class="action-btn" onclick="checkAnswer()">Tarkista</button>
 
-<button onclick="checkAnswer()">Tarkista</button>
+        <div id="fb"></div>
 
-<div id="fb"></div>
-
-<div class="stats">
-Pisteet <span id="sc">0</span> |
-Putki <span id="st">0</span> |
-Tarkkuus <span id="ac">0</span>%
-</div>
-
+        <div class="stats">
+            Pisteet <span id="sc">0</span> |
+            Putki <span id="st">0</span> |
+            Tarkkuus <span id="ac">0</span>%
+        </div>
+    </div>
 </div>
 
 <div id="p" class="popup">
 <div class="content">
-
-<button onclick="document.getElementById('p').style.display='none'">
-Sulje
-</button>
-
-<h2>Katakana + romaji</h2>
-
-<table class="katakanaTable">
-
-<tr>
-<th></th>
-<th>a</th>
-<th>i</th>
-<th>u</th>
-<th>e</th>
-<th>o</th>
-</tr>
-
-<tr class="a">
-<td>∅</td><td>ア a</td><td>イ i</td><td>ウ u</td><td>エ e</td><td>オ o</td>
-</tr>
-
-<tr class="k">
-<td>k</td><td>カ ka</td><td>キ ki</td><td>ク ku</td><td>ケ ke</td><td>コ ko</td>
-</tr>
-
-<tr class="s">
-<td>s</td><td>サ sa</td><td>シ shi</td><td>ス su</td><td>セ se</td><td>ソ so</td>
-</tr>
-
-<tr class="t">
-<td>t</td><td>タ ta</td><td>チ chi</td><td>ツ tsu</td><td>テ te</td><td>ト to</td>
-</tr>
-
-<tr class="n">
-<td>n</td><td>ナ na</td><td>ニ ni</td><td>ヌ nu</td><td>ネ ne</td><td>ノ no</td>
-</tr>
-
-<tr class="h">
-<td>h</td><td>ハ ha</td><td>ヒ hi</td><td>フ fu</td><td>ヘ he</td><td>ホ ho</td>
-</tr>
-
-<tr class="m">
-<td>m</td><td>マ ma</td><td>ミ mi</td><td>ム mu</td><td>メ me</td><td>モ mo</td>
-</tr>
-
-<tr class="y">
-<td>y</td><td>ヤ ya</td><td>–</td><td>ユ yu</td><td>–</td><td>ヨ yo</td>
-</tr>
-
-<tr class="r">
-<td>r</td><td>ラ ra</td><td>リ ri</td><td>ル ru</td><td>レ re</td><td>ロ ro</td>
-</tr>
-
-<tr class="w">
-<td>w</td><td>ワ wa</td><td>–</td><td>–</td><td>–</td><td>ヲ wo</td>
-</tr>
-
-<tr style="background:#ddd">
-<td>n</td>
-<td colspan="5">ン n</td>
-</tr>
-
-<tr class="g">
-<td>g</td><td>ガ ga</td><td>ギ gi</td><td>グ gu</td><td>ゲ ge</td><td>ゴ go</td>
-</tr>
-
-<tr class="z">
-<td>z</td><td>ザ za</td><td>ジ ji</td><td>ズ zu</td><td>ゼ ze</td><td>ゾ zo</td>
-</tr>
-
-<tr class="d">
-<td>d</td><td>ダ da</td><td>ヂ ji</td><td>づ/ヅ zu</td><td>デ de</td><td>ド do</td>
-</tr>
-
-<tr class="b">
-<td>b</td><td>バ ba</td><td>ビ bi</td><td>ブ bu</td><td>ベ be</td><td>ボ bo</td>
-</tr>
-
-<tr class="p">
-<td>p</td><td>パ pa</td><td>ピ pi</td><td>プ pu</td><td>ペ pe</td><td>ポ po</td>
-</tr>
-
-</table>
-
+    <h2>Katakana + romaji</h2>
+    <table class="katakanaTable">
+        <tr>
+            <th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th>
+        </tr>
+        <tr class="a"><td>∅</td><td>ア a</td><td>イ i</td><td>ウ u</td><td>エ e</td><td>オ o</td></tr>
+        <tr class="k"><td>k</td><td>カ ka</td><td>キ ki</td><td>ク ku</td><td>ケ ke</td><td>コ ko</td></tr>
+        <tr class="s"><td>s</td><td>サ sa</td><td>シ shi</td><td>ス su</td><td>セ se</td><td>ソ so</td></tr>
+        <tr class="t"><td>t</td><td>タ ta</td><td>チ chi</td><td>ツ tsu</td><td>テ te</td><td>ト to</td></tr>
+        <tr class="n"><td>n</td><td>ナ na</td><td>ニ ni</td><td>ヌ nu</td><td>ネ ne</td><td>ノ no</td></tr>
+        <tr class="h"><td>h</td><td>ハ ha</td><td>ヒ hi</td><td>フ fu</td><td>ヘ he</td><td>ホ ho</td></tr>
+        <tr class="m"><td>m</td><td>マ ma</td><td>ミ mi</td><td>ム mu</td><td>メ me</td><td>モ mo</td></tr>
+        <tr class="y"><td>y</td><td>ヤ ya</td><td>–</td><td>ユ yu</td><td>–</td><td>ヨ yo</td></tr>
+        <tr class="r"><td>r</td><td>ラ ra</td><td>リ ri</td><td>ル ru</td><td>レ re</td><td>ロ ro</td></tr>
+        <tr class="w"><td>w</td><td>ワ wa</td><td>–</td><td>–</td><td>–</td><td>ヲ wo</td></tr>
+        <tr style="background:#ddd"><td>n</td><td colspan="5">ン n</td></tr>
+        <tr class="g"><td>g</td><td>ガ ga</td><td>ギ gi</td><td>グ gu</td><td>ゲ ge</td><td>ゴ go</td></tr>
+        <tr class="z"><td>z</td><td>ザ za</td><td>ジ ji</td><td>ズ zu</td><td>ゼ ze</td><td>ゾ zo</td></tr>
+        <tr class="d"><td>d</td><td>ダ da</td><td>ヂ ji</td><td>づ zu</td><td>デ de</td><td>ド do</td></tr>
+        <tr class="b"><td>b</td><td>バ ba</td><td>ビ bi</td><td>ブ bu</td><td>ベ be</td><td>ボ bo</td></tr>
+        <tr class="p"><td>p</td><td>パ pa</td><td>ピ pi</td><td>プ pu</td><td>ペ pe</td><td>ポ po</td></tr>
+    </table>
+    <br>
+    <button class="secondary-btn" onclick="document.getElementById('p').style.display='none'">Sulje</button>
 </div>
 </div>
 
 <script>
-
 const base=[
 ['ア','a','a'],['イ','i','a'],['ウ','u','a'],['エ','e','a'],['オ','o','a'],
 ['カ','ka','k'],['キ','ki','k'],['ク','ku','k'],['ケ','ke','k'],['コ','ko','k'],
@@ -367,7 +439,6 @@ ans.addEventListener('keydown', e => {
     if(e.key === 'Enter') checkAnswer();
 });
 
-// Käynnistetään peli kerran heti sivun latauduttua
 startGame();
 </script>
 
