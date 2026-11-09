@@ -433,8 +433,8 @@ button.action-btn:hover {
         <a href="index.html" class="päävalikko-btn">
             ← Päävalikkoon
         </a>
-        <h1>🀄 Kiinan Muistipeli</h1>
-        <p class="subtitle">Yhdistä parit – löydetyt sanat siirtyvät siistiin kokoelmaan alle!</p>
+        <h1>🀄 Kiinan muistipeli</h1>
+        <p class="subtitle">Yhdistä parit – löydetyt sanat siirtyvät siistiin kokoelmaan alle! Kertaa ne vielä lopuksi.</p>
     </header>
 
     <!-- Parivalitsin -->
@@ -478,7 +478,6 @@ button.action-btn:hover {
 </div>
 
 <script>
-// Laaja sanasto (45 sanaa)
 const vocabList = [
     { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Hei" },
     { hanzi: "谢谢", pinyin: "xièxie", meaning: "Kiitos" },
@@ -524,8 +523,64 @@ const vocabList = [
     { hanzi: "学校", pinyin: "xuéxiào", meaning: "Koulu" },
     { hanzi: "医院", pinyin: "yīyuàn", meaning: "Sairaala" },
     { hanzi: "商店", pinyin: "shāngdiàn", meaning: "Kauppa" },
-    { hanzi: "时间", pinyin: "shíjiān", meaning: "Aika" }
+    { hanzi: "时间", pinyin: "shíjiān", meaning: "Aika" },
+    { hanzi: "咖啡", pinyin: "kāfēi", meaning: "Kahvi" },
+    { hanzi: "牛奶", pinyin: "niúnǎi", meaning: "Maito" },
+    { hanzi: "面包", pinyin: "miànbāo", meaning: "Leipä" },
+    { hanzi: "衣服", pinyin: "yīfu", meaning: "Vaatteet" },
+    { hanzi: "桌子", pinyin: "zhuōzi", meaning: "Pöytä" },
+    { hanzi: "椅子", pinyin: "yǐzi", meaning: "Tuoli" },
+    { hanzi: "今天", pinyin: "jīntiān", meaning: "Tänään" },
+    { hanzi: "明天", pinyin: "míngtiān", meaning: "Huomenna" },
+    { hanzi: "昨天", pinyin: "zuótiān", meaning: "Eilen" },
+    { hanzi: "医生", pinyin: "yīshēng", meaning: "Lääkäri" },
+    { hanzi: "中国菜", pinyin: "zhōngguócài", meaning: "Kiinalainen ruoka" },
+    { hanzi: "汉字", pinyin: "hànzì", meaning: "Kiinan merkki" },
+    { hanzi: "汉语", pinyin: "hànyǔ", meaning: "Kiinan kieli" },
+    { hanzi: "火车", pinyin: "huǒchē", meaning: "Juna" },
+    { hanzi: "电影", pinyin: "diànyǐng", meaning: "Elokuva" },
+    { hanzi: "电视", pinyin: "diànshì", meaning: "Televisio" },
+    { hanzi: "饭馆", pinyin: "fànguǎn", meaning: "Ravintola" },
+    { hanzi: "北京", pinyin: "běijīng", meaning: "Peking" },
+    { hanzi: "芬兰", pinyin: "fēnlán", meaning: "Suomi" },
+    { hanzi: "高兴", pinyin: "gāoxìng", meaning: "Iloinen / Onnellinen" },
+    { hanzi: "热", pinyin: "rè", meaning: "Kuuma" },
+    { hanzi: "冷", pinyin: "lěng", meaning: "Kylmä" },
+    { hanzi: "快", pinyin: "kuài", meaning: "Nopea / Iloinen" },
+    { hanzi: "慢", pinyin: "màn", meaning: "Hidas" },
+    { hanzi: "多", pinyin: "duō", meaning: "Paljon" },
+    { hanzi: "少", pinyin: "shǎo", meaning: "Vähän" },
+    { hanzi: "好", pinyin: "hǎo", meaning: "Hyvä" },
+    { hanzi: "坏", pinyin: "huài", meaning: "Paha / Huono" },
+    { hanzi: "新", pinyin: "xīn", meaning: "Uusi" },
+    { hanzi: "旧", pinyin: "jiù", meaning: "Vanha (esineestä)" },
+    { hanzi: "远", pinyin: "yuǎn", meaning: "Kaukana" },
+    { hanzi: "近", pinyin: "jìn", meaning: "Lähellä" },
+    { hanzi: "对", pinyin: "duì", meaning: "Oikein / Oikea" },
+    { hanzi: "错", pinyin: "cuò", meaning: "Väärin" },
+    { hanzi: "东西", pinyin: "dōngxi", meaning: "Esine / Tavara" },
+    { hanzi: "名字", pinyin: "míngzi", meaning: "Nimi" },
+    { hanzi: "问题", pinyin: "wèntí", meaning: "Kysymys / Ongelma" },
+    { hanzi: "工作", pinyin: "gōngzuò", meaning: "Työ" },
+    { hanzi: "事情", pinyin: "shìqing", meaning: "Asia" },
+    { hanzi: "年", pinyin: "nián", meaning: "Vuosi" },
+    { hanzi: "小时", pinyin: "xiǎoshí", meaning: "Tunti" },
+    { hanzi: "分钟", pinyin: "fēnzhōng", meaning: "Minuutti" },
+    { hanzi: "时候", pinyin: "shíhou", meaning: "Aika / Ajankohta" },
+    { hanzi: "地方", pinyin: "dìfang", meaning: "Paikka" },
+    { hanzi: "路", pinyin: "lù", meaning: "Tie / Reitti" },
+    { hanzi: "房间", pinyin: "fángjiān", meaning: "Huone" },
+    { hanzi: "公司", pinyin: "gōngsī", meaning: "Yritys / Yhtiö" },
+    { hanzi: "爱", pinyin: "ài", meaning: "Rakastaa" },
+    { hanzi: "喜欢", pinyin: "xǐhuan", meaning: "Pitää jostakin" },
+    { hanzi: "想", pinyin: "xiǎng", meaning: "Haluta / Ajatella" },
+    { hanzi: "吃", pinyin: "chī", meaning: "Syödä" },
+    { hanzi: "喝", pinyin: "hē", meaning: "Juoa" },
+    { hanzi: "看", pinyin: "kàn", meaning: "Katsoa / Lukea" },
+    { hanzi: "听", pinyin: "tīng", meaning: "Kuunnella" },
+    { hanzi: "说", pinyin: "shuō", meaning: "Puhua / Sanoa" }
 ];
+
 
 let cards = [];
 let flippedCards = [];
