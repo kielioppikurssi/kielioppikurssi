@@ -12,8 +12,17 @@
     padding: 0;
 }
 
-/* Päävalikko-nappi tyyli */
-.päävalikko-btn {
+/* Päävalikko- ja toimintonapit */
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.päävalikko-btn, .toggle-pinyin-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -27,17 +36,17 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
     transition: all 0.2s ease;
-    margin-bottom: 20px;
+    cursor: pointer;
 }
 
-.päävalikko-btn:hover {
+.päävalikko-btn:hover, .toggle-pinyin-btn:hover {
     background: #f8fafc;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     border-color: #cbd5e1;
 }
 
-.päävalikko-btn svg {
+.päävalikko-btn svg, .toggle-pinyin-btn svg {
     width: 18px;
     height: 18px;
     fill: currentColor;
@@ -115,6 +124,14 @@ h1 {
     font-size: 20px;
     color: #6366f1;
     font-weight: 600;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Pinyin piilotettuna */
+.target-pinyin.hidden-pinyin {
+    opacity: 0;
+    filter: blur(6px);
+    user-select: none;
 }
 
 .answer-slots {
@@ -156,7 +173,6 @@ h1 {
     animation: successPop 0.5s ease;
 }
 
-/* Puhesynteesin aikainen lukukorostus */
 .slot.speaking {
     border-color: #f59e0b !important;
     background: #fef3c7 !important;
@@ -351,13 +367,22 @@ button.action-btn:hover {
 
 <div class="container">
     <div class="main-panel">
+        <div class="top-actions">
+            <a href="index.html" class="päävalikko-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                Päävalikkoon
+            </a>
+            <button id="togglePinyinBtn" class="toggle-pinyin-btn" onclick="togglePinyin()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <span id="pinyinBtnText">Piilota pinyin</span>
+            </button>
+        </div>
+
         <h1>🀄 Hanzi-numeropulma (1–1000)</h1>
-        <a href="index.html" class="päävalikko-btn">
-            <svg viewBox="0 0 24 24">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-            </svg>
-            Päävalikkoon
-        </a>
         <p class="subtitle">Muodosta luku kiinalaisilla merkeillä!</p>
 
         <div class="target-box">
@@ -407,9 +432,8 @@ button.action-btn:hover {
 
 const hanziMap = {
     0: '零', 1: '一', 2: '二', 3: '三', 4: '四',
-    5: '五', 6: '六', 7: '七', 8: '八', 9: '九' // <-- Korjattu '九'
+    5: '五', 6: '六', 7: '七', 8: '八', 9: '九'
 };
-
 
 const pinyinMap = {
     0: 'líng', 1: 'yī', 2: 'èr', 3: 'sān', 4: 'sì',
@@ -428,6 +452,7 @@ let poolBlocks = [];
 let score = 0;
 let streak = 0;
 let isLocked = false;
+let pinyinVisible = true; // Tilamuuttuja pinyin-näkyvyydelle
 
 // --- PUHESYNTEESI (Web Speech API) ---
 function speakText(text, onEndCallback) {
@@ -436,12 +461,11 @@ function speakText(text, onEndCallback) {
         return;
     }
 
-    // Pysäytetään mahdollisesti kesken oleva puhe
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN'; // Kiinan kieli
-    utterance.rate = 0.85;   // Hieman normaalia hitaampi puherytmi oppimisen tueksi
+    utterance.lang = 'zh-CN';
+    utterance.rate = 0.85;
 
     if (onEndCallback) {
         utterance.onend = onEndCallback;
@@ -449,6 +473,21 @@ function speakText(text, onEndCallback) {
     }
 
     window.speechSynthesis.speak(utterance);
+}
+
+// Piilota / Näytä pinyin -toiminto
+function togglePinyin() {
+    pinyinVisible = !pinyinVisible;
+    const pinyinEl = document.getElementById('targetPinyin');
+    const btnText = document.getElementById('pinyinBtnText');
+
+    if (pinyinVisible) {
+        pinyinEl.classList.remove('hidden-pinyin');
+        btnText.textContent = 'Piilota pinyin';
+    } else {
+        pinyinEl.classList.add('hidden-pinyin');
+        btnText.textContent = 'Näytä pinyin';
+    }
 }
 
 // Muuntaa luvun kiinalaisiksi merkeiksi ja pinyiniksi.
@@ -613,7 +652,6 @@ function selectBlock(id) {
 
     if (currentSlots.length >= targetHanziStr.length) return;
 
-    // 1) LUE NUMERO KIINAKSI AINA KUN PELAAJA KLIKKAA PALIKKAA
     speakText(block.char);
 
     block.used = true;
@@ -622,7 +660,6 @@ function selectBlock(id) {
     clearFeedback();
     renderBoard();
 
-    // Tarkistetaan vastaus, kun kaikki ruudut on täytetty.
     if (currentSlots.length === targetHanziStr.length) {
         checkAnswer();
     }
@@ -679,16 +716,12 @@ function playFullAnswerWithHighlight(index, slots, onComplete) {
         return;
     }
 
-    // Poistetaan edellinen korostus
     slots.forEach(s => s.classList.remove('speaking'));
 
-    // Lisätään korostus nykyiseen merkkiin
     slots[index].classList.add('speaking');
     const charToSpeak = targetHanziStr[index];
 
-    // Luetaan merkki ja siirrytään seuraavaan sen valmistuttua
     speakText(charToSpeak, () => {
-        // Pieni tauko merkkien välissä selkeyden vuoksi
         setTimeout(() => {
             playFullAnswerWithHighlight(index + 1, slots, onComplete);
         }, 300);
@@ -713,13 +746,11 @@ function checkAnswer() {
 
         slots.forEach(slot => slot.classList.add('correct'));
 
-        feedback.textContent = 'Oikein!';
+        feedback.textContent = 'Oikein! 🎉 Great job!';
         feedback.style.color = '#16a34a';
 
-        // 2) KÄYNNISTETÄÄN VASTAUKSEN LUKU RAUHALLISESTI KOROSTUKSEN KANSSA
         setTimeout(() => {
             playFullAnswerWithHighlight(0, slots, () => {
-                // Odotetaan vielä hetki lukemisen päättymisen jälkeen ennen uutta kierrosta
                 setTimeout(() => {
                     newRound();
                 }, 800);
@@ -736,7 +767,6 @@ function checkAnswer() {
         feedback.textContent = 'Väärin, yritä uudelleen!';
         feedback.style.color = '#ef4444';
 
-        // Pelaaja voi poistaa ja vaihtaa merkkejä.
         setTimeout(() => {
             if (!isLocked) {
                 document.querySelectorAll('.slot').forEach(slot => {
@@ -747,10 +777,8 @@ function checkAnswer() {
     }
 }
 
-// Käynnistetään peli vasta, kun sivu on ladattu.
 document.addEventListener('DOMContentLoaded', newRound);
 
-// Jos skripti suoritetaan jo ladatun sivun jälkeen:
 if (document.readyState !== 'loading') {
     newRound();
 }
