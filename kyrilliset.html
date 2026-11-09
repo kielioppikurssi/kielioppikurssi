@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Venäjän aakkoset Trainer</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    max-width: 750px;
+    width: 100%;
+}
+
+.main-panel {
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.päävalikko-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #4f46e5;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    margin-bottom: 20px;
+}
+
+.päävalikko-btn:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+
+.päävalikko-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.opts label {
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.1s;
+}
+
+.opts label:hover {
+    transform: scale(1.05);
+}
+
+.settings-group {
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.settings-group label {
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.vokaalit { background: #ffb3b3; }
+.konsonantit1 { background: #b3d1ff; }
+.konsonantit2 { background: #b8f5b8; }
+.konsonantit3 { background: #ffd2a6; }
+.erikois { background: #dab6ff; }
+
+.card {
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 100px;
+    border-radius: 24px;
+    font-weight: bold;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.help-text {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 15px;
+}
+
+.stats {
+    margin: 15px 0 0 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #475569;
+}
+
+input[type="text"] {
+    font-size: 24px;
+    padding: 10px;
+    text-align: center;
+    width: 220px;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+    border-color: #6366f1;
+}
+
+button.action-btn {
+    padding: 10px 20px;
+    background: #6366f1;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    margin: 5px;
+}
+
+button.action-btn:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
+}
+
+button.secondary-btn {
+    padding: 10px 20px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 16px;
+    margin: 5px;
+}
+
+button.secondary-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+}
+
+.content {
+    background: #fff;
+    width: 95%;
+    max-width: 950px;
+    margin: 40px auto;
+    padding: 30px;
+    max-height: 85vh;
+    overflow: auto;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: left;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+}
+
+td, th {
+    border: 1px solid #cbd5e1;
+    padding: 10px;
+    text-align: center;
+}
+
+.ok { color: #16a34a; font-weight: bold; margin-top: 10px; }
+.bad { color: #dc2626; font-weight: bold; margin-top: 10px; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="main-panel">
+        <h1>🇷🇺 Русский Алфавит</h1>
+        <a href="index.html" class="päävalikko-btn">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            Päävalikkoon
+        </a>
+
+        <div class="opts">
+            <label class="vokaalit"><input type="checkbox" value="vokaalit" checked> Vokaalit</label>
+            <label class="konsonantit1"><input type="checkbox" value="konsonantit1" checked> Konsonantit 1</label>
+            <label class="konsonantit2"><input type="checkbox" value="konsonantit2" checked> Konsonantit 2</label>
+            <label class="konsonantit3"><input type="checkbox" value="konsonantit3" checked> Konsonantit 3</label>
+            <label class="erikois"><input type="checkbox" value="erikois" checked> Erikoismerkit</label>
+        </div>
+
+        <div class="settings-group">
+            <label><input id="isot" type="checkbox"> Harjoittele myös isoilla kirjaimilla</label>
+        </div>
+
+        <div>
+            <button class="action-btn" onclick="startGame()">Aloita</button>
+            <button class="secondary-btn" onclick="document.getElementById('p').style.display='block'">Näytä taulukko</button>
+        </div>
+
+        <div id="card" class="card">а</div>
+
+        <input id="ans" type="text" placeholder="kirjoita translitterointi" autocomplete="off">
+        <div class="help-text">Vinkki: Voit käyttää hatullisten sijaan myös zh, sh, ts jne.</div>
+
+        <br>
+
+        <button class="action-btn" onclick="checkAnswer()">Tarkista</button>
+
+        <div id="fb"></div>
+
+        <div class="stats">
+            Pisteet <span id="sc">0</span> |
+            Putki <span id="st">0</span> |
+            Tarkkuus <span id="ac">0</span>%
+        </div>
+    </div>
+</div>
+
+<div id="p" class="popup">
+<div class="content">
+    <h2>Venäjän aakkoset ja translitterointi</h2>
+    <table>
+        <tr>
+            <th>Kirjain</th><th>Nimi</th><th>Ensisijainen</th><th>Vaihtoehtoinen (helppo)</th>
+        </tr>
+        <tr><td>а / А</td><td>а</td><td>a</td><td>a</td></tr>
+        <tr><td>б / Б</td><td>бэ</td><td>b</td><td>b</td></tr>
+        <tr><td>в / В</td><td>вэ</td><td>v</td><td>v</td></tr>
+        <tr><td>г / Г</td><td>гэ</td><td>g</td><td>g</td></tr>
+        <tr><td>д / Д</td><td>дэ</td><td>d</td><td>d</td></tr>
+        <tr><td>е / Е</td><td>е</td><td>je</td><td>je / e</td></tr>
+        <tr><td>ё / Ё</td><td>ё</td><td>jo</td><td>jo / o</td></tr>
+        <tr><td>ж / Ж</td><td>жэ</td><td>ž</td><td>zh / z</td></tr>
+        <tr><td>з / З</td><td>зэ</td><td>z</td><td>z</td></tr>
+        <tr><td>и / И</td><td>и</td><td>i</td><td>i</td></tr>
+        <tr><td>й / Й</td><td>и краткое</td><td>j</td><td>j</td></tr>
+        <tr><td>к / К</td><td>ка</td><td>k</td><td>k</td></tr>
+        <tr><td>л / Л</td><td>эл</td><td>l</td><td>l</td></tr>
+        <tr><td>м / М</td><td>эм</td><td>m</td><td>m</td></tr>
+        <tr><td>н / Н</td><td>эн</td><td>n</td><td>n</td></tr>
+        <tr><td>о / О</td><td>о</td><td>o</td><td>o</td></tr>
+        <tr><td>п / П</td><td>пэ</td><td>p</td><td>p</td></tr>
+        <tr><td>р / Р</td><td>эр</td><td>r</td><td>r</td></tr>
+        <tr><td>с / С</td><td>эс</td><td>s</td><td>s</td></tr>
+        <tr><td>т / Т</td><td>тэ</td><td>t</td><td>t</td></tr>
+        <tr><td>у / У</td><td>у</td><td>u</td><td>u</td></tr>
+        <tr><td>ф / Ф</td><td>эф</td><td>f</td><td>f</td></tr>
+        <tr><td>х / Х</td><td>ха</td><td>h</td><td>h</td></tr>
+        <tr><td>ц / Ц</td><td>цэ</td><td>c</td><td>ts / c</td></tr>
+        <tr><td>ч / Ч</td><td>че</td><td>č</td><td>ch / c</td></tr>
+        <tr><td>ш / Ш</td><td>ша</td><td>š</td><td>sh / s</td></tr>
+        <tr><td>щ / Щ</td><td>ща</td><td>šč</td><td>shch / sch</td></tr>
+        <tr><td>ъ / Ъ</td><td>твёрдый знак</td><td>ʺ</td><td>"" tai "</td></tr>
+        <tr><td>ы / Ы</td><td>ы</td><td>y</td><td>y / i</td></tr>
+        <tr><td>ь / Ь</td><td>мягкий знак</td><td>ʹ</td><td>' tai '</td></tr>
+        <tr><td>э / Э</td><td>э</td><td>e</td><td>e</td></tr>
+        <tr><td>ю / Ю</td><td>ю</td><td>ju</td><td>ju</td></tr>
+        <tr><td>я / Я</td><td>я</td><td>ja</td><td>ja</td></tr>
+    </table>
+    <br>
+    <button class="secondary-btn" onclick="document.getElementById('p').style.display='none'">Sulje</button>
+</div>
+</div>
+
+<script>
+const alphabet = [
+    ['а', 'А', 'a', 'vokaalit'],
+    ['е', 'Е', 'je', 'vokaalit'],
+    ['ё', 'Ё', 'jo', 'vokaalit'],
+    ['и', 'И', 'i', 'vokaalit'],
+    ['о', 'О', 'o', 'vokaalit'],
+    ['у', 'У', 'u', 'vokaalit'],
+    ['ы', 'Ы', 'y', 'vokaalit'],
+    ['э', 'Э', 'e', 'vokaalit'],
+    ['ю', 'Ю', 'ju', 'vokaalit'],
+    ['я', 'Я', 'ja', 'vokaalit'],
+    ['б', 'Б', 'b', 'konsonantit1'],
+    ['в', 'В', 'v', 'konsonantit1'],
+    ['г', 'Г', 'g', 'konsonantit1'],
+    ['д', 'Д', 'd', 'konsonantit1'],
+    ['ж', 'Ж', 'ž', 'konsonantit1'],
+    ['з', 'З', 'z', 'konsonantit1'],
+    ['к', 'К', 'k', 'konsonantit1'],
+    ['л', 'Л', 'l', 'konsonantit2'],
+    ['м', 'М', 'm', 'konsonantit2'],
+    ['н', 'Н', 'n', 'konsonantit2'],
+    ['п', 'П', 'p', 'konsonantit2'],
+    ['р', 'Р', 'r', 'konsonantit2'],
+    ['с', 'С', 's', 'konsonantit2'],
+    ['т', 'Т', 't', 'konsonantit2'],
+    ['ф', 'Ф', 'f', 'konsonantit3'],
+    ['х', 'Х', 'h', 'konsonantit3'],
+    ['ц', 'Ц', 'c', 'konsonantit3'],
+    ['ч', 'Ч', 'č', 'konsonantit3'],
+    ['ш', 'Ш', 'š', 'konsonantit3'],
+    ['щ', 'Щ', 'šč', 'konsonantit3'],
+    ['й', 'Й', 'j', 'konsonantit3'],
+    ['ъ', 'Ъ', 'ʺ', 'erikois'],
+    ['ь', 'Ь', 'ʹ', 'erikois']
+];
+
+let pool = [];
+let cur;
+let score = 0;
+let streak = 0;
+let total = 0;
+let right = 0;
+
+function startGame() {
+    pool = [];
+    const sel = Array.from(document.querySelectorAll('.opts input[type=checkbox]:checked'))
+        .map(x => x.value);
+
+    for (const x of alphabet) {
+        if (sel.includes(x[3])) pool.push(x);
+    }
+
+    if (pool.length === 0) {
+        alert('Valitse vähintään yksi ryhmä!');
+        return;
+    }
+
+    score = 0;
+    streak = 0;
+    total = 0;
+    right = 0;
+    sc.textContent = score;
+    st.textContent = streak;
+    ac.textContent = 0;
+    fb.innerHTML = '';
+    next();
+}
+
+function next() {
+    if (!pool.length) return;
+    cur = pool[Math.floor(Math.random() * pool.length)];
+    const useUppercase = document.getElementById('isot').checked && Math.random() < 0.5;
+    card.textContent = useUppercase ? cur[1] : cur[0];
+    ans.value = '';
+    ans.focus();
+}
+
+// Hyväksytään myös helpot näppäinkorvikkeet (esim. zh -> ž, sh -> š)
+function checkAnswer() {
+    if (!cur) return;
+    total++;
+
+    let userIn = ans.value.trim().toLowerCase();
+    let expected = cur[2].toLowerCase();
+
+    // Sallitaan vaihtoehtoiset kirjoitustavat
+    const equivalents = {
+        'ž': ['ž', 'zh', 'z'],
+        'š': ['š', 'sh'],
+        'šč': ['šč', 'shch', 'sch'],
+        'č': ['č', 'ch'],
+        'c': ['c', 'ts'],
+        'ʺ': ['ʺ', '"', "'"],
+        'ʹ': ['ʹ', "'"]
+    };
+
+    let acceptedAnswers = [expected];
+    if (equivalents[expected]) {
+        acceptedAnswers = acceptedAnswers.concat(equivalents[expected]);
+    }
+
+    if (acceptedAnswers.includes(userIn)) {
+        score++;
+        right++;
+        streak++;
+        fb.innerHTML = '<div class="ok">✅ ' + cur[0] + '/' + cur[1] + ' = ' + cur[2] + '</div>';
+    } else {
+        streak = 0;
+        pool.push(cur);
+        fb.innerHTML = '<div class="bad">❌ Oikea vastaus: ' + cur[2] + '</div>';
+    }
+
+    sc.textContent = score;
+    st.textContent = streak;
+    ac.textContent = Math.round(right * 100 / total) || 0;
+
+    setTimeout(next, 900);
+}
+
+ans.addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+});
+
+startGame();
+</script>
+
+</body>
+</html>
