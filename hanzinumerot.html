@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hanzi Numeropulma</title>
+<title>Hanzi-numeropulma</title>
 
 <style>
 * {
@@ -91,7 +91,7 @@ h1 {
     justify-content: center;
     gap: 12px;
     margin-bottom: 25px;
-    min-height: 70px;
+    min-height: 75px;
     align-items: center;
 }
 
@@ -310,11 +310,11 @@ button.action-btn:hover {
 <div class="container">
     <div class="main-panel">
         <h1>🀄 Hanzi Numeropulma</h1>
-        <p class="subtitle">Kirjoita luku kiinalaisilla merkeillä (hanzeilla)!</p>
+        <p class="subtitle">Muodosta luku kiinalaisilla merkeillä!</p>
 
         <div class="target-box">
-            <div id="targetNumber" class="target-number">37</div>
-            <div id="targetPinyin" class="target-pinyin">sān shí qī</div>
+            <div id="targetNumber" class="target-number">59</div>
+            <div id="targetPinyin" class="target-pinyin">wǔ shí jiǔ</div>
         </div>
 
         <div id="answerSlots" class="answer-slots"></div>
@@ -323,7 +323,7 @@ button.action-btn:hover {
         <div id="blockPool" class="pool"></div>
 
         <div class="controls">
-            <button class="action-btn" onclick="clearAnswer()">Tyhjennä rivi</button>
+            <button class="action-btn" onclick="userClear()">Tyhjennä rivi</button>
         </div>
 
         <div id="feedback" class="feedback"></div>
@@ -347,7 +347,6 @@ button.action-btn:hover {
             <div class="hanzi-item"><span class="hanzi-num">8</span><span class="hanzi-char">八</span><span class="hanzi-pinyin">bā</span></div>
             <div class="hanzi-item"><span class="hanzi-num">9</span><span class="hanzi-char">九</span><span class="hanzi-pinyin">jiǔ</span></div>
             <div class="hanzi-item"><span class="hanzi-num">10</span><span class="hanzi-char">十</span><span class="hanzi-pinyin">shí</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">100</span><span class="hanzi-char">百</span><span class="hanzi-pinyin">bǎi</span></div>
         </div>
     </div>
 </div>
@@ -396,14 +395,15 @@ function nextTask() {
     currentSlots = new Array(targetHanziStr.length).fill(null);
     renderSlots();
 
-    // Luodaan 8 palikan laari: oikeat hanzi-merkit + vääriä sekaan
+    // Luodaan 8 palikkaa (tarvittavat merkit + satunnaisia vääriä merkkejä)
     let poolChars = targetHanziStr.split('');
     while(poolChars.length < 8) {
         let randomChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
         poolChars.push(randomChar);
     }
+
     poolBlocks = poolChars
-        .map(val => ({ val, id: Math.random(), used: false }))
+        .map((val, id) => ({ val, id, used: false }))
         .sort(() => Math.random() - 0.5);
 
     renderPool();
@@ -412,10 +412,10 @@ function nextTask() {
 function renderSlots() {
     const container = document.getElementById('answerSlots');
     container.innerHTML = '';
-    currentSlots.forEach((val, idx) => {
+    currentSlots.forEach((val) => {
         const slot = document.createElement('div');
         slot.className = 'slot' + (val !== null ? ' filled fly-in' : '');
-        slot.textContent = val !== null ? val : '';
+        slot.textContent = val !== null ? val.val : '';
         container.appendChild(slot);
     });
 }
@@ -440,19 +440,25 @@ function selectBlock(poolIndex) {
     const emptySlotIdx = currentSlots.indexOf(null);
     if (emptySlotIdx === -1) return;
 
-    currentSlots[emptySlotIdx] = poolBlocks[poolIndex].val;
+    // Asetetaan valittu palikka slottiin
+    currentSlots[emptySlotIdx] = poolBlocks[poolIndex];
     poolBlocks[poolIndex].used = true;
 
     renderSlots();
     renderPool();
 
+    // Jos kaikki paikat on täytetty, tarkistetaan vastaus!
     if (!currentSlots.includes(null)) {
         checkAnswer();
     }
 }
 
-function clearAnswer() {
+function userClear() {
     if (isLocked) return;
+    resetSlots();
+}
+
+function resetSlots() {
     currentSlots.fill(null);
     poolBlocks.forEach(b => b.used = false);
     renderSlots();
@@ -462,11 +468,14 @@ function clearAnswer() {
 
 function checkAnswer() {
     isLocked = true;
-    const userAnswer = currentSlots.join('');
+    
+    // Yhdistetään merkkeinä käyttäjän valitsevat palikat
+    const userAnswerStr = currentSlots.map(s => s.val).join('');
     const slotsEls = document.querySelectorAll('.slot');
     const fb = document.getElementById('feedback');
 
-    if (userAnswer === targetHanziStr) {
+    // Pelkkä merkkien merkkijono ratkaisee, onko vastaus oikein (riippumatta siitä mitä 2 samanlaisesta palikasta käytettiin)
+    if (userAnswerStr === targetHanziStr) {
         slotsEls.forEach(s => s.classList.add('correct'));
         score += 10;
         streak += 1;
@@ -483,7 +492,8 @@ function checkAnswer() {
         updateStats();
 
         setTimeout(() => {
-            clearAnswer();
+            resetSlots();
+            isLocked = false;
         }, 1200);
     }
 }
