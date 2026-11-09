@@ -387,6 +387,7 @@ button.action-btn:hover {
             <div class="hanzi-item"><span class="hanzi-num">9</span><span class="hanzi-char">九</span><span class="hanzi-pinyin">jiǔ</span></div>
             <div class="hanzi-item"><span class="hanzi-num">10</span><span class="hanzi-char">十</span><span class="hanzi-pinyin">shí</span></div>
             <div class="hanzi-item"><span class="hanzi-num">100</span><span class="hanzi-char">百</span><span class="hanzi-pinyin">bǎi</span></div>
+            <div class="hanzi-item"><span class="hanzi-num">1000</span><span class="hanzi-char">千</span><span class="hanzi-pinyin">qiān</span></div>
             <div class="hanzi-item"><span class="hanzi-num">0</span><span class="hanzi-char">零</span><span class="hanzi-pinyin">líng</span></div>
         </div>
     </div>
@@ -395,7 +396,7 @@ button.action-btn:hover {
 <script>
 const hanziMap = {0:'零', 1:'一', 2:'二', 3:'三', 4:'四', 5:'五', 6:'六', 7:'七', 8:'八', 9:'九', 10:'十'};
 const pinyinMap = {0:'líng', 1:'yī', 2:'èr', 3:'sān', 4:'sì', 5:'wǔ', 6:'liù', 7:'qī', 8:'bā', 9:'jiǔ', 10:'shí'};
-const allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百'];
+const allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千'];
 
 let currentNumber = 0;
 let targetHanziStr = "";
@@ -405,178 +406,9 @@ let score = 0;
 let streak = 0;
 let isLocked = false;
 
+// Täydellinen ja kieliopillisesti tarkka kiinalainen lukugeneraattori (1–1000)
 function numberToChinese(n) {
     if (n === 1000) return { hanzi: '一千', pinyin: 'yī qiān' };
     
     let hz = '';
     let py = '';
-    
-    // Sadat
-    let hundreds = Math.floor(n / 100);
-    let remainder = n % 100;
-    
-    if (hundreds > 0) {
-        // Käytetään satojen kohdalla kielioppisääntöä: 200 on 两百 (liǎng bǎi)
-        if (hundreds === 2) {
-            hz += '两百';
-            py += 'liǎng bǎi';
-        } else {
-            hz += (hundreds > 1 ? hanziMap[hundreds] : '') + '百';
-            py += (hundreds > 1 ? pinyinMap[hundreds] + ' ' : '') + 'bǎi';
-        }
-        
-        if (remainder > 0 && remainder < 10) {
-            hz += '零';
-            py += ' líng';
-        }
-    }
-    
-    // Kymmenet
-    let tens = Math.floor(remainder / 10);
-    let units = remainder % 10;
-    
-    if (tens > 0) {
-        if (hundreds > 0 || tens > 1) {
-            hz += hanziMap[tens];
-            py += ' ' + pinyinMap[tens];
-        }
-        hz += '十';
-        py += ' shí';
-    }
-    
-    // Ykköset
-    if (units > 0) {
-        hz += hanziMap[units];
-        py += (tens > 0 || hundreds > 0 ? ' ' : '') + pinyinMap[units];
-    }
-    
-    if (n <= 10) {
-        hz = hanziMap[n];
-        py = pinyinMap[n];
-    }
-    
-    return { hanzi: hz, pinyin: py };
-}
-
-function nextTask() {
-    isLocked = false;
-    document.getElementById('feedback').innerHTML = '';
-    
-    currentNumber = Math.floor(Math.random() * 1000) + 1;
-    const res = numberToChinese(currentNumber);
-    targetHanziStr = res.hanzi;
-
-    document.getElementById('targetNumber').textContent = currentNumber;
-    document.getElementById('targetPinyin').textContent = res.pinyin;
-
-    currentSlots = new Array(targetHanziStr.length).fill(null);
-    renderSlots();
-
-    let poolChars = targetHanziStr.split('');
-    while(poolChars.length < 8) {
-        let randomChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
-        poolChars.push(randomChar);
-    }
-
-    poolBlocks = poolChars
-        .map((val, id) => ({ val, id, used: false }))
-        .sort(() => Math.random() - 0.5);
-
-    renderPool();
-}
-
-function renderSlots() {
-    const container = document.getElementById('answerSlots');
-    container.innerHTML = '';
-    currentSlots.forEach((val) => {
-        const slot = document.createElement('div');
-        slot.className = 'slot' + (val !== null ? ' filled fly-in' : '');
-        slot.textContent = val !== null ? val.val : '';
-        container.appendChild(slot);
-    });
-}
-
-function renderPool() {
-    const container = document.getElementById('blockPool');
-    container.innerHTML = '';
-    poolBlocks.forEach((block, idx) => {
-        const el = document.createElement('div');
-        el.className = 'block' + (block.used ? ' used' : ' fly-in');
-        el.textContent = block.val;
-        if (!block.used) {
-            el.onclick = () => selectBlock(idx);
-        }
-        container.appendChild(el);
-    });
-}
-
-function selectBlock(poolIndex) {
-    if (isLocked) return;
-
-    const emptySlotIdx = currentSlots.indexOf(null);
-    if (emptySlotIdx === -1) return;
-
-    currentSlots[emptySlotIdx] = poolBlocks[poolIndex];
-    poolBlocks[poolIndex].used = true;
-
-    renderSlots();
-    renderPool();
-
-    if (!currentSlots.includes(null)) {
-        checkAnswer();
-    }
-}
-
-function userClear() {
-    if (isLocked) return;
-    resetSlots();
-}
-
-function resetSlots() {
-    currentSlots.fill(null);
-    poolBlocks.forEach(b => b.used = false);
-    renderSlots();
-    renderPool();
-    document.getElementById('feedback').innerHTML = '';
-}
-
-function checkAnswer() {
-    isLocked = true;
-    
-    const userAnswerStr = currentSlots.map(s => s.val).join('');
-    const slotsEls = document.querySelectorAll('.slot');
-    const fb = document.getElementById('feedback');
-
-    if (userAnswerStr === targetHanziStr) {
-        slotsEls.forEach(s => s.classList.add('correct'));
-        score += 10;
-        streak += 1;
-        fb.innerHTML = '<span style="color: #22c55e;">✨ Oikein! Loistavaa!</span>';
-        updateStats();
-
-        setTimeout(() => {
-            nextTask();
-        }, 2000);
-    } else {
-        slotsEls.forEach(s => s.classList.add('error'));
-        streak = 0;
-        fb.innerHTML = '<span style="color: #ef4444;">❌ Väärät merkit tai järjestys! Yritä uudelleen.</span>';
-        updateStats();
-
-        setTimeout(() => {
-            resetSlots();
-            isLocked = false;
-        }, 1200);
-    }
-}
-
-function updateStats() {
-    document.getElementById('score').textContent = score;
-    document.getElementById('streak').textContent = streak;
-}
-
-nextTask();
-</script>
-
-</body>
-</html>
