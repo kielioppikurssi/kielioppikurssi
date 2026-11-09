@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Kiinalainen Numeropulma - Hanzi Trainer</title>
+<title>Hanzi Numeropulma</title>
 
 <style>
 * {
@@ -37,7 +37,6 @@ body {
     }
 }
 
-/* Pääpaneeli */
 .main-panel {
     background: #ffffff;
     padding: 35px;
@@ -60,7 +59,6 @@ h1 {
     margin-bottom: 25px;
 }
 
-/* Tehtäväalue */
 .target-box {
     background: #f8f9fa;
     border: 2px dashed #cbd5e1;
@@ -89,7 +87,6 @@ h1 {
     font-weight: 600;
 }
 
-/* Vastauskenttä (Slots) */
 .answer-slots {
     display: flex;
     justify-content: center;
@@ -133,7 +130,6 @@ h1 {
     animation: shake 0.4s ease;
 }
 
-/* Palikkalaari (Pool) */
 .pool-label {
     font-size: 14px;
     font-weight: 600;
@@ -186,7 +182,6 @@ h1 {
     opacity: 0.6;
 }
 
-/* Kontrollit ja palaute */
 .controls {
     display: flex;
     justify-content: center;
@@ -229,7 +224,6 @@ button.action-btn:hover {
     color: #475569;
 }
 
-/* Oikea sivupaneeli (Hanzi-lista) */
 .sidebar {
     background: #ffffff;
     padding: 25px;
@@ -289,7 +283,6 @@ button.action-btn:hover {
     color: #334155;
 }
 
-/* Animaatiot */
 @keyframes successPop {
     0% { transform: scale(1); }
     50% { transform: scale(1.15) rotate(3deg); }
@@ -316,26 +309,19 @@ button.action-btn:hover {
 <body>
 
 <div class="container">
-    <!-- PÄÄPELIALUE -->
     <div class="main-panel">
         <h1>🀄 Kiinalainen Numeropulma</h1>
         <p class="subtitle">Klikkaa palikoita oikeassa järjestyksessä muodostaaksesi luku!</p>
 
         <div class="target-box">
-            <div id="targetHanzi" class="target-hanzi">三十七</div>
+            <div id="targetHanzi" class="target-hanzi">37</div>
             <div id="targetPinyin" class="target-pinyin">sān shí qī</div>
         </div>
 
-        <!-- Vastauskenttä paikat -->
-        <div id="answerSlots" class="answer-slots">
-            <!-- Luodaan dynaamisesti -->
-        </div>
+        <div id="answerSlots" class="answer-slots"></div>
 
         <div class="pool-label">Valitse oikeat palikat (8 kpl):</div>
-        <!-- 8 Palikan laari -->
-        <div id="blockPool" class="pool">
-            <!-- Luodaan dynaamisesti -->
-        </div>
+        <div id="blockPool" class="pool"></div>
 
         <div class="controls">
             <button class="action-btn" onclick="clearAnswer()">Tyhjennä rivi</button>
@@ -349,7 +335,6 @@ button.action-btn:hover {
         </div>
     </div>
 
-    <!-- OIKEA SIVUPANEELI: HANZI-NUMEROT -->
     <div class="sidebar">
         <h2>📜 Kiinan numerot</h2>
         <div class="hanzi-list">
@@ -380,7 +365,6 @@ let score = 0;
 let streak = 0;
 let isLocked = false;
 
-// Muunnetaan luku (1-99) kiinaksi
 function numberToChinese(n) {
     if (n <= 10) return { hanzi: hanziMap[n], pinyin: pinyinMap[n] };
     let t = Math.floor(n / 10);
@@ -402,26 +386,21 @@ function nextTask() {
     isLocked = false;
     document.getElementById('feedback').innerHTML = '';
     
-    // Arvotaan luku 1 - 99 väliltä
     currentNumber = Math.floor(Math.random() * 99) + 1;
     targetString = currentNumber.toString();
 
-    // Päivitetään näkymä
     const res = numberToChinese(currentNumber);
     document.getElementById('targetHanzi').textContent = res.hanzi;
     document.getElementById('targetPinyin').textContent = res.pinyin;
 
-    // Luodaan vastauspaikat (slotit) vastauksen pituuden mukaan
     currentSlots = new Array(targetString.length).fill(null);
     renderSlots();
 
-    // Luodaan 8 palikkaa laariin: oikeat numerot + satunnaisia vääriä numeroita
     let poolDigits = targetString.split('');
     while(poolDigits.length < 8) {
         let randomDigit = Math.floor(Math.random() * 10).toString();
         poolDigits.push(randomDigit);
     }
-    // Sekoitetaan palikat satunnaiseen järjestykseen
     poolBlocks = poolDigits
         .map(val => ({ val, id: Math.random(), used: false }))
         .sort(() => Math.random() - 0.5);
@@ -457,18 +436,15 @@ function renderPool() {
 function selectBlock(poolIndex) {
     if (isLocked) return;
 
-    // Etsitään ensimmäinen tyhjä paikka slot-riviltä
     const emptySlotIdx = currentSlots.indexOf(null);
-    if (emptySlotIdx === -1) return; // Rivi on jo täynnä
+    if (emptySlotIdx === -1) return;
 
-    // Siirretään palikan arvo slottiin
     currentSlots[emptySlotIdx] = poolBlocks[poolIndex].val;
     poolBlocks[poolIndex].used = true;
 
     renderSlots();
     renderPool();
 
-    // Tarkistetaan heti, kun kaikki slotit on täytetty!
     if (!currentSlots.includes(null)) {
         checkAnswer();
     }
@@ -490,25 +466,21 @@ function checkAnswer() {
     const fb = document.getElementById('feedback');
 
     if (userAnswer === targetString) {
-        // OIKEA VASTAUS
         slotsEls.forEach(s => s.classList.add('correct'));
         score += 10;
         streak += 1;
         fb.innerHTML = '<span style="color: #22c55e;">✨ Oikein! Loistavaa!</span>';
         updateStats();
 
-        // 2 sekunnin viive ja siirry seuraavaan
         setTimeout(() => {
             nextTask();
         }, 2000);
     } else {
-        // VÄÄRÄ VASTAUS
         slotsEls.forEach(s => s.classList.add('error'));
         streak = 0;
         fb.innerHTML = '<span style="color: #ef4444;">❌ Hups, väärä järjestys! Yritä uudelleen.</span>';
         updateStats();
 
-        // 1 sekunnin kuluttua tyhjennetään rivi automaattisesti, jotta voi yrittää uudelleen
         setTimeout(() => {
             clearAnswer();
         }, 1200);
@@ -520,7 +492,6 @@ function updateStats() {
     document.getElementById('streak').textContent = streak;
 }
 
-// Käynnistä peli heti latauksella
 nextTask();
 </script>
 
