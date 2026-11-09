@@ -395,196 +395,301 @@ button.action-btn:hover {
 </div>
 
 <script>
-const hanziMap = {0:'零', 1:'一', 2:'二', 3:'三', 4:'四', 5:'五', 6:'六', 7:'七', 8:'八', 9:'九', 10:'十'};
-const pinyinMap = {0:'líng', 1:'yī', 2:'èr', 3:'sān', 4:'sì', 5:'wǔ', 6:'liù', 7:'qī', 8:'bā', 9:'jiǔ', 10:'shí'};
-const allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千'];
+
+const hanziMap = {
+    0: '零', 1: '一', 2: '二', 3: '三', 4: '四',
+    5: '五', 6: '六', 7: '七', 8: '八', 9: '九'
+};
+
+const pinyinMap = {
+    0: 'líng', 1: 'yī', 2: 'èr', 3: 'sān', 4: 'sì',
+    5: 'wǔ', 6: 'liù', 7: 'qī', 8: 'bā', 9: 'jiǔ'
+};
+
+const allPossibleHanzis = [
+    '零', '一', '两', '二', '三', '四', '五',
+    '六', '七', '八', '九', '十', '百', '千'
+];
 
 let currentNumber = 0;
-let targetHanziStr = "";
+let targetHanziStr = '';
 let currentSlots = [];
 let poolBlocks = [];
 let score = 0;
 let streak = 0;
 let isLocked = false;
 
-// Tarkka kiinalainen lukugeneraattori (1–1000)
+// Muuntaa luvun kiinalaisiksi merkeiksi ja pinyiniksi.
 function numberToChinese(n) {
-    if (n === 1000) return { hanzi: '一千', pinyin: 'yī qiān' };
-    
+    if (!Number.isInteger(n) || n < 1 || n > 1000) {
+        throw new Error('Luvun pitää olla välillä 1–1000.');
+    }
+
+    if (n === 1000) {
+        return { hanzi: '一千', pinyin: 'yī qiān' };
+    }
+
     let hz = '';
     let py = '';
 
-    let hundreds = Math.floor(n / 100);
-    let tens = Math.floor((n % 100) / 10);
-    let units = n % 10;
+    const hundreds = Math.floor(n / 100);
+    const tens = Math.floor((n % 100) / 10);
+    const units = n % 10;
 
-    // Sadasosat
+    // Sadat
     if (hundreds > 0) {
         hz += (hundreds === 2 ? '两' : hanziMap[hundreds]) + '百';
         py += (hundreds === 2 ? 'liǎng' : pinyinMap[hundreds]) + ' bǎi';
     }
 
-    // Kymmenosa
+    // Kymmenet
     if (tens > 0) {
         if (hundreds > 0) {
-            // Esim. 110 -> 一百一十 (jos halutaan lyhyt muoto tai perusmuoto)
             hz += hanziMap[tens] + '十';
             py += ' ' + pinyinMap[tens] + ' shí';
+        } else if (tens === 1) {
+            hz += '十';
+            py += 'shí';
         } else {
-            if (tens === 1) {
-                hz += '十';
-                py += 'shí';
-            } else {
-                hz += hanziMap[tens] + '十';
-                py += pinyinMap[tens] + ' shí';
-            }
+            hz += hanziMap[tens] + '十';
+            py += pinyinMap[tens] + ' shí';
         }
-    } else if (hundreds > 0 && (units > 0 || (n % 100 !== 0 && n % 10 === 0))) {
-        // Nolla tarvitaan väliin, jos kymmenet on 0 mutta ykkösiä tai satojen ja ykkösen välissä tyhjää
     }
-    
-    // Tarkistetaan erikoissääntö esim luvuille kuten 105 (一百零五)
+
+    // Nolla satojen ja ykkösten väliin.
     if (hundreds > 0 && tens === 0 && units > 0) {
         hz += '零';
         py += ' líng';
     }
 
-    // Ykkösosa
+    // Ykköset
     if (units > 0) {
-        if (py.length > 0) py += ' ';
         hz += hanziMap[units];
-        py += pinyinMap[units];
+        py += (py ? ' ' : '') + pinyinMap[units];
     }
 
     return { hanzi: hz, pinyin: py };
 }
 
+// Sekoittaa taulukon.
+function shuffle(array) {
+    const result = [...array];
+
+    for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+    }
+
+    return result;
+}
+
+// Aloittaa uuden kierroksen.
 function newRound() {
     isLocked = false;
     currentSlots = [];
-    document.getElementById('feedback').textContent = '';
-    document.getElementById('feedback').style.color = '#333';
 
-    // Arvotaan luku 1-1000
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = '';
+    feedback.style.color = '#333';
+
     currentNumber = Math.floor(Math.random() * 1000) + 1;
-    
-    // Pakotetaan testin vuoksi varmistus, että generaattori antaa aina validin merkkijonon
+
     const result = numberToChinese(currentNumber);
     targetHanziStr = result.hanzi;
 
     document.getElementById('targetNumber').textContent = currentNumber;
     document.getElementById('targetPinyin').textContent = result.pinyin;
 
-    // Otetaan oikeat merkit taulukkoon
-    let neededChars = targetHanziStr.split('');
+    // Oikeat merkit.
+    const neededChars = targetHanziStr.split('');
+
+    // Lisätään satunnaisia häiriömerkkejä.
     let pool = [...neededChars];
 
-    // Täytetään palikat yhteensä 8 kappaleeseen sopivilla satunnaisilla merkeillä
     while (pool.length < 8) {
-        let randChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
-        pool.push(randChar);
+        const randomChar =
+            allPossibleHanzis[
+                Math.floor(Math.random() * allPossibleHanzis.length)
+            ];
+
+        pool.push(randomChar);
     }
 
-    // Sekoitetaan palikat satunnaiseen järjestykseen
-    pool.sort(() => Math.random() - 0.5);
-    poolBlocks = pool.map((char, index) => ({ id: index, char: char, used: false }));
+    pool = shuffle(pool);
+
+    poolBlocks = pool.map((char, index) => ({
+        id: index,
+        char: char,
+        used: false
+    }));
 
     renderBoard();
 }
 
+// Piirtää pelilaudan uudelleen.
 function renderBoard() {
-    // Vastausruudut
     const slotsContainer = document.getElementById('answerSlots');
+    const poolContainer = document.getElementById('blockPool');
+
     slotsContainer.innerHTML = '';
-    
-    const targetLen = targetHanziStr.length;
-    for (let i = 0; i < targetLen; i++) {
+    poolContainer.innerHTML = '';
+
+    // Vastausruudut.
+    for (let i = 0; i < targetHanziStr.length; i++) {
         const slot = document.createElement('div');
-        slot.className = 'slot' + (currentSlots[i] ? ' filled' : '');
-        slot.textContent = currentSlots[i] ? currentSlots[i].char : '';
+
+        slot.className = 'slot';
+
+        if (currentSlots[i]) {
+            slot.classList.add('filled');
+            slot.textContent = currentSlots[i].char;
+        }
+
+        slot.setAttribute('role', 'button');
+        slot.setAttribute('aria-label', 'Poista merkki');
         slot.onclick = () => removeSlot(i);
+
         slotsContainer.appendChild(slot);
     }
 
-    // Valintapalikat
-    const poolContainer = document.getElementById('blockPool');
-    poolContainer.innerHTML = '';
-    
+    // Valintapalikat.
     poolBlocks.forEach(block => {
         const blockEl = document.createElement('div');
-        blockEl.className = 'block' + (block.used ? ' used' : '');
+
+        blockEl.className = 'block';
+
+        if (block.used) {
+            blockEl.classList.add('used');
+        }
+
         blockEl.textContent = block.char;
+
         blockEl.onclick = () => selectBlock(block.id);
+
         poolContainer.appendChild(blockEl);
     });
 }
 
+// Valitsee palikan.
 function selectBlock(id) {
     if (isLocked) return;
+
     const block = poolBlocks.find(b => b.id === id);
+
     if (!block || block.used) return;
+
     if (currentSlots.length >= targetHanziStr.length) return;
 
     block.used = true;
     currentSlots.push(block);
+
+    clearFeedback();
     renderBoard();
 
+    // Tarkistetaan vastaus, kun kaikki ruudut on täytetty.
     if (currentSlots.length === targetHanziStr.length) {
         checkAnswer();
     }
 }
 
+// Poistaa valitun merkin vastausriviltä.
 function removeSlot(index) {
-    if (isLocked || !currentSlots[index]) return;
+    if (isLocked) return;
+
+    if (index < 0 || index >= currentSlots.length) return;
+
     const removedBlock = currentSlots.splice(index, 1)[0];
+
     const block = poolBlocks.find(b => b.id === removedBlock.id);
-    if (block) block.used = false;
+
+    if (block) {
+        block.used = false;
+    }
+
+    clearFeedback();
     renderBoard();
 }
 
+// Tyhjentää koko vastausrivin.
 function userClear() {
     if (isLocked) return;
+
     currentSlots = [];
-    poolBlocks.forEach(b => b.used = false);
+
+    poolBlocks.forEach(block => {
+        block.used = false;
+    });
+
+    clearFeedback();
     renderBoard();
 }
 
+// Tyhjentää palautetekstin.
+function clearFeedback() {
+    const feedback = document.getElementById('feedback');
+
+    feedback.textContent = '';
+    feedback.style.color = '#333';
+
+    document.querySelectorAll('.slot').forEach(slot => {
+        slot.classList.remove('error', 'correct');
+    });
+}
+
+// Tarkistaa vastauksen.
 function checkAnswer() {
-    const userStr = currentSlots.map(s => s.char).join('');
+    const userStr = currentSlots.map(block => block.char).join('');
+
     const slots = document.querySelectorAll('.slot');
+    const feedback = document.getElementById('feedback');
 
     if (userStr === targetHanziStr) {
         isLocked = true;
+
         score += 10;
         streak += 1;
+
         document.getElementById('score').textContent = score;
         document.getElementById('streak').textContent = streak;
 
         slots.forEach(slot => slot.classList.add('correct'));
-        const fb = document.getElementById('feedback');
-        fb.textContent = 'Oikein! 🎉 Great job!';
-        fb.style.color = '#16a34a';
+
+        feedback.textContent = 'Oikein! 🎉 Great job!';
+        feedback.style.color = '#16a34a';
 
         setTimeout(() => {
             newRound();
         }, 1600);
+
     } else {
         streak = 0;
-        document.getElementById('streak').textContent = streak;
-        slots.forEach(slot => slot.classList.add('error'));
-        
-        const fb = document.getElementById('feedback');
-        fb.textContent = 'Väärin, yritä uudelleen!';
-        fb.style.color = '#ef4444';
 
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('error'));
+
+        feedback.textContent = 'Väärin, yritä uudelleen!';
+        feedback.style.color = '#ef4444';
+
+        // Pelaaja voi poistaa ja vaihtaa merkkejä.
         setTimeout(() => {
-            slots.forEach(slot => slot.classList.remove('error'));
+            if (!isLocked) {
+                document.querySelectorAll('.slot').forEach(slot => {
+                    slot.classList.remove('error');
+                });
+            }
         }, 500);
     }
 }
 
-// Käynnistetään peli
-newRound();
+// Käynnistetään peli vasta, kun sivu on ladattu.
+document.addEventListener('DOMContentLoaded', newRound);
+
+// Jos skripti suoritetaan jo ladatun sivun jälkeen:
+if (document.readyState !== 'loading') {
+    newRound();
+}
+
 </script>
 
 </body>
