@@ -645,7 +645,76 @@ function initGame() {
     });
 
     // Sekoitetaan korttipakka
-    cards.sort(() => Math.random() - 0.5);
+    // Aito ja satunnainen Fisher-Yates -sekoitusalgoritmi
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function initGame() {
+    closeWinModal();
+    const grid = document.getElementById('gameGrid');
+    grid.innerHTML = '';
+    
+    updateCollectionDisplay([]);
+
+    flippedCards = [];
+    matchedPairs = 0;
+    moves = 0;
+    isLocked = false;
+    activeVocabMap.clear();
+
+    document.getElementById('moves').textContent = moves;
+    document.getElementById('matches').textContent = matchedPairs;
+    document.getElementById('totalPairs').textContent = pairsPerGame;
+
+    // Arvotaan sanastosta satunnaiset parit aidosti satunnaistetusta listasta
+    let shuffledVocab = shuffleArray([...vocabList]).slice(0, pairsPerGame);
+    
+    cards = [];
+    shuffledVocab.forEach((item, index) => {
+        activeVocabMap.set(index, item);
+
+        // Kortti 1: Hanzi + Pinyin
+        cards.push({
+            id: index,
+            type: 'hanzi',
+            content: `<div class="card-hanzi">${item.hanzi}</div><div class="card-pinyin">${item.pinyin}</div>`,
+            matchId: index
+        });
+        // Kortti 2: Suomennos
+        cards.push({
+            id: index,
+            type: 'meaning',
+            content: `<div class="card-meaning">${item.meaning}</div>`,
+            matchId: index
+        });
+    });
+
+    // Sekoitetaan korttipakka lopuksi aidolla sekoituksella
+    shuffleArray(cards);
+
+    // Luodaan DOM-elementit
+    cards.forEach((cardData, idx) => {
+        const cardBtn = document.createElement('button');
+        cardBtn.className = 'card';
+        cardBtn.dataset.index = idx;
+        cardBtn.dataset.matchId = cardData.matchId;
+
+        cardBtn.innerHTML = `
+            <div class="card-inner">
+                <div class="card-front"></div>
+                <div class="card-back">${cardData.content}</div>
+            </div>
+        `;
+
+        cardBtn.onclick = () => flipCard(cardBtn, cardData);
+        grid.appendChild(cardBtn);
+    });
+}
 
     // Luodaan DOM-elementit
     cards.forEach((cardData, idx) => {
