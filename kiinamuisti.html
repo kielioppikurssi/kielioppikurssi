@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Kiinan kielen jättimuistipeli</title>
+<title>Kiinan kielen säädettävä muistipeli</title>
 <style>
 * {
     box-sizing: border-box;
@@ -44,13 +44,13 @@ body {
 .container {
     position: relative;
     z-index: 1;
-    max-width: 1000px;
+    max-width: 1050px;
     width: 100%;
     text-align: center;
 }
 
 header {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 h1 {
@@ -63,6 +63,7 @@ h1 {
 .subtitle {
     color: #64748b;
     font-size: 15px;
+    margin-bottom: 15px;
 }
 
 .päävalikko-btn {
@@ -88,6 +89,38 @@ h1 {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
+/* Koko-valitsin napit */
+.size-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.size-btn {
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    color: #475569;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.size-btn:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+}
+
+.size-btn.active {
+    background: #6366f1;
+    border-color: #6366f1;
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
 .score-board {
     display: flex;
     justify-content: center;
@@ -106,22 +139,25 @@ h1 {
     font-size: 18px;
 }
 
-/* Pelilauta (24 korttia = 6 saraketta x 4 riviä) */
+/* Dynaaminen pelilauta (sarakkeet mukautuvat korttimäärän mukaan) */
 .grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 12px;
     perspective: 1000px;
     margin-bottom: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 800px) {
     .grid {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 550px) {
     .grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 8px;
@@ -299,9 +335,17 @@ button.action-btn:hover {
         <a href="index.html" class="päävalikko-btn">
             ← Päävalikkoon
         </a>
-        <h1>🀄 Kiinan Jättimuistipeli (45+ sanaa)</h1>
-        <p class="subtitle">Etsi kiinalainen merkki ja sen suomenkielinen merkitys laajasta sanastosta!</p>
+        <h1>🀄 Kiinan Muistipeli</h1>
+        <p class="subtitle">Valitse pelin koko ja yhdistä kiinalaiset merkit suomennoksiin!</p>
     </header>
+
+    <!-- Parivalitsin -->
+    <div class="size-selector">
+        <button class="size-btn" onclick="setPairs(8)">8 paria (16 korttia)</button>
+        <button class="size-btn active" onclick="setPairs(12)">12 paria (24 korttia)</button>
+        <button class="size-btn" onclick="setPairs(16)">16 paria (32 korttia)</button>
+        <button class="size-btn" onclick="setPairs(20)">20 paria (40 korttia)</button>
+    </div>
 
     <div class="score-board">
         <div>Yritykset: <span id="moves">0</span></div>
@@ -318,13 +362,13 @@ button.action-btn:hover {
 <div id="winModal" class="win-message">
     <div class="win-modal">
         <h2>🎉 Upeaa työtä!</h2>
-        <p>Läpäisit jättimuistipelin <span id="finalMoves">0</span> yrityksellä!</p>
+        <p>Läpäisit pelin <span id="finalMoves">0</span> yrityksellä!</p>
         <button class="action-btn" onclick="initGame(); closeWinModal();">Pelaa uudelleen</button>
     </div>
 </div>
 
 <script>
-// Laajennettu massiivinen sanasto (45 sanaa)
+// Laaja sanasto (45 sanaa)
 const vocabList = [
     { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Hei" },
     { hanzi: "谢谢", pinyin: "xièxie", meaning: "Kiitos" },
@@ -378,7 +422,21 @@ let flippedCards = [];
 let matchedPairs = 0;
 let moves = 0;
 let isLocked = false;
-const pairsPerGame = 12; // 12 paria = 24 korttia (täyttää hienosti ruudukon)
+let pairsPerGame = 12; // Oletuksena 12 paria
+
+function setPairs(num) {
+    pairsPerGame = num;
+    
+    // Päivitetään aktiivinen nappi ulkoasussa
+    document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.includes(`${num} paria`)) {
+            btn.classList.add('active');
+        }
+    });
+
+    initGame();
+}
 
 function initGame() {
     closeWinModal();
@@ -392,7 +450,7 @@ function initGame() {
     document.getElementById('matches').textContent = matchedPairs;
     document.getElementById('totalPairs').textContent = pairsPerGame;
 
-    // Arvotaan sanastosta satunnaiset parit tälle pelikerralle
+    // Arvotaan sanastosta satunnaiset parit valitun koon mukaan
     let shuffledVocab = [...vocabList].sort(() => Math.random() - 0.5).slice(0, pairsPerGame);
     
     cards = [];
@@ -484,7 +542,7 @@ function closeWinModal() {
     document.getElementById('winModal').style.display = 'none';
 }
 
-// Käynnistetään peli heti sivun latauduttua
+// Käynnistetään peli heti oletuskoolla (12 paria)
 initGame();
 </script>
 
