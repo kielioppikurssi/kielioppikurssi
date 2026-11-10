@@ -432,3 +432,542 @@ button.action-btn:hover {
                 <svg viewBox="0 0 24 24">
                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                 </svg>
+                <span id="pinyinBtnText">Piilota pinyin</span>
+            </button>
+        </div>
+
+        <h1>🀄 Hanzi-numeropulma</h1>
+        <p class="subtitle">Muodosta luku kiinalaisilla merkeillä!</p>
+
+        <!-- Vaikeustasojen valinta -->
+        <div class="difficulty-selector">
+            <button class="diff-btn active" onclick="setDifficulty(1, this)">
+                <span>1. Aloitteleva Oppilas</span>
+                <span class="diff-sub">初学 (Chūxué) • 0–100</span>
+            </button>
+            <button class="diff-btn" onclick="setDifficulty(2, this)">
+                <span>2. Qi-Mestari</span>
+                <span class="diff-sub">炼气 (Liànqì) • 0–1 000</span>
+            </button>
+            <button class="diff-btn" onclick="setDifficulty(3, this)">
+                <span>3. Suurmestari</span>
+                <span class="diff-sub">宗师 (Zōngshī) • 0–10 000</span>
+            </button>
+            <button class="diff-btn" onclick="setDifficulty(4, this)">
+                <span>4. Taivaallinen Kultivoija</span>
+                <span class="diff-sub">天仙 (Tiānxiān) • 0–1 000 000</span>
+            </button>
+        </div>
+
+        <!-- Wuxia-kannustusOsio -->
+        <div class="encouragement-box">
+            <div id="encZh" class="enc-zh">千里之行，始于足下！</div>
+            <div id="encFi" class="enc-fi">"Tuhannen mailin matka alkaa yhdestä askeleesta!"</div>
+        </div>
+
+        <div class="target-box">
+            <div id="targetNumber" class="target-number">0</div>
+            <div id="targetPinyin" class="target-pinyin">líng</div>
+        </div>
+
+        <div id="answerSlots" class="answer-slots"></div>
+
+        <div class="pool-label">Valitse oikeat hanzipalikat:</div>
+        <div id="blockPool" class="pool"></div>
+
+        <div class="controls">
+            <button class="action-btn" onclick="userClear()">Tyhjennä rivi</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+
+        <div class="stats">
+            <div>Pisteet: <span id="score">0</span></div>
+            <div>Putki: <span id="streak">0</span></div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <h2>📜 Kiinan numerot</h2>
+        <div id="hanziList" class="hanzi-list"></div>
+    </div>
+</div>
+
+<script>
+const hanziMap = {
+    0: '零', 1: '一', 2: '二', 3: '三', 4: '四',
+    5: '五', 6: '六', 7: '七', 8: '八', 9: '九'
+};
+
+const pinyinMap = {
+    0: 'líng', 1: 'yī', 2: 'èr', 3: 'sān', 4: 'sì',
+    5: 'wǔ', 6: 'liù', 7: 'qī', 8: 'bā', 9: 'jiǔ'
+};
+
+const wuxiaEncouragements = {
+    1: [
+        { zh: "千里之行，始于足下！", fi: "Tuhannen mailin matka alkaa yhdestä askeleesta!" },
+        { zh: "静心凝神，打好基础！", fi: "Rauhoita mielesi ja vala vahva perusta!" },
+        { zh: "打通经脉，气血自通！", fi: "Avaa meridiaanisi, niin qi virtaa vapaasti!" }
+    ],
+    2: [
+        { zh: "聚气成刃，渐入佳境！", fi: "Kokoa qi teräksi, etenet kohti suuruutta!" },
+        { zh: "行云流水，身法自然！", fi: "Kuin virtaavat pilvet ja vesi – liikkeesi on luonnollista!" },
+        { zh: "融会贯通，功力大增！", fi: "Yhdistä oppisi, voimasi kasvaa kohisten!" }
+    ],
+    3: [
+        { zh: "宗师风范，威震八方！", fi: "Suurmestarin olemuksesi kajahtaa kaikkiin ilmansuuntiin!" },
+        { zh: "人剑合一，出神入化！", fi: "Mieli ja miekka ovat yhtä – taitosi hakevat vertaistaan!" },
+        { zh: "所向披靡，无人能挡！", fi: "Mikään ei voi seisottaa kulkuasi Wulin-maailmassa!" }
+    ],
+    4: [
+        { zh: "超凡入圣，羽化登仙！", fi: "Ylitä kuolevaisten rajat ja nouse taivaalliseen kuolemattomuuteen!" },
+        { zh: "天地同寿，日月同辉！", fi: "Elät ikuisesti taivaan rinnalla, loistaen auringon lailla!" },
+        { zh: "打破虚空，主宰天道！", fi: "Murskaa tyhjyys ja hallitse itse Taivaan tietä!" }
+    ]
+};
+
+const hanziReferenceData = [
+    { num: '0', char: '零', pinyin: 'líng' },
+    { num: '1', char: '一', pinyin: 'yī' },
+    { num: '2 (määrä)', char: '两', pinyin: 'liǎng' },
+    { num: '2 (luku)', char: '二', pinyin: 'èr' },
+    { num: '3', char: '三', pinyin: 'sān' },
+    { num: '4', char: '四', pinyin: 'sì' },
+    { num: '5', char: '五', pinyin: 'wǔ' },
+    { num: '6', char: '六', pinyin: 'liù' },
+    { num: '7', char: '七', pinyin: 'qī' },
+    { num: '8', char: '八', pinyin: 'bā' },
+    { num: '9', char: '九', pinyin: 'jiǔ' },
+    { num: '10', char: '十', pinyin: 'shí' },
+    { num: '100', char: '百', pinyin: 'bǎi' },
+    { num: '1 000', char: '千', pinyin: 'qiān' },
+    { num: '10 000', char: '万', pinyin: 'wàn' },
+    { num: '100 000 000', char: '亿', pinyin: 'yì' }
+];
+
+let allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+let currentDifficulty = 1;
+let currentNumber = 0;
+let targetHanziStr = '';
+let currentSlots = [];
+let poolBlocks = [];
+let score = 0;
+let streak = 0;
+let isLocked = false;
+let pinyinVisible = true;
+
+let chineseVoice = null;
+
+function loadVoices() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    chineseVoice = voices.find(v => v.lang === 'zh-CN' || v.lang.startsWith('zh')) || voices[0];
+}
+
+if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+}
+
+function speakText(text, onEndCallback) {
+    if (!('speechSynthesis' in window)) {
+        if (onEndCallback) onEndCallback();
+        return;
+    }
+
+    try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (chineseVoice) utterance.voice = chineseVoice;
+        utterance.lang = 'zh-CN';
+        utterance.rate = 0.85;
+
+        let finished = false;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            if (onEndCallback) onEndCallback();
+        };
+
+        utterance.onend = finish;
+        utterance.onerror = finish;
+        setTimeout(finish, 1500);
+
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        if (onEndCallback) onEndCallback();
+    }
+}
+
+function togglePinyin() {
+    pinyinVisible = !pinyinVisible;
+    const pinyinEl = document.getElementById('targetPinyin');
+    const btnText = document.getElementById('pinyinBtnText');
+
+    if (pinyinVisible) {
+        pinyinEl.classList.remove('hidden-pinyin');
+        btnText.textContent = 'Piilota pinyin';
+    } else {
+        pinyinEl.classList.add('hidden-pinyin');
+        btnText.textContent = 'Näytä pinyin';
+    }
+}
+
+function updateEncouragement() {
+    const list = wuxiaEncouragements[currentDifficulty];
+    const randomItem = list[Math.floor(Math.random() * list.length)];
+    document.getElementById('encZh').textContent = randomItem.zh;
+    document.getElementById('encFi').textContent = `"${randomItem.fi}"`;
+}
+
+function updateSidebarList() {
+    const container = document.getElementById('hanziList');
+    container.innerHTML = '';
+    
+    let maxNumLimit = 100;
+    if (currentDifficulty === 2) maxNumLimit = 1000;
+    if (currentDifficulty === 3) maxNumLimit = 10000;
+    if (currentDifficulty === 4) maxNumLimit = 1000000;
+
+    const filtered = hanziReferenceData.filter(item => {
+        if (item.char === '百' && maxNumLimit < 100) return false;
+        if (item.char === '千' && maxNumLimit < 1000) return false;
+        if (item.char === '万' && maxNumLimit < 10000) return false;
+        if (item.char === '亿' && maxNumLimit < 100000000) return false;
+        return true;
+    });
+
+    filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'hanzi-item';
+        div.innerHTML = `<span class="hanzi-num">${item.num}</span><span class="hanzi-char">${item.char}</span><span class="hanzi-pinyin">${item.pinyin}</span>`;
+        container.appendChild(div);
+    });
+}
+
+function setDifficulty(level, btnEl) {
+    currentDifficulty = level;
+    document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+    btnEl.classList.add('active');
+
+    allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+    if (level >= 2) allPossibleHanzis.push('百', '千');
+    if (level >= 3) allPossibleHanzis.push('万');
+    if (level >= 4) allPossibleHanzis.push('亿');
+
+    updateSidebarList();
+    newRound();
+}
+
+function convertUnder10k(n, isLeading = false) {
+    if (n === 0) return { hanzi: '', pinyin: [] };
+
+    let hz = '';
+    let py = [];
+
+    const thousands = Math.floor(n / 1000);
+    const hundreds = Math.floor((n % 1000) / 100);
+    const tens = Math.floor((n % 100) / 10);
+    const units = n % 10;
+
+    if (thousands > 0) {
+        const char = (thousands === 2) ? '两' : hanziMap[thousands];
+        const pyChar = (thousands === 2) ? 'liǎng' : pinyinMap[thousands];
+        hz += char + '千';
+        py.push(pyChar, 'qiān');
+    }
+
+    if (hundreds > 0) {
+        const char = (hundreds === 2) ? '两' : hanziMap[hundreds];
+        const pyChar = (hundreds === 2) ? 'liǎng' : pinyinMap[hundreds];
+        hz += char + '百';
+        py.push(pyChar, 'bǎi');
+    } else if (thousands > 0 && (tens > 0 || units > 0)) {
+        hz += '零';
+        py.push('líng');
+    }
+
+    if (tens > 0) {
+        if (tens === 1 && !isLeading && thousands === 0 && hundreds === 0) {
+            hz += '十';
+            py.push('shí');
+        } else {
+            hz += hanziMap[tens] + '十';
+            py.push(pinyinMap[tens], 'shí');
+        }
+    } else if (hundreds > 0 && units > 0) {
+        if (!hz.endsWith('零')) {
+            hz += '零';
+            py.push('líng');
+        }
+    }
+
+    if (units > 0) {
+        hz += hanziMap[units];
+        py.push(pinyinMap[units]);
+    }
+
+    return { hanzi: hz, pinyin: py };
+}
+
+function numberToChinese(n) {
+    if (n === 0) return { hanzi: '零', pinyin: 'líng' };
+
+    let hz = '';
+    let py = [];
+
+    if (n >= 10000) {
+        const wan = Math.floor(n / 10000);
+        const remainder = n % 10000;
+
+        const wanPart = convertUnder10k(wan, true);
+        hz += wanPart.hanzi + '万';
+        py.push(...wanPart.pinyin, 'wàn');
+
+        if (remainder > 0) {
+            if (remainder < 1000) {
+                hz += '零';
+                py.push('líng');
+            }
+            const remPart = convertUnder10k(remainder, false);
+            hz += remPart.hanzi;
+            py.push(...remPart.pinyin);
+        }
+    } else {
+        const part = convertUnder10k(n, false);
+        hz = part.hanzi;
+        py = part.pinyin;
+    }
+
+    return { hanzi: hz, pinyin: py.join(' ') };
+}
+
+function shuffle(array) {
+    const result = [...array];
+    for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+}
+
+function newRound() {
+    isLocked = false;
+    currentSlots = [];
+
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = '';
+    feedback.style.color = '#333';
+
+    updateEncouragement();
+
+    let max = 100;
+    if (currentDifficulty === 2) max = 1000;
+    if (currentDifficulty === 3) max = 10000;
+    if (currentDifficulty === 4) max = 1000000;
+
+    currentNumber = Math.floor(Math.random() * max) + 1;
+
+    const result = numberToChinese(currentNumber);
+    targetHanziStr = result.hanzi;
+
+    document.getElementById('targetNumber').textContent = currentNumber.toLocaleString('fi-FI');
+    document.getElementById('targetPinyin').textContent = result.pinyin;
+
+    const neededChars = targetHanziStr.split('');
+    let pool = [...neededChars];
+
+    const targetPoolSize = Math.max(8, neededChars.length + 3);
+
+    while (pool.length < targetPoolSize) {
+        const randomChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
+        pool.push(randomChar);
+    }
+
+    pool = shuffle(pool);
+
+    poolBlocks = pool.map((char, index) => ({
+        id: index,
+        char: char,
+        used: false
+    }));
+
+    renderBoard();
+}
+
+function renderBoard() {
+    const slotsContainer = document.getElementById('answerSlots');
+    const poolContainer = document.getElementById('blockPool');
+
+    slotsContainer.innerHTML = '';
+    poolContainer.innerHTML = '';
+
+    for (let i = 0; i < targetHanziStr.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.index = i;
+
+        if (currentSlots[i]) {
+            slot.classList.add('filled');
+            slot.textContent = currentSlots[i].char;
+        }
+
+        slot.setAttribute('role', 'button');
+        slot.setAttribute('aria-label', 'Poista merkki');
+        slot.onclick = () => removeSlot(i);
+
+        slotsContainer.appendChild(slot);
+    }
+
+    poolBlocks.forEach(block => {
+        const blockEl = document.createElement('div');
+        blockEl.className = 'block';
+
+        if (block.used) {
+            blockEl.classList.add('used');
+        }
+
+        blockEl.textContent = block.char;
+        blockEl.onclick = () => selectBlock(block.id);
+
+        poolContainer.appendChild(blockEl);
+    });
+}
+
+function selectBlock(id) {
+    if (isLocked) return;
+
+    const block = poolBlocks.find(b => b.id === id);
+    if (!block || block.used) return;
+    if (currentSlots.length >= targetHanziStr.length) return;
+
+    speakText(block.char);
+
+    block.used = true;
+    currentSlots.push(block);
+
+    clearFeedback();
+    renderBoard();
+
+    if (currentSlots.length === targetHanziStr.length) {
+        checkAnswer();
+    }
+}
+
+function removeSlot(index) {
+    if (isLocked) return;
+    if (index < 0 || index >= currentSlots.length) return;
+
+    const removedBlock = currentSlots.splice(index, 1)[0];
+    const block = poolBlocks.find(b => b.id === removedBlock.id);
+
+    if (block) {
+        block.used = false;
+    }
+
+    clearFeedback();
+    renderBoard();
+}
+
+function userClear() {
+    if (isLocked) return;
+
+    currentSlots = [];
+    poolBlocks.forEach(block => {
+        block.used = false;
+    });
+
+    clearFeedback();
+    renderBoard();
+}
+
+function clearFeedback() {
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = '';
+    feedback.style.color = '#333';
+
+    document.querySelectorAll('.slot').forEach(slot => {
+        slot.classList.remove('error', 'correct', 'speaking');
+    });
+}
+
+function playFullAnswerWithHighlight(index, slots, onComplete) {
+    if (index >= targetHanziStr.length) {
+        if (onComplete) onComplete();
+        return;
+    }
+
+    slots.forEach(s => s.classList.remove('speaking'));
+
+    slots[index].classList.add('speaking');
+    const charToSpeak = targetHanziStr[index];
+
+    speakText(charToSpeak, () => {
+        setTimeout(() => {
+            playFullAnswerWithHighlight(index + 1, slots, onComplete);
+        }, 300);
+    });
+}
+
+function checkAnswer() {
+    const userStr = currentSlots.map(block => block.char).join('');
+    const slots = document.querySelectorAll('.slot');
+    const feedback = document.getElementById('feedback');
+
+    if (userStr === targetHanziStr) {
+        isLocked = true;
+
+        score += 10 * currentDifficulty;
+        streak += 1;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('correct'));
+
+        feedback.textContent = 'Oikein! 做得好!';
+        feedback.style.color = '#16a34a';
+
+        setTimeout(() => {
+            playFullAnswerWithHighlight(0, slots, () => {
+                setTimeout(() => {
+                    newRound();
+                }, 800);
+            });
+        }, 300);
+
+    } else {
+        streak = 0;
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('error'));
+
+        feedback.textContent = 'Väärin, yritä uudelleen!';
+        feedback.style.color = '#ef4444';
+
+        setTimeout(() => {
+            if (!isLocked) {
+                document.querySelectorAll('.slot').forEach(slot => {
+                    slot.classList.remove('error');
+                });
+            }
+        }, 500);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateSidebarList();
+    newRound();
+});
+
+if (document.readyState !== 'loading') {
+    updateSidebarList();
+    newRound();
+}
+</script>
+
+</body>
+</html>
