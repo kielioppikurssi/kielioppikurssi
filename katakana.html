@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Katakana Trainer</title>
+<title>Katakanojen harjoittelua</title>
 
 <style>
 * {
@@ -302,7 +302,7 @@ td, th {
 
 <div class="container">
     <div class="main-panel">
-        <h1>カタカナ Trainer</h1>
+        <h1>カタカナ-harjoittelua</h1>
         <a href="index.html" class="päävalikko-btn">
             <svg viewBox="0 0 24 24">
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
@@ -350,4 +350,187 @@ td, th {
 
         <br><br>
 
-        <button class="action-btn" onclick="check
+        <button class="action-btn" onclick="checkAnswer()">Tarkista</button>
+
+        <div id="fb"></div>
+
+        <div class="stats">
+            Pisteet <span id="sc">0</span> |
+            Putki <span id="st">0</span> |
+            Tarkkuus <span id="ac">0</span>%
+        </div>
+    </div>
+</div>
+
+<div id="p" class="popup">
+<div class="content">
+    <h2>Katakana + romaji</h2>
+    <table class="katakanaTable">
+        <tr>
+            <th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th>
+        </tr>
+        <tr class="a"><td>∅</td><td>ア a</td><td>イ i</td><td>ウ u</td><td>エ e</td><td>オ o</td></tr>
+        <tr class="k"><td>k</td><td>カ ka</td><td>キ ki</td><td>ク ku</td><td>ケ ke</td><td>コ ko</td></tr>
+        <tr class="s"><td>s</td><td>サ sa</td><td>シ shi</td><td>ス su</td><td>セ se</td><td>ソ so</td></tr>
+        <tr class="t"><td>t</td><td>タ ta</td><td>チ chi</td><td>ツ tsu</td><td>テ te</td><td>ト to</td></tr>
+        <tr class="n"><td>n</td><td>ナ na</td><td>ニ ni</td><td>ヌ nu</td><td>ネ ne</td><td>ノ no</td></tr>
+        <tr class="h"><td>h</td><td>ハ ha</td><td>ヒ hi</td><td>フ fu</td><td>ヘ he</td><td>ホ ho</td></tr>
+        <tr class="m"><td>m</td><td>マ ma</td><td>ミ mi</td><td>ム mu</td><td>メ me</td><td>モ mo</td></tr>
+        <tr class="y"><td>y</td><td>ヤ ya</td><td>–</td><td>ユ yu</td><td>–</td><td>ヨ yo</td></tr>
+        <tr class="r"><td>r</td><td>ラ ra</td><td>リ ri</td><td>ル ru</td><td>レ re</td><td>ロ ro</td></tr>
+        <tr class="w"><td>w</td><td>ワ wa</td><td>–</td><td>–</td><td>–</td><td>ヲ wo</td></tr>
+        <tr style="background:#ddd"><td>n</td><td colspan="5">ン n</td></tr>
+        <tr class="g"><td>g</td><td>ガ ga</td><td>ギ gi</td><td>グ gu</td><td>ゲ ge</td><td>ゴ go</td></tr>
+        <tr class="z"><td>z</td><td>ザ za</td><td>ジ ji</td><td>ズ zu</td><td>ゼ ze</td><td>ゾ zo</td></tr>
+        <tr class="d"><td>d</td><td>ダ da</td><td>ヂ ji</td><td>ヅ zu</td><td>デ de</td><td>ド do</td></tr>
+        <tr class="b"><td>b</td><td>バ ba</td><td>ビ bi</td><td>ブ bu</td><td>ベ be</td><td>ボ bo</td></tr>
+        <tr class="p"><td>p</td><td>パ pa</td><td>ピ pi</td><td>プ pu</td><td>ペ pe</td><td>ポ po</td></tr>
+    </table>
+    <br>
+    <button class="secondary-btn" onclick="document.getElementById('p').style.display='none'">Sulje</button>
+</div>
+</div>
+
+<script>
+const base=[
+['ア','a','a'],['イ','i','a'],['ウ','u','a'],['エ','e','a'],['オ','o','a'],
+['カ','ka','k'],['キ','ki','k'],['ク','ku','k'],['ケ','ke','k'],['コ','ko','k'],
+['サ','sa','s'],['シ','shi','s'],['ス','su','s'],['セ','se','s'],['ソ','so','s'],
+['タ','ta','t'],['チ','chi','t'],['ツ','tsu','t'],['テ','te','t'],['ト','to','t'],
+['ナ','na','n'],['ニ','ni','n'],['ヌ','nu','n'],['ネ','ne','n'],['ノ','no','n'],
+['ハ','ha','h'],['ヒ','hi','h'],['フ','fu','h'],['ヘ','he','h'],['ホ','ho','h'],
+['マ','ma','m'],['ミ','mi','m'],['ム','mu','m'],['メ','me','m'],['モ','mo','m'],
+['ヤ','ya','y'],['ユ','yu','y'],['ヨ','yo','y'],
+['ラ','ra','r'],['リ','ri','r'],['ル','ru','r'],['レ','re','r'],['ロ','ro','r'],
+['ワ','wa','w'],['ヲ','wo','w'],['ン','n','n']
+];
+
+const dak=[
+['ガ','ga','g'],['ギ','gi','g'],['グ','gu','g'],['ゲ','ge','g'],['ゴ','go','g'],
+['ザ','za','z'],['ジ','ji','z'],['ズ','zu','z'],['ゼ','ze','z'],['ゾ','zo','z'],
+['ダ','da','d'],['ヂ','ji','d'],['ヅ','zu','d'],['デ','de','d'],['ド','do','d'],
+['バ','ba','b'],['ビ','bi','b'],['ブ','bu','b'],['ベ','be','b'],['ボ','bo','b']
+];
+
+const hand=[
+['パ','pa','p'],['ピ','pi','p'],['プ','pu','p'],['ペ','pe','p'],['ポ','po','p']
+];
+
+// DOM-elementit
+const card = document.getElementById('card');
+const ans = document.getElementById('ans');
+const fb = document.getElementById('fb');
+const sc = document.getElementById('sc');
+const st = document.getElementById('st');
+const ac = document.getElementById('ac');
+const audioModeSelect = document.getElementById('audioMode');
+const dakCheckbox = document.getElementById('dak');
+const handaCheckbox = document.getElementById('handa');
+
+let pool=[];
+let cur;
+let score=0;
+let streak=0;
+let total=0;
+let right=0;
+
+// Äänisynteesitoiminto
+function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'ja-JP';
+    msg.rate = 0.9;
+    window.speechSynthesis.speak(msg);
+}
+
+function speakCurrent() {
+    if (cur) speak(cur[0]);
+}
+
+function startGame(){
+    pool=[];
+
+    const sel = Array.from(document.querySelectorAll('.opts input[type=checkbox]:checked'))
+        .map(x => x.value);
+
+    for(const x of base){
+        if(sel.includes(x[2])) pool.push(x);
+    }
+
+    if(dakCheckbox.checked) pool.push(...dak);
+    if(handaCheckbox.checked) pool.push(...hand);
+
+    if(pool.length === 0){
+        alert('Valitse vähintään yksi merkistö!');
+        return;
+    }
+
+    score = 0;
+    streak = 0;
+    total = 0;
+    right = 0;
+    sc.textContent = score;
+    st.textContent = streak;
+    ac.textContent = 0;
+    fb.innerHTML = '';
+
+    next();
+}
+
+function next(){
+    if(!pool.length) return;
+
+    cur = pool[Math.floor(Math.random()*pool.length)];
+
+    card.textContent = cur[0];
+    card.className = 'card ' + cur[2];
+
+    ans.value = '';
+    ans.focus();
+
+    const mode = audioModeSelect.value;
+    if (mode === 'hint') {
+        speak(cur[0]);
+    }
+}
+
+function checkAnswer(){
+    if(!cur) return;
+
+    total++;
+
+    const isCorrect = ans.value.trim().toLowerCase() === cur[1];
+    const mode = audioModeSelect.value;
+
+    if(isCorrect){
+        score++;
+        right++;
+        streak++;
+        fb.innerHTML = '<div class="ok">✅ ' + cur[0] + ' = ' + cur[1] + '</div>';
+        
+        if (mode === 'correct') {
+            speak(cur[0]);
+        }
+    } else {
+        streak = 0;
+        pool.push(cur);
+        fb.innerHTML = '<div class="bad">❌ Oikea vastaus: ' + cur[1] + '</div>';
+    }
+
+    sc.textContent = score;
+    st.textContent = streak;
+    ac.textContent = Math.round(right * 100 / total) || 0;
+
+    setTimeout(next, 900);
+}
+
+ans.addEventListener('keydown', e => {
+    if(e.key === 'Enter') checkAnswer();
+});
+
+startGame();
+</script>
+
+</body>
+</html>
