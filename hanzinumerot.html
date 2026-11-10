@@ -452,27 +452,58 @@ let poolBlocks = [];
 let score = 0;
 let streak = 0;
 let isLocked = false;
-let pinyinVisible = true; // Tilamuuttuja pinyin-näkyvyydelle
+let pinyinVisible = true;
 
 // --- PUHESYNTEESI (Web Speech API) ---
+let chineseVoice = null;
+
+function loadVoices() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    // Etsitään ensisijaisesti kiinankielinen ääni
+    chineseVoice = voices.find(v => v.lang === 'zh-CN' || v.lang.startsWith('zh')) || voices[0];
+}
+
+if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+}
+
 function speakText(text, onEndCallback) {
     if (!('speechSynthesis' in window)) {
         if (onEndCallback) onEndCallback();
         return;
     }
 
-    window.speechSynthesis.cancel();
+    try {
+        window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.rate = 0.85;
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (chineseVoice) {
+            utterance.voice = chineseVoice;
+        }
+        utterance.lang = 'zh-CN';
+        utterance.rate = 0.85;
 
-    if (onEndCallback) {
-        utterance.onend = onEndCallback;
-        utterance.onerror = onEndCallback;
+        let finished = false;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            if (onEndCallback) onEndCallback();
+        };
+
+        utterance.onend = finish;
+        utterance.onerror = finish;
+
+        // Varmuustoiminto Firefoxin bugien varalle: jos onend ei jostain syystä laukea, vapautetaan ketju 1.5 sekunnissa
+        setTimeout(finish, 1500);
+
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        if (onEndCallback) onEndCallback();
     }
-
-    window.speechSynthesis.speak(utterance);
 }
 
 // Piilota / Näytä pinyin -toiminto
@@ -738,52 +769,4 @@ function checkAnswer() {
     if (userStr === targetHanziStr) {
         isLocked = true;
 
-        score += 10;
-        streak += 1;
-
-        document.getElementById('score').textContent = score;
-        document.getElementById('streak').textContent = streak;
-
-        slots.forEach(slot => slot.classList.add('correct'));
-
-        feedback.textContent = 'Oikein! 做得好!';
-        feedback.style.color = '#16a34a';
-
-        setTimeout(() => {
-            playFullAnswerWithHighlight(0, slots, () => {
-                setTimeout(() => {
-                    newRound();
-                }, 800);
-            });
-        }, 300);
-
-    } else {
-        streak = 0;
-
-        document.getElementById('streak').textContent = streak;
-
-        slots.forEach(slot => slot.classList.add('error'));
-
-        feedback.textContent = 'Väärin, yritä uudelleen!';
-        feedback.style.color = '#ef4444';
-
-        setTimeout(() => {
-            if (!isLocked) {
-                document.querySelectorAll('.slot').forEach(slot => {
-                    slot.classList.remove('error');
-                });
-            }
-        }, 500);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', newRound);
-
-if (document.readyState !== 'loading') {
-    newRound();
-}
-
-</script>
-
-</body>
-</html>
+        score
