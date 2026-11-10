@@ -257,14 +257,15 @@
 
     <!-- Valmiiksi pelattu korttipakka -näkymä -->
     <div id="deck-container" class="deck-container">
-        <h2>🎉 Hienoa! Läpäisit teeman!</h2>
+        <h2>🎉 Hienoa! Läpäisit kierroksen!</h2>
         <p>Kaikki sanat yhdistettiin korttipakaksi. Klikkaa mitä tahansa korttia kuullaksesi venäjänkielisen ääntämyksen!</p>
         <div id="flashcards-grid" class="flashcards-grid"></div>
-        <button onclick="loadCategory(document.getElementById('category-select').value)" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer;">Pelaa uudelleen</button>
+        <button onclick="loadCategory(document.getElementById('category-select').value)" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer;">Pelaa uudet 6 sanaa</button>
     </div>
 </div>
 
 <script>
+    // Voit lisätä `pairs`-taulukkoon vaikka 200 sanaa per teema!
     const VOCABULARY = {
         food: {
             title: "🍎 Ruoka ja juoma (A1)",
@@ -274,7 +275,11 @@
                 { id: 3, ru: "сыр", fi: "juusto" },
                 { id: 4, ru: "чай", fi: "tee" },
                 { id: 5, ru: "яблоко", fi: "omena" },
-                { id: 6, ru: "рыба", fi: "kala" }
+                { id: 6, ru: "рыба", fi: "kala" },
+                { id: 7, ru: "молоко", fi: "maito" },
+                { id: 8, ru: "мясо", fi: "liha" },
+                { id: 9, ru: "сок", fi: "mehu" },
+                { id: 10, ru: "кофе", fi: "kahvi" }
             ]
         },
         greetings: {
@@ -334,6 +339,11 @@
         }
     }
 
+    function getRandomPairs(array, count) {
+        const shuffled = [...array].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
+    }
+
     function speakRussian(text) {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
@@ -348,9 +358,12 @@
         const data = VOCABULARY[catKey];
         if (!data) return;
 
+        // Arpohin valitun teeman taulukosta täsmälleen 6 paria
+        const activePairs = getRandomPairs(data.pairs, 6);
+
         currentScore = 0;
-        currentPairsList = data.pairs;
-        totalPairs = data.pairs.length;
+        currentPairsList = activePairs;
+        totalPairs = activePairs.length;
         selectedRu = null;
         selectedFi = null;
 
@@ -365,8 +378,8 @@
         ruCol.innerHTML = '';
         fiCol.innerHTML = '';
 
-        const ruList = [...data.pairs].sort(() => Math.random() - 0.5);
-        const fiList = [...data.pairs].sort(() => Math.random() - 0.5);
+        const ruList = [...activePairs].sort(() => Math.random() - 0.5);
+        const fiList = [...activePairs].sort(() => Math.random() - 0.5);
 
         ruList.forEach(item => {
             const card = document.createElement('div');
