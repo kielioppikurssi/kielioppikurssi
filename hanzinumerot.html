@@ -324,7 +324,7 @@ h1 {
     user-select: none;
 }
 
-/* Info-huomautus kiinalaisesta ryhmittelystä */
+/* Info-huomautus kiinalaisesta ryhmittelystä (oletuksena piilossa) */
 .format-info-note {
     font-size: 12px;
     color: #64748b;
@@ -332,8 +332,12 @@ h1 {
     padding: 6px 10px;
     border-radius: 8px;
     margin-top: 8px;
-    display: inline-block;
+    display: none;
     border: 1px solid #e2e8f0;
+}
+
+.format-info-note.visible {
+    display: inline-block;
 }
 
 .answer-slots {
@@ -712,8 +716,8 @@ button.action-btn:hover {
         <div class="target-box">
             <div id="targetNumber" class="target-number">0</div>
             <div id="targetPinyin" class="target-pinyin">líng</div>
-            <!-- Tekstimuistutus kiinalaisesta ryhmittelystä -->
-            <div class="format-info-note">💡 Huom: Numerot on ryhmitelty kiinalaisittain 4 numeron lohkoihin (Wàn/Yi).</div>
+            <!-- Muistutus tulee näkyviin vain tarvittaessa -->
+            <div id="formatInfoNote" class="format-info-note">💡 Huom: Suurissa luvuissa ryhmittely on kiinalainen (4 numeron lohkot Wàn/Yì sijaan 3 numeron).</div>
         </div>
 
         <div id="answerSlots" class="answer-slots"></div>
@@ -1192,9 +1196,17 @@ function newRound() {
     const result = numberToChinese(currentNumber);
     targetHanziStr = result.hanzi;
 
-    // Käytetään kiinalaista 4 numeron ryhmittelyä (Wàn / Yì logiikka)
+    // Näytetään luku kiinalaisittain (4 numeron ryhmissä)
     document.getElementById('targetNumber').textContent = formatChineseNumber(currentNumber);
     document.getElementById('targetPinyin').textContent = result.pinyin;
+
+    // Tuodaan muistutus esille vain, jos luku on vähintään 10 000 (eli ryhmittely poikkeaa länkkäreistä)
+    const noteEl = document.getElementById('formatInfoNote');
+    if (currentNumber >= 10000) {
+        noteEl.classList.add('visible');
+    } else {
+        noteEl.classList.remove('visible');
+    }
 
     const neededChars = targetHanziStr.split('');
     let pool = [...neededChars];
