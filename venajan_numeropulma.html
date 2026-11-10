@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="fi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Venäjän numeropulma</title><style>body{font-family:Segoe UI,sans-serif;background:#eef2ff;padding:20px}.container{max-width:1000px;margin:auto;display:grid;grid-template-columns:1fr 260px;gap:20px}.panel,.side{background:#fff;border-radius:15px;padding:20px}.target{font-size:56px;font-weight:bold;text-align:center}.slots,.pool{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0}
+.menu-btn{
+    position:fixed;
+    top:15px;
+    left:15px;
+    z-index:999;
+    background:#ffffff;
+    color:#4f46e5;
+    text-decoration:none;
+    padding:10px 18px;
+    border-radius:12px;
+    font-weight:600;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+    border:1px solid #dbeafe;
+}
+
+.menu-btn:hover{
+    background:#eef2ff;
+}
+
+
+.slot,.block{border:2px solid #6366f1;border-radius:10px;padding:10px 14px;min-width:120px;text-align:center}.block{background:#6366f1;color:#fff;cursor:pointer}.used{opacity:.35}.stats{text-align:center;font-weight:bold}.ok{color:green}.bad{color:red}</style></head><body>
+<a href="index.html" class="menu-btn">Päävalikkoon</a>
+<div class="container"><div class="panel"><h1>🇷🇺 Venäjän numeropulma (0–100)</h1><div id="num" class="target"></div><div id="slots" class="slots"></div><div id="pool" class="pool"></div><button onclick="clearRow()">Tyhjennä</button><div id="fb"></div><div class="stats">Pisteet <span id="score">0</span> | Putki <span id="streak">0</span></div></div><div class="side"><h3>Perusluvut</h3><div>0 ноль<br>1 один<br>2 два<br>3 три<br>4 четыре<br>5 пять<br>6 шесть<br>7 семь<br>8 восемь<br>9 девять<br>10 десять<br>20 двадцать<br>30 тридцать<br>40 сорок<br>50 пятьдесят<br>60 шестьдесят<br>70 семьдесят<br>80 восемьдесят<br>90 девяносто<br>100 сто</div></div></div><script>const w={0:'ноль',1:'один',2:'два',3:'три',4:'четыре',5:'пять',6:'шесть',7:'семь',8:'восемь',9:'девять',10:'десять',11:'одиннадцать',12:'двенадцать',13:'тринадцать',14:'четырнадцать',15:'пятнадцать',16:'шестнадцать',17:'семнадцать',18:'восемнадцать',19:'девятнадцать',20:'двадцать',30:'тридцать',40:'сорок',50:'пятьдесят',60:'шестьдесят',70:'семьдесят',80:'восемьдесят',90:'девяносто',100:'сто'};const all=Object.values(w);let target='',ans=[],pool=[],score=0,streak=0;function numToRus(n){if(n<=20||n==100)return w[n];let t=Math.floor(n/10)*10,u=n%10;return u?w[t]+' '+w[u]:w[t]}function sh(a){return a.sort(()=>Math.random()-.5)}function round(){ans=[];let n=Math.floor(Math.random()*101);target=numToRus(n);num.textContent=n;let need=target.split(' ');pool=[...need];while(pool.length<8)pool.push(all[Math.floor(Math.random()*all.length)]);pool=sh(pool).map((x,i)=>({id:i,word:x,used:false}));draw();fb.textContent=''}function draw(){slots.innerHTML='';poolEl=poolDiv=document.getElementById('pool');poolDiv.innerHTML='';target.split(' ').forEach((_,i)=>{let d=document.createElement('div');d.className='slot';d.textContent=ans[i]||'';slots.appendChild(d)});pool.forEach(b=>{let d=document.createElement('div');d.className='block'+(b.used?' used':'');d.textContent=b.word;d.onclick=()=>pick(b.id);poolDiv.appendChild(d)})}function pick(id){let b=pool.find(x=>x.id==id);if(b.used)return;b.used=true;ans.push(b.word);draw();if(ans.length===target.split(' ').length)check()}function clearRow(){ans=[];pool.forEach(b=>b.used=false);draw()}function check(){if(ans.join(' ')==target){score+=10;streak++;scoreEl.textContent=score;streakEl.textContent=streak;fb.className='ok';fb.textContent='Oikein!';setTimeout(round,1000)}else{streak=0;streakEl.textContent=streak;fb.className='bad';fb.textContent='Väärin'}}const num=document.getElementById('num'),slots=document.getElementById('slots'),scoreEl=document.getElementById('score'),streakEl=document.getElementById('streak'),fb=document.getElementById('fb');round();</script></body></html>
