@@ -546,7 +546,7 @@ const hanziReferenceData = [
     { num: '100 000 000', char: '亿', pinyin: 'yì' }
 ];
 
-let allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+let allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千', '万', '亿'];
 let currentDifficulty = 1;
 let currentNumber = 0;
 let targetHanziStr = '';
@@ -626,21 +626,8 @@ function updateEncouragement() {
 function updateSidebarList() {
     const container = document.getElementById('hanziList');
     container.innerHTML = '';
-    
-    let maxNumLimit = 100;
-    if (currentDifficulty === 2) maxNumLimit = 1000;
-    if (currentDifficulty === 3) maxNumLimit = 10000;
-    if (currentDifficulty === 4) maxNumLimit = 1000000;
 
-    const filtered = hanziReferenceData.filter(item => {
-        if (item.char === '百' && maxNumLimit < 100) return false;
-        if (item.char === '千' && maxNumLimit < 1000) return false;
-        if (item.char === '万' && maxNumLimit < 10000) return false;
-        if (item.char === '亿' && maxNumLimit < 100000000) return false;
-        return true;
-    });
-
-    filtered.forEach(item => {
+    hanziReferenceData.forEach(item => {
         const div = document.createElement('div');
         div.className = 'hanzi-item';
         div.innerHTML = `<span class="hanzi-num">${item.num}</span><span class="hanzi-char">${item.char}</span><span class="hanzi-pinyin">${item.pinyin}</span>`;
@@ -653,10 +640,7 @@ function setDifficulty(level, btnEl) {
     document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
     btnEl.classList.add('active');
 
-    allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
-    if (level >= 2) allPossibleHanzis.push('百', '千');
-    if (level >= 3) allPossibleHanzis.push('万');
-    if (level >= 4) allPossibleHanzis.push('亿');
+    allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千', '万', '亿'];
 
     updateSidebarList();
     newRound();
