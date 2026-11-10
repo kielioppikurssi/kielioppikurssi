@@ -324,6 +324,18 @@ h1 {
     user-select: none;
 }
 
+/* Info-huomautus kiinalaisesta ryhmittelystä */
+.format-info-note {
+    font-size: 12px;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-top: 8px;
+    display: inline-block;
+    border: 1px solid #e2e8f0;
+}
+
 .answer-slots {
     display: flex;
     justify-content: center;
@@ -700,6 +712,8 @@ button.action-btn:hover {
         <div class="target-box">
             <div id="targetNumber" class="target-number">0</div>
             <div id="targetPinyin" class="target-pinyin">líng</div>
+            <!-- Tekstimuistutus kiinalaisesta ryhmittelystä -->
+            <div class="format-info-note">💡 Huom: Numerot on ryhmitelty kiinalaisittain 4 numeron lohkoihin (Wàn/Yi).</div>
         </div>
 
         <div id="answerSlots" class="answer-slots"></div>
@@ -1134,6 +1148,18 @@ function numberToChinese(n) {
     return { hanzi: hz, pinyin: Array.isArray(py) ? py.join(' ') : py };
 }
 
+// Apufunktio: muotoilee numeron kiinalaisittain 4 numeron ryhmiin (esim. 1234567 -> "123 4567")
+function formatChineseNumber(n) {
+    let s = n.toString();
+    if (s.length <= 4) return s;
+    let result = '';
+    while (s.length > 4) {
+        result = ' ' + s.slice(-4) + result;
+        s = s.slice(0, -4);
+    }
+    return s + result;
+}
+
 function shuffle(array) {
     const result = [...array];
     for (let i = result.length - 1; i > 0; i--) {
@@ -1166,7 +1192,8 @@ function newRound() {
     const result = numberToChinese(currentNumber);
     targetHanziStr = result.hanzi;
 
-    document.getElementById('targetNumber').textContent = currentNumber.toLocaleString('fi-FI');
+    // Käytetään kiinalaista 4 numeron ryhmittelyä (Wàn / Yì logiikka)
+    document.getElementById('targetNumber').textContent = formatChineseNumber(currentNumber);
     document.getElementById('targetPinyin').textContent = result.pinyin;
 
     const neededChars = targetHanziStr.split('');
