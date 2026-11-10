@@ -127,9 +127,10 @@
 .top-right-group {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
-.päävalikko-btn, .toggle-pinyin-btn, .toggle-sound-btn {
+.päävalikko-btn, .toggle-pinyin-btn, .toggle-sound-btn, .toggle-speech-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -146,20 +147,20 @@
     cursor: pointer;
 }
 
-.päävalikko-btn:hover, .toggle-pinyin-btn:hover, .toggle-sound-btn:hover {
+.päävalikko-btn:hover, .toggle-pinyin-btn:hover, .toggle-sound-btn:hover, .toggle-speech-btn:hover {
     background: #f8fafc;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     border-color: #cbd5e1;
 }
 
-.toggle-sound-btn.muted {
+.toggle-sound-btn.muted, .toggle-speech-btn.muted {
     color: #ef4444;
     border-color: #fca5a5;
     background: #fef2f2;
 }
 
-.päävalikko-btn svg, .toggle-pinyin-btn svg, .toggle-sound-btn svg {
+.päävalikko-btn svg, .toggle-pinyin-btn svg, .toggle-sound-btn svg, .toggle-speech-btn svg {
     width: 18px;
     height: 18px;
     fill: currentColor;
@@ -642,7 +643,13 @@ button.action-btn:hover {
                     <svg viewBox="0 0 24 24">
                         <path id="soundIconPath" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                     </svg>
-                    <span id="soundBtnText">Äänet: Päällä</span>
+                    <span id="soundBtnText">Ääniefektit: Päällä</span>
+                </button>
+                <button id="toggleSpeechBtn" class="toggle-speech-btn" onclick="toggleSpeech()">
+                    <svg viewBox="0 0 24 24">
+                        <path id="speechIconPath" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                    </svg>
+                    <span id="speechBtnText">Numeroiden luku: Päällä</span>
                 </button>
                 <button id="togglePinyinBtn" class="toggle-pinyin-btn" onclick="togglePinyin()">
                     <svg viewBox="0 0 24 24">
@@ -719,9 +726,10 @@ button.action-btn:hover {
 </div>
 
 <script>
-// --- ÄÄNITEHOSTEET JA MYKISTYS (Web Audio API) ---
+// --- ÄÄNITEHOSTEET JA PUHESYNTEESI ---
 let audioCtx = null;
 let soundEnabled = true;
+let speechEnabled = true;
 
 function toggleSound() {
     soundEnabled = !soundEnabled;
@@ -731,12 +739,32 @@ function toggleSound() {
 
     if (soundEnabled) {
         btn.classList.remove('muted');
-        btnText.textContent = 'Äänet: Päällä';
+        btnText.textContent = 'Ääniefektit: Päällä';
         iconPath.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
     } else {
         btn.classList.add('muted');
-        btnText.textContent = 'Äänet: Pois';
+        btnText.textContent = 'Ääniefektit: Pois';
         iconPath.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C22.63 14.85 23 13.47 23 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+    }
+}
+
+function toggleSpeech() {
+    speechEnabled = !speechEnabled;
+    const btn = document.getElementById('toggleSpeechBtn');
+    const btnText = document.getElementById('speechBtnText');
+    const iconPath = document.getElementById('speechIconPath');
+
+    if (speechEnabled) {
+        btn.classList.remove('muted');
+        btnText.textContent = 'Numeroiden luku: Päällä';
+        iconPath.setAttribute('d', 'M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z');
+    } else {
+        btn.classList.add('muted');
+        btnText.textContent = 'Numeroiden luku: Pois';
+        iconPath.setAttribute('d', 'M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.17l5.98 5.98zM4.27 3L3 4.27l6 6V11c0 1.66 1.34 3 3 3 .23 0 .44-.03.65-.08l1.66 1.66c-.71.27-1.48.42-2.31.42-3 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z');
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
     }
 }
 
@@ -922,7 +950,7 @@ if ('speechSynthesis' in window) {
 }
 
 function speakText(text, onEndCallback) {
-    if (!soundEnabled) {
+    if (!speechEnabled) {
         if (onEndCallback) onEndCallback();
         return;
     }
@@ -1272,7 +1300,7 @@ function clearFeedback() {
 }
 
 function playFullAnswerWithHighlight(index, slots, onComplete) {
-    if (index >= targetHanziStr.length) {
+    if (!speechEnabled || index >= targetHanziStr.length) {
         if (onComplete) onComplete();
         return;
     }
