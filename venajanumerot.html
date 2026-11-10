@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Venäläinen numeropulma – Kirjallisuustaso</title>
+<title>Venäläinen numeropulma – Kirjoitusharjoitus</title>
 
 <style>
 * {
@@ -297,41 +297,35 @@ h1 {
     border: 2px dashed #d4af37;
     border-radius: 16px;
     padding: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .target-number {
-    font-size: 38px;
+    font-size: 40px;
     font-weight: bold;
     color: #2b1d0c;
     margin-bottom: 10px;
     font-family: 'Georgia', serif;
     display: flex;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
-/* Klikattavat numerosegmentit */
+/* Klikattavat osat luvussa */
 .num-part {
     cursor: pointer;
-    padding: 2px 8px;
+    padding: 2px 10px;
     border-radius: 8px;
     transition: all 0.2s ease;
 }
 
-.num-part:hover:not(.disabled-part) {
+.num-part:hover {
     background: #e8d7b5;
     color: #111;
     transform: scale(1.05);
 }
 
-.num-part.disabled-part {
-    cursor: default;
-    opacity: 0.9;
-}
-
-/* Korostus äänitoiston aikana */
 .num-part.highlighted {
     background: #d4af37 !important;
     color: #ffffff !important;
@@ -345,108 +339,57 @@ h1 {
     font-style: italic;
 }
 
-.answer-slots {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 25px;
-    min-height: 75px;
-    align-items: center;
-    flex-wrap: wrap;
+/* Kirjoituskenttäalue */
+.input-section {
+    margin-bottom: 20px;
 }
 
-.slot {
-    width: 42px;
-    height: 55px;
-    border: 3px solid #d4af37;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    font-weight: bold;
-    background: #fdfbf7;
-    color: #2b1d0c;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    cursor: pointer;
-}
-
-.slot.filled {
-    border-color: #8c6d3f;
-    background: #f4ecd8;
-    transform: scale(1.05);
-}
-
-.slot.correct {
-    border-color: #16a34a;
-    background: #f0fdf4;
-    color: #16a34a;
-    animation: successPop 0.5s ease;
-}
-
-.slot.error {
-    border-color: #ef4444;
-    background: #fef2f2;
-    animation: shake 0.4s ease;
-}
-
-.pool-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #6b5844;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.pool {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-    max-width: 480px;
-    margin: 0 auto 25px auto;
-}
-
-.block {
-    height: 50px;
-    background: linear-gradient(135deg, #3a2b1c 0%, #2b1d0c 100%);
-    color: #fdfbf7;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.answer-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 14px 18px;
     font-size: 20px;
     font-weight: bold;
-    cursor: pointer;
+    text-align: center;
+    border: 3px solid #d4af37;
+    border-radius: 12px;
+    background: #fff;
+    color: #2b1d0c;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.answer-input:focus {
+    border-color: #8c6d3f;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+}
+
+/* Virtuaalinen kyrillinen näppäimistöapu / kirjainnapit */
+.virtual-keyboard {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    max-width: 550px;
+    margin: 0 auto 20px auto;
+}
+
+.vk-btn {
+    background: #f4ecd8;
     border: 1px solid #d4af37;
-    box-shadow: 0 4px 10px rgba(43, 29, 12, 0.3);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
+    color: #2b1d0c;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.1s;
 }
 
-.block.selecting-anim {
-    animation: blockSelectEffect 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes blockSelectEffect {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.25) rotate(6deg); background: linear-gradient(135deg, #8c6d3f 0%, #5c4a38 100%); }
-    100% { transform: scale(1); }
-}
-
-.block:hover:not(.used) {
-    transform: translateY(-4px) scale(1.03);
-    background: linear-gradient(135deg, #5c4a38 0%, #3a2b1c 100%);
-}
-
-.block.used {
-    background: #e2e8f0;
-    color: #94a3b8;
-    border-color: #cbd5e1;
-    box-shadow: none;
-    cursor: not-allowed;
-    transform: scale(0.95);
-    opacity: 0.6;
+.vk-btn:hover {
+    background: #e8d7b5;
+    transform: translateY(-2px);
 }
 
 .controls {
@@ -457,19 +400,19 @@ h1 {
 }
 
 button.action-btn {
-    padding: 10px 20px;
-    background: #f4ecd8;
+    padding: 10px 22px;
+    background: #3a2b1c;
     border: 1px solid #d4af37;
     border-radius: 8px;
     font-weight: 600;
-    color: #5c4a38;
+    color: #fdfbf7;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 button.action-btn:hover {
-    background: #e8d7b5;
-    color: #2b1d0c;
+    background: #2b1d0c;
+    box-shadow: 0 4px 12px rgba(43, 29, 12, 0.3);
 }
 
 .feedback {
@@ -549,7 +492,7 @@ button.action-btn:hover {
 
 @keyframes successPop {
     0% { transform: scale(1); }
-    50% { transform: scale(1.15) rotate(3deg); }
+    50% { transform: scale(1.15); }
     100% { transform: scale(1); }
 }
 
@@ -602,7 +545,7 @@ button.action-btn:hover {
 <div id="welcomeOverlay" class="welcome-overlay">
     <div class="welcome-modal">
         <h2>🇷🇺 Tervetuloa, Oppija! (Добро пожаловать)</h2>
-        <p>Valitse kirjallinen vaikeustasosi ja kirjoita venäjän numerot itsenäisesti kyrillisillä kirjaimilla.</p>
+        <p>Valitse kirjallinen vaikeustasosi ja kirjoita venäjän luvut itsenäisesti kyrillisillä kirjaimilla.</p>
         
         <div class="welcome-diff-list">
             <button class="welcome-diff-btn" onclick="selectInitialDifficulty(0)">
@@ -692,22 +635,60 @@ button.action-btn:hover {
         <!-- Kirjallinen kannustusosio -->
         <div id="encBox" class="encouragement-box">
             <div id="encRu" class="enc-ru">Всякое волнение проходит...</div>
-            <div id="encFi" class="enc-fi">"Kaikki levottomuus menee ohi..." – Ivan Turgenev</div>
+            <div id="encFi" class="enc-fi">"Kaikki levottomuus menee ohi..." – Turgenev</div>
         </div>
 
         <div class="target-box">
-            <!-- Klikattava lukuosa dynaamisesti -->
+            <!-- Klikattavat osat luvussa -->
             <div id="targetNumber" class="target-number">0</div>
-            <div class="click-hint">💡 Klikkaa numeron osia kuullaksesi niiden venäjänkieliset vastineet</div>
+            <div class="click-hint">💡 Klikkaa luvun eri osia (satoja, kymmeniä, yms.) kuullaksesi ne erikseen!</div>
         </div>
 
-        <div id="answerSlots" class="answer-slots"></div>
+        <!-- Kirjoituskenttä -->
+        <div class="input-section">
+            <input type="text" id="answerInput" class="answer-input" placeholder="Kirjoita vastaus tähän..." autocomplete="off" spellcheck="false">
+        </div>
 
-        <div class="pool-label">Valitse kyrilliset kirjaimet:</div>
-        <div id="blockPool" class="pool"></div>
+        <!-- Virtuaalinen näppäimistöapu kyrillisille kirjaimille -->
+        <div class="virtual-keyboard">
+            <button class="vk-btn" onclick="insertChar('а')">а</button>
+            <button class="vk-btn" onclick="insertChar('б')">б</button>
+            <button class="vk-btn" onclick="insertChar('в')">в</button>
+            <button class="vk-btn" onclick="insertChar('г')">г</button>
+            <button class="vk-btn" onclick="insertChar('д')">д</button>
+            <button class="vk-btn" onclick="insertChar('е')">е</button>
+            <button class="vk-btn" onclick="insertChar('ё')">ё</button>
+            <button class="vk-btn" onclick="insertChar('ж')">ж</button>
+            <button class="vk-btn" onclick="insertChar('з')">з</button>
+            <button class="vk-btn" onclick="insertChar('и')">и</button>
+            <button class="vk-btn" onclick="insertChar('й')">й</button>
+            <button class="vk-btn" onclick="insertChar('к')">к</button>
+            <button class="vk-btn" onclick="insertChar('л')">л</button>
+            <button class="vk-btn" onclick="insertChar('м')">м</button>
+            <button class="vk-btn" onclick="insertChar('н')">н</button>
+            <button class="vk-btn" onclick="insertChar('о')">о</button>
+            <button class="vk-btn" onclick="insertChar('п')">п</button>
+            <button class="vk-btn" onclick="insertChar('р')">р</button>
+            <button class="vk-btn" onclick="insertChar('с')">с</button>
+            <button class="vk-btn" onclick="insertChar('т')">т</button>
+            <button class="vk-btn" onclick="insertChar('у')">у</button>
+            <button class="vk-btn" onclick="insertChar('ф')">ф</button>
+            <button class="vk-btn" onclick="insertChar('х')">х</button>
+            <button class="vk-btn" onclick="insertChar('ц')">ц</button>
+            <button class="vk-btn" onclick="insertChar('ч')">ч</button>
+            <button class="vk-btn" onclick="insertChar('ш')">ш</button>
+            <button class="vk-btn" onclick="insertChar('щ')">щ</button>
+            <button class="vk-btn" onclick="insertChar('ы')">ы</button>
+            <button class="vk-btn" onclick="insertChar('ь')">ь</button>
+            <button class="vk-btn" onclick="insertChar('э')">э</button>
+            <button class="vk-btn" onclick="insertChar('ю')">ю</button>
+            <button class="vk-btn" onclick="insertChar('я')">я</button>
+            <button class="vk-btn" onclick="insertChar(' ')">␣</button>
+        </div>
 
         <div class="controls">
-            <button class="action-btn" onclick="userClear()">Tyhjennä rivi</button>
+            <button class="action-btn" onclick="checkAnswer()">Tarkista vastaus</button>
+            <button class="action-btn" onclick="clearInput()">Tyhjennä</button>
         </div>
 
         <div id="feedback" class="feedback"></div>
@@ -866,7 +847,7 @@ const literaryEncouragements = {
         { ru: "Умей выждать.", fi: "Osaa odottaa. – Turgenev" }
     ],
     1: [
-        { ru: "И скучно, и грустно...", fi: "On ikävää ja synkkää... – Lermontov" },
+        { ru: "И скучно, и грустно...", fi: "On synkkää... – Lermontov" },
         { ru: "Я ищу свободы и покоя!", fi: "Etsin vapautta ja rauhaa! – Lermontov" }
     ],
     2: [
@@ -878,7 +859,7 @@ const literaryEncouragements = {
         { ru: "Надо жить, надо любить, надо верить.", fi: "Täytyy elää, täytyy rakastaa... – Tolstoi" }
     ],
     4: [
-        { ru: "Февраль. Достать чернил и плакать!", fi: "Helmikuu. Ottaapa mustekynä ja itkeä! – Pasternak" }
+        { ru: "Февраль. Достать чернил и плакать!", fi: "Helmikuu. Ottaa mustetta ja itkeä! – Pasternak" }
     ],
     5: [
         { ru: "Красота спасет мир!", fi: "Kauneus pelastaa maailman! – Dostojevski" },
@@ -899,11 +880,6 @@ const referenceData = [
 let currentDifficulty = 0;
 let currentNumber = 0;
 let targetRuStr = '';
-let currentSlots = [];
-let poolBlocks = [];
-let score = 0;
-let streak = 0;
-let isLocked = false;
 let russianVoice = null;
 
 function selectInitialDifficulty(level) {
@@ -1001,7 +977,7 @@ function setDifficulty(level, btnEl) {
     newRound();
 }
 
-// Apufunktio joka pilkkoo luvun venäjän kieliopin mukaisiin sanoihin ja osiin (sis. 11-19 omina kokonaisuuksinaan)
+// Pilkotaan luku juuri oikeisiin osiin, jotta jokainen palanen äännetään omana sananaan
 function getNumberBreakdown(n) {
     if (n === 0) return [{ label: "0", text: numWords[0] }];
 
@@ -1041,8 +1017,27 @@ function getNumberBreakdown(n) {
         n %= 1000;
     }
 
+    // Sadat (esim. 400 -> четыреста)
+    const hundreds = Math.floor(n / 100) * 100;
+    if (hundreds > 0) {
+        parts.push({ label: hundreds.toString(), text: numWords[hundreds] });
+        n %= 100;
+    }
+
+    // Kymmenet ja ykköset (esim. 24 -> 20 ja 4, tai 12 -> 12 omana kokonaisuutenaan)
     if (n > 0) {
-        parts.push({ label: n.toString(), text: getNumberString(n) });
+        if (n >= 11 && n <= 19) {
+            parts.push({ label: n.toString(), text: numWords[n] });
+        } else {
+            const tens = Math.floor(n / 10) * 10;
+            const units = n % 10;
+            if (tens > 0) {
+                parts.push({ label: tens.toString(), text: numWords[tens] });
+            }
+            if (units > 0) {
+                parts.push({ label: units.toString(), text: numWords[units] });
+            }
+        }
     }
 
     return parts;
@@ -1061,7 +1056,7 @@ function getNumberString(n) {
 
     if (remainder > 0) {
         if (remainder >= 11 && remainder <= 19) {
-            words.push(numWords[remainder]); // 11-19 omina sanoinaan!
+            words.push(numWords[remainder]);
         } else {
             const tens = Math.floor(remainder / 10) * 10;
             const units = remainder % 10;
@@ -1078,24 +1073,14 @@ function numberToRussian(n) {
     return { ru: breakdown.map(p => p.text).join(" ") };
 }
 
-function shuffle(array) {
-    const result = [...array];
-    for (let i = result.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
-}
-
 function newRound() {
-    isLocked = false;
-    currentSlots = [];
-
     const feedback = document.getElementById('feedback');
     if (feedback) {
         feedback.textContent = '';
         feedback.style.color = '#333';
     }
+
+    document.getElementById('answerInput').value = '';
 
     updateEncouragement();
 
@@ -1109,35 +1094,13 @@ function newRound() {
     currentNumber = Math.floor(Math.random() * (max + 1));
     if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1;
 
-    // Testitapaukset haluttaessa: esim. 1513 tai 8764818 toimivat nyt täydellisesti
     const result = numberToRussian(currentNumber);
     targetRuStr = result.ru;
 
     renderClickableNumber(currentNumber);
-
-    const neededChars = targetRuStr.split('');
-    let pool = [...neededChars];
-
-    const targetPoolSize = Math.max(12, neededChars.length + 4);
-    const alphabet = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', ' '];
-
-    while (pool.length < targetPoolSize) {
-        let randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
-        pool.push(randomChar);
-    }
-
-    pool = shuffle(pool);
-
-    poolBlocks = pool.map((char, index) => ({
-        id: index,
-        char: char,
-        used: false
-    }));
-
-    renderBoard();
 }
 
-// Renderöidään luku fiksuiksi klikattaviksi osiksi
+// Renderöidään luku osiin, joita klikkaamalla kuullaan TÄSMÄLLEEN kyseinen osa erikseen
 function renderClickableNumber(n) {
     const container = document.getElementById('targetNumber');
     container.innerHTML = '';
@@ -1158,7 +1121,6 @@ function renderClickableNumber(n) {
         if (index < breakdown.length - 1) {
             const sep = document.createElement('span');
             sep.textContent = " ";
-            sep.className = 'num-part disabled-part';
             container.appendChild(sep);
         }
     });
@@ -1177,129 +1139,36 @@ function highlightAndSpeak(element, russianText) {
     });
 }
 
-function renderBoard() {
-    const slotsContainer = document.getElementById('answerSlots');
-    const poolContainer = document.getElementById('blockPool');
-
-    if (!slotsContainer || !poolContainer) return;
-
-    slotsContainer.innerHTML = '';
-    poolContainer.innerHTML = '';
-
-    for (let i = 0; i < targetRuStr.length; i++) {
-        const slot = document.createElement('div');
-        slot.className = 'slot';
-        slot.dataset.index = i;
-
-        if (currentSlots[i]) {
-            slot.classList.add('filled');
-            slot.textContent = currentSlots[i].char === ' ' ? '␣' : currentSlots[i].char;
-        }
-
-        slot.setAttribute('role', 'button');
-        slot.setAttribute('aria-label', 'Poista merkki');
-        slot.onclick = () => removeSlot(i);
-
-        slotsContainer.appendChild(slot);
-    }
-
-    poolBlocks.forEach(block => {
-        const blockEl = document.createElement('div');
-        blockEl.className = 'block';
-        blockEl.dataset.blockId = block.id;
-
-        if (block.used) {
-            blockEl.classList.add('used');
-        }
-
-        blockEl.textContent = block.char === ' ' ? '␣' : block.char;
-        blockEl.onclick = () => selectBlock(block.id, blockEl);
-
-        poolContainer.appendChild(blockEl);
-    });
+function insertChar(char) {
+    const input = document.getElementById('answerInput');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const val = input.value;
+    input.value = val.substring(0, start) + char + val.substring(end);
+    input.focus();
+    input.setSelectionRange(start + 1, start + 1);
 }
 
-function selectBlock(id, element) {
-    if (isLocked) return;
-
-    const block = poolBlocks.find(b => b.id === id);
-    if (!block || block.used) return;
-    if (currentSlots.length >= targetRuStr.length) return;
-
-    playPopSound();
-    element.classList.add('selecting-anim');
-    setTimeout(() => {
-        element.classList.remove('selecting-anim');
-    }, 350);
-
-    if (block.char !== ' ') {
-        speakText(block.char);
-    }
-
-    block.used = true;
-    currentSlots.push(block);
-
-    clearFeedback();
-    renderBoard();
-
-    if (currentSlots.length === targetRuStr.length) {
-        checkAnswer();
-    }
-}
-
-function removeSlot(index) {
-    if (isLocked) return;
-    if (index < 0 || index >= currentSlots.length) return;
-
-    const removedBlock = currentSlots.splice(index, 1)[0];
-    const block = poolBlocks.find(b => b.id === removedBlock.id);
-
-    if (block) {
-        block.used = false;
-    }
-
-    clearFeedback();
-    renderBoard();
-}
-
-function userClear() {
-    if (isLocked) return;
-
-    currentSlots = [];
-    poolBlocks.forEach(block => {
-        block.used = false;
-    });
-
-    clearFeedback();
-    renderBoard();
-}
-
-function clearFeedback() {
+function clearInput() {
+    const input = document.getElementById('answerInput');
+    input.value = '';
+    input.focus();
     const feedback = document.getElementById('feedback');
-    if (!feedback) return;
-    feedback.textContent = '';
-    feedback.style.color = '#333';
-
-    document.querySelectorAll('.slot').forEach(slot => {
-        slot.classList.remove('error', 'correct');
-    });
+    if (feedback) feedback.textContent = '';
 }
 
 function checkAnswer() {
-    const userStr = currentSlots.map(block => block.char).join('');
-    const slots = document.querySelectorAll('.slot');
+    const input = document.getElementById('answerInput');
+    // Poistetaan ylimääräiset tyhjät alusta, lopusta ja tuplavälit vertailun helpottamiseksi
+    const userStr = input.value.trim().replace(/\s+/g, ' ');
     const feedback = document.getElementById('feedback');
 
     if (userStr === targetRuStr) {
-        isLocked = true;
-
         score += 10 * (currentDifficulty + 1);
         streak += 1;
 
         document.getElementById('score').textContent = score;
         document.getElementById('streak').textContent = streak;
-
-        slots.forEach(slot => slot.classList.add('correct'));
 
         if (feedback) {
             feedback.textContent = 'Oikein! Отлично!';
@@ -1324,10 +1193,8 @@ function checkAnswer() {
         streak = 0;
         document.getElementById('streak').textContent = streak;
 
-        slots.forEach(slot => slot.classList.add('error'));
-
         if (feedback) {
-            feedback.textContent = 'Väärin, yritä uudelleen!';
+            feedback.textContent = `Väärin! Oikea muoto olisi: "${targetRuStr}"`;
             feedback.style.color = '#ef4444';
         }
 
@@ -1336,14 +1203,6 @@ function checkAnswer() {
         flashEl.className = 'screen-flash-error';
         document.body.appendChild(flashEl);
         setTimeout(() => flashEl.remove(), 450);
-
-        setTimeout(() => {
-            if (!isLocked) {
-                document.querySelectorAll('.slot').forEach(slot => {
-                    slot.classList.remove('error');
-                });
-            }
-        }, 500);
     }
 }
 
