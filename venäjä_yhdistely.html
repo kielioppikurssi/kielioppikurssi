@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venäjän sanastopeli – Valitse teema ja yhdistä parit</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: #1a2a3a;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e0;
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .stats {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .column-title {
+            text-align: center;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50px;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .card.selected {
+            border-color: var(--primary);
+            background-color: #ebf8ff;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+        }
+
+        .card.matched {
+            border-color: var(--success);
+            background-color: #e6fffa;
+            color: #234e52;
+            cursor: default;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .card.wrong {
+            border-color: var(--error);
+            background-color: #fff5f5;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .audio-icon {
+            margin-left: 8px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        /* Korttipakka-osion tyylit */
+        .deck-container {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0fff4;
+            border: 2px solid var(--success);
+            border-radius: 12px;
+        }
+
+        .flashcards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .flashcard {
+            background: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .flashcard:hover {
+            border-color: var(--success);
+            transform: translateY(-3px);
+            background-color: #f7fafc;
+        }
+
+        .flashcard .ru-word {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2b6cb0;
+            margin-bottom: 5px;
+        }
+
+        .flashcard .fi-word {
+            font-size: 15px;
+            color: #4a5568;
+        }
+
+        @media (max-width: 600px) {
+            .game-board {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Venäjän sanastopeli – Valitse teema ja yhdistä parit</h1>
+        <p>Yhdistä venäjänkielinen sana ja sen suomennos!</p>
+    </header>
+
+    <div class="controls">
+        <div>
+            <label for="category-select"><b>Valitse teema:</b> </label>
+            <select id="category-select" onchange="loadCategory(this.value)">
+                <!-- Teemat ladataan JS:stä -->
+            </select>
+        </div>
+        <div class="stats">
+            Pisteet: <span id="score">0</span> / <span id="total">0</span>
+        </div>
+    </div>
+
+    <!-- Pelialue -->
+    <div id="game-board-wrapper">
+        <div class="game-board">
+            <div class="column">
+                <div class="column-title">Venäjä (Русский)</div>
+                <div id="ru-column" class="column"></div>
+            </div>
+            <div class="column">
+                <div class="column-title">Suomi</div>
+                <div id="fi-column" class="column"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Valmiiksi pelattu korttipakka -näkymä -->
+    <div id="deck-container" class="deck-container">
+        <h2>🎉 Hienoa! Läpäisit teeman!</h2>
+        <p>Kaikki sanat yhdistettiin korttipakaksi. Klikkaa mitä tahansa korttia kuullaksesi venäjänkielisen ääntämyksen!</p>
+        <div id="flashcards-grid" class="flashcards-grid"></div>
+        <button onclick="loadCategory(document.getElementById('category-select').value)" style="margin-top: 20px; padding: 10px 20px; font-size: 16px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer;">Pelaa uudelleen</button>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // 1. SANASTO & TEEMAT
+    // ==========================================
+    const VOCABULARY = {
+        food: {
+            title: "🍎 Ruoka ja juoma (A1)",
+            pairs: [
+                { id: 1, ru: "хлеб", fi: "leipä" },
+                { id: 2, ru: "вода", fi: "vesi" },
+                { id: 3, ru: "сыр", fi: "juusto" },
+                { id: 4, ru: "чай", fi: "tee" },
+                { id: 5, ru: "яблоко", fi: "omena" },
+                { id: 6, ru: "рыба", fi: "kala" }
+            ]
+        },
+        greetings: {
+            title: "👋 Tervehdykset & Fraasit (A1)",
+            pairs: [
+                { id: 101, ru: "Здравствуйте", fi: "Hyvää päivää (muod.)" },
+                { id: 102, ru: "Привет", fi: "Moi / Hei" },
+                { id: 103, ru: "Спасибо", fi: "Kiitos" },
+                { id: 104, ru: "Пожалуйста", fi: "Ole hyvä / Pyydän" },
+                { id: 105, ru: "До свидания", fi: "Näkemiin" },
+                { id: 106, ru: "Извините", fi: "Anteeksi" }
+            ]
+        },
+        city: {
+            title: "🏙️ Kaupunki ja matkailu (A1-A2)",
+            pairs: [
+                { id: 201, ru: "отель", fi: "hotelli" },
+                { id: 202, ru: "улица", fi: "katu" },
+                { id: 203, ru: "поезд", fi: "juna" },
+                { id: 204, ru: "магазин", fi: "kauppa" },
+                { id: 205, ru: "аптека", fi: "apteekki" },
+                { id: 206, ru: "аэропорт", fi: "lentokenttä" }
+            ]
+        },
+        family: {
+            title: "👨‍👩‍👧 Perhe ja ihmiset (A1)",
+            pairs: [
+                { id: 301, ru: "мама", fi: "äiti" },
+                { id: 302, ru: "папа", fi: "isä" },
+                { id: 303, ru: "друг", fi: "ystävä" },
+                { id: 304, ru: "брат", fi: "veli" },
+                { id: 305, ru: "сестра", fi: "sisko" },
+                { id: 306, ru: "семья", fi: "perhe" }
+            ]
+        }
+    };
+
+    // ==========================================
+    // 2. PELIN LOGIIKKA
+    // ==========================================
+    let selectedRu = null;
+    let selectedFi = null;
+    let currentScore = 0;
+    let totalPairs = 0;
+    let currentPairsList = [];
+
+    window.onload = () => {
+        initCategorySelect();
+        loadCategory('food');
+    };
+
+    function initCategorySelect() {
+        const select = document.getElementById('category-select');
+        select.innerHTML = '';
+        for (const key in VOCABULARY) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = VOCABULARY[key].title;
+            select.appendChild(opt);
+        }
+    }
+
+    function speakRussian(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ru-RU';
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function loadCategory(catKey) {
+        const data = VOCABULARY[catKey];
+        if (!data) return;
+
+        currentScore = 0;
+        currentPairsList = data.pairs;
+        totalPairs = data.pairs.length;
+        selectedRu = null;
+        selectedFi = null;
+
+        document.getElementById('score').textContent = currentScore;
+        document.getElementById('total').textContent = totalPairs;
+        
+        // Piilotetaan korttipakka ja näytetään pelilauta
+        document.getElementById('deck-container').style.display = 'none';
+        document.getElementById('game-board-wrapper').style.display = 'block';
+
+        const ruCol = document.getElementById('ru-column');
+        const fiCol = document.getElementById('fi-column');
+        ruCol.innerHTML = '';
+        fiCol.innerHTML = '';
+
+        const ruList = [...data.pairs].sort(() => Math.random() - 0.5);
+        const fiList = [...data.pairs].sort(() => Math.random() - 0.5);
+
+        ruList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.id = item.id;
+            card.dataset.lang = 'ru';
+            card.dataset.text = item.ru;
+            card.innerHTML = `${item.ru} <span class="audio-icon">🔊</span>`;
+            card.onclick = () => selectCard(card);
+            ruCol.appendChild(card);
+        });
+
+        fiList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.id = item.id;
+            card.dataset.lang = 'fi';
+            card.textContent = item.fi;
+            card.onclick = () => selectCard(card);
+            fiCol.appendChild(card);
+        });
+    }
+
+    function selectCard(card) {
+        if (card.classList.contains('matched')) return;
+
+        const lang = card.dataset.lang;
+
+        if (lang === 'ru') {
+            speakRussian(card.dataset.text);
+        }
+
+        if (lang === 'ru') {
+            if (selectedRu) selectedRu.classList.remove('selected');
+            selectedRu = card;
+            card.classList.add('selected');
+        } else {
+            if (selectedFi) selectedFi.classList.remove('selected');
+            selectedFi = card;
+            card.classList.add('selected');
+        }
+
+        if (selectedRu && selectedFi) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        const ruId = selectedRu.dataset.id;
+        const fiId = selectedFi.dataset.id;
+
+        if (ruId === fiId) {
+            selectedRu.classList.remove('selected');
+            selectedFi.classList.remove('selected');
+            selectedRu.classList.add('matched');
+            selectedFi.classList.add('matched');
+
+            currentScore++;
+            document.getElementById('score').textContent = currentScore;
+
+            selectedRu = null;
+            selectedFi = null;
+
+            if (currentScore === totalPairs) {
+                setTimeout(() => {
+                    showFlashcardDeck();
+                }, 400);
+            }
+        } else {
+            const tempRu = selectedRu;
+            const tempFi = selectedFi;
+
+            tempRu.classList.add('wrong');
+            tempFi.classList.add('wrong');
+
+            setTimeout(() => {
+                tempRu.classList.remove('selected', 'wrong');
+                tempFi.classList.remove('selected', 'wrong');
+            }, 600);
+
+            selectedRu = null;
+            selectedFi = null;
+        }
+    }
+
+    // Näytetään korttipakka kun peli on läpäisty
+    function showFlashcardDeck() {
+        document.getElementById('game-board-wrapper').style.display = 'none';
+        const deckContainer = document.getElementById('deck-container');
+        const grid = document.getElementById('flashcards-grid');
+        grid.innerHTML = '';
+
+        // Luodaan korttipakan kortit
+        currentPairsList.forEach(item => {
+            const flashcard = document.createElement('div');
+            flashcard.className = 'flashcard';
+            flashcard.innerHTML = `
+                <div class="ru-word">${item.ru} 🔊</div>
+                <div class="fi-word">${item.fi}</div>
+            `;
+            // Klikkaus lausuu venäjänkielisen sanan
+            flashcard.onclick = () => speakRussian(item.ru);
+            grid.appendChild(flashcard);
+        });
+
+        deckContainer.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
