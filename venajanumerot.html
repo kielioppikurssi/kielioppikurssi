@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Venäläinen numeropulma – Dostojevski-tila</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Koko ruudun aloitus-popup */
+.welcome-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 20, 15, 0.90);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 1;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.welcome-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.welcome-modal {
+    background: #fdfbf7;
+    max-width: 580px;
+    width: 100%;
+    padding: 35px 30px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    border: 2px solid #d4af37;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.welcome-modal h2 {
+    font-size: 26px;
+    color: #2b1d0c;
+    margin-bottom: 8px;
+    font-family: 'Georgia', serif;
+}
+
+.welcome-modal p {
+    color: #5c4a38;
+    font-size: 15px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.welcome-diff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.welcome-diff-btn {
+    background: #f4ecd8;
+    border: 2px solid #d4af37;
+    padding: 12px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #2b1d0c;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.welcome-diff-btn:hover {
+    background: #e8d7b5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.welcome-diff-btn.dostoevsky-btn {
+    background: linear-gradient(135deg, #2c1212 0%, #110505 100%);
+    border-color: #8b0000;
+    color: #fca5a5;
+}
+
+.welcome-diff-btn.dostoevsky-btn:hover {
+    background: linear-gradient(135deg, #4a1919 0%, #220a0a 100%);
+    border-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(139, 0, 0, 0.6);
+}
+
+.welcome-diff-sub {
+    font-size: 12px;
+    opacity: 0.85;
+    font-weight: normal;
+}
+
+/* Päävalikko- ja toimintonapit */
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.top-right-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.päävalikko-btn, .toggle-sound-btn, .toggle-speech-btn, .toggle-translit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fdfbf7;
+    color: #5c4a38;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #d4af37;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.päävalikko-btn:hover, .toggle-sound-btn:hover, .toggle-speech-btn:hover, .toggle-translit-btn:hover {
+    background: #f4ecd8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.toggle-sound-btn.muted, .toggle-speech-btn.muted {
+    color: #b91c1c;
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.päävalikko-btn svg, .toggle-sound-btn svg, .toggle-speech-btn svg, .toggle-translit-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2b2521 0%, #1a1614 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 25px;
+    max-width: 1150px;
+    width: 100%;
+}
+
+@media (max-width: 850px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.main-panel {
+    background: #fdfbf7;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #d4af37;
+}
+
+h1 {
+    font-size: 28px;
+    color: #2b1d0c;
+    margin-bottom: 5px;
+    font-family: 'Georgia', serif;
+}
+
+.subtitle {
+    color: #6b5844;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Vaikeustasovaltin tyylit */
+.difficulty-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.diff-btn {
+    background: #f4ecd8;
+    border: 1px solid #d4af37;
+    color: #5c4a38;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.diff-btn:hover {
+    background: #e8d7b5;
+}
+
+.diff-btn.active {
+    background: #2b1d0c;
+    color: #fdfbf7;
+    border-color: #d4af37;
+    box-shadow: 0 4px 10px rgba(43, 29, 12, 0.3);
+}
+
+.diff-btn.dostoevsky.active {
+    background: linear-gradient(135deg, #8b0000 0%, #3f0000 100%);
+    color: #ffffff;
+    border-color: #ef4444;
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.6);
+}
+
+.diff-sub {
+    font-size: 9px;
+    opacity: 0.85;
+    font-weight: normal;
+}
+
+/* Venäläinen kannustuslaatikko */
+.encouragement-box {
+    background: linear-gradient(135deg, #fdf6e2 0%, #f4e8c1 100%);
+    border: 1px solid #d4af37;
+    border-radius: 12px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    color: #4a3822;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.15);
+}
+
+.encouragement-box.dostoevsky-theme {
+    background: linear-gradient(135deg, #1f0b0b 0%, #3a0d0d 100%);
+    border-color: #8b0000;
+    color: #fca5a5;
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4);
+}
+
+.enc-ru {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.enc-fi {
+    font-size: 13px;
+    font-style: italic;
+}
+
+.target-box {
+    background: #f4ecd8;
+    border: 2px dashed #d4af37;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.target-number {
+    font-size: 40px;
+    font-weight: bold;
+    color: #2b1d0c;
+    margin-bottom: 5px;
+    word-break: break-all;
+    font-family: 'Georgia', serif;
+}
+
+.target-translit {
+    font-size: 18px;
+    color: #8c6d3f;
+    font-weight: 600;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.target-translit.hidden-translit {
+    opacity: 0;
+    filter: blur(6px);
+    user-select: none;
+}
+
+.answer-slots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 25px;
+    min-height: 75px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.slot {
+    width: 50px;
+    height: 65px;
+    border: 3px solid #d4af37;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: bold;
+    background: #fdfbf7;
+    color: #2b1d0c;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+}
+
+.slot.filled {
+    border-color: #8c6d3f;
+    background: #f4ecd8;
+    transform: scale(1.05);
+}
+
+.slot.correct {
+    border-color: #16a34a;
+    background: #f0fdf4;
+    color: #16a34a;
+    animation: successPop 0.5s ease;
+}
+
+.slot.speaking {
+    border-color: #d4af37 !important;
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    transform: scale(1.15) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+.slot.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+    animation: shake 0.4s ease;
+}
+
+.pool-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b5844;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pool {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 440px;
+    margin: 0 auto 25px auto;
+}
+
+.block {
+    height: 55px;
+    background: linear-gradient(135deg, #3a2b1c 0%, #2b1d0c 100%);
+    color: #fdfbf7;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #d4af37;
+    box-shadow: 0 4px 12px rgba(43, 29, 12, 0.3);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.block.selecting-anim {
+    animation: blockSelectEffect 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes blockSelectEffect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25) rotate(6deg); background: linear-gradient(135deg, #8c6d3f 0%, #5c4a38 100%); }
+    100% { transform: scale(1); }
+}
+
+.block:hover:not(.used) {
+    transform: translateY(-4px) scale(1.03);
+    background: linear-gradient(135deg, #5c4a38 0%, #3a2b1c 100%);
+}
+
+.block.used {
+    background: #e2e8f0;
+    color: #94a3b8;
+    border-color: #cbd5e1;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: scale(0.95);
+    opacity: 0.6;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button.action-btn {
+    padding: 10px 20px;
+    background: #f4ecd8;
+    border: 1px solid #d4af37;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #5c4a38;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button.action-btn:hover {
+    background: #e8d7b5;
+    color: #2b1d0c;
+}
+
+.feedback {
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 30px;
+    margin-bottom: 15px;
+    transition: opacity 0.3s;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: #f4ecd8;
+    border: 1px solid #d4af37;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #5c4a38;
+}
+
+.sidebar {
+    background: #fdfbf7;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    max-height: 650px;
+    overflow-y: auto;
+    border: 2px solid #d4af37;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    color: #2b1d0c;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #f4ecd8;
+    padding-bottom: 8px;
+    font-family: 'Georgia', serif;
+}
+
+.cyrillic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cyrillic-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f4ecd8;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.cyrillic-item:hover {
+    background: #e8d7b5;
+}
+
+.cyrillic-char {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2b1d0c;
+}
+
+.cyrillic-translit {
+    color: #8c6d3f;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.cyrillic-num {
+    background: #d4af37;
+    color: #2b1d0c;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+@keyframes successPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(3deg); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+/* Väärän vastauksen efekti */
+.screen-flash-error {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(139, 0, 0, 0.45);
+    z-index: 9999;
+    pointer-events: none;
+    animation: flashErrorAnim 0.45s ease-out forwards;
+}
+
+@keyframes flashErrorAnim {
+    0% { opacity: 1; backdrop-filter: brightness(1.8) blur(4px); }
+    100% { opacity: 0; backdrop-filter: brightness(1) blur(0px); }
+}
+
+/* Oikean vastauksen efekti */
+.screen-burst-success {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, rgba(212,175,55,0.5) 0%, rgba(34,197,94,0.4) 50%, rgba(255,255,255,0) 100%);
+    z-index: 9999;
+    pointer-events: none;
+    animation: burstSuccessAnim 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes burstSuccessAnim {
+    0% { transform: scale(0.2); opacity: 1; filter: brightness(2); }
+    50% { opacity: 0.9; }
+    100% { transform: scale(2.2); opacity: 0; filter: brightness(1); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Koko ruudun aloitus-popup -->
+<div id="welcomeOverlay" class="welcome-overlay">
+    <div class="welcome-modal">
+        <h2>🇷🇺 Tervetuloa, Oppija! (Добро пожаловать)</h2>
+        <p>Valitse kirjallinen vaikeustasosi ja astu sisään venäläisen kirjallisuuden ja numeroiden sielunmaisemaan.</p>
+        
+        <div class="welcome-diff-list">
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(0)">
+                <span>0. Puškin (Runoilijan alkutaival)</span>
+                <span class="welcome-diff-sub">0 – 10</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(1)">
+                <span>1. Gogol (Pietarin kaduilla)</span>
+                <span class="welcome-diff-sub">0 – 100</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(2)">
+                <span>2. Tšehov (Pieniä ihmisiä ja tarinoita)</span>
+                <span class="welcome-diff-sub">0 – 1 000</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(3)">
+                <span>3. Tolstoi (Sota ja rauha)</span>
+                <span class="welcome-diff-sub">0 – 10 000</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(4)">
+                <span>4. Pasternak (Tohtori Živagon talvi)</span>
+                <span class="welcome-diff-sub">0 – 1 000 000</span>
+            </button>
+            <button class="welcome-diff-btn dostoevsky-btn" onclick="selectInitialDifficulty(5)">
+                <span>5. ⛓️ Dostojevski (Idiootin ja Rangaistussiirtolan tyhjyys)</span>
+                <span class="welcome-diff-sub">0 – 100 000 000 (Äärimmäinen kärsimys)</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="main-panel">
+        <div class="top-actions">
+            <a href="index.html" class="päävalikko-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                Päävalikkoon
+            </a>
+            <div class="top-right-group">
+                <button id="toggleSoundBtn" class="toggle-sound-btn" onclick="toggleSound()">
+                    <svg viewBox="0 0 24 24">
+                        <path id="soundIconPath" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                    <span id="soundBtnText">Ääniefektit: Päällä</span>
+                </button>
+                <button id="toggleSpeechBtn" class="toggle-speech-btn" onclick="toggleSpeech()">
+                    <svg viewBox="0 0 24 24">
+                        <path id="speechIconPath" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                    </svg>
+                    <span id="speechBtnText">Numeroiden luku: Päällä</span>
+                </button>
+                <button id="toggleTranslitBtn" class="toggle-translit-btn" onclick="toggleTranslit()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                    <span id="translitBtnText">Piilota translitterointi</span>
+                </button>
+            </div>
+        </div>
+
+        <h1>🇷🇺 Venäjän numeropulma</h1>
+        <p class="subtitle">Kokoa oikea luku venäläisillä sanoilla kirjain kirjaimelta!</p>
+
+        <!-- Vaikeustasojen valinta -->
+        <div class="difficulty-selector">
+            <button id="diffBtn0" class="diff-btn active" onclick="setDifficulty(0, this)">
+                <span>0. Puškin</span>
+                <span class="diff-sub">0–10</span>
+            </button>
+            <button id="diffBtn1" class="diff-btn" onclick="setDifficulty(1, this)">
+                <span>1. Gogol</span>
+                <span class="diff-sub">0–100</span>
+            </button>
+            <button id="diffBtn2" class="diff-btn" onclick="setDifficulty(2, this)">
+                <span>2. Tšehov</span>
+                <span class="diff-sub">0–1k</span>
+            </button>
+            <button id="diffBtn3" class="diff-btn" onclick="setDifficulty(3, this)">
+                <span>3. Tolstoi</span>
+                <span class="diff-sub">0–10k</span>
+            </button>
+            <button id="diffBtn4" class="diff-btn" onclick="setDifficulty(4, this)">
+                <span>4. Pasternak</span>
+                <span class="diff-sub">0–1M</span>
+            </button>
+            <button id="diffBtn5" class="diff-btn dostoevsky" onclick="setDifficulty(5, this)">
+                <span>5. Dostojevski</span>
+                <span class="diff-sub">0–100M</span>
+            </button>
+        </div>
+
+        <!-- Kirjallinen kannustusosio -->
+        <div id="encBox" class="encouragement-box">
+            <div id="encRu" class="enc-ru">И опыт, сын ошибок трудных...</div>
+            <div id="encFi" class="enc-fi">"Ja kokemus, vaikeiden erehdysten poika..." – Aleksandr Puškin</div>
+        </div>
+
+        <div class="target-box">
+            <div id="targetNumber" class="target-number">0</div>
+            <div id="targetTranslit" class="target-translit">nol'</div>
+        </div>
+
+        <div id="answerSlots" class="answer-slots"></div>
+
+        <div class="pool-label">Valitse oikeat kirjainlaatat:</div>
+        <div id="blockPool" class="pool"></div>
+
+        <div class="controls">
+            <button class="action-btn" onclick="userClear()">Tyhjennä rivi</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+
+        <div class="stats">
+            <div>Pisteet: <span id="score">0</span></div>
+            <div>Putki: <span id="streak">0</span></div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <h2>📜 Venäjän numerot</h2>
+        <div id="cyrillicList" class="cyrillic-list"></div>
+    </div>
+</div>
+
+<script>
+// --- ÄÄNITEHOSTEET JA PUHESYNTEESI ---
+let audioCtx = null;
+let soundEnabled = true;
+let speechEnabled = true;
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('toggleSoundBtn');
+    const btnText = document.getElementById('soundBtnText');
+    const iconPath = document.getElementById('soundIconPath');
+
+    if (soundEnabled) {
+        btn.classList.remove('muted');
+        btnText.textContent = 'Ääniefektit: Päällä';
+        iconPath.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+    } else {
+        btn.classList.add('muted');
+        btnText.textContent = 'Ääniefektit: Pois';
+        iconPath.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C22.63 14.85 23 13.47 23 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+    }
+}
+
+function toggleSpeech() {
+    speechEnabled = !speechEnabled;
+    const btn = document.getElementById('toggleSpeechBtn');
+    const btnText = document.getElementById('speechBtnText');
+    const iconPath = document.getElementById('speechIconPath');
+
+    if (speechEnabled) {
+        btn.classList.remove('muted');
+        btnText.textContent = 'Numeroiden luku: Päällä';
+        iconPath.setAttribute('d', 'M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z');
+    } else {
+        btn.classList.add('muted');
+        btnText.textContent = 'Numeroiden luku: Pois';
+        iconPath.setAttribute('d', 'M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.17l5.98 5.98zM4.27 3L3 4.27l6 6V11c0 1.66 1.34 3 3 3 .23 0 .44-.03.65-.08l1.66 1.66c-.71.27-1.48.42-2.31.42-3 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z');
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+    }
+}
+
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+function playPopSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.08);
+
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+    } catch(e) {}
+}
+
+function playErrorSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.35);
+
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+    } catch(e) {}
+}
+
+function playSuccessBurstSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+
+            gain.gain.setValueAtTime(0.2, now + idx * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.3);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(now + idx * 0.06);
+            osc.stop(now + idx * 0.06 + 0.3);
+        });
+    } catch(e) {}
+}
+
+// --- VENÄJÄN NUMERODATA ---
+const numWords = {
+    0: { ru: "ноль", tr: "nol'" },
+    1: { ru: "один", tr: "odin" },
+    2: { ru: "два", tr: "dva" },
+    3: { ru: "три", tr: "tri" },
+    4: { ru: "четыре", tr: "chetyre" },
+    5: { ru: "пять", tr: "pyat'" },
+    6: { ru: "шесть", tr: "shest'" },
+    7: { ru: "семь", tr: "sem'" },
+    8: { ru: "восемь", tr: "vosem'" },
+    9: { ru: "девять", tr: "devyat'" },
+    10: { ru: "десять", tr: "desyat'" },
+    11: { ru: "одиннадцать", tr: "odinnadcat'" },
+    12: { ru: "двенадцать", tr: "dvenadcat'" },
+    13: { ru: "тринадцать", tr: "trinadcat'" },
+    14: { ru: "четырнадцать", tr: "chetyrnadcat'" },
+    15: { ru: "пятнадцать", tr: "pyatnadcat'" },
+    16: { ru: "шестнадцать", tr: "shestnadcat'" },
+    17: { ru: "семнадцать", tr: "semnadcat'" },
+    18: { ru: "восемнадцать", tr: "vosemnadcat'" },
+    19: { ru: "девятнадцать", tr: "devyatnadcat'" },
+    20: { ru: "двадцать", tr: "dvadcat'" },
+    30: { ru: "тридцать", tr: "tridcat'" },
+    40: { ru: "сорок", tr: "sorok" },
+    50: { ru: "пятьдесят", tr: "pyat'desyat" },
+    60: { ru: "шестьдесят", tr: "shest'desyat" },
+    70: { ru: "семьдесят", tr: "sem'desyat" },
+    80: { ru: "восемьдесят", tr: "vosem'desyat" },
+    90: { ru: "девяносто", tr: "devyanosto" },
+    100: { ru: "сто", tr: "sto" },
+    200: { ru: "двести", tr: "dvesti" },
+    300: { ru: "триста", tr: "trista" },
+    400: { ru: "четыреста", tr: "chetyresta" },
+    500: { ru: "пятьсот", tr: "pyat'sot" },
+    600: { ru: "шестьсот", tr: "shest'sot" },
+    700: { ru: "семьсот", tr: "sem'sot" },
+    800: { ru: "восемьсот", tr: "vosem'sot" },
+    900: { ru: "девятьсот", tr: "devyat'sot" },
+    1000: { ru: "тысяча", tr: "tysyacha" },
+    2000: { ru: "тысячи", tr: "tysyachi" },
+    5000: { ru: "тысяч", tr: "tysyach" },
+    1000000: { ru: "миллион", tr: "million" },
+    1000000000: { ru: "миллиард", tr: "milliard" }
+};
+
+const literaryEncouragements = {
+    0: [
+        { ru: "И опыт, сын ошибок трудных...", fi: "Ja kokemus, vaikeiden erehdysten poika... – Puškin" },
+        { ru: "Мороз и солнце; день чудесный!", fi: "Pakkasta ja aurinko; ihana päivä! – Puškin" },
+        { ru: "Я помню чудное мгновенье...", fi: "Muistan ihmeellisen hetken... – Puškin" }
+    ],
+    1: [
+        { ru: "Эх, тройка! Птица-тройка, кто тебя выдумал?", fi: "Voi troikka! Lintutroikka, kuka sinut keksi? – Gogol" },
+        { ru: "Скучно жить на этом свете, господа!", fi: "On tylsää elää tässä maailmassa, hyvät herrat! – Gogol" },
+        { ru: "Ревизор! К нам едет ревизор!", fi: "Reviisori! Reviisori on tulossa meille! – Gogol" }
+    ],
+    2: [
+        { ru: "В человеке должно быть всё прекрасно...", fi: "Ihmisessä tulisi olla kaikki kaunista... – Tšehov" },
+        { ru: "Краткость — сестра таланта.", fi: "Tiiviys on lahjakkuuden sisar. – Tšehov" },
+        { ru: "Дело мастера боится.", fi: "Työ pelkää mestaria. – Venäläinen sananlasku" }
+    ],
+    3: [
+        { ru: "Все счастливые семьи похожи друг на друга...", fi: "Kaikki onnelliset perheet muistuttavat toisiaan... – Tolstoi" },
+        { ru: "Надо жить, надо любить, надо верить.", fi: "Täytyy elää, täytyy rakastaa, täytyy uskoa. – Tolstoi" },
+        { ru: "Сила воли побеждает любые преграdy.", fi: "Tahdonvoima voittaa mitkä tahansa esteet." }
+    ],
+    4: [
+        { ru: "Февраль. Достать чернил и плакать!", fi: "Helmikuu. Ottaa mustetta ja itkeä! – Pasternak" },
+        2: { ru: "Быть знаменитым некрасиво.", fi: "Kuuluisana olemisen kauneus on kyseenalaista. – Pasternak" }
+    ],
+    5: [
+        { ru: "Красота спасет мир!", fi: "Kauneus pelastaa maailman! – Dostojevski" },
+        { ru: "Страдание — это единственный источник познания.", fi: "Kärsimys on ainoa tiedon lähde. – Dostojevski" },
+        { ru: "Человек есть тайна. Ее надо разгадать...", fi: "Ihminen on arvoitus. Se täytyy ratkaista... – Dostojevski" }
+    ]
+};
+
+const referenceData = [
+    { num: '0', ru: 'ноль', tr: 'nol\'' },
+    { num: '1', ru: 'один', tr: 'odin' },
+    { num: '2', ru: 'два', tr: 'dva' },
+    { num: '3', ru: 'три', tr: 'tri' },
+    { num: '4', ru: 'четыре', tr: 'chetyre' },
+    { num: '5', ru: 'пять', tr: 'pyat\'' },
+    { num: '6', ru: 'шесть', tr: 'shest\'' },
+    { num: '7', ru: 'семь', tr: 'sem\'' },
+    { num: '8', ru: 'восемь', tr: 'vosem\'' },
+    { num: '9', ru: 'девять', tr: 'devyat\'' },
+    { num: '10', ru: 'десять', tr: 'desyat\'' },
+    { num: '100', ru: 'сто', tr: 'sto' },
+    { num: '1000', ru: 'тысяча', tr: 'tysyacha' }
+];
+
+let currentDifficulty = 0;
+let currentNumber = 0;
+let targetRuStr = '';
+let currentSlots = [];
+let poolBlocks = [];
+let score = 0;
+let streak = 0;
+let isLocked = false;
+let translitVisible = true;
+let russianVoice = null;
+
+function selectInitialDifficulty(level) {
+    const targetBtn = document.getElementById(`diffBtn${level}`);
+    if (targetBtn) {
+        setDifficulty(level, targetBtn);
+    }
+    const overlay = document.getElementById('welcomeOverlay');
+    overlay.classList.add('hidden');
+}
+
+function loadVoices() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    russianVoice = voices.find(v => v.lang === 'ru-RU' || v.lang.startsWith('ru')) || voices[0];
+}
+
+if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+}
+
+function speakText(text, onEndCallback) {
+    if (!speechEnabled) {
+        if (onEndCallback) onEndCallback();
+        return;
+    }
+    if (!('speechSynthesis' in window)) {
+        if (onEndCallback) onEndCallback();
+        return;
+    }
+
+    try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (russianVoice) utterance.voice = russianVoice;
+        utterance.lang = 'ru-RU';
+        utterance.rate = 0.85;
+
+        let finished = false;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            if (onEndCallback) onEndCallback();
+        };
+
+        utterance.onend = finish;
+        utterance.onerror = finish;
+        setTimeout(finish, 1500);
+
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        if (onEndCallback) onEndCallback();
+    }
+}
+
+function toggleTranslit() {
+    translitVisible = !translitVisible;
+    const translitEl = document.getElementById('targetTranslit');
+    const btnText = document.getElementById('translitBtnText');
+
+    if (translitVisible) {
+        translitEl.classList.remove('hidden-translit');
+        btnText.textContent = 'Piilota translitterointi';
+    } else {
+        translitEl.classList.add('hidden-translit');
+        btnText.textContent = 'Näytä translitterointi';
+    }
+}
+
+function updateEncouragement() {
+    const list = literaryEncouragements[currentDifficulty] || literaryEncouragements[0];
+    const randomItem = list[Math.floor(Math.random() * list.length)];
+    document.getElementById('encRu').textContent = randomItem.ru;
+    document.getElementById('encFi').textContent = `"${randomItem.fi}"`;
+
+    const box = document.getElementById('encBox');
+    if (currentDifficulty === 5) {
+        box.classList.add('dostoevsky-theme');
+    } else {
+        box.classList.remove('dostoevsky-theme');
+    }
+}
+
+function updateSidebarList() {
+    const container = document.getElementById('cyrillicList');
+    container.innerHTML = '';
+
+    referenceData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cyrillic-item';
+        div.innerHTML = `<span class="cyrillic-num">${item.num}</span><span class="cyrillic-char">${item.ru}</span><span class="cyrillic-translit">${item.tr}</span>`;
+        container.appendChild(div);
+    });
+}
+
+function setDifficulty(level, btnEl) {
+    currentDifficulty = level;
+    document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+    btnEl.classList.add('active');
+
+    updateSidebarList();
+    newRound();
+}
+
+// Apufunktio luvun muuntamiseksi venäjän kielelle (1-999 999)
+function numberToRussian(n) {
+    if (n === 0) return { ru: "ноль", tr: "nol'" };
+
+    let words = [];
+    let translits = [];
+
+    if (n >= 1000000) {
+        const mil = Math.floor(n / 1000000);
+        const rem = n % 1000000;
+        const sub = numberToRussian(mil);
+        words.push(sub.ru, "миллион");
+        translits.push(sub.tr, "million");
+        if (rem > 0) {
+            const subRem = numberToRussian(rem);
+            words.push(subRem.ru);
+            translits.push(subRem.tr);
+        }
+        return { ru: words.join(" "), tr: translits.join(" ") };
+    }
+
+    if (n >= 1000) {
+        const tys = Math.floor(n / 1000);
+        const rem = n % 1000;
+        
+        if (tys === 1) {
+            words.push("тысяча");
+            translits.push("tysyacha");
+        } else if (tys === 2) {
+            words.push("две", "тысячи");
+            translits.push("dve", "tysyachi");
+        } else if (tys >= 3 && tys <= 4) {
+            const sub = numberToRussian(tys);
+            words.push(sub.ru, "тысячи");
+            translits.push(sub.tr, "tysyachi");
+        } else {
+            const sub = numberToRussian(tys);
+            words.push(sub.ru, "тысяч");
+            translits.push(sub.tr, "tysyach");
+        }
+
+        if (rem > 0) {
+            const subRem = numberToRussian(rem);
+            words.push(subRem.ru);
+            translits.push(subRem.tr);
+        }
+        return { ru: words.join(" "), tr: translits.join(" ") };
+    }
+
+    const hundreds = Math.floor(n / 100) * 100;
+    const remainder = n % 100;
+
+    if (hundreds > 0) {
+        words.push(numWords[hundreds].ru);
+        translits.push(numWords[hundreds].tr);
+    }
+
+    if (remainder > 0) {
+        if (remainder < 20 || remainder % 10 === 0) {
+            words.push(numWords[remainder].ru);
+            translits.push(numWords[remainder].tr);
+        } else {
+            const tens = Math.floor(remainder / 10) * 10;
+            const units = remainder % 10;
+            words.push(numWords[tens].ru, numWords[units].ru);
+            translits.push(numWords[tens].tr, numWords[units].tr);
+        }
+    }
+
+    return { ru: words.join(" "), tr: translits.join(" ") };
+}
+
+function shuffle(array) {
+    const result = [...array];
+    for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+}
+
+function newRound() {
+    isLocked = false;
+    currentSlots = [];
+
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = '';
+    feedback.style.color = '#333';
+
+    updateEncouragement();
+
+    let max = 10;
+    if (currentDifficulty === 1) max = 100;
+    else if (currentDifficulty === 2) max = 1000;
+    else if (currentDifficulty === 3) max = 10000;
+    else if (currentDifficulty === 4) max = 1000000;
+    else if (currentDifficulty === 5) max = 100000000;
+
+    currentNumber = Math.floor(Math.random() * (max + 1));
+    if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1;
+
+    const result = numberToRussian(currentNumber);
+    targetRuStr = result.ru;
+
+    document.getElementById('targetNumber').textContent = currentNumber.toLocaleString('fi-FI');
+    document.getElementById('targetTranslit').textContent = result.tr;
+
+    // Pilkotaan merkkijono ilman välilyöntejä tai välilyönneillä, tässä kirjainlaatoiksi:
+    const neededChars = targetRuStr.split('');
+    let pool = [...neededChars];
+
+    const targetPoolSize = Math.max(8, neededChars.length + 3);
+    const alphabet = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', ' '];
+
+    while (pool.length < targetPoolSize) {
+        let randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
+        pool.push(randomChar);
+    }
+
+    pool = shuffle(pool);
+
+    poolBlocks = pool.map((char, index) => ({
+        id: index,
+        char: char,
+        used: false
+    }));
+
+    renderBoard();
+}
+
+function renderBoard() {
+    const slotsContainer = document.getElementById('answerSlots');
+    const poolContainer = document.getElementById('blockPool');
+
+    slotsContainer.innerHTML = '';
+    poolContainer.innerHTML = '';
+
+    for (let i = 0; i < targetRuStr.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.index = i;
+
+        if (currentSlots[i]) {
+            slot.classList.add('filled');
+            slot.textContent = currentSlots[i].char === ' ' ? '␣' : currentSlots[i].char;
+        }
+
+        slot.setAttribute('role', 'button');
+        slot.setAttribute('aria-label', 'Poista merkki');
+        slot.onclick = () => removeSlot(i);
+
+        slotsContainer.appendChild(slot);
+    }
+
+    poolBlocks.forEach(block => {
+        const blockEl = document.createElement('div');
+        blockEl.className = 'block';
+        blockEl.dataset.blockId = block.id;
+
+        if (block.used) {
+            blockEl.classList.add('used');
+        }
+
+        blockEl.textContent = block.char === ' ' ? '␣' : block.char;
+        blockEl.onclick = () => selectBlock(block.id, blockEl);
+
+        poolContainer.appendChild(blockEl);
+    });
+}
+
+function selectBlock(id, element) {
+    if (isLocked) return;
+
+    const block = poolBlocks.find(b => b.id === id);
+    if (!block || block.used) return;
+    if (currentSlots.length >= targetRuStr.length) return;
+
+    playPopSound();
+    element.classList.add('selecting-anim');
+    setTimeout(() => {
+        element.classList.remove('selecting-anim');
+    }, 350);
+
+    if (block.char !== ' ') {
+        speakText(block.char);
+    }
+
+    block.used = true;
+    currentSlots.push(block);
+
+    clearFeedback();
+    renderBoard();
+
+    if (currentSlots.length === targetRuStr.length) {
+        checkAnswer();
+    }
+}
+
+function removeSlot(index) {
+    if (isLocked) return;
+    if (index < 0 || index >= currentSlots.length) return;
+
+    const removedBlock = currentSlots.splice(index, 1)[0];
+    const block = poolBlocks.find(b => b.id === removedBlock.id);
+
+    if (block) {
+        block.used = false;
+    }
+
+    clearFeedback();
+    renderBoard();
+}
+
+function userClear() {
+    if (isLocked) return;
+
+    currentSlots = [];
+    poolBlocks.forEach(block => {
+        block.used = false;
+    });
+
+    clearFeedback();
+    renderBoard();
+}
+
+function clearFeedback() {
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = '';
+    feedback.style.color = '#333';
+
+    document.querySelectorAll('.slot').forEach(slot => {
+        slot.classList.remove('error', 'correct', 'speaking');
+    });
+}
+
+function playFullAnswerWithHighlight(index, slots, onComplete) {
+    if (!speechEnabled || index >= targetRuStr.length) {
+        if (onComplete) onComplete();
+        return;
+    }
+
+    slots.forEach(s => s.classList.remove('speaking'));
+
+    if (slots[index]) {
+        slots[index].classList.add('speaking');
+    }
+    
+    // Luetaan koko vastaus kerralla tai sanana, estetään jumittaminen jos tulee välilyönti
+    speakText(targetRuStr, () => {
+        if (onComplete) onComplete();
+    });
+}
+
+function checkAnswer() {
+    const userStr = currentSlots.map(block => block.char).join('');
+    const slots = document.querySelectorAll('.slot');
+    const feedback = document.getElementById('feedback');
+
+    if (userStr === targetRuStr) {
+        isLocked = true;
+
+        score += 10 * (currentDifficulty + 1);
+        streak += 1;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('correct'));
+
+        feedback.textContent = 'Oikein! Отлично!';
+        feedback.style.color = '#16a34a';
+
+        playSuccessBurstSound();
+        const burstEl = document.createElement('div');
+        burstEl.className = 'screen-burst-success';
+        document.body.appendChild(burstEl);
+        setTimeout(() => burstEl.remove(), 800);
+
+        setTimeout(() => {
+            playFullAnswerWithHighlight(0, slots, () => {
+                setTimeout(() => {
+                    newRound();
+                }, 1000);
+            });
+        }, 300);
+
+    } else {
+        streak = 0;
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('error'));
+
+        feedback.textContent = 'Väärin, yritä uudelleen (Dostojevski itkee)!';
+        feedback.style.color = '#ef4444';
+
+        playErrorSound();
+        const flashEl = document.createElement('div');
+        flashEl.className = 'screen-flash-error';
+        document.body.appendChild(flashEl);
+        setTimeout(() => flashEl.remove(), 450);
+
+        setTimeout(() => {
+            if (!isLocked) {
+                document.querySelectorAll('.slot').forEach(slot => {
+                    slot.classList.remove('error');
+                });
+            }
+        }, 500);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateSidebarList();
+    newRound();
+});
+
+if (document.readyState !== 'loading') {
+    updateSidebarList();
+    newRound();
+}
+</script>
+
+</body>
+</html>
