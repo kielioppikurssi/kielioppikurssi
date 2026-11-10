@@ -103,10 +103,26 @@ h1 {
     margin-bottom: 20px;
     font-weight: 600;
     color: #475569;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
 .settings-group label {
-    margin: 0 10px;
+    cursor: pointer;
+}
+
+.audio-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    outline: none;
+    background: #fff;
     cursor: pointer;
 }
 
@@ -127,10 +143,15 @@ h1 {
 .b{background:#7de7d7}
 .p{background:#4fd1c5;color:black}
 
+.card-container {
+    position: relative;
+    width: 200px;
+    margin: 20px auto;
+}
+
 .card {
     width: 200px;
     height: 200px;
-    margin: 20px auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -138,6 +159,28 @@ h1 {
     border-radius: 24px;
     font-weight: bold;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.audio-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.1s, background 0.2s;
+}
+
+.audio-btn:hover {
+    transform: scale(1.1);
+    background: #ffffff;
 }
 
 .stats {
@@ -283,6 +326,14 @@ td, th {
         <div class="settings-group">
             <label><input id="dak" type="checkbox" checked> Dakuten</label>
             <label><input id="handa" type="checkbox" checked> Handakuten</label>
+            <label>
+                🔊 Ääni:
+                <select id="audioMode" class="audio-select">
+                    <option value="hint">Vihjeenä (heti)</option>
+                    <option value="correct" selected>Vastaus (oikein)</option>
+                    <option value="off">Ei ääntä</option>
+                </select>
+            </label>
         </div>
 
         <div>
@@ -290,156 +341,13 @@ td, th {
             <button class="secondary-btn" onclick="document.getElementById('p').style.display='block'">Näytä taulukko</button>
         </div>
 
-        <div id="card" class="card a">ア</div>
+        <div class="card-container">
+            <div id="card" class="card a">ア</div>
+            <button class="audio-btn" onclick="speakCurrent()" title="Kuuntele">🔊</button>
+        </div>
 
         <input id="ans" type="text" placeholder="romaji" autocomplete="off">
 
         <br><br>
 
-        <button class="action-btn" onclick="checkAnswer()">Tarkista</button>
-
-        <div id="fb"></div>
-
-        <div class="stats">
-            Pisteet <span id="sc">0</span> |
-            Putki <span id="st">0</span> |
-            Tarkkuus <span id="ac">0</span>%
-        </div>
-    </div>
-</div>
-
-<div id="p" class="popup">
-<div class="content">
-    <h2>Katakana + romaji</h2>
-    <table class="katakanaTable">
-        <tr>
-            <th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th>
-        </tr>
-        <tr class="a"><td>∅</td><td>ア a</td><td>イ i</td><td>ウ u</td><td>エ e</td><td>オ o</td></tr>
-        <tr class="k"><td>k</td><td>カ ka</td><td>キ ki</td><td>ク ku</td><td>ケ ke</td><td>コ ko</td></tr>
-        <tr class="s"><td>s</td><td>サ sa</td><td>シ shi</td><td>ス su</td><td>セ se</td><td>ソ so</td></tr>
-        <tr class="t"><td>t</td><td>タ ta</td><td>チ chi</td><td>ツ tsu</td><td>テ te</td><td>ト to</td></tr>
-        <tr class="n"><td>n</td><td>ナ na</td><td>ニ ni</td><td>ヌ nu</td><td>ネ ne</td><td>ノ no</td></tr>
-        <tr class="h"><td>h</td><td>ハ ha</td><td>ヒ hi</td><td>フ fu</td><td>ヘ he</td><td>ホ ho</td></tr>
-        <tr class="m"><td>m</td><td>マ ma</td><td>ミ mi</td><td>ム mu</td><td>メ me</td><td>モ mo</td></tr>
-        <tr class="y"><td>y</td><td>ヤ ya</td><td>–</td><td>ユ yu</td><td>–</td><td>ヨ yo</td></tr>
-        <tr class="r"><td>r</td><td>ラ ra</td><td>リ ri</td><td>ル ru</td><td>レ re</td><td>ロ ro</td></tr>
-        <tr class="w"><td>w</td><td>ワ wa</td><td>–</td><td>–</td><td>–</td><td>ヲ wo</td></tr>
-        <tr style="background:#ddd"><td>n</td><td colspan="5">ン n</td></tr>
-        <tr class="g"><td>g</td><td>ガ ga</td><td>ギ gi</td><td>グ gu</td><td>ゲ ge</td><td>ゴ go</td></tr>
-        <tr class="z"><td>z</td><td>ザ za</td><td>ジ ji</td><td>ズ zu</td><td>ゼ ze</td><td>ゾ zo</td></tr>
-        <tr class="d"><td>d</td><td>ダ da</td><td>ヂ ji</td><td>ヅ zu</td><td>デ de</td><td>ド do</td></tr>
-        <tr class="b"><td>b</td><td>バ ba</td><td>ビ bi</td><td>ブ bu</td><td>ベ be</td><td>ボ bo</td></tr>
-        <tr class="p"><td>p</td><td>パ pa</td><td>ピ pi</td><td>プ pu</td><td>ペ pe</td><td>ポ po</td></tr>
-    </table>
-    <br>
-    <button class="secondary-btn" onclick="document.getElementById('p').style.display='none'">Sulje</button>
-</div>
-</div>
-
-<script>
-const base=[
-['ア','a','a'],['イ','i','a'],['ウ','u','a'],['エ','e','a'],['オ','o','a'],
-['カ','ka','k'],['キ','ki','k'],['ク','ku','k'],['ケ','ke','k'],['コ','ko','k'],
-['サ','sa','s'],['シ','shi','s'],['ス','su','s'],['セ','se','s'],['ソ','so','s'],
-['タ','ta','t'],['チ','chi','t'],['ツ','tsu','t'],['テ','te','t'],['ト','to','t'],
-['ナ','na','n'],['ニ','ni','n'],['ヌ','nu','n'],['ネ','ne','n'],['ノ','no','n'],
-['ハ','ha','h'],['ヒ','hi','h'],['フ','fu','h'],['ヘ','he','h'],['ホ','ho','h'],
-['マ','ma','m'],['ミ','mi','m'],['ム','mu','m'],['メ','me','m'],['モ','mo','m'],
-['ヤ','ya','y'],['ユ','yu','y'],['ヨ','yo','y'],
-['ラ','ra','r'],['リ','ri','r'],['ル','ru','r'],['レ','re','r'],['ロ','ro','r'],
-['ワ','wa','w'],['ヲ','wo','w'],['ン','n','n']
-];
-
-const dak=[
-['ガ','ga','g'],['ギ','gi','g'],['グ','gu','g'],['ゲ','ge','g'],['ゴ','go','g'],
-['ザ','za','z'],['ジ','ji','z'],['ズ','zu','z'],['ゼ','ze','z'],['ゾ','zo','z'],
-['ダ','da','d'],['ヂ','ji','d'],['ヅ','zu','d'],['デ','de','d'],['ド','do','d'],
-['バ','ba','b'],['ビ','bi','b'],['ブ','bu','b'],['ベ','be','b'],['ボ','bo','b']
-];
-
-const hand=[
-['パ','pa','p'],['ピ','pi','p'],['プ','pu','p'],['ペ','pe','p'],['ポ','po','p']
-];
-
-let pool=[];
-let cur;
-let score=0;
-let streak=0;
-let total=0;
-let right=0;
-
-function startGame(){
-    pool=[];
-
-    const sel = Array.from(document.querySelectorAll('.opts input[type=checkbox]:checked'))
-        .map(x => x.value);
-
-    for(const x of base){
-        if(sel.includes(x[2])) pool.push(x);
-    }
-
-    if(document.getElementById('dak').checked) pool.push(...dak);
-    if(document.getElementById('handa').checked) pool.push(...hand);
-
-    if(pool.length === 0){
-        alert('Valitse vähintään yksi merkistö!');
-        return;
-    }
-
-    score = 0;
-    streak = 0;
-    total = 0;
-    right = 0;
-    sc.textContent = score;
-    st.textContent = streak;
-    ac.textContent = 0;
-    fb.innerHTML = '';
-
-    next();
-}
-
-function next(){
-    if(!pool.length) return;
-
-    cur = pool[Math.floor(Math.random()*pool.length)];
-
-    card.textContent = cur[0];
-    card.className = 'card ' + cur[2];
-
-    ans.value = '';
-    ans.focus();
-}
-
-function checkAnswer(){
-    if(!cur) return;
-
-    total++;
-
-    if(ans.value.trim().toLowerCase() === cur[1]){
-        score++;
-        right++;
-        streak++;
-        fb.innerHTML = '<div class="ok">✅ ' + cur[0] + ' = ' + cur[1] + '</div>';
-    } else {
-        streak = 0;
-        pool.push(cur);
-        fb.innerHTML = '<div class="bad">❌ Oikea vastaus: ' + cur[1] + '</div>';
-    }
-
-    sc.textContent = score;
-    st.textContent = streak;
-    ac.textContent = Math.round(right * 100 / total) || 0;
-
-    setTimeout(next, 900);
-}
-
-ans.addEventListener('keydown', e => {
-    if(e.key === 'Enter') checkAnswer();
-});
-
-startGame();
-</script>
-
-</body>
-</html>
+        <button class="action-btn" onclick="check
