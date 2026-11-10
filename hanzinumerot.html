@@ -398,6 +398,17 @@ h1 {
     user-select: none;
 }
 
+/* Laatan valinta-animaatio */
+.block.selecting-anim {
+    animation: blockSelectEffect 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes blockSelectEffect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25) rotate(6deg); background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%); box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
+    100% { transform: scale(1); }
+}
+
 .block:hover:not(.used) {
     transform: translateY(-4px) scale(1.03);
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
@@ -529,6 +540,43 @@ button.action-btn:hover {
     20%, 60% { transform: translateX(-6px); }
     40%, 80% { transform: translateX(6px); }
 }
+
+/* Väärän vastauksen koko näytön sokaiseva animaatio */
+.screen-flash-error {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(239, 68, 68, 0.45);
+    z-index: 9999;
+    pointer-events: none;
+    animation: flashErrorAnim 0.45s ease-out forwards;
+}
+
+@keyframes flashErrorAnim {
+    0% { opacity: 1; backdrop-filter: brightness(1.8) blur(4px); }
+    100% { opacity: 0; backdrop-filter: brightness(1) blur(0px); }
+}
+
+/* Oikean vastauksen koko näytön räjäyttävä animaatio */
+.screen-burst-success {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, rgba(34,197,94,0.6) 0%, rgba(99,102,241,0.4) 50%, rgba(255,255,255,0) 100%);
+    z-index: 9999;
+    pointer-events: none;
+    animation: burstSuccessAnim 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes burstSuccessAnim {
+    0% { transform: scale(0.2); opacity: 1; filter: brightness(2); }
+    50% { opacity: 0.9; }
+    100% { transform: scale(2.2); opacity: 0; filter: brightness(1); }
+}
 </style>
 </head>
 
@@ -652,6 +700,91 @@ button.action-btn:hover {
 </div>
 
 <script>
+// --- ÄÄNITEHOSTEET (Web Audio API) ---
+let audioCtx = null;
+
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+// 1) Poksahdusääni laatan valintaan
+function playPopSound() {
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.08);
+
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+    } catch(e) {}
+}
+
+// 2) Sokaiseva / matala hälytysääni väärälle vastaukselle
+function playErrorSound() {
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.35);
+
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+    } catch(e) {}
+}
+
+// 3) Räjäyttävä / iloinen sointuaniaatio oikealle vastaukselle
+function playSuccessBurstSound() {
+    try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        
+        // Pieni arpeggio-sointu + kohinaefekti (räjähdys)
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+
+            gain.gain.setValueAtTime(0.2, now + idx * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.3);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(now + idx * 0.06);
+            osc.stop(now + idx * 0.06 + 0.3);
+        });
+    } catch(e) {}
+}
+
+
 const hanziMap = {
     0: '零', 1: '一', 2: '二', 3: '三', 4: '四',
     5: '五', 6: '六', 7: '七', 8: '八', 9: '九'
@@ -957,7 +1090,7 @@ function newRound() {
     else if (currentDifficulty === 5) max = 100000000;
 
     currentNumber = Math.floor(Math.random() * (max + 1));
-    if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1; // pidetään alkeistasolla 1-10
+    if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1;
 
     const result = numberToChinese(currentNumber);
     targetHanziStr = result.hanzi;
@@ -1019,24 +1152,32 @@ function renderBoard() {
     poolBlocks.forEach(block => {
         const blockEl = document.createElement('div');
         blockEl.className = 'block';
+        blockEl.dataset.blockId = block.id;
 
         if (block.used) {
             blockEl.classList.add('used');
         }
 
         blockEl.textContent = block.char;
-        blockEl.onclick = () => selectBlock(block.id);
+        blockEl.onclick = () => selectBlock(block.id, blockEl);
 
         poolContainer.appendChild(blockEl);
     });
 }
 
-function selectBlock(id) {
+function selectBlock(id, element) {
     if (isLocked) return;
 
     const block = poolBlocks.find(b => b.id === id);
     if (!block || block.used) return;
     if (currentSlots.length >= targetHanziStr.length) return;
+
+    // Soitetaan laatan valinnan poksahdusääni ja animaatio
+    playPopSound();
+    element.classList.add('selecting-anim');
+    setTimeout(() => {
+        element.classList.remove('selecting-anim');
+    }, 350);
 
     speakText(block.char);
 
@@ -1125,6 +1266,13 @@ function checkAnswer() {
         feedback.textContent = 'Oikein! 做得好!';
         feedback.style.color = '#16a34a';
 
+        // Soitetaan räjähdysääni ja näytetään animaatio
+        playSuccessBurstSound();
+        const burstEl = document.createElement('div');
+        burstEl.className = 'screen-burst-success';
+        document.body.appendChild(burstEl);
+        setTimeout(() => burstEl.remove(), 800);
+
         setTimeout(() => {
             playFullAnswerWithHighlight(0, slots, () => {
                 setTimeout(() => {
@@ -1141,6 +1289,13 @@ function checkAnswer() {
 
         feedback.textContent = 'Väärin, yritä uudelleen!';
         feedback.style.color = '#ef4444';
+
+        // Soitetaan virheen matala sokaiseva äänitehoste ja näytetään animaatio
+        playErrorSound();
+        const flashEl = document.createElement('div');
+        flashEl.className = 'screen-flash-error';
+        document.body.appendChild(flashEl);
+        setTimeout(() => flashEl.remove(), 450);
 
         setTimeout(() => {
             if (!isLocked) {
