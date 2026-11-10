@@ -864,8 +864,7 @@ function createMCQuiz(){
     mcChecked = false;
 currentDirection =
     document.getElementById("mcDirection").value;
-const filtered = getFilteredVerbs();
-
+const filtered = getFilteredVerbs().filter(v => v.forms[0] !== "-");
 if(filtered.length < 3){
 
     box.innerHTML =
