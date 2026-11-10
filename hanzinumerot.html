@@ -102,7 +102,7 @@ h1 {
 /* Vaikeustasovaltin tyylit */
 .difficulty-selector {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 8px;
     margin-bottom: 20px;
 }
@@ -113,7 +113,7 @@ h1 {
     color: #475569;
     padding: 10px 12px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -134,8 +134,14 @@ h1 {
     box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
 }
 
+.diff-btn.impossible.active {
+    background: linear-gradient(135deg, #7c3aed 0%, #dc2626 100%);
+    border-color: #7c3aed;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
 .diff-sub {
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.85;
     font-weight: normal;
 }
@@ -149,6 +155,13 @@ h1 {
     margin-bottom: 15px;
     color: #78350f;
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.encouragement-box.impossible-theme {
+    background: linear-gradient(135deg, #2e1065 0%, #4c1d95 100%);
+    border-color: #8b5cf6;
+    color: #f3e8ff;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .enc-zh {
@@ -177,14 +190,15 @@ h1 {
 }
 
 .target-number {
-    font-size: 48px;
+    font-size: 40px;
     font-weight: bold;
     color: #1e293b;
     margin-bottom: 5px;
+    word-break: break-all;
 }
 
 .target-pinyin {
-    font-size: 20px;
+    font-size: 18px;
     color: #6366f1;
     font-weight: 600;
     transition: opacity 0.3s ease, filter 0.3s ease;
@@ -200,7 +214,7 @@ h1 {
 .answer-slots {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 25px;
     min-height: 75px;
     align-items: center;
@@ -208,14 +222,14 @@ h1 {
 }
 
 .slot {
-    width: 55px;
-    height: 70px;
+    width: 50px;
+    height: 65px;
     border: 3px solid #e2e8f0;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
+    font-size: 26px;
     font-weight: bold;
     background: #f8fafc;
     color: #1e293b;
@@ -268,14 +282,14 @@ h1 {
 }
 
 .block {
-    height: 60px;
+    height: 55px;
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
@@ -349,7 +363,7 @@ button.action-btn:hover {
     padding: 25px;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    max-height: 600px;
+    max-height: 650px;
     overflow-y: auto;
 }
 
@@ -374,7 +388,7 @@ button.action-btn:hover {
     padding: 8px 12px;
     background: #f8fafc;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 14px;
     transition: background 0.2s;
 }
 
@@ -383,7 +397,7 @@ button.action-btn:hover {
 }
 
 .hanzi-char {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     color: #4f46e5;
     width: 35px;
@@ -398,7 +412,7 @@ button.action-btn:hover {
     background: #e2e8f0;
     padding: 2px 6px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     color: #334155;
 }
@@ -454,13 +468,17 @@ button.action-btn:hover {
                 <span class="diff-sub">宗师 (Zōngshī) • 0–10 000</span>
             </button>
             <button class="diff-btn" onclick="setDifficulty(4, this)">
-                <span>4. Taivaallinen Kultivoija</span>
+                <span>4. Taivaallinen</span>
                 <span class="diff-sub">天仙 (Tiānxiān) • 0–1 000 000</span>
+            </button>
+            <button class="diff-btn impossible" onclick="setDifficulty(5, this)">
+                <span>5. 💥 Tyhjyys / Mahdoton</span>
+                <span class="diff-sub">神魔 (Shénmó) • 0–100M</span>
             </button>
         </div>
 
         <!-- Wuxia-kannustusOsio -->
-        <div class="encouragement-box">
+        <div id="encBox" class="encouragement-box">
             <div id="encZh" class="enc-zh">千里之行，始于足下！</div>
             <div id="encFi" class="enc-fi">"Tuhannen mailin matka alkaa yhdestä askeleesta!"</div>
         </div>
@@ -524,6 +542,11 @@ const wuxiaEncouragements = {
         { zh: "超凡入圣，羽化登仙！", fi: "Ylitä kuolevaisten rajat ja nouse taivaalliseen kuolemattomuuteen!" },
         { zh: "天地同寿，日月同辉！", fi: "Elät ikuisesti taivaan rinnalla, loistaen auringon lailla!" },
         { zh: "打破虚空，主宰天道！", fi: "Murskaa tyhjyys ja hallitse itse Taivaan tietä!" }
+    ],
+    5: [
+        { zh: "万界主宰，唯我独尊！", fi: "Olet kaikkien maailmojen hallitsija, ainoa ja voittamaton!" },
+        { zh: "一念永恒，踏碎凌霄！", fi: "Yksi ajatus on ikuisuus; polje taivaat jalkojesi alle!" },
+        { zh: "逆天改命，神魔俱灭！", fi: "Haasta itse kohtalo – jumalat ja demonit murtuvat edessäsi!" }
     ]
 };
 
@@ -621,6 +644,13 @@ function updateEncouragement() {
     const randomItem = list[Math.floor(Math.random() * list.length)];
     document.getElementById('encZh').textContent = randomItem.zh;
     document.getElementById('encFi').textContent = `"${randomItem.fi}"`;
+
+    const box = document.getElementById('encBox');
+    if (currentDifficulty === 5) {
+        box.classList.add('impossible-theme');
+    } else {
+        box.classList.remove('impossible-theme');
+    }
 }
 
 function updateSidebarList() {
@@ -639,8 +669,6 @@ function setDifficulty(level, btnEl) {
     currentDifficulty = level;
     document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
     btnEl.classList.add('active');
-
-    allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千', '万', '亿'];
 
     updateSidebarList();
     newRound();
@@ -703,7 +731,20 @@ function numberToChinese(n) {
     let hz = '';
     let py = [];
 
-    if (n >= 10000) {
+    if (n >= 100000000) {
+        const yi = Math.floor(n / 100000000);
+        const remainder = n % 100000000;
+        const yiPart = convertUnder10k(yi, true);
+        hz += yiPart.hanzi + '亿';
+        py.push(...yiPart.pinyin, 'yì');
+
+        if (remainder > 0) {
+            if (remainder < 10000000) { hz += '零'; py.push('líng'); }
+            const remRes = numberToChinese(remainder);
+            hz += remRes.hanzi;
+            py.push(remRes.pinyin);
+        }
+    } else if (n >= 10000) {
         const wan = Math.floor(n / 10000);
         const remainder = n % 10000;
 
@@ -726,7 +767,7 @@ function numberToChinese(n) {
         py = part.pinyin;
     }
 
-    return { hanzi: hz, pinyin: py.join(' ') };
+    return { hanzi: hz, pinyin: Array.isArray(py) ? py.join(' ') : py };
 }
 
 function shuffle(array) {
@@ -752,6 +793,7 @@ function newRound() {
     if (currentDifficulty === 2) max = 1000;
     if (currentDifficulty === 3) max = 10000;
     if (currentDifficulty === 4) max = 1000000;
+    if (currentDifficulty === 5) max = 100000000;
 
     currentNumber = Math.floor(Math.random() * max) + 1;
 
@@ -902,56 +944,4 @@ function checkAnswer() {
     const feedback = document.getElementById('feedback');
 
     if (userStr === targetHanziStr) {
-        isLocked = true;
-
-        score += 10 * currentDifficulty;
-        streak += 1;
-
-        document.getElementById('score').textContent = score;
-        document.getElementById('streak').textContent = streak;
-
-        slots.forEach(slot => slot.classList.add('correct'));
-
-        feedback.textContent = 'Oikein! 做得好!';
-        feedback.style.color = '#16a34a';
-
-        setTimeout(() => {
-            playFullAnswerWithHighlight(0, slots, () => {
-                setTimeout(() => {
-                    newRound();
-                }, 800);
-            });
-        }, 300);
-
-    } else {
-        streak = 0;
-        document.getElementById('streak').textContent = streak;
-
-        slots.forEach(slot => slot.classList.add('error'));
-
-        feedback.textContent = 'Väärin, yritä uudelleen!';
-        feedback.style.color = '#ef4444';
-
-        setTimeout(() => {
-            if (!isLocked) {
-                document.querySelectorAll('.slot').forEach(slot => {
-                    slot.classList.remove('error');
-                });
-            }
-        }, 500);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    updateSidebarList();
-    newRound();
-});
-
-if (document.readyState !== 'loading') {
-    updateSidebarList();
-    newRound();
-}
-</script>
-
-</body>
-</html>
+        isLocked =
