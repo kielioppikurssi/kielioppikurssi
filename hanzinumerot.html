@@ -45,6 +45,8 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
     text-align: center;
     animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 @keyframes modalPop {
@@ -202,8 +204,8 @@ h1 {
 /* Vaikeustasovaltin tyylit */
 .difficulty-selector {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px;
     margin-bottom: 20px;
 }
 
@@ -211,9 +213,9 @@ h1 {
     background: #f1f5f9;
     border: 1px solid #cbd5e1;
     color: #475569;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border-radius: 10px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -241,7 +243,7 @@ h1 {
 }
 
 .diff-sub {
-    font-size: 10px;
+    font-size: 9px;
     opacity: 0.85;
     font-weight: normal;
 }
@@ -539,6 +541,10 @@ button.action-btn:hover {
         <p>Valitse polkusi ja harjoitustasosi ennen kuin astut taistelulajien ja kiinan numeroiden maailmaan.</p>
         
         <div class="welcome-diff-list">
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(0)">
+                <span>0. Heräävä Lapsi</span>
+                <span class="welcome-diff-sub">童蒙 (Tóngméng) • 0–10</span>
+            </button>
             <button class="welcome-diff-btn" onclick="selectInitialDifficulty(1)">
                 <span>1. Aloitteleva Oppilas</span>
                 <span class="welcome-diff-sub">初学 (Chūxué) • 0–100</span>
@@ -585,25 +591,29 @@ button.action-btn:hover {
 
         <!-- Vaikeustasojen valinta -->
         <div class="difficulty-selector">
-            <button id="diffBtn1" class="diff-btn active" onclick="setDifficulty(1, this)">
-                <span>1. Aloitteleva Oppilas</span>
-                <span class="diff-sub">初学 (Chūxué) • 0–100</span>
+            <button id="diffBtn0" class="diff-btn active" onclick="setDifficulty(0, this)">
+                <span>0. Heräävä Lapsi</span>
+                <span class="diff-sub">童蒙 • 0–10</span>
+            </button>
+            <button id="diffBtn1" class="diff-btn" onclick="setDifficulty(1, this)">
+                <span>1. Oppilas</span>
+                <span class="diff-sub">初学 • 0–100</span>
             </button>
             <button id="diffBtn2" class="diff-btn" onclick="setDifficulty(2, this)">
                 <span>2. Qi-Mestari</span>
-                <span class="diff-sub">炼气 (Liànqì) • 0–1 000</span>
+                <span class="diff-sub">炼气 • 0–1k</span>
             </button>
             <button id="diffBtn3" class="diff-btn" onclick="setDifficulty(3, this)">
                 <span>3. Suurmestari</span>
-                <span class="diff-sub">宗师 (Zōngshī) • 0–10 000</span>
+                <span class="diff-sub">宗师 • 0–10k</span>
             </button>
             <button id="diffBtn4" class="diff-btn" onclick="setDifficulty(4, this)">
                 <span>4. Taivaallinen</span>
-                <span class="diff-sub">天仙 (Tiānxiān) • 0–1 000 000</span>
+                <span class="diff-sub">天仙 • 0–1M</span>
             </button>
             <button id="diffBtn5" class="diff-btn impossible" onclick="setDifficulty(5, this)">
-                <span>5. 💥 Tyhjyys / Mahdoton</span>
-                <span class="diff-sub">神魔 (Shénmó) • 0–100M</span>
+                <span>5. Tyhjyys</span>
+                <span class="diff-sub">神魔 • 0–100M</span>
             </button>
         </div>
 
@@ -653,6 +663,11 @@ const pinyinMap = {
 };
 
 const wuxiaEncouragements = {
+    0: [
+        { zh: "童蒙求我，初识 Daon tie!", fi: "Lapsenmielisenä opit Daon perusteet!" },
+        { zh: "一元复始，万象更新！", fi: "Uusi alku koittaa, kaikki alkaa ykkösestä!" },
+        { zh: "循序渐进，方成大器！", fi: "Etene askel kerrallaan kohti suuruutta!" }
+    ],
     1: [
         { zh: "千里之行，始于足下！", fi: "Tuhannen mailin matka alkaa yhdestä askeleesta!" },
         { zh: "静心凝神，打好基础！", fi: "Rauhoita mielesi ja vala vahva perusta!" },
@@ -699,8 +714,8 @@ const hanziReferenceData = [
     { num: '100 000 000', char: '亿', pinyin: 'yì' }
 ];
 
-let allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千', '万', '亿'];
-let currentDifficulty = 1;
+let allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+let currentDifficulty = 0;
 let currentNumber = 0;
 let targetHanziStr = '';
 let currentSlots = [];
@@ -900,6 +915,12 @@ function numberToChinese(n) {
             hz += remPart.hanzi;
             py.push(...remPart.pinyin);
         }
+    } else if (n === 10) {
+        hz = '十';
+        py = ['shí'];
+    } else if (n > 10 && n < 20) {
+        hz = '十' + hanziMap[n % 10];
+        py = ['shí', pinyinMap[n % 10]];
     } else {
         const part = convertUnder10k(n, false);
         hz = part.hanzi;
@@ -928,13 +949,15 @@ function newRound() {
 
     updateEncouragement();
 
-    let max = 100;
-    if (currentDifficulty === 2) max = 1000;
-    if (currentDifficulty === 3) max = 10000;
-    if (currentDifficulty === 4) max = 1000000;
-    if (currentDifficulty === 5) max = 100000000;
+    let max = 10;
+    if (currentDifficulty === 1) max = 100;
+    else if (currentDifficulty === 2) max = 1000;
+    else if (currentDifficulty === 3) max = 10000;
+    else if (currentDifficulty === 4) max = 1000000;
+    else if (currentDifficulty === 5) max = 100000000;
 
-    currentNumber = Math.floor(Math.random() * max) + 1;
+    currentNumber = Math.floor(Math.random() * (max + 1));
+    if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1; // pidetään alkeistasolla 1-10
 
     const result = numberToChinese(currentNumber);
     targetHanziStr = result.hanzi;
@@ -948,7 +971,13 @@ function newRound() {
     const targetPoolSize = Math.max(8, neededChars.length + 3);
 
     while (pool.length < targetPoolSize) {
-        const randomChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
+        let randomChar = '';
+        if (currentDifficulty === 0) {
+            const basicPool = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '零'];
+            randomChar = basicPool[Math.floor(Math.random() * basicPool.length)];
+        } else {
+            randomChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
+        }
         pool.push(randomChar);
     }
 
@@ -1085,7 +1114,7 @@ function checkAnswer() {
     if (userStr === targetHanziStr) {
         isLocked = true;
 
-        score += 10 * currentDifficulty;
+        score += 10 * (currentDifficulty + 1);
         streak += 1;
 
         document.getElementById('score').textContent = score;
