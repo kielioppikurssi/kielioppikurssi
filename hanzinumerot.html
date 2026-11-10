@@ -96,7 +96,39 @@ h1 {
 .subtitle {
     color: #7f8c8d;
     font-size: 14px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
+}
+
+/* Vaikeustasovaltin tyylit */
+.difficulty-selector {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.diff-btn {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.diff-btn:hover {
+    background: #e2e8f0;
+}
+
+.diff-btn.active {
+    background: #4f46e5;
+    color: #ffffff;
+    border-color: #4f46e5;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
 }
 
 .target-box {
@@ -114,7 +146,7 @@ h1 {
 }
 
 .target-number {
-    font-size: 55px;
+    font-size: 48px;
     font-weight: bold;
     color: #1e293b;
     margin-bottom: 5px;
@@ -351,15 +383,6 @@ button.action-btn:hover {
     20%, 60% { transform: translateX(-6px); }
     40%, 80% { transform: translateX(6px); }
 }
-
-.fly-in {
-    animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes flyIn {
-    0% { transform: scale(0.3) translateY(20px); opacity: 0; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
-}
 </style>
 </head>
 
@@ -376,18 +399,26 @@ button.action-btn:hover {
             </a>
             <button id="togglePinyinBtn" class="toggle-pinyin-btn" onclick="togglePinyin()">
                 <svg viewBox="0 0 24 24">
-                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                 </svg>
                 <span id="pinyinBtnText">Piilota pinyin</span>
             </button>
         </div>
 
-        <h1>🀄 Hanzi-numeropulma (1–1000)</h1>
+        <h1>🀄 Hanzi-numeropulma</h1>
         <p class="subtitle">Muodosta luku kiinalaisilla merkeillä!</p>
 
+        <!-- Vaikeustasojen valinta -->
+        <div class="difficulty-selector">
+            <button class="diff-btn active" onclick="setDifficulty(1, this)">1. Aloitteleva Oppilas (0–100)</button>
+            <button class="diff-btn" onclick="setDifficulty(2, this)">2. Qi-Mestari (0–1 000)</button>
+            <button class="diff-btn" onclick="setDifficulty(3, this)">3. Taistelulajien Suurmestari (0–10 000)</button>
+            <button class="diff-btn" onclick="setDifficulty(4, this)">4. Taivaallinen Kultivoija (0–1 000 000)</button>
+        </div>
+
         <div class="target-box">
-            <div id="targetNumber" class="target-number">100</div>
-            <div id="targetPinyin" class="target-pinyin">yī bǎi</div>
+            <div id="targetNumber" class="target-number">0</div>
+            <div id="targetPinyin" class="target-pinyin">líng</div>
         </div>
 
         <div id="answerSlots" class="answer-slots"></div>
@@ -409,22 +440,7 @@ button.action-btn:hover {
 
     <div class="sidebar">
         <h2>📜 Kiinan numerot</h2>
-        <div class="hanzi-list">
-            <div class="hanzi-item"><span class="hanzi-num">1</span><span class="hanzi-char">一</span><span class="hanzi-pinyin">yī</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">2 (määrä)</span><span class="hanzi-char">两</span><span class="hanzi-pinyin">liǎng</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">2 (luku)</span><span class="hanzi-char">二</span><span class="hanzi-pinyin">èr</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">3</span><span class="hanzi-char">三</span><span class="hanzi-pinyin">sān</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">4</span><span class="hanzi-char">四</span><span class="hanzi-pinyin">sì</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">5</span><span class="hanzi-char">五</span><span class="hanzi-pinyin">wǔ</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">6</span><span class="hanzi-char">六</span><span class="hanzi-pinyin">liù</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">7</span><span class="hanzi-char">七</span><span class="hanzi-pinyin">qī</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">8</span><span class="hanzi-char">八</span><span class="hanzi-pinyin">bā</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">9</span><span class="hanzi-char">九</span><span class="hanzi-pinyin">jiǔ</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">10</span><span class="hanzi-char">十</span><span class="hanzi-pinyin">shí</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">100</span><span class="hanzi-char">百</span><span class="hanzi-pinyin">bǎi</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">1000</span><span class="hanzi-char">千</span><span class="hanzi-pinyin">qiān</span></div>
-            <div class="hanzi-item"><span class="hanzi-num">0</span><span class="hanzi-char">零</span><span class="hanzi-pinyin">líng</span></div>
-        </div>
+        <div id="hanziList" class="hanzi-list"></div>
     </div>
 </div>
 
@@ -439,11 +455,27 @@ const pinyinMap = {
     5: 'wǔ', 6: 'liù', 7: 'qī', 8: 'bā', 9: 'jiǔ'
 };
 
-const allPossibleHanzis = [
-    '零', '一', '两', '二', '三', '四', '五',
-    '六', '七', '八', '九', '十', '百', '千'
+const hanziReferenceData = [
+    { num: '0', char: '零', pinyin: 'líng' },
+    { num: '1', char: '一', pinyin: 'yī' },
+    { num: '2 (määrä)', char: '两', pinyin: 'liǎng' },
+    { num: '2 (luku)', char: '二', pinyin: 'èr' },
+    { num: '3', char: '三', pinyin: 'sān' },
+    { num: '4', char: '四', pinyin: 'sì' },
+    { num: '5', char: '五', pinyin: 'wǔ' },
+    { num: '6', char: '六', pinyin: 'liù' },
+    { num: '7', char: '七', pinyin: 'qī' },
+    { num: '8', char: '八', pinyin: 'bā' },
+    { num: '9', char: '九', pinyin: 'jiǔ' },
+    { num: '10', char: '十', pinyin: 'shí' },
+    { num: '100', char: '百', pinyin: 'bǎi' },
+    { num: '1 000', char: '千', pinyin: 'qiān' },
+    { num: '10 000', char: '万', pinyin: 'wàn' },
+    { num: '100 000 000', char: '亿', pinyin: 'yì' }
 ];
 
+let allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+let currentDifficulty = 1;
 let currentNumber = 0;
 let targetHanziStr = '';
 let currentSlots = [];
@@ -453,7 +485,7 @@ let streak = 0;
 let isLocked = false;
 let pinyinVisible = true;
 
-// --- PUHESYNTEESI (Web Speech API) ---
+// --- PUHESYNTEESI ---
 let chineseVoice = null;
 
 function loadVoices() {
@@ -477,11 +509,8 @@ function speakText(text, onEndCallback) {
 
     try {
         window.speechSynthesis.cancel();
-
         const utterance = new SpeechSynthesisUtterance(text);
-        if (chineseVoice) {
-            utterance.voice = chineseVoice;
-        }
+        if (chineseVoice) utterance.voice = chineseVoice;
         utterance.lang = 'zh-CN';
         utterance.rate = 0.85;
 
@@ -494,7 +523,6 @@ function speakText(text, onEndCallback) {
 
         utterance.onend = finish;
         utterance.onerror = finish;
-
         setTimeout(finish, 1500);
 
         window.speechSynthesis.speak(utterance);
@@ -503,7 +531,6 @@ function speakText(text, onEndCallback) {
     }
 }
 
-// Piilota / Näytä pinyin -toiminto
 function togglePinyin() {
     pinyinVisible = !pinyinVisible;
     const pinyinEl = document.getElementById('targetPinyin');
@@ -518,71 +545,159 @@ function togglePinyin() {
     }
 }
 
-// Muuntaa luvun kiinalaisiksi merkeiksi ja pinyiniksi.
-function numberToChinese(n) {
-    if (!Number.isInteger(n) || n < 1 || n > 1000) {
-        throw new Error('Luvun pitää olla välillä 1–1000.');
-    }
+function updateSidebarList() {
+    const container = document.getElementById('hanziList');
+    container.innerHTML = '';
+    
+    // Suodatetaan näytettävät merkit valitun vaikeustason mukaan
+    let maxNumLimit = 10;
+    if (currentDifficulty === 2) maxNumLimit = 1000;
+    if (currentDifficulty === 3) maxNumLimit = 10000;
+    if (currentDifficulty === 4) maxNumLimit = 1000000;
 
-    if (n === 1000) {
-        return { hanzi: '一千', pinyin: 'yī qiān' };
-    }
+    const filtered = hanziReferenceData.filter(item => {
+        if (item.char === '百' && maxNumLimit < 100) return false;
+        if (item.char === '千' && maxNumLimit < 1000) return false;
+        if (item.char === '万' && maxNumLimit < 10000) return false;
+        if (item.char === '亿' && maxNumLimit < 100000000) return false;
+        return true;
+    });
+
+    filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'hanzi-item';
+        div.innerHTML = `<span class="hanzi-num">${item.num}</span><span class="hanzi-char">${item.char}</span><span class="hanzi-pinyin">${item.pinyin}</span>`;
+        container.appendChild(div);
+    });
+}
+
+function setDifficulty(level, btnEl) {
+    currentDifficulty = level;
+    document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+    btnEl.classList.add('active');
+
+    // Päivitetään mahdolliset valintamerkit
+    allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+    if (level >= 2) allPossibleHanzis.push('百');
+    if (level >= 2) allPossibleHanzis.push('千');
+    if (level >= 3) allPossibleHanzis.push('万');
+    if (level >= 4) allPossibleHanzis.push('亿');
+
+    updateSidebarList();
+    newRound();
+}
+
+// Konvertoi 0–9999 luvun perusmuotoon kiinaksi
+function convertUnder10k(n, isLeading = false) {
+    if (n === 0) return { hanzi: '', pinyin: [] };
 
     let hz = '';
-    let py = '';
+    let py = [];
 
-    const hundreds = Math.floor(n / 100);
+    const thousands = Math.floor(n / 1000);
+    const hundreds = Math.floor((n % 1000) / 100);
     const tens = Math.floor((n % 100) / 10);
     const units = n % 10;
 
+    // Tuhannet
+    if (thousands > 0) {
+        const char = (thousands === 2) ? '两' : hanziMap[thousands];
+        const pyChar = (thousands === 2) ? 'liǎng' : pinyinMap[thousands];
+        hz += char + '千';
+        py.push(pyChar, 'qiān');
+    }
+
     // Sadat
     if (hundreds > 0) {
-        hz += (hundreds === 2 ? '两' : hanziMap[hundreds]) + '百';
-        py += (hundreds === 2 ? 'liǎng' : pinyinMap[hundreds]) + ' bǎi';
+        if (thousands > 0 && hundreds === 0) {
+            // käsitellään nolla myöhemmin
+        }
+        const char = (hundreds === 2) ? '两' : hanziMap[hundreds];
+        const pyChar = (hundreds === 2) ? 'liǎng' : pinyinMap[hundreds];
+        hz += char + '百';
+        py.push(pyChar, 'bǎi');
+    } else if (thousands > 0 && (tens > 0 || units > 0)) {
+        hz += '零';
+        py.push('líng');
     }
 
     // Kymmenet
     if (tens > 0) {
-        if (hundreds > 0) {
-            hz += hanziMap[tens] + '十';
-            py += ' ' + pinyinMap[tens] + ' shí';
-        } else if (tens === 1) {
+        if (hundreds > 0 && tens === 0) {
+            // nolla käsitely
+        } else if (hundreds > 0 && tens < 10 && hundreds > 0) {
+            // Nolla satojen ja kymmenten välissä käsitellään
+        }
+        
+        if (hundreds > 0 && tens > 0 && hundreds > 0) {
+            // normaali
+        }
+
+        if (tens === 1 && !isLeading && thousands === 0 && hundreds === 0) {
             hz += '十';
-            py += 'shí';
+            py.push('shí');
         } else {
             hz += hanziMap[tens] + '十';
-            py += pinyinMap[tens] + ' shí';
+            py.push(pinyinMap[tens], 'shí');
         }
-    }
-
-    // Nolla satojen ja ykkösten väliin.
-    if (hundreds > 0 && tens === 0 && units > 0) {
-        hz += '零';
-        py += ' líng';
+    } else if (hundreds > 0 && units > 0) {
+        if (!hz.endsWith('零')) {
+            hz += '零';
+            py.push('líng');
+        }
     }
 
     // Ykköset
     if (units > 0) {
         hz += hanziMap[units];
-        py += (py ? ' ' : '') + pinyinMap[units];
+        py.push(pinyinMap[units]);
     }
 
     return { hanzi: hz, pinyin: py };
 }
 
-// Sekoittaa taulukon.
+// Yleinen luvun muunnos
+function numberToChinese(n) {
+    if (n === 0) return { hanzi: '零', pinyin: 'líng' };
+
+    let hz = '';
+    let py = [];
+
+    if (n >= 10000) {
+        const wan = Math.floor(n / 10000);
+        const remainder = n % 10000;
+
+        const wanPart = convertUnder10k(wan, true);
+        hz += wanPart.hanzi + '万';
+        py.push(...wanPart.pinyin, 'wàn');
+
+        if (remainder > 0) {
+            if (remainder < 1000) {
+                hz += '零';
+                py.push('líng');
+            }
+            const remPart = convertUnder10k(remainder, false);
+            hz += remPart.hanzi;
+            py.push(...remPart.pinyin);
+        }
+    } else {
+        const part = convertUnder10k(n, false);
+        hz = part.hanzi;
+        py = part.pinyin;
+    }
+
+    return { hanzi: hz, pinyin: py.join(' ') };
+}
+
 function shuffle(array) {
     const result = [...array];
-
     for (let i = result.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [result[i], result[j]] = [result[j], result[i]];
     }
-
     return result;
 }
 
-// Aloittaa uuden kierroksen.
 function newRound() {
     isLocked = false;
     currentSlots = [];
@@ -591,26 +706,27 @@ function newRound() {
     feedback.textContent = '';
     feedback.style.color = '#333';
 
-    currentNumber = Math.floor(Math.random() * 1000) + 1;
+    // Arvotaan luku valitun vaikeustason mukaisesti
+    let max = 100;
+    if (currentDifficulty === 2) max = 1000;
+    if (currentDifficulty === 3) max = 10000;
+    if (currentDifficulty === 4) max = 1000000;
+
+    currentNumber = Math.floor(Math.random() * max) + 1;
 
     const result = numberToChinese(currentNumber);
     targetHanziStr = result.hanzi;
 
-    document.getElementById('targetNumber').textContent = currentNumber;
+    document.getElementById('targetNumber').textContent = currentNumber.toLocaleString('fi-FI');
     document.getElementById('targetPinyin').textContent = result.pinyin;
 
-    // Oikeat merkit.
     const neededChars = targetHanziStr.split('');
-
-    // Lisätään satunnaisia häiriömerkkejä.
     let pool = [...neededChars];
 
-    while (pool.length < 8) {
-        const randomChar =
-            allPossibleHanzis[
-                Math.floor(Math.random() * allPossibleHanzis.length)
-            ];
+    const targetPoolSize = Math.max(8, neededChars.length + 3);
 
+    while (pool.length < targetPoolSize) {
+        const randomChar = allPossibleHanzis[Math.floor(Math.random() * allPossibleHanzis.length)];
         pool.push(randomChar);
     }
 
@@ -625,7 +741,6 @@ function newRound() {
     renderBoard();
 }
 
-// Piirtää pelilaudan uudelleen.
 function renderBoard() {
     const slotsContainer = document.getElementById('answerSlots');
     const poolContainer = document.getElementById('blockPool');
@@ -633,10 +748,8 @@ function renderBoard() {
     slotsContainer.innerHTML = '';
     poolContainer.innerHTML = '';
 
-    // Vastausruudut.
     for (let i = 0; i < targetHanziStr.length; i++) {
         const slot = document.createElement('div');
-
         slot.className = 'slot';
         slot.dataset.index = i;
 
@@ -652,10 +765,8 @@ function renderBoard() {
         slotsContainer.appendChild(slot);
     }
 
-    // Valintapalikat.
     poolBlocks.forEach(block => {
         const blockEl = document.createElement('div');
-
         blockEl.className = 'block';
 
         if (block.used) {
@@ -663,21 +774,17 @@ function renderBoard() {
         }
 
         blockEl.textContent = block.char;
-
         blockEl.onclick = () => selectBlock(block.id);
 
         poolContainer.appendChild(blockEl);
     });
 }
 
-// Valitsee palikan.
 function selectBlock(id) {
     if (isLocked) return;
 
     const block = poolBlocks.find(b => b.id === id);
-
     if (!block || block.used) return;
-
     if (currentSlots.length >= targetHanziStr.length) return;
 
     speakText(block.char);
@@ -693,14 +800,11 @@ function selectBlock(id) {
     }
 }
 
-// Poistaa valitun merkin vastausriviltä.
 function removeSlot(index) {
     if (isLocked) return;
-
     if (index < 0 || index >= currentSlots.length) return;
 
     const removedBlock = currentSlots.splice(index, 1)[0];
-
     const block = poolBlocks.find(b => b.id === removedBlock.id);
 
     if (block) {
@@ -711,12 +815,10 @@ function removeSlot(index) {
     renderBoard();
 }
 
-// Tyhjentää koko vastausrivin.
 function userClear() {
     if (isLocked) return;
 
     currentSlots = [];
-
     poolBlocks.forEach(block => {
         block.used = false;
     });
@@ -725,10 +827,8 @@ function userClear() {
     renderBoard();
 }
 
-// Tyhjentää palautetekstin.
 function clearFeedback() {
     const feedback = document.getElementById('feedback');
-
     feedback.textContent = '';
     feedback.style.color = '#333';
 
@@ -737,7 +837,6 @@ function clearFeedback() {
     });
 }
 
-// Lukee vastauksen merkit yksitellen korostaen ne vuorotellen.
 function playFullAnswerWithHighlight(index, slots, onComplete) {
     if (index >= targetHanziStr.length) {
         if (onComplete) onComplete();
@@ -756,17 +855,15 @@ function playFullAnswerWithHighlight(index, slots, onComplete) {
     });
 }
 
-// Tarkistaa vastauksen.
 function checkAnswer() {
     const userStr = currentSlots.map(block => block.char).join('');
-
     const slots = document.querySelectorAll('.slot');
     const feedback = document.getElementById('feedback');
 
     if (userStr === targetHanziStr) {
         isLocked = true;
 
-        score += 10;
+        score += 10 * currentDifficulty;
         streak += 1;
 
         document.getElementById('score').textContent = score;
@@ -787,7 +884,6 @@ function checkAnswer() {
 
     } else {
         streak = 0;
-
         document.getElementById('streak').textContent = streak;
 
         slots.forEach(slot => slot.classList.add('error'));
@@ -805,9 +901,13 @@ function checkAnswer() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', newRound);
+document.addEventListener('DOMContentLoaded', () => {
+    updateSidebarList();
+    newRound();
+});
 
 if (document.readyState !== 'loading') {
+    updateSidebarList();
     newRound();
 }
 </script>
