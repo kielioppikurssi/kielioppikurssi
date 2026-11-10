@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Katakanojen harjoittelua</title>
+<title>Katakana Trainer</title>
 
 <style>
 * {
@@ -276,6 +276,16 @@ td, th {
     text-align: center;
 }
 
+/* Klikattavat taulukon solut */
+.katakanaTable td.clickable {
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.1s;
+}
+.katakanaTable td.clickable:hover {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    transform: scale(1.05);
+}
+
 .katakanaTable tr.a td{background:#ffb3b3}
 .katakanaTable tr.k td{background:#b3d1ff}
 .katakanaTable tr.s td{background:#b8f5b8}
@@ -302,7 +312,7 @@ td, th {
 
 <div class="container">
     <div class="main-panel">
-        <h1>カタカナ-harjoittelua</h1>
+        <h1>カタカナ Trainer</h1>
         <a href="index.html" class="päävalikko-btn">
             <svg viewBox="0 0 24 24">
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
@@ -369,22 +379,22 @@ td, th {
         <tr>
             <th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th>
         </tr>
-        <tr class="a"><td>∅</td><td>ア a</td><td>イ i</td><td>ウ u</td><td>エ e</td><td>オ o</td></tr>
-        <tr class="k"><td>k</td><td>カ ka</td><td>キ ki</td><td>ク ku</td><td>ケ ke</td><td>コ ko</td></tr>
-        <tr class="s"><td>s</td><td>サ sa</td><td>シ shi</td><td>ス su</td><td>セ se</td><td>ソ so</td></tr>
-        <tr class="t"><td>t</td><td>タ ta</td><td>チ chi</td><td>ツ tsu</td><td>テ te</td><td>ト to</td></tr>
-        <tr class="n"><td>n</td><td>ナ na</td><td>ニ ni</td><td>ヌ nu</td><td>ネ ne</td><td>ノ no</td></tr>
-        <tr class="h"><td>h</td><td>ハ ha</td><td>ヒ hi</td><td>フ fu</td><td>ヘ he</td><td>ホ ho</td></tr>
-        <tr class="m"><td>m</td><td>マ ma</td><td>ミ mi</td><td>ム mu</td><td>メ me</td><td>モ mo</td></tr>
-        <tr class="y"><td>y</td><td>ヤ ya</td><td>–</td><td>ユ yu</td><td>–</td><td>ヨ yo</td></tr>
-        <tr class="r"><td>r</td><td>ラ ra</td><td>リ ri</td><td>ル ru</td><td>レ re</td><td>ロ ro</td></tr>
-        <tr class="w"><td>w</td><td>ワ wa</td><td>–</td><td>–</td><td>–</td><td>ヲ wo</td></tr>
-        <tr style="background:#ddd"><td>n</td><td colspan="5">ン n</td></tr>
-        <tr class="g"><td>g</td><td>ガ ga</td><td>ギ gi</td><td>グ gu</td><td>ゲ ge</td><td>ゴ go</td></tr>
-        <tr class="z"><td>z</td><td>ザ za</td><td>ジ ji</td><td>ズ zu</td><td>ゼ ze</td><td>ゾ zo</td></tr>
-        <tr class="d"><td>d</td><td>ダ da</td><td>ヂ ji</td><td>ヅ zu</td><td>デ de</td><td>ド do</td></tr>
-        <tr class="b"><td>b</td><td>バ ba</td><td>ビ bi</td><td>ブ bu</td><td>ベ be</td><td>ボ bo</td></tr>
-        <tr class="p"><td>p</td><td>パ pa</td><td>ピ pi</td><td>プ pu</td><td>ペ pe</td><td>ポ po</td></tr>
+        <tr class="a"><td>∅</td><td class="clickable">ア a</td><td class="clickable">イ i</td><td class="clickable">ウ u</td><td class="clickable">エ e</td><td class="clickable">オ o</td></tr>
+        <tr class="k"><td>k</td><td class="clickable">カ ka</td><td class="clickable">キ ki</td><td class="clickable">ク ku</td><td class="clickable">ケ ke</td><td class="clickable">コ ko</td></tr>
+        <tr class="s"><td>s</td><td class="clickable">サ sa</td><td class="clickable">シ shi</td><td class="clickable">ス su</td><td class="clickable">セ se</td><td class="clickable">ソ so</td></tr>
+        <tr class="t"><td>t</td><td class="clickable">タ ta</td><td class="clickable">チ chi</td><td class="clickable">ツ tsu</td><td class="clickable">テ te</td><td class="clickable">ト to</td></tr>
+        <tr class="n"><td>n</td><td class="clickable">ナ na</td><td class="clickable">ニ ni</td><td class="clickable">ヌ nu</td><td class="clickable">ネ ne</td><td class="clickable">ノ no</td></tr>
+        <tr class="h"><td>h</td><td class="clickable">ハ ha</td><td class="clickable">ヒ hi</td><td class="clickable">フ fu</td><td class="clickable">ヘ he</td><td class="clickable">ホ ho</td></tr>
+        <tr class="m"><td>m</td><td class="clickable">マ ma</td><td class="clickable">ミ mi</td><td class="clickable">ム mu</td><td class="clickable">メ me</td><td class="clickable">モ mo</td></tr>
+        <tr class="y"><td>y</td><td class="clickable">ヤ ya</td><td>–</td><td class="clickable">ユ yu</td><td>–</td><td class="clickable">ヨ yo</td></tr>
+        <tr class="r"><td>r</td><td class="clickable">ラ ra</td><td class="clickable">リ ri</td><td class="clickable">ル ru</td><td class="clickable">レ re</td><td class="clickable">ロ ro</td></tr>
+        <tr class="w"><td>w</td><td class="clickable">ワ wa</td><td>–</td><td>–</td><td>–</td><td class="clickable">ヲ wo</td></tr>
+        <tr style="background:#ddd"><td>n</td><td colspan="5" class="clickable">ン n</td></tr>
+        <tr class="g"><td>g</td><td class="clickable">ガ ga</td><td class="clickable">ギ gi</td><td class="clickable">グ gu</td><td class="clickable">ゲ ge</td><td class="clickable">ゴ go</td></tr>
+        <tr class="z"><td>z</td><td class="clickable">ザ za</td><td class="clickable">ジ ji</td><td class="clickable">ズ zu</td><td class="clickable">ゼ ze</td><td class="clickable">ゾ zo</td></tr>
+        <tr class="d"><td>d</td><td class="clickable">ダ da</td><td class="clickable">ヂ ji</td><td class="clickable">ヅ zu</td><td class="clickable">デ de</td><td class="clickable">ド do</td></tr>
+        <tr class="b"><td>b</td><td class="clickable">バ ba</td><td class="clickable">ビ bi</td><td class="clickable">ブ bu</td><td class="clickable">ベ be</td><td class="clickable">ボ bo</td></tr>
+        <tr class="p"><td>p</td><td class="clickable">パ pa</td><td class="clickable">ピ pi</td><td class="clickable">プ pu</td><td class="clickable">ペ pe</td><td class="clickable">ポ po</td></tr>
     </table>
     <br>
     <button class="secondary-btn" onclick="document.getElementById('p').style.display='none'">Sulje</button>
@@ -409,11 +419,19 @@ const dak=[
 ['ガ','ga','g'],['ギ','gi','g'],['グ','gu','g'],['ゲ','ge','g'],['ゴ','go','g'],
 ['ザ','za','z'],['ジ','ji','z'],['ズ','zu','z'],['ゼ','ze','z'],['ゾ','zo','z'],
 ['ダ','da','d'],['ヂ','ji','d'],['ヅ','zu','d'],['デ','de','d'],['ド','do','d'],
-['バ','ba','b'],['ビ','bi','b'],['ブ','bu','b'],['ベ','be','b'],['ボ','bo','b']
+['b','バ','b'],['ビ','bi','b'],['ブ','bu','b'],['ベ','be','b'],['ボ','bo','b']
 ];
 
 const hand=[
 ['パ','pa','p'],['ピ','pi','p'],['プ','pu','p'],['ペ','pe','p'],['ポ','po','p']
+];
+
+// Korjataan dakutenin 'b'-alkioiden taulukkorakenne varmuuden vuoksi oikeaksi
+const dakFixed=[
+['ガ','ga','g'],['ギ','gi','g'],['グ','gu','g'],['ゲ','ge','g'],['ゴ','go','g'],
+['ザ','za','z'],['ジ','ji','z'],['ズ','zu','z'],['ゼ','ze','z'],['ゾ','zo','z'],
+['ダ','da','d'],['ヂ','ji','d'],['ヅ','zu','d'],['デ','de','d'],['ド','do','d'],
+['バ','ba','b'],['ビ','bi','b'],['ブ','bu','b'],['ベ','be','b'],['ボ','bo','b']
 ];
 
 // DOM-elementit
@@ -458,7 +476,7 @@ function startGame(){
         if(sel.includes(x[2])) pool.push(x);
     }
 
-    if(dakCheckbox.checked) pool.push(...dak);
+    if(dakCheckbox.checked) pool.push(...dakFixed);
     if(handaCheckbox.checked) pool.push(...hand);
 
     if(pool.length === 0){
@@ -527,6 +545,18 @@ function checkAnswer(){
 
 ans.addEventListener('keydown', e => {
     if(e.key === 'Enter') checkAnswer();
+});
+
+// Lisätään taulukon soluille klikkauskuuntelija, joka poimii katakana-merkin tekstistä ja lausuu sen
+document.querySelectorAll('.katakanaTable td.clickable').forEach(td => {
+    td.addEventListener('click', () => {
+        const text = td.textContent.trim();
+        // Poimitaan ensimmäinen merkki (katakana), esim. "ア a" -> "ア"
+        const kana = text.split(' ')[0];
+        if (kana && kana !== '–') {
+            speak(kana);
+        }
+    });
 });
 
 startGame();
