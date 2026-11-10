@@ -265,7 +265,6 @@
 </div>
 
 <script>
-    // Voit lisätä `pairs`-taulukkoon vaikka 200 sanaa per teema!
     const VOCABULARY = {
         food: {
             title: "🍎 Ruoka ja juoma (A1)",
@@ -280,10 +279,6 @@
                 { id: 8, ru: "мясо", fi: "liha" },
                 { id: 9, ru: "сок", fi: "mehu" },
                 { id: 10, ru: "кофе", fi: "kahvi" },
-                { id: 11, ru: "молоко", fi: "maito" },
-                { id: 12, ru: "мясо", fi: "liha" },
-                { id: 13, ru: "сок", fi: "mehu" },
-                { id: 14, ru: "кофе", fi: "kahvi" },
                 { id: 15, ru: "суп", fi: "keitto" },
                 { id: 16, ru: "салат", fi: "salaatti" },
                 { id: 17, ru: "сахар", fi: "sokeri" },
@@ -296,7 +291,6 @@
                 { id: 24, ru: "банан", fi: "banaani" },
                 { id: 25, ru: "апельсин", fi: "appelsiini" },
                 { id: 26, ru: "курица", fi: "kana" },
-                { id: 27, ru: "суп", fi: "keitto" },
                 { id: 28, ru: "шоколад", fi: "suklaa" },
                 { id: 29, ru: "мороженое", fi: "jäätelö" },
                 { id: 30, ru: "пицца", fi: "pitsa" },
@@ -374,7 +368,6 @@
                 { id: 222, ru: "почта", fi: "posti" },
                 { id: 223, ru: "больница", fi: "sairaala" },
                 { id: 224, ru: "полиция", fi: "poliisi" },
-                { id: 225, ru: "аптека", fi: "apteekki" },
                 { id: 226, ru: "гостиница", fi: "hotelli / majatalo" },
                 { id: 227, ru: "карта", fi: "kartta" },
                 { id: 228, ru: "адрес", fi: "osoite" },
@@ -392,35 +385,34 @@
                 { id: 305, ru: "сестра", fi: "sisko" },
                 { id: 306, ru: "семья", fi: "perhe" },
                 { id: 307, ru: "дедушка", fi: "isoisä" },
-{ id: 308, ru: "бабушка", fi: "isoäiti" },
-{ id: 309, ru: "сын", fi: "poika" },
-{ id: 310, ru: "дочь", fi: "tytär" },
-{ id: 311, ru: "ребёнок", fi: "lapsi" },
-{ id: 312, ru: "родители", fi: "vanhemmat" },
-{ id: 313, ru: "родственник", fi: "sukulainen" },
-{ id: 314, ru: "дядя", fi: "setä" },
-{ id: 315, ru: "тётя", fi: "täti" },
-{ id: 316, ru: "кузен", fi: "serkku" },
-{ id: 317, ru: "муж", fi: "aviomies" },
-{ id: 318, ru: "жена", fi: "vaimo" },
-{ id: 319, ru: "внук", fi: "pojanpoika" },
-{ id: 320, ru: "внучка", fi: "tyttärentytär" },
-{ id: 321, ru: "мальчик", fi: "poika" },
-{ id: 322, ru: "девочка", fi: "tyttö" },
-{ id: 323, ru: "человек", fi: "ihminen" },
-{ id: 324, ru: "мужчина", fi: "mies" },
-{ id: 325, ru: "женщина", fi: "nainen" },
-{ id: 326, ru: "ребята", fi: "lapset" },
-{ id: 327, ru: "сосед", fi: "naapuri" },
-{ id: 328, ru: "гость", fi: "vieras" },
-{ id: 329, ru: "знакомый", fi: "tuttava" },
-{ id: 330, ru: "любовь", fi: "rakkaus" },
-{ id: 331, ru: "брак", fi: "avioliitto" },
-{ id: 332, ru: "свадьба", fi: "häät" },
-{ id: 333, ru: "пара", fi: "pari" },
-{ id: 334, ru: "молодой человек", fi: "poikaystävä" },
-{ id: 335, ru: "девушка", fi: "tyttöystävä" },
-{ id: 336, ru: "дети", fi: "lapset" }
+                { id: 308, ru: "бабушка", fi: "isoäiti" },
+                { id: 309, ru: "сын", fi: "poika" },
+                { id: 310, ru: "дочь", fi: "tytär" },
+                { id: 311, ru: "ребёнок", fi: "lapsi" },
+                { id: 312, ru: "родители", fi: "vanhemmat" },
+                { id: 313, ru: "родственник", fi: "sukulainen" },
+                { id: 314, ru: "дядя", fi: "setä" },
+                { id: 315, ru: "тётя", fi: "täti" },
+                { id: 316, ru: "кузен", fi: "serkku" },
+                { id: 317, ru: "муж", fi: "aviomies" },
+                { id: 318, ru: "жена", fi: "vaimo" },
+                { id: 319, ru: "внук", fi: "pojanpoika" },
+                { id: 320, ru: "внучка", fi: "tyttärentytär" },
+                { id: 321, ru: "мальчик", fi: "poika" },
+                { id: 322, ru: "девочка", fi: "tyttö" },
+                { id: 323, ru: "человек", fi: "ihminen" },
+                { id: 324, ru: "мужчина", fi: "mies" },
+                { id: 325, ru: "женщина", fi: "nainen" },
+                { id: 327, ru: "сосед", fi: "naapuri" },
+                { id: 328, ru: "гость", fi: "vieras" },
+                { id: 329, ru: "знакомый", fi: "tuttava" },
+                { id: 330, ru: "любовь", fi: "rakkaus" },
+                { id: 331, ru: "брак", fi: "avioliitto" },
+                { id: 332, ru: "свадьба", fi: "häät" },
+                { id: 333, ru: "пара", fi: "pari" },
+                { id: 334, ru: "молодой человек", fi: "poikaystävä" },
+                { id: 335, ru: "девушка", fi: "tyttöystävä" },
+                { id: 336, ru: "дети", fi: "lapset" }
             ]
         }
     };
@@ -447,9 +439,18 @@
         }
     }
 
+    // Luotettava Fisher-Yates sekoitusalgoritmi
+    function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
     function getRandomPairs(array, count) {
-        const shuffled = [...array].sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, count);
+        return shuffleArray(array).slice(0, count);
     }
 
     function speakRussian(text) {
@@ -466,7 +467,6 @@
         const data = VOCABULARY[catKey];
         if (!data) return;
 
-        // Arpohin valitun teeman taulukosta täsmälleen 6 paria
         const activePairs = getRandomPairs(data.pairs, 6);
 
         currentScore = 0;
@@ -486,8 +486,9 @@
         ruCol.innerHTML = '';
         fiCol.innerHTML = '';
 
-        const ruList = [...activePairs].sort(() => Math.random() - 0.5);
-        const fiList = [...activePairs].sort(() => Math.random() - 0.5);
+        // Sekoitetaan sarakkeet erikseen Fisher-Yatesilla
+        const ruList = shuffleArray(activePairs);
+        const fiList = shuffleArray(activePairs);
 
         ruList.forEach(item => {
             const card = document.createElement('div');
@@ -518,9 +519,6 @@
 
         if (lang === 'ru') {
             speakRussian(card.dataset.text);
-        }
-
-        if (lang === 'ru') {
             if (selectedRu) selectedRu.classList.remove('selected');
             selectedRu = card;
             card.classList.add('selected');
@@ -593,6 +591,5 @@
         deckContainer.style.display = 'block';
     }
 </script>
-
 </body>
 </html>
