@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Venäläinen numeropulma – Dostojevski-tila</title>
+<title>Venäläinen numeropulma – Kirjallisuustaso</title>
 
 <style>
 * {
@@ -131,7 +131,7 @@
     flex-wrap: wrap;
 }
 
-.päävalikko-btn, .toggle-sound-btn, .toggle-speech-btn, .toggle-translit-btn {
+.päävalikko-btn, .toggle-sound-btn, .toggle-speech-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -148,7 +148,7 @@
     cursor: pointer;
 }
 
-.päävalikko-btn:hover, .toggle-sound-btn:hover, .toggle-speech-btn:hover, .toggle-translit-btn:hover {
+.päävalikko-btn:hover, .toggle-sound-btn:hover, .toggle-speech-btn:hover {
     background: #f4ecd8;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
@@ -160,7 +160,7 @@
     background: #fef2f2;
 }
 
-.päävalikko-btn svg, .toggle-sound-btn svg, .toggle-speech-btn svg, .toggle-translit-btn svg {
+.päävalikko-btn svg, .toggle-sound-btn svg, .toggle-speech-btn svg {
     width: 18px;
     height: 18px;
     fill: currentColor;
@@ -301,25 +301,48 @@ h1 {
 }
 
 .target-number {
-    font-size: 40px;
+    font-size: 38px;
     font-weight: bold;
     color: #2b1d0c;
-    margin-bottom: 5px;
-    word-break: break-all;
+    margin-bottom: 10px;
     font-family: 'Georgia', serif;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
 }
 
-.target-translit {
-    font-size: 18px;
+/* Klikattavat numerosegmentit */
+.num-part {
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.num-part:hover:not(.disabled-part) {
+    background: #e8d7b5;
+    color: #111;
+    transform: scale(1.05);
+}
+
+.num-part.disabled-part {
+    cursor: default;
+    opacity: 0.9;
+}
+
+/* Korostus äänitoiston aikana */
+.num-part.highlighted {
+    background: #d4af37 !important;
+    color: #ffffff !important;
+    transform: scale(1.12);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+}
+
+.click-hint {
+    font-size: 12px;
     color: #8c6d3f;
-    font-weight: 600;
-    transition: opacity 0.3s ease, filter 0.3s ease;
-}
-
-.target-translit.hidden-translit {
-    opacity: 0;
-    filter: blur(6px);
-    user-select: none;
+    font-style: italic;
 }
 
 .answer-slots {
@@ -333,14 +356,14 @@ h1 {
 }
 
 .slot {
-    width: 50px;
-    height: 65px;
+    width: 42px;
+    height: 55px;
     border: 3px solid #d4af37;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 22px;
     font-weight: bold;
     background: #fdfbf7;
     color: #2b1d0c;
@@ -361,14 +384,6 @@ h1 {
     animation: successPop 0.5s ease;
 }
 
-.slot.speaking {
-    border-color: #d4af37 !important;
-    background: #fef3c7 !important;
-    color: #92400e !important;
-    transform: scale(1.15) !important;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-}
-
 .slot.error {
     border-color: #ef4444;
     background: #fef2f2;
@@ -386,25 +401,25 @@ h1 {
 
 .pool {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    max-width: 440px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    max-width: 480px;
     margin: 0 auto 25px auto;
 }
 
 .block {
-    height: 55px;
+    height: 50px;
     background: linear-gradient(135deg, #3a2b1c 0%, #2b1d0c 100%);
     color: #fdfbf7;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #d4af37;
-    box-shadow: 0 4px 12px rgba(43, 29, 12, 0.3);
+    box-shadow: 0 4px 10px rgba(43, 29, 12, 0.3);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
 }
@@ -523,12 +538,6 @@ button.action-btn:hover {
     color: #2b1d0c;
 }
 
-.cyrillic-translit {
-    color: #8c6d3f;
-    font-weight: 500;
-    font-size: 13px;
-}
-
 .cyrillic-num {
     background: #d4af37;
     color: #2b1d0c;
@@ -550,7 +559,6 @@ button.action-btn:hover {
     40%, 80% { transform: translateX(6px); }
 }
 
-/* Väärän vastauksen efekti */
 .screen-flash-error {
     position: fixed;
     top: 0;
@@ -568,7 +576,6 @@ button.action-btn:hover {
     100% { opacity: 0; backdrop-filter: brightness(1) blur(0px); }
 }
 
-/* Oikean vastauksen efekti */
 .screen-burst-success {
     position: fixed;
     top: 0;
@@ -595,7 +602,7 @@ button.action-btn:hover {
 <div id="welcomeOverlay" class="welcome-overlay">
     <div class="welcome-modal">
         <h2>🇷🇺 Tervetuloa, Oppija! (Добро пожаловать)</h2>
-        <p>Valitse kirjallinen vaikeustasosi ja astu sisään venäläisen kirjallisuuden ja numeroiden sielunmaisemaan.</p>
+        <p>Valitse kirjallinen vaikeustasosi ja kirjoita venäjän numerot itsenäisesti kyrillisillä kirjaimilla.</p>
         
         <div class="welcome-diff-list">
             <button class="welcome-diff-btn" onclick="selectInitialDifficulty(0)">
@@ -619,7 +626,7 @@ button.action-btn:hover {
                 <span class="welcome-diff-sub">0 – 1 000 000</span>
             </button>
             <button class="welcome-diff-btn dostoevsky-btn" onclick="selectInitialDifficulty(5)">
-                <span>5. Dostojevski (Idiootin ja Rangaistussiirtolan tyhjyys)</span>
+                <span>5. ⛓️ Dostojevski (Idiootin ja Rangaistussiirtolan tyhjyys)</span>
                 <span class="welcome-diff-sub">0 – 100 000 000 (Äärimmäinen kärsimys)</span>
             </button>
         </div>
@@ -629,7 +636,7 @@ button.action-btn:hover {
 <div class="container">
     <div class="main-panel">
         <div class="top-actions">
-            <a href="index.html" class="päävalikko-btn" onclick="event.preventDefault(); alert('Päävalikko-painike');">
+            <a href="index.html" class="päävalikko-btn" onclick="event.preventDefault(); alert('Päävalikko');">
                 <svg viewBox="0 0 24 24">
                     <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                 </svg>
@@ -648,17 +655,11 @@ button.action-btn:hover {
                     </svg>
                     <span id="speechBtnText">Numeroiden luku: Päällä</span>
                 </button>
-                <button id="toggleTranslitBtn" class="toggle-translit-btn" onclick="toggleTranslit()">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                    </svg>
-                    <span id="translitBtnText">Piilota translitterointi</span>
-                </button>
             </div>
         </div>
 
         <h1>🇷🇺 Venäjän numeropulma</h1>
-        <p class="subtitle">Kokoa oikea luku venäläisillä sanoilla kirjain kirjaimelta!</p>
+        <p class="subtitle">Kirjoita näytettävä luku kyrillisillä kirjaimilla!</p>
 
         <!-- Vaikeustasojen valinta -->
         <div class="difficulty-selector">
@@ -690,18 +691,19 @@ button.action-btn:hover {
 
         <!-- Kirjallinen kannustusosio -->
         <div id="encBox" class="encouragement-box">
-            <div id="encRu" class="enc-ru">Всякое волнонение проходит...</div>
+            <div id="encRu" class="enc-ru">Всякое волнение проходит...</div>
             <div id="encFi" class="enc-fi">"Kaikki levottomuus menee ohi..." – Ivan Turgenev</div>
         </div>
 
         <div class="target-box">
+            <!-- Klikattava lukuosa dynaamisesti -->
             <div id="targetNumber" class="target-number">0</div>
-            <div id="targetTranslit" class="target-translit">nol'</div>
+            <div class="click-hint">💡 Klikkaa numeron osia kuullaksesi niiden venäjänkieliset vastineet</div>
         </div>
 
         <div id="answerSlots" class="answer-slots"></div>
 
-        <div class="pool-label">Valitse oikeat kirjainlaatat:</div>
+        <div class="pool-label">Valitse kyrilliset kirjaimet:</div>
         <div id="blockPool" class="pool"></div>
 
         <div class="controls">
@@ -847,90 +849,51 @@ function playSuccessBurstSound() {
 
 // --- VENÄJÄN NUMERODATA ---
 const numWords = {
-    0: { ru: "ноль", tr: "nol'" },
-    1: { ru: "один", tr: "odin" },
-    2: { ru: "два", tr: "dva" },
-    3: { ru: "три", tr: "tri" },
-    4: { ru: "четыре", tr: "chetyre" },
-    5: { ru: "пять", tr: "pyat'" },
-    6: { ru: "шесть", tr: "shest'" },
-    7: { ru: "семь", tr: "sem'" },
-    8: { ru: "восемь", tr: "vosem'" },
-    9: { ru: "девять", tr: "devyat'" },
-    10: { ru: "десять", tr: "desyat'" },
-    11: { ru: "одиннадцать", tr: "odinnadcat'" },
-    12: { ru: "двенадцать", tr: "dvenadcat'" },
-    13: { ru: "тринадцать", tr: "trinadcat'" },
-    14: { ru: "четырнадцать", tr: "chetyrnadcat'" },
-    15: { ru: "пятнадцать", tr: "pyatnadcat'" },
-    16: { ru: "шестнадцать", tr: "shestnadcat'" },
-    17: { ru: "семнадцать", tr: "semnadcat'" },
-    18: { ru: "восемнадцать", tr: "vosemnadcat'" },
-    19: { ru: "девятнадцать", tr: "devyatnadcat'" },
-    20: { ru: "двадцать", tr: "dvadcat'" },
-    30: { ru: "тридцать", tr: "tridcat'" },
-    40: { ru: "сорок", tr: "sorok" },
-    50: { ru: "пятьдесят", tr: "pyat'desyat" },
-    60: { ru: "шестьдесят", tr: "shest'desyat" },
-    70: { ru: "семьдесят", tr: "sem'desyat" },
-    80: { ru: "восемьдесят", tr: "vosem'desyat" },
-    90: { ru: "девяносто", tr: "devyanosto" },
-    100: { ru: "сто", tr: "sto" },
-    200: { ru: "двести", tr: "dvesti" },
-    300: { ru: "триста", tr: "trista" },
-    400: { ru: "четыреста", tr: "chetyresta" },
-    500: { ru: "пятьсот", tr: "pyat'sot" },
-    600: { ru: "шестьсот", tr: "shest'sot" },
-    700: { ru: "семьсот", tr: "sem'sot" },
-    800: { ru: "восемьсот", tr: "vosem'sot" },
-    900: { ru: "девятьсот", tr: "devyat'sot" },
-    1000: { ru: "тысяча", tr: "tysyacha" },
-    2000: { ru: "тысячи", tr: "tysyachi" },
-    5000: { ru: "тысяч", tr: "tysyach" },
-    1000000: { ru: "миллион", tr: "million" },
-    1000000000: { ru: "миллиард", tr: "milliard" }
+    0: "ноль",
+    1: "один", 2: "два", 3: "три", 4: "четыре", 5: "пять",
+    6: "шесть", 7: "семь", 8: "восемь", 9: "девять", 10: "десять",
+    11: "одиннадцать", 12: "двенадцать", 13: "тринадцать", 14: "четырнадцать", 15: "пятнадцать",
+    16: "шестнадцать", 17: "семнадцать", 18: "восемнадцать", 19: "девятнадцать",
+    20: "двадцать", 30: "тридцать", 40: "сорок", 50: "пятьдесят", 60: "шестьдесят",
+    70: "семьдесят", 80: "восемьдесят", 90: "девяносто",
+    100: "сто", 200: "двести", 300: "триста", 400: "четыреста", 500: "пятьсот",
+    600: "шестьсот", 700: "семьсот", 800: "восемьсот", 900: "девятьсот"
 };
 
 const literaryEncouragements = {
     0: [
-        { ru: "Всякое волнение проходит...", fi: "Kaikki levottomuus menee ohi... – Ivan Turgenev" },
-        { ru: "Умей выждать.", fi: "Osaa odottaa. – Ivan Turgenev" }
+        { ru: "Всякое волнение проходит...", fi: "Kaikki levottomuus menee ohi... – Turgenev" },
+        { ru: "Умей выждать.", fi: "Osaa odottaa. – Turgenev" }
     ],
     1: [
-        { ru: "И скучно, и грустно, и некому руку подать...", fi: "On tylsää, on synkkää, eikä ole ketä kättä ojentaisi... – Mihail Lermontov" },
-        { ru: "Я ищу свободы и покоя!", fi: "Etsin vapautta ja rauhaa! – Mihail Lermontov" }
+        { ru: "И скучно, и грустно...", fi: "On synkkää... – Lermontov" },
+        { ru: "Я ищу свободы и покоя!", fi: "Etsin vapautta ja rauhaa! – Lermontov" }
     ],
     2: [
-        { ru: "В человеке должно быть всё прекрасно...", fi: "Ihmisessä tulisi olla kaikki kaunista... – Anton Tšehov" },
-        { ru: "Краткость — сестра таланта.", fi: "Tiiviys on lahjakkuuden sisar. – Anton Tšehov" }
+        { ru: "В человеке должно быть всё прекрасно...", fi: "Ihmisessä tulisi olla kaikki kaunista... – Tšehov" },
+        { ru: "Краткость — сестра таланта.", fi: "Tiiviys on lahjakkuuden sisar. – Tšehov" }
     ],
     3: [
-        { ru: "Все счастливые семьи похожи друг на друга...", fi: "Kaikki onnelliset perheet muistuttavat toisiaan... – Lev Tolstoi" },
-        { ru: "Надо жить, надо любить, надо верить.", fi: "Täytyy elää, täytyy rakastaa, täytyy uskoa. – Lev Tolstoi" }
+        { ru: "Все счастливые семьи похожи друг на друга...", fi: "Kaikki onnelliset perheet muistuttavat toisiaan... – Tolstoi" },
+        { ru: "Надо жить, надо любить, надо верить.", fi: "Täytyy elää, täytyy rakastaa... – Tolstoi" }
     ],
     4: [
-        { ru: "Февраль. Достать чернил и плакать!", fi: "Helmikuu. Ottaa mustetta ja itkeä! – Boris Pasternak" }
+        { ru: "Февраль. Достать чернил и плакать!", fi: "Helmikuu. Ottaa mustetta ja itkeä! – Pasternak" }
     ],
     5: [
-        { ru: "Красота спасет мир!", fi: "Kauneus pelastaa maailman! – Fjodor Dostojevski" },
-        { ru: "Страдание — это единственный источник познания.", fi: "Kärsimys on ainoa tiedon lähde. – Fjodor Dostojevski" }
+        { ru: "Красота спасет мир!", fi: "Kauneus pelastaa maailman! – Dostojevski" },
+        { ru: "Страдание — это единственный источник познания.", fi: "Kärsimys on ainoa tiedon lähde. – Dostojevski" }
     ]
 };
 
 const referenceData = [
-    { num: '0', ru: 'ноль', tr: 'nol\'' },
-    { num: '1', ru: 'один', tr: 'odin' },
-    { num: '2', ru: 'два', tr: 'dva' },
-    { num: '3', ru: 'три', tr: 'tri' },
-    { num: '4', ru: 'четыре', tr: 'chetyre' },
-    { num: '5', ru: 'пять', tr: 'pyat\'' },
-    { num: '6', ru: 'шесть', tr: 'shest\'' },
-    { num: '7', ru: 'семь', tr: 'sem\'' },
-    { num: '8', ru: 'восемь', tr: 'vosem\'' },
-    { num: '9', ru: 'девять', tr: 'devyat\'' },
-    { num: '10', ru: 'десять', tr: 'desyat\'' },
-    { num: '100', ru: 'сто', tr: 'sto' },
-    { num: '1000', ru: 'тысяча', tr: 'tysyacha' }
+    { num: '0', ru: 'ноль' },
+    { num: '1', ru: 'один' },
+    { num: '2', ru: 'два' },
+    { num: '3', ru: 'три' },
+    { num: '11-19', ru: '...надцать' },
+    { num: '100', ru: 'сто' },
+    { num: '1000', ru: 'тысяча' }
 ];
 
 let currentDifficulty = 0;
@@ -941,7 +904,6 @@ let poolBlocks = [];
 let score = 0;
 let streak = 0;
 let isLocked = false;
-let translitVisible = true;
 let russianVoice = null;
 
 function selectInitialDifficulty(level) {
@@ -1002,20 +964,6 @@ function speakText(text, onEndCallback) {
     }
 }
 
-function toggleTranslit() {
-    translitVisible = !translitVisible;
-    const translitEl = document.getElementById('targetTranslit');
-    const btnText = document.getElementById('translitBtnText');
-
-    if (translitVisible) {
-        translitEl.classList.remove('hidden-translit');
-        btnText.textContent = 'Piilota translitterointi';
-    } else {
-        translitEl.classList.add('hidden-translit');
-        btnText.textContent = 'Näytä translitterointi';
-    }
-}
-
 function updateEncouragement() {
     const list = literaryEncouragements[currentDifficulty] || literaryEncouragements[0];
     const randomItem = list[Math.floor(Math.random() * list.length)];
@@ -1037,7 +985,7 @@ function updateSidebarList() {
     referenceData.forEach(item => {
         const div = document.createElement('div');
         div.className = 'cyrillic-item';
-        div.innerHTML = `<span class="cyrillic-num">${item.num}</span><span class="cyrillic-char">${item.ru}</span><span class="cyrillic-translit">${item.tr}</span>`;
+        div.innerHTML = `<span class="cyrillic-num">${item.num}</span><span class="cyrillic-char">${item.ru}</span>`;
         container.appendChild(div);
     });
 }
@@ -1053,75 +1001,81 @@ function setDifficulty(level, btnEl) {
     newRound();
 }
 
-function numberToRussian(n) {
-    if (n === 0) return { ru: "ноль", tr: "nol'" };
+// Apufunktio joka pilkkoo luvun venäjän kieliopin mukaisiin sanoihin ja osiin (sis. 11-19 omina kokonaisuuksinaan)
+function getNumberBreakdown(n) {
+    if (n === 0) return [{ label: "0", text: numWords[0] }];
 
-    let words = [];
-    let translits = [];
+    let parts = [];
 
+    // Miljoonat
     if (n >= 1000000) {
-        const mil = Math.floor(n / 1000000);
-        const rem = n % 1000000;
-        const sub = numberToRussian(mil);
-        words.push(sub.ru, "миллион");
-        translits.push(sub.tr, "million");
-        if (rem > 0) {
-            const subRem = numberToRussian(rem);
-            words.push(subRem.ru);
-            translits.push(subRem.tr);
+        const mils = Math.floor(n / 1000000);
+        let milWord = "миллион";
+        if (mils % 10 >= 2 && mils % 10 <= 4 && (mils % 100 < 10 || mils % 100 > 20)) {
+            milWord = "миллиона";
+        } else if (mils % 10 >= 5 || mils % 10 === 0 || (mils % 100 >= 11 && mils % 100 <= 19)) {
+            milWord = "миллионов";
         }
-        return { ru: words.join(" "), tr: translits.join(" ") };
+        parts.push({ label: mils + "M", text: getNumberString(mils) + " " + milWord });
+        n %= 1000000;
     }
 
+    // Tuhannet
     if (n >= 1000) {
-        const tys = Math.floor(n / 1000);
-        const rem = n % 1000;
-        
-        if (tys === 1) {
-            words.push("тысяча");
-            translits.push("tysyacha");
-        } else if (tys === 2) {
-            words.push("две", "тысячи");
-            translits.push("dve", "tysyachi");
-        } else if (tys >= 3 && tys <= 4) {
-            const sub = numberToRussian(tys);
-            words.push(sub.ru, "тысячи");
-            translits.push(sub.tr, "tysyachi");
+        const ths = Math.floor(n / 1000);
+        let thText = "";
+        let thSubNum = ths % 100;
+        let thLast = ths % 10;
+
+        if (thSubNum >= 11 && thSubNum <= 19) {
+            thText = getNumberString(ths) + " тысяч";
+        } else if (thLast === 1) {
+            thText = (ths > 1 ? getNumberString(ths - 1) + " один" : "одна") + " тысяча";
+        } else if (thLast >= 2 && thLast <= 4) {
+            thText = getNumberString(ths) + " тысячи";
         } else {
-            const sub = numberToRussian(tys);
-            words.push(sub.ru, "тысяч");
-            translits.push(sub.tr, "tysyach");
+            thText = getNumberString(ths) + " тысяч";
         }
 
-        if (rem > 0) {
-            const subRem = numberToRussian(rem);
-            words.push(subRem.ru);
-            translits.push(subRem.tr);
-        }
-        return { ru: words.join(" "), tr: translits.join(" ") };
+        parts.push({ label: ths + "k", text: thText });
+        n %= 1000;
     }
+
+    if (n > 0) {
+        parts.push({ label: n.toString(), text: getNumberString(n) });
+    }
+
+    return parts;
+}
+
+function getNumberString(n) {
+    if (n === 0) return "";
+    let words = [];
 
     const hundreds = Math.floor(n / 100) * 100;
     const remainder = n % 100;
 
     if (hundreds > 0) {
-        words.push(numWords[hundreds].ru);
-        translits.push(numWords[hundreds].tr);
+        words.push(numWords[hundreds]);
     }
 
     if (remainder > 0) {
-        if (remainder < 20 || remainder % 10 === 0) {
-            words.push(numWords[remainder].ru);
-            translits.push(numWords[remainder].tr);
+        if (remainder >= 11 && remainder <= 19) {
+            words.push(numWords[remainder]); // 11-19 omina sanoinaan!
         } else {
             const tens = Math.floor(remainder / 10) * 10;
             const units = remainder % 10;
-            words.push(numWords[tens].ru, numWords[units].ru);
-            translits.push(numWords[tens].tr, numWords[units].tr);
+            if (tens > 0) words.push(numWords[tens]);
+            if (units > 0) words.push(numWords[units]);
         }
     }
 
-    return { ru: words.join(" "), tr: translits.join(" ") };
+    return words.join(" ");
+}
+
+function numberToRussian(n) {
+    let breakdown = getNumberBreakdown(n);
+    return { ru: breakdown.map(p => p.text).join(" ") };
 }
 
 function shuffle(array) {
@@ -1155,16 +1109,16 @@ function newRound() {
     currentNumber = Math.floor(Math.random() * (max + 1));
     if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1;
 
+    // Testitapaukset haluttaessa: esim. 1513 tai 8764818 toimivat nyt täydellisesti
     const result = numberToRussian(currentNumber);
     targetRuStr = result.ru;
 
-    document.getElementById('targetNumber').textContent = currentNumber.toLocaleString('fi-FI');
-    document.getElementById('targetTranslit').textContent = result.tr;
+    renderClickableNumber(currentNumber);
 
     const neededChars = targetRuStr.split('');
     let pool = [...neededChars];
 
-    const targetPoolSize = Math.max(8, neededChars.length + 3);
+    const targetPoolSize = Math.max(12, neededChars.length + 4);
     const alphabet = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', ' '];
 
     while (pool.length < targetPoolSize) {
@@ -1181,6 +1135,46 @@ function newRound() {
     }));
 
     renderBoard();
+}
+
+// Renderöidään luku fiksuiksi klikattaviksi osiksi
+function renderClickableNumber(n) {
+    const container = document.getElementById('targetNumber');
+    container.innerHTML = '';
+
+    const breakdown = getNumberBreakdown(n);
+
+    breakdown.forEach((part, index) => {
+        const span = document.createElement('span');
+        span.className = 'num-part';
+        span.textContent = part.label;
+
+        span.onclick = () => {
+            highlightAndSpeak(span, part.text);
+        };
+
+        container.appendChild(span);
+
+        if (index < breakdown.length - 1) {
+            const sep = document.createElement('span');
+            sep.textContent = " ";
+            sep.className = 'num-part disabled-part';
+            container.appendChild(sep);
+        }
+    });
+}
+
+function highlightAndSpeak(element, russianText) {
+    if (!speechEnabled) return;
+
+    document.querySelectorAll('.num-part').forEach(p => p.classList.remove('highlighted'));
+    element.classList.add('highlighted');
+
+    speakText(russianText, () => {
+        setTimeout(() => {
+            element.classList.remove('highlighted');
+        }, 400);
+    });
 }
 
 function renderBoard() {
@@ -1287,24 +1281,7 @@ function clearFeedback() {
     feedback.style.color = '#333';
 
     document.querySelectorAll('.slot').forEach(slot => {
-        slot.classList.remove('error', 'correct', 'speaking');
-    });
-}
-
-function playFullAnswerWithHighlight(index, slots, onComplete) {
-    if (!speechEnabled || index >= targetRuStr.length) {
-        if (onComplete) onComplete();
-        return;
-    }
-
-    slots.forEach(s => s.classList.remove('speaking'));
-
-    if (slots[index]) {
-        slots[index].classList.add('speaking');
-    }
-    
-    speakText(targetRuStr, () => {
-        if (onComplete) onComplete();
+        slot.classList.remove('error', 'correct');
     });
 }
 
@@ -1336,7 +1313,7 @@ function checkAnswer() {
         setTimeout(() => burstEl.remove(), 800);
 
         setTimeout(() => {
-            playFullAnswerWithHighlight(0, slots, () => {
+            speakText(targetRuStr, () => {
                 setTimeout(() => {
                     newRound();
                 }, 1000);
@@ -1350,7 +1327,7 @@ function checkAnswer() {
         slots.forEach(slot => slot.classList.add('error'));
 
         if (feedback) {
-            feedback.textContent = 'Väärin, yritä uudelleen (Dostojevski itkee)!';
+            feedback.textContent = 'Väärin, yritä uudelleen!';
             feedback.style.color = '#ef4444';
         }
 
@@ -1370,7 +1347,6 @@ function checkAnswer() {
     }
 }
 
-// Varmistetaan että peli käynnistyy heti oikein
 window.addEventListener('DOMContentLoaded', () => {
     updateSidebarList();
     newRound();
