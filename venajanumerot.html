@@ -599,15 +599,15 @@ button.action-btn:hover {
         
         <div class="welcome-diff-list">
             <button class="welcome-diff-btn" onclick="selectInitialDifficulty(0)">
-                <span>0. Puškin (Runoilijan alkutaival)</span>
+                <span>0. Turgenev (Isät, lapset ja alku)</span>
                 <span class="welcome-diff-sub">0 – 10</span>
             </button>
             <button class="welcome-diff-btn" onclick="selectInitialDifficulty(1)">
-                <span>1. Gogol (Pietarin kaduilla)</span>
+                <span>1. Lermontov (Kaukasian sankari)</span>
                 <span class="welcome-diff-sub">0 – 100</span>
             </button>
             <button class="welcome-diff-btn" onclick="selectInitialDifficulty(2)">
-                <span>2. Tšehov (Pieniä ihmisiä ja tarinoita)</span>
+                <span>2. Tšehov (Pieniä tarinoita arjesta)</span>
                 <span class="welcome-diff-sub">0 – 1 000</span>
             </button>
             <button class="welcome-diff-btn" onclick="selectInitialDifficulty(3)">
@@ -629,7 +629,7 @@ button.action-btn:hover {
 <div class="container">
     <div class="main-panel">
         <div class="top-actions">
-            <a href="index.html" class="päävalikko-btn">
+            <a href="index.html" class="päävalikko-btn" onclick="event.preventDefault(); alert('Päävalikko-painike');">
                 <svg viewBox="0 0 24 24">
                     <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                 </svg>
@@ -663,11 +663,11 @@ button.action-btn:hover {
         <!-- Vaikeustasojen valinta -->
         <div class="difficulty-selector">
             <button id="diffBtn0" class="diff-btn active" onclick="setDifficulty(0, this)">
-                <span>0. Puškin</span>
+                <span>0. Turgenev</span>
                 <span class="diff-sub">0–10</span>
             </button>
             <button id="diffBtn1" class="diff-btn" onclick="setDifficulty(1, this)">
-                <span>1. Gogol</span>
+                <span>1. Lermontov</span>
                 <span class="diff-sub">0–100</span>
             </button>
             <button id="diffBtn2" class="diff-btn" onclick="setDifficulty(2, this)">
@@ -690,8 +690,8 @@ button.action-btn:hover {
 
         <!-- Kirjallinen kannustusosio -->
         <div id="encBox" class="encouragement-box">
-            <div id="encRu" class="enc-ru">И опыт, сын ошибок трудных...</div>
-            <div id="encFi" class="enc-fi">"Ja kokemus, vaikeiden erehdysten poika..." – Aleksandr Puškin</div>
+            <div id="encRu" class="enc-ru">Всякое волнонение проходит...</div>
+            <div id="encFi" class="enc-fi">"Kaikki levottomuus menee ohi..." – Ivan Turgenev</div>
         </div>
 
         <div class="target-box">
@@ -893,33 +893,27 @@ const numWords = {
 
 const literaryEncouragements = {
     0: [
-        { ru: "И опыт, сын ошибок трудных...", fi: "Ja kokemus, vaikeiden erehdysten poika... – Puškin" },
-        { ru: "Мороз и солнце; день чудесный!", fi: "Pakkasta ja aurinko; ihana päivä! – Puškin" },
-        { ru: "Я помню чудное мгновенье...", fi: "Muistan ihmeellisen hetken... – Puškin" }
+        { ru: "Всякое волнение проходит...", fi: "Kaikki levottomuus menee ohi... – Ivan Turgenev" },
+        { ru: "Умей выждать.", fi: "Osaa odottaa. – Ivan Turgenev" }
     ],
     1: [
-        { ru: "Эх, тройка! Птица-тройка, кто тебя выдумал?", fi: "Voi troikka! Lintutroikka, kuka sinut keksi? – Gogol" },
-        { ru: "Скучно жить на этом свете, господа!", fi: "On tylsää elää tässä maailmassa, hyvät herrat! – Gogol" },
-        { ru: "Ревизор! К нам едет ревизор!", fi: "Reviisori! Reviisori on tulossa meille! – Gogol" }
+        { ru: "И скучно, и грустно, и некому руку подать...", fi: "On tylsää, on synkkää, eikä ole ketä kättä ojentaisi... – Mihail Lermontov" },
+        { ru: "Я ищу свободы и покоя!", fi: "Etsin vapautta ja rauhaa! – Mihail Lermontov" }
     ],
     2: [
-        { ru: "В человеке должно быть всё прекрасно...", fi: "Ihmisessä tulisi olla kaikki kaunista... – Tšehov" },
-        { ru: "Краткость — сестра таланта.", fi: "Tiiviys on lahjakkuuden sisar. – Tšehov" },
-        { ru: "Дело мастера боится.", fi: "Työ pelkää mestaria. – Venäläinen sananlasku" }
+        { ru: "В человеке должно быть всё прекрасно...", fi: "Ihmisessä tulisi olla kaikki kaunista... – Anton Tšehov" },
+        { ru: "Краткость — сестра таланта.", fi: "Tiiviys on lahjakkuuden sisar. – Anton Tšehov" }
     ],
     3: [
-        { ru: "Все счастливые семьи похожи друг на друга...", fi: "Kaikki onnelliset perheet muistuttavat toisiaan... – Tolstoi" },
-        { ru: "Надо жить, надо любить, надо верить.", fi: "Täytyy elää, täytyy rakastaa, täytyy uskoa. – Tolstoi" },
-        { ru: "Сила воли побеждает любые преграdy.", fi: "Tahdonvoima voittaa mitkä tahansa esteet." }
+        { ru: "Все счастливые семьи похожи друг на друга...", fi: "Kaikki onnelliset perheet muistuttavat toisiaan... – Lev Tolstoi" },
+        { ru: "Надо жить, надо любить, надо верить.", fi: "Täytyy elää, täytyy rakastaa, täytyy uskoa. – Lev Tolstoi" }
     ],
     4: [
-        { ru: "Февраль. Достать чернил и плакать!", fi: "Helmikuu. Ottaa mustetta ja itkeä! – Pasternak" },
-        2: { ru: "Быть знаменитым некрасиво.", fi: "Kuuluisana olemisen kauneus on kyseenalaista. – Pasternak" }
+        { ru: "Февраль. Достать чернил и плакать!", fi: "Helmikuu. Ottaa mustetta ja itkeä! – Boris Pasternak" }
     ],
     5: [
-        { ru: "Красота спасет мир!", fi: "Kauneus pelastaa maailman! – Dostojevski" },
-        { ru: "Страдание — это единственный источник познания.", fi: "Kärsimys on ainoa tiedon lähde. – Dostojevski" },
-        { ru: "Человек есть тайна. Ее надо разгадать...", fi: "Ihminen on arvoitus. Se täytyy ratkaista... – Dostojevski" }
+        { ru: "Красота спасет мир!", fi: "Kauneus pelastaa maailman! – Fjodor Dostojevski" },
+        { ru: "Страдание — это единственный источник познания.", fi: "Kärsimys on ainoa tiedon lähde. – Fjodor Dostojevski" }
     ]
 };
 
@@ -956,7 +950,9 @@ function selectInitialDifficulty(level) {
         setDifficulty(level, targetBtn);
     }
     const overlay = document.getElementById('welcomeOverlay');
-    overlay.classList.add('hidden');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
 }
 
 function loadVoices() {
@@ -1049,13 +1045,14 @@ function updateSidebarList() {
 function setDifficulty(level, btnEl) {
     currentDifficulty = level;
     document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
-    btnEl.classList.add('active');
+    if (btnEl) {
+        btnEl.classList.add('active');
+    }
 
     updateSidebarList();
     newRound();
 }
 
-// Apufunktio luvun muuntamiseksi venäjän kielelle (1-999 999)
 function numberToRussian(n) {
     if (n === 0) return { ru: "ноль", tr: "nol'" };
 
@@ -1141,8 +1138,10 @@ function newRound() {
     currentSlots = [];
 
     const feedback = document.getElementById('feedback');
-    feedback.textContent = '';
-    feedback.style.color = '#333';
+    if (feedback) {
+        feedback.textContent = '';
+        feedback.style.color = '#333';
+    }
 
     updateEncouragement();
 
@@ -1162,7 +1161,6 @@ function newRound() {
     document.getElementById('targetNumber').textContent = currentNumber.toLocaleString('fi-FI');
     document.getElementById('targetTranslit').textContent = result.tr;
 
-    // Pilkotaan merkkijono ilman välilyöntejä tai välilyönneillä, tässä kirjainlaatoiksi:
     const neededChars = targetRuStr.split('');
     let pool = [...neededChars];
 
@@ -1188,6 +1186,8 @@ function newRound() {
 function renderBoard() {
     const slotsContainer = document.getElementById('answerSlots');
     const poolContainer = document.getElementById('blockPool');
+
+    if (!slotsContainer || !poolContainer) return;
 
     slotsContainer.innerHTML = '';
     poolContainer.innerHTML = '';
@@ -1282,6 +1282,7 @@ function userClear() {
 
 function clearFeedback() {
     const feedback = document.getElementById('feedback');
+    if (!feedback) return;
     feedback.textContent = '';
     feedback.style.color = '#333';
 
@@ -1302,7 +1303,6 @@ function playFullAnswerWithHighlight(index, slots, onComplete) {
         slots[index].classList.add('speaking');
     }
     
-    // Luetaan koko vastaus kerralla tai sanana, estetään jumittaminen jos tulee välilyönti
     speakText(targetRuStr, () => {
         if (onComplete) onComplete();
     });
@@ -1324,8 +1324,10 @@ function checkAnswer() {
 
         slots.forEach(slot => slot.classList.add('correct'));
 
-        feedback.textContent = 'Oikein! Отлично!';
-        feedback.style.color = '#16a34a';
+        if (feedback) {
+            feedback.textContent = 'Oikein! Отлично!';
+            feedback.style.color = '#16a34a';
+        }
 
         playSuccessBurstSound();
         const burstEl = document.createElement('div');
@@ -1347,8 +1349,10 @@ function checkAnswer() {
 
         slots.forEach(slot => slot.classList.add('error'));
 
-        feedback.textContent = 'Väärin, yritä uudelleen (Dostojevski itkee)!';
-        feedback.style.color = '#ef4444';
+        if (feedback) {
+            feedback.textContent = 'Väärin, yritä uudelleen (Dostojevski itkee)!';
+            feedback.style.color = '#ef4444';
+        }
 
         playErrorSound();
         const flashEl = document.createElement('div');
@@ -1366,15 +1370,11 @@ function checkAnswer() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Varmistetaan että peli käynnistyy heti oikein
+window.addEventListener('DOMContentLoaded', () => {
     updateSidebarList();
     newRound();
 });
-
-if (document.readyState !== 'loading') {
-    updateSidebarList();
-    newRound();
-}
 </script>
 
 </body>
