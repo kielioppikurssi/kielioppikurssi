@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hiragana Trainer</title>
+<title>Hiraganojen harjoittelua</title>
 
 <style>
 * {
@@ -47,7 +47,6 @@ h1 {
     margin-bottom: 5px;
 }
 
-/* Päävalikko-nappi tyyli */
 .päävalikko-btn {
     display: inline-flex;
     align-items: center;
@@ -104,10 +103,26 @@ h1 {
     margin-bottom: 20px;
     font-weight: 600;
     color: #475569;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
 .settings-group label {
-    margin: 0 10px;
+    cursor: pointer;
+}
+
+.audio-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    outline: none;
+    background: #fff;
     cursor: pointer;
 }
 
@@ -128,10 +143,15 @@ h1 {
 .b{background:#7de7d7}
 .p{background:#4fd1c5;color:black}
 
+.card-container {
+    position: relative;
+    width: 200px;
+    margin: 20px auto;
+}
+
 .card {
     width: 200px;
     height: 200px;
-    margin: 20px auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -139,6 +159,28 @@ h1 {
     border-radius: 24px;
     font-weight: bold;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.audio-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.1s, background 0.2s;
+}
+
+.audio-btn:hover {
+    transform: scale(1.1);
+    background: #ffffff;
 }
 
 .stats {
@@ -234,6 +276,16 @@ td, th {
     text-align: center;
 }
 
+/* Klikattavat taulukon solut */
+.hiraganaTable td.clickable {
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.1s;
+}
+.hiraganaTable td.clickable:hover {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    transform: scale(1.05);
+}
+
 .hiraganaTable tr.a td{background:#ffb3b3}
 .hiraganaTable tr.k td{background:#b3d1ff}
 .hiraganaTable tr.s td{background:#b8f5b8}
@@ -260,7 +312,7 @@ td, th {
 
 <div class="container">
     <div class="main-panel">
-        <h1>ひらがな Trainer</h1>
+        <h1>ひらがな harjoittelua</h1>
         <a href="index.html" class="päävalikko-btn">
             <svg viewBox="0 0 24 24">
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
@@ -284,6 +336,14 @@ td, th {
         <div class="settings-group">
             <label><input id="dak" type="checkbox" checked> Dakuten</label>
             <label><input id="handa" type="checkbox" checked> Handakuten</label>
+            <label>
+                🔊 Ääni:
+                <select id="audioMode" class="audio-select">
+                    <option value="hint">Vihjeenä (heti)</option>
+                    <option value="correct" selected>Vastaus (oikein)</option>
+                    <option value="off">Ei ääntä</option>
+                </select>
+            </label>
         </div>
 
         <div>
@@ -291,7 +351,10 @@ td, th {
             <button class="secondary-btn" onclick="document.getElementById('p').style.display='block'">Näytä taulukko</button>
         </div>
 
-        <div id="card" class="card a">あ</div>
+        <div class="card-container">
+            <div id="card" class="card a">あ</div>
+            <button class="audio-btn" onclick="speakCurrent()" title="Kuuntele">🔊</button>
+        </div>
 
         <input id="ans" type="text" placeholder="romaji" autocomplete="off">
 
@@ -316,22 +379,22 @@ td, th {
         <tr>
             <th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th>
         </tr>
-        <tr class="a"><td>∅</td><td>あ a</td><td>い i</td><td>う u</td><td>え e</td><td>お o</td></tr>
-        <tr class="k"><td>k</td><td>か ka</td><td>き ki</td><td>く ku</td><td>け ke</td><td>こ ko</td></tr>
-        <tr class="s"><td>s</td><td>さ sa</td><td>し shi</td><td>す su</td><td>せ se</td><td>そ so</td></tr>
-        <tr class="t"><td>t</td><td>た ta</td><td>ち chi</td><td>つ tsu</td><td>て te</td><td>と to</td></tr>
-        <tr class="n"><td>n</td><td>な na</td><td>に ni</td><td>ぬ nu</td><td>ね ne</td><td>の no</td></tr>
-        <tr class="h"><td>h</td><td>は ha</td><td>ひ hi</td><td>ふ fu</td><td>へ he</td><td>ほ ho</td></tr>
-        <tr class="m"><td>m</td><td>ま ma</td><td>み mi</td><td>む mu</td><td>め me</td><td>も mo</td></tr>
-        <tr class="y"><td>y</td><td>や ya</td><td>–</td><td>ゆ yu</td><td>–</td><td>よ yo</td></tr>
-        <tr class="r"><td>r</td><td>ら ra</td><td>り ri</td><td>る ru</td><td>れ re</td><td>ろ ro</td></tr>
-        <tr class="w"><td>w</td><td>わ wa</td><td>–</td><td>–</td><td>–</td><td>を wo</td></tr>
-        <tr style="background:#ddd"><td>n</td><td colspan="5">ん n</td></tr>
-        <tr class="g"><td>g</td><td>が ga</td><td>ぎ gi</td><td>ぐ gu</td><td>げ ge</td><td>ご go</td></tr>
-        <tr class="z"><td>z</td><td>ざ za</td><td>じ ji</td><td>ず zu</td><td>ぜ ze</td><td>ぞ zo</td></tr>
-        <tr class="d"><td>d</td><td>だ da</td><td>ぢ ji</td><td>づ zu</td><td>で de</td><td>ど do</td></tr>
-        <tr class="b"><td>b</td><td>ば ba</td><td>び bi</td><td>ぶ bu</td><td>べ be</td><td>ぼ bo</td></tr>
-        <tr class="p"><td>p</td><td>ぱ pa</td><td>ぴ pi</td><td>ぷ pu</td><td>ぺ pe</td><td>ぽ po</td></tr>
+        <tr class="a"><td>∅</td><td class="clickable">あ a</td><td class="clickable">い i</td><td class="clickable">う u</td><td class="clickable">え e</td><td class="clickable">お o</td></tr>
+        <tr class="k"><td>k</td><td class="clickable">か ka</td><td class="clickable">き ki</td><td class="clickable">く ku</td><td class="clickable">け ke</td><td class="clickable">こ ko</td></tr>
+        <tr class="s"><td>s</td><td class="clickable">さ sa</td><td class="clickable">し shi</td><td class="clickable">す su</td><td class="clickable">せ se</td><td class="clickable">そ so</td></tr>
+        <tr class="t"><td>t</td><td class="clickable">た ta</td><td class="clickable">ち chi</td><td class="clickable">つ tsu</td><td class="clickable">て te</td><td class="clickable">と to</td></tr>
+        <tr class="n"><td>n</td><td class="clickable">な na</td><td class="clickable">に ni</td><td class="clickable">ぬ nu</td><td class="clickable">ね ne</td><td class="clickable">の no</td></tr>
+        <tr class="h"><td>h</td><td class="clickable">は ha</td><td class="clickable">ひ hi</td><td class="clickable">ふ fu</td><td class="clickable">へ he</td><td class="clickable">ほ ho</td></tr>
+        <tr class="m"><td>m</td><td class="clickable">ま ma</td><td class="clickable">み mi</td><td class="clickable">む mu</td><td class="clickable">め me</td><td class="clickable">も mo</td></tr>
+        <tr class="y"><td>y</td><td class="clickable">や ya</td><td>–</td><td class="clickable">ゆ yu</td><td>–</td><td class="clickable">よ yo</td></tr>
+        <tr class="r"><td>r</td><td class="clickable">ら ra</td><td class="clickable">り ri</td><td class="clickable">る ru</td><td class="clickable">れ re</td><td class="clickable">ろ ro</td></tr>
+        <tr class="w"><td>w</td><td class="clickable">わ wa</td><td>–</td><td>–</td><td>–</td><td class="clickable">を wo</td></tr>
+        <tr style="background:#ddd"><td>n</td><td colspan="5" class="clickable">ん n</td></tr>
+        <tr class="g"><td>g</td><td class="clickable">が ga</td><td class="clickable">ぎ gi</td><td class="clickable">ぐ gu</td><td class="clickable">げ ge</td><td class="clickable">ご go</td></tr>
+        <tr class="z"><td>z</td><td class="clickable">ざ za</td><td class="clickable">じ ji</td><td class="clickable">ず zu</td><td class="clickable">ぜ ze</td><td class="clickable">ぞ zo</td></tr>
+        <tr class="d"><td>d</td><td class="clickable">だ da</td><td class="clickable">ぢ ji</td><td class="clickable">づ zu</td><td class="clickable">で de</td><td class="clickable">ど do</td></tr>
+        <tr class="b"><td>b</td><td class="clickable">ば ba</td><td class="clickable">び bi</td><td class="clickable">ぶ bu</td><td class="clickable">べ be</td><td class="clickable">ぼ bo</td></tr>
+        <tr class="p"><td>p</td><td class="clickable">ぱ pa</td><td class="clickable">ぴ pi</td><td class="clickable">ぷ pu</td><td class="clickable">ぺ pe</td><td class="clickable">ぽ po</td></tr>
     </table>
     <br>
     <button class="secondary-btn" onclick="document.getElementById('p').style.display='none'">Sulje</button>
@@ -363,12 +426,37 @@ const hand=[
 ['ぱ','pa','p'],['ぴ','pi','p'],['ぷ','pu','p'],['ぺ','pe','p'],['ぽ','po','p']
 ];
 
+// DOM-elementit
+const card = document.getElementById('card');
+const ans = document.getElementById('ans');
+const fb = document.getElementById('fb');
+const sc = document.getElementById('sc');
+const st = document.getElementById('st');
+const ac = document.getElementById('ac');
+const audioModeSelect = document.getElementById('audioMode');
+const dakCheckbox = document.getElementById('dak');
+const handaCheckbox = document.getElementById('handa');
+
 let pool=[];
 let cur;
 let score=0;
 let streak=0;
 let total=0;
 let right=0;
+
+// Äänisynteesitoiminto
+function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'ja-JP';
+    msg.rate = 0.9;
+    window.speechSynthesis.speak(msg);
+}
+
+function speakCurrent() {
+    if (cur) speak(cur[0]);
+}
 
 function startGame(){
     pool=[];
@@ -380,8 +468,8 @@ function startGame(){
         if(sel.includes(x[2])) pool.push(x);
     }
 
-    if(document.getElementById('dak').checked) pool.push(...dak);
-    if(document.getElementById('handa').checked) pool.push(...hand);
+    if(dakCheckbox.checked) pool.push(...dak);
+    if(handaCheckbox.checked) pool.push(...hand);
 
     if(pool.length === 0){
         alert('Valitse vähintään yksi merkistö!');
@@ -410,6 +498,11 @@ function next(){
 
     ans.value = '';
     ans.focus();
+
+    const mode = audioModeSelect.value;
+    if (mode === 'hint') {
+        speak(cur[0]);
+    }
 }
 
 function checkAnswer(){
@@ -417,11 +510,18 @@ function checkAnswer(){
 
     total++;
 
-    if(ans.value.trim().toLowerCase() === cur[1]){
+    const isCorrect = ans.value.trim().toLowerCase() === cur[1];
+    const mode = audioModeSelect.value;
+
+    if(isCorrect){
         score++;
         right++;
         streak++;
         fb.innerHTML = '<div class="ok">✅ ' + cur[0] + ' = ' + cur[1] + '</div>';
+        
+        if (mode === 'correct') {
+            speak(cur[0]);
+        }
     } else {
         streak = 0;
         pool.push(cur);
@@ -437,6 +537,17 @@ function checkAnswer(){
 
 ans.addEventListener('keydown', e => {
     if(e.key === 'Enter') checkAnswer();
+});
+
+// Taulukon solujen klikkauskuuntelija
+document.querySelectorAll('.hiraganaTable td.clickable').forEach(td => {
+    td.addEventListener('click', () => {
+        const text = td.textContent.trim();
+        const kana = text.split(' ')[0];
+        if (kana && kana !== '–') {
+            speak(kana);
+        }
+    });
 });
 
 startGame();
