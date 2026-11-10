@@ -429,7 +429,6 @@ button.action-btn:hover {
 </div>
 
 <script>
-
 const hanziMap = {
     0: '零', 1: '一', 2: '二', 3: '三', 4: '四',
     5: '五', 6: '六', 7: '七', 8: '八', 9: '九'
@@ -460,7 +459,6 @@ let chineseVoice = null;
 function loadVoices() {
     if (!('speechSynthesis' in window)) return;
     const voices = window.speechSynthesis.getVoices();
-    // Etsitään ensisijaisesti kiinankielinen ääni
     chineseVoice = voices.find(v => v.lang === 'zh-CN' || v.lang.startsWith('zh')) || voices[0];
 }
 
@@ -497,7 +495,6 @@ function speakText(text, onEndCallback) {
         utterance.onend = finish;
         utterance.onerror = finish;
 
-        // Varmuustoiminto Firefoxin bugien varalle: jos onend ei jostain syystä laukea, vapautetaan ketju 1.5 sekunnissa
         setTimeout(finish, 1500);
 
         window.speechSynthesis.speak(utterance);
@@ -769,4 +766,51 @@ function checkAnswer() {
     if (userStr === targetHanziStr) {
         isLocked = true;
 
-        score
+        score += 10;
+        streak += 1;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('correct'));
+
+        feedback.textContent = 'Oikein! 做得好!';
+        feedback.style.color = '#16a34a';
+
+        setTimeout(() => {
+            playFullAnswerWithHighlight(0, slots, () => {
+                setTimeout(() => {
+                    newRound();
+                }, 800);
+            });
+        }, 300);
+
+    } else {
+        streak = 0;
+
+        document.getElementById('streak').textContent = streak;
+
+        slots.forEach(slot => slot.classList.add('error'));
+
+        feedback.textContent = 'Väärin, yritä uudelleen!';
+        feedback.style.color = '#ef4444';
+
+        setTimeout(() => {
+            if (!isLocked) {
+                document.querySelectorAll('.slot').forEach(slot => {
+                    slot.classList.remove('error');
+                });
+            }
+        }, 500);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', newRound);
+
+if (document.readyState !== 'loading') {
+    newRound();
+}
+</script>
+
+</body>
+</html>
