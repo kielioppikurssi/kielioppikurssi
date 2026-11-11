@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Svensk talutmaning – Skrivövning</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Koko ruudun aloitus-popup */
+.welcome-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 34, 64, 0.90);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 1;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.welcome-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.welcome-modal {
+    background: #fdfbf7;
+    max-width: 580px;
+    width: 100%;
+    padding: 35px 30px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    border: 2px solid #fecc00;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.welcome-modal h2 {
+    font-size: 26px;
+    color: #0051ba;
+    margin-bottom: 8px;
+    font-family: 'Georgia', serif;
+}
+
+.welcome-modal p {
+    color: #334155;
+    font-size: 15px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.welcome-diff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.welcome-diff-btn {
+    background: #eef2ff;
+    border: 2px solid #0051ba;
+    padding: 14px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #002e66;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.welcome-diff-btn:hover {
+    background: #dbeafe;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 81, 186, 0.3);
+}
+
+.welcome-diff-btn.surstromming-btn {
+    background: linear-gradient(135deg, #450a0a 0%, #1c0505 100%);
+    border-color: #dc2626;
+    color: #fca5a5;
+}
+
+.welcome-diff-btn.surstromming-btn:hover {
+    background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);
+    border-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.6);
+}
+
+.welcome-diff-sub {
+    font-size: 13px;
+    opacity: 0.85;
+    font-weight: normal;
+}
+
+/* Päävalikko- ja toimintonapit */
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.top-right-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.päävalikko-btn, .toggle-sound-btn, .toggle-speech-btn, .toggle-sidebar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fdfbf7;
+    color: #003366;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #fecc00;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.päävalikko-btn:hover, .toggle-sound-btn:hover, .toggle-speech-btn:hover, .toggle-sidebar-btn:hover {
+    background: #fffbeb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.toggle-sound-btn.muted, .toggle-speech-btn.muted {
+    color: #b91c1c;
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.päävalikko-btn svg, .toggle-sound-btn svg, .toggle-speech-btn svg, .toggle-sidebar-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #001f3f 0%, #000c1a 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 25px;
+    max-width: 1150px;
+    width: 100%;
+    transition: grid-template-columns 0.3s ease;
+}
+
+.container.sidebar-hidden {
+    grid-template-columns: 1fr;
+}
+
+@media (max-width: 850px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+    .container.sidebar-hidden {
+        grid-template-columns: 1fr;
+    }
+}
+
+.main-panel {
+    background: #fdfbf7;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #fecc00;
+}
+
+h1 {
+    font-size: 28px;
+    color: #0051ba;
+    margin-bottom: 5px;
+    font-family: 'Georgia', serif;
+}
+
+.subtitle {
+    color: #475569;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Pelimoodin valinta pääruudulla */
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.mode-btn {
+    background: #eef2ff;
+    border: 2px solid #0051ba;
+    color: #002e66;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mode-btn.active {
+    background: #0051ba;
+    color: #ffffff;
+    border-color: #fecc00;
+}
+
+/* Vaikeustasovalitsimen tyylit */
+.difficulty-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.diff-btn {
+    background: #f0fdf4;
+    border: 1px solid #0051ba;
+    color: #003366;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.diff-btn:hover {
+    background: #dbeafe;
+}
+
+.diff-btn.active {
+    background: #0051ba;
+    color: #ffffff;
+    border-color: #fecc00;
+    box-shadow: 0 4px 10px rgba(0, 81, 186, 0.3);
+}
+
+.diff-btn.surstromming.active {
+    background: linear-gradient(135deg, #991b1b 0%, #450a0a 100%);
+    color: #ffffff;
+    border-color: #ef4444;
+    box-shadow: 0 4px 15px rgba(153, 27, 27, 0.6);
+}
+
+.diff-sub {
+    font-size: 9px;
+    opacity: 0.85;
+    font-weight: normal;
+}
+
+/* Ruotsalainen kannustuslaatikko */
+.encouragement-box {
+    background: linear-gradient(135deg, #fefce8 0%, #fef08a 100%);
+    border: 1px solid #fecc00;
+    border-radius: 12px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    color: #713f12;
+    box-shadow: 0 2px 8px rgba(254, 204, 0, 0.2);
+}
+
+.encouragement-box.surstromming-theme {
+    background: linear-gradient(135deg, #2a0808 0%, #450a0a 100%);
+    border-color: #dc2626;
+    color: #fca5a5;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+}
+
+.enc-sv {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.enc-fi {
+    font-size: 13px;
+    font-style: italic;
+}
+
+.target-box {
+    background: #f0f9ff;
+    border: 2px dashed #0051ba;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.target-number {
+    font-size: 42px;
+    font-weight: bold;
+    color: #002e66;
+    margin-bottom: 10px;
+    font-family: 'Georgia', serif;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    letter-spacing: 1px;
+}
+
+.num-digit {
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.num-digit:hover {
+    background: #bae6fd;
+    color: #000;
+}
+
+.num-zero {
+    cursor: default;
+    padding: 2px 2px;
+    color: #002e66;
+}
+.num-zero:hover {
+    background: transparent;
+}
+
+.num-digit.highlighted {
+    background: #0051ba !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(0, 81, 186, 0.8);
+}
+
+.click-hint {
+    font-size: 12px;
+    color: #0369a1;
+    font-style: italic;
+}
+
+.input-section {
+    margin-bottom: 25px;
+}
+
+.answer-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 14px 18px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border: 3px solid #0051ba;
+    border-radius: 12px;
+    background: #fff;
+    color: #001f3f;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.answer-input:focus {
+    border-color: #fecc00;
+    box-shadow: 0 0 12px rgba(254, 204, 0, 0.8);
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button.action-btn {
+    padding: 10px 22px;
+    background: #0051ba;
+    border: 1px solid #fecc00;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button.action-btn:hover {
+    background: #003366;
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.3);
+}
+
+.feedback {
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 30px;
+    margin-bottom: 15px;
+    transition: opacity 0.3s;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: #f0f9ff;
+    border: 1px solid #0051ba;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0369a1;
+}
+
+/* Sivupalkki (Vihjelista) */
+.sidebar {
+    background: #fdfbf7;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    max-height: 650px;
+    overflow-y: auto;
+    border: 3px solid #fecc00;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.sidebar.hidden {
+    display: none;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    color: #0051ba;
+    border-bottom: 2px solid #eef2ff;
+    padding-bottom: 8px;
+    font-family: 'Georgia', serif;
+}
+
+.sidebar-section-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #0369a1;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.swedish-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.swedish-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: #f0f9ff;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+.swedish-item:hover {
+    background: #bae6fd;
+}
+
+.swedish-char {
+    font-size: 15px;
+    font-weight: bold;
+    color: #002e66;
+}
+
+.swedish-num {
+    background: #fecc00;
+    color: #002e66;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+@keyframes successPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.screen-flash-error {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(185, 28, 28, 0.45);
+    z-index: 9999;
+    pointer-events: none;
+    animation: flashErrorAnim 0.45s ease-out forwards;
+}
+
+@keyframes flashErrorAnim {
+    0% { opacity: 1; backdrop-filter: brightness(1.8) blur(4px); }
+    100% { opacity: 0; backdrop-filter: brightness(1) blur(0px); }
+}
+
+.screen-burst-success {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, rgba(254,204,0,0.6) 0%, rgba(0,81,186,0.4) 50%, rgba(255,255,255,0) 100%);
+    z-index: 9999;
+    pointer-events: none;
+    animation: burstSuccessAnim 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes burstSuccessAnim {
+    0% { transform: scale(0.2); opacity: 1; filter: brightness(2); }
+    50% { opacity: 0.9; }
+    100% { transform: scale(2.2); opacity: 0; filter: brightness(1); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- POPUP 1: Pelimoodin valinta -->
+<div id="modeOverlay" class="welcome-overlay">
+    <div class="welcome-modal">
+        <h2>🇸🇪 Välkommen!</h2>
+        <p>Valitse pelimoodi ennen aloitusta:</p>
+        
+        <div class="welcome-diff-list">
+            <button class="welcome-diff-btn" onclick="selectGameMode('cardinal')">
+                <span>🔢 Perusluvut (Grundtal)</span>
+                <span class="welcome-diff-sub">en, två, tre...</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectGameMode('ordinal')">
+                <span>🥇 Järjestysluvut (Ordningstal)</span>
+                <span class="welcome-diff-sub">första, andra, tredje...</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- POPUP 2: Vaikeustason valinta -->
+<div id="diffOverlay" class="welcome-overlay hidden">
+    <div class="welcome-modal">
+        <h2>🇸🇪 Välj svårighetsgrad!</h2>
+        <p>Valitse ruotsalainen vaikeustasosi:</p>
+        
+        <div class="welcome-diff-list">
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(0)">
+                <span>0. 🧆 Köttbullar (Lihapullamestari)</span>
+                <span class="welcome-diff-sub">0 – 10</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(1)">
+                <span>1. 📦 IKEA (Kallaxin kasaaja)</span>
+                <span class="welcome-diff-sub">0 – 100</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(2)">
+                <span>2. 🐴 Dalahäst (Puuhevosen veistäjä)</span>
+                <span class="welcome-diff-sub">0 – 1 000</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(3)">
+                <span>3. 🚘 Volvo (Turvallinen maantiekiitäjä)</span>
+                <span class="welcome-diff-sub">0 – 10 000</span>
+            </button>
+            <button class="welcome-diff-btn" onclick="selectInitialDifficulty(4)">
+                <span>4. ✈️ Saab (Vauhdikas hävittäjälentäjä)</span>
+                <span class="welcome-diff-sub">0 – 1 000 000</span>
+            </button>
+            <button class="welcome-diff-btn surstromming-btn" onclick="selectInitialDifficulty(5)">
+                <span>5. 🐟 Surströmming (Äärimmäinen hapansilakkahaaste)</span>
+                <span class="welcome-diff-sub">0 – 100 000 000 (Peltipurkki räjähtää!)</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="mainContainer" class="container">
+    <div class="main-panel">
+        <div class="top-actions">
+<a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="päävalikko-btn">                <svg viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                Päävalikkoon
+            </a>
+            <div class="top-right-group">
+                <button class="toggle-sidebar-btn" onclick="toggleSidebar()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                    <span id="sidebarBtnText">Sulje vihjeet</span>
+                </button>
+                <button id="toggleSoundBtn" class="toggle-sound-btn" onclick="toggleSound()">
+                    <svg viewBox="0 0 24 24">
+                        <path id="soundIconPath" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                    <span id="soundBtnText">Äänet: Päällä</span>
+                </button>
+                <button id="toggleSpeechBtn" class="toggle-speech-btn" onclick="toggleSpeech()">
+                    <svg viewBox="0 0 24 24">
+                        <path id="speechIconPath" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                    </svg>
+                    <span id="speechBtnText">Luku: Päällä</span>
+                </button>
+            </div>
+        </div>
+
+        <h1>🇸🇪 Ruotsin numeropulma</h1>
+        <p class="subtitle" id="gameSubtitle">Kirjoita näytettävä luku ruotsiksi!</p>
+
+        <!-- Pelimoodin vaihto pääruudulla -->
+        <div class="mode-selector">
+            <button id="modeCardinalBtn" class="mode-btn active" onclick="switchGameMode('cardinal')">Perusluvut</button>
+            <button id="modeOrdinalBtn" class="mode-btn" onclick="switchGameMode('ordinal')">Järjestysluvut</button>
+        </div>
+
+        <!-- Vaikeustasojen valinta -->
+        <div class="difficulty-selector">
+            <button id="diffBtn0" class="diff-btn active" onclick="setDifficulty(0, this)">
+                <span>0. Köttbullar</span>
+                <span class="diff-sub">0–10</span>
+            </button>
+            <button id="diffBtn1" class="diff-btn" onclick="setDifficulty(1, this)">
+                <span>1. IKEA</span>
+                <span class="diff-sub">0–100</span>
+            </button>
+            <button id="diffBtn2" class="diff-btn" onclick="setDifficulty(2, this)">
+                <span>2. Dalahäst</span>
+                <span class="diff-sub">0–1k</span>
+            </button>
+            <button id="diffBtn3" class="diff-btn" onclick="setDifficulty(3, this)">
+                <span>3. Volvo</span>
+                <span class="diff-sub">0–10k</span>
+            </button>
+            <button id="diffBtn4" class="diff-btn" onclick="setDifficulty(4, this)">
+                <span>4. Saab</span>
+                <span class="diff-sub">0–1M</span>
+            </button>
+            <button id="diffBtn5" class="diff-btn surstromming" onclick="setDifficulty(5, this)">
+                <span>5. Surströmming</span>
+                <span class="diff-sub">0–100M</span>
+            </button>
+        </div>
+
+        <!-- Ruotsalainen kannustusosio -->
+        <div id="encBox" class="encouragement-box">
+            <div id="encSv" class="enc-sv">Tappa inte sugen, skriv i stället!</div>
+            <div id="encFi" class="enc-fi">"Älä heitä kirvestä kaivoon, kirjoita mieluummin!"</div>
+        </div>
+
+        <div class="target-box">
+            <div id="targetNumber" class="target-number">0</div>
+            <div class="click-hint">💡 Klikkaa lukualuetta (esim. tuhansia tai satoja) kuullaksesi sen erikseen!</div>
+        </div>
+
+        <!-- Kirjoituskenttä -->
+        <div class="input-section">
+            <input type="text" id="answerInput" class="answer-input" placeholder="Kirjoita vastaus tähän (ruotsiksi)..." autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="controls">
+            <button class="action-btn" onclick="checkAnswer()">Tarkista vastaus</button>
+            <button class="action-btn" onclick="clearInput()">Tyhjennä</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+
+        <div class="stats">
+            <div>Pisteet: <span id="score">0</span></div>
+            <div>Putki: <span id="streak">0</span></div>
+        </div>
+    </div>
+
+    <!-- Oikean puolen avattava vihjelista -->
+    <div id="sidebarPanel" class="sidebar">
+        <h2 id="sidebarTitle">📜 Ruotsin numerot</h2>
+        <div id="swedishList" class="swedish-list"></div>
+    </div>
+</div>
+
+<script>
+// --- ÄÄNITEHOSTEET JA PUHESYNTEESI ---
+let audioCtx = null;
+let soundEnabled = true;
+let speechEnabled = true;
+let sidebarVisible = true;
+let gameMode = 'cardinal'; // 'cardinal' tai 'ordinal'
+
+function selectGameMode(mode) {
+    gameMode = mode;
+    document.getElementById('modeOverlay').classList.add('hidden');
+    document.getElementById('diffOverlay').classList.remove('hidden');
+    updateModeUI();
+}
+
+function selectInitialDifficulty(level) {
+    const targetBtn = document.getElementById(`diffBtn${level}`);
+    if (targetBtn) setDifficulty(level, targetBtn);
+    const overlay = document.getElementById('diffOverlay');
+    if (overlay) overlay.classList.add('hidden');
+}
+
+function switchGameMode(mode) {
+    gameMode = mode;
+    updateModeUI();
+    newRound();
+}
+
+function updateModeUI() {
+    const cardinalBtn = document.getElementById('modeCardinalBtn');
+    const ordinalBtn = document.getElementById('modeOrdinalBtn');
+    const subtitle = document.getElementById('gameSubtitle');
+    const sidebarTitle = document.getElementById('sidebarTitle');
+
+    if (gameMode === 'ordinal') {
+        cardinalBtn.classList.remove('active');
+        ordinalBtn.classList.add('active');
+        subtitle.textContent = "Kirjoita näytettävä järjestysluku ruotsiksi (esim. 1. = första)!";
+        sidebarTitle.textContent = "📜 Ruotsin järjestysluvut";
+    } else {
+        cardinalBtn.classList.add('active');
+        ordinalBtn.classList.remove('active');
+        subtitle.textContent = "Kirjoita näytettävä luku ruotsiksi!";
+        sidebarTitle.textContent = "📜 Ruotsin numerot";
+    }
+    updateSidebarList();
+}
+
+function toggleSidebar() {
+    sidebarVisible = !sidebarVisible;
+    const container = document.getElementById('mainContainer');
+    const sidebar = document.getElementById('sidebarPanel');
+    const btnText = document.getElementById('sidebarBtnText');
+
+    if (sidebarVisible) {
+        container.classList.remove('sidebar-hidden');
+        sidebar.classList.remove('hidden');
+        btnText.textContent = 'Sulje vihjeet';
+    } else {
+        container.classList.add('sidebar-hidden');
+        sidebar.classList.add('hidden');
+        btnText.textContent = 'Avaa vihjeet';
+    }
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('toggleSoundBtn');
+    const btnText = document.getElementById('soundBtnText');
+    const iconPath = document.getElementById('soundIconPath');
+
+    if (soundEnabled) {
+        btn.classList.remove('muted');
+        btnText.textContent = 'Äänet: Päällä';
+        iconPath.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+    } else {
+        btn.classList.add('muted');
+        btnText.textContent = 'Äänet: Pois';
+        iconPath.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C22.63 14.85 23 13.47 23 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+    }
+}
+
+function toggleSpeech() {
+    speechEnabled = !speechEnabled;
+    const btn = document.getElementById('toggleSpeechBtn');
+    const btnText = document.getElementById('speechBtnText');
+    const iconPath = document.getElementById('speechIconPath');
+
+    if (speechEnabled) {
+        btn.classList.remove('muted');
+        btnText.textContent = 'Luku: Päällä';
+        iconPath.setAttribute('d', 'M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z');
+    } else {
+        btn.classList.add('muted');
+        btnText.textContent = 'Luku: Pois';
+        iconPath.setAttribute('d', 'M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.17l5.98 5.98zM4.27 3L3 4.27l6 6V11c0 1.66 1.34 3 3 3 .23 0 .44-.03.65-.08l1.66 1.66c-.71.27-1.48.42-2.31.42-3 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z');
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+}
+
+function getAudioContext() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+}
+
+function playPopSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+    } catch(e) {}
+}
+
+function playErrorSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+    } catch(e) {}
+}
+
+function playSuccessBurstSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+            gain.gain.setValueAtTime(0.2, now + idx * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.06);
+            osc.stop(now + idx * 0.06 + 0.3);
+        });
+    } catch(e) {}
+}
+
+// --- RUOTSIN NUMERODATA ---
+const numWords = {
+    0: "noll",
+    1: "ett", 2: "två", 3: "tre", 4: "fyra", 5: "fem",
+    6: "sex", 7: "sju", 8: "åtta", 9: "nio", 10: "tio",
+    11: "elva", 12: "tolv", 13: "tretton", 14: "fjorton", 15: "femton",
+    16: "sexton", 17: "sjutton", 18: "arton", 19: "nitton",
+    20: "tjugo", 30: "trettio", 40: "fyrtio", 50: "femtio", 60: "sextio",
+    70: "sjutti", 80: "åttio", 90: "nittio"
+};
+
+const ordWords = {
+    0: "nollte",
+    1: "första", 2: "andra", 3: "tredje", 4: "fjärde", 5: "femte",
+    6: "sjätte", 7: "sjunde", 8: "åttonde", 9: "nionde", 10: "tionde",
+    11: "elfte", 12: "tolvte", 13: "trettonde", 14: "fjortonde", 15: "femtonde",
+    16: "sextonde", 17: "sjuttonde", 18: "artonde", 19: "nittonde",
+    20: "tjugonde", 30: "trettionde", 40: "fyrtionde", 50: "femtionde", 60: "sextionde",
+    70: "sjuttionde", 80: "åttionde", 90: "nittionde"
+};
+
+const swedishEncouragements = {
+    0: [
+        { sv: "Lagom är bäst, men fler köttbullar är bättre!", fi: "Kohtuus on paras, mutta enemmän lihapullia on parempi!" },
+        { sv: "En köttbulle i handen är bättre än tio i pannan.", fi: "Yksi lihapulla kädessä on parempi kuin kymmenen pannulla." }
+    ],
+    1: [
+        { sv: "Det saknas alltid en skruv i IKEA-monteringen...", fi: "IKEA-kokoamisohjeesta puuttuu aina yksi ruuvi..." },
+        { sv: "Ta en fika innan du löser detta!", fi: "Ota fikataauko ennen kuin ratkaiset tämän!" }
+    ],
+    2: [
+        { sv: "Till och med dalahästen är stolt över dina framsteg!", fi: "Jopa Taalainmaan hevonenkin on ylpeä edistymisestäsi!" }
+    ],
+    3: [
+        { sv: "Volvo rullar säkert mot rätt svar!", fi: "Volvo rullaa turvallisesti kohti oikeaa vastausta!" }
+    ],
+    4: [
+{ sv: "Snabbare än ett stridsflygplan genom ljudvallen!", fi: "Nopeammin kuin hävittäjä läpi äänivallin!" }    ],
+    5: [
+        { sv: "Varning! Öppna inte burken inomhus!", fi: "Varoitus! Älä avaa purkkia sisätiloissa!" },
+        { sv: "Surströmming kräver starkt sinne och bra minne!", fi: "Hapansilli vaatii vahvaa mieltä ja hyvää muistia!" }
+    ]
+};
+
+// Vaaditut vihjetiedot sivupalkkiin (Perusluvut)
+const referenceDataCardinal = [
+    { title: "Numerot 0–20", items: [
+        { num: '0', sv: 'noll' }, { num: '1', sv: 'en / ett' }, { num: '2', sv: 'två' },
+        { num: '3', sv: 'tre' }, { num: '4', sv: 'fyra' }, { num: '5', sv: 'fem' },
+        { num: '6', sv: 'sex' }, { num: '7', sv: 'sju' }, { num: '8', sv: 'åtta' },
+        { num: '9', sv: 'nio' }, { num: '10', sv: 'tio' }, { num: '11', sv: 'elva' },
+        { num: '12', sv: 'tolv' }, { num: '13', sv: 'tretton' }, { num: '14', sv: 'fjorton' },
+        { num: '15', sv: 'femton' }, { num: '16', sv: 'sexton' }, { num: '17', sv: 'sjutton' },
+        { num: '18', sv: 'arton' }, { num: '19', sv: 'nitton' }, { num: '20', sv: 'tjugo' }
+    ]},
+    { title: "Kymmenet (20–90)", items: [
+        { num: '20', sv: 'tjugo' }, { num: '30', sv: 'trettio' }, { num: '40', sv: 'fyrtio' },
+        { num: '50', sv: 'femtio' }, { num: '60', sv: 'sextio' }, { num: '70', sv: 'sjuttio' },
+        { num: '80', sv: 'åttio' }, { num: '90', sv: 'nittio' }
+    ]},
+    { title: "Sataset & Tuhannet", items: [
+        { num: '100', sv: 'ett hundra' }, { num: '200', sv: 'tvåhundra' },
+        { num: '1 000', sv: 'ett tusen' }, { num: '2 000', sv: 'två tusen' }
+    ]},
+    { title: "Suuret luvut", items: [
+        { num: '10 000', sv: 'tio tusen' }, { num: '100 000', sv: 'ett hundra tusen' },
+        { num: '1 000 000', sv: 'en miljon' }, { num: '10 000 000', sv: 'tio miljoner' },
+        { num: '100 000 000', sv: 'ett hundra miljoner' }
+    ]}
+];
+
+// Vaaditut vihjetiedot sivupalkkiin (Järjestysluvut)
+const referenceDataOrdinal = [
+    { title: "Järjestysluvut 1.–20.", items: [
+        { num: '1.', sv: 'första' }, { num: '2.', sv: 'andra' }, { num: '3.', sv: 'tredje' },
+        { num: '4.', sv: 'fjärde' }, { num: '5.', sv: 'femte' }, { num: '6.', sv: 'sjätte' },
+        { num: '7.', sv: 'sjunde' }, { num: '8.', sv: 'åttonde' }, { num: '9.', sv: 'nionde' },
+        { num: '10.', sv: 'tionde' }, { num: '11.', sv: 'elfte' }, { num: '12.', sv: 'tolvte' },
+        { num: '13.', sv: 'trettonde' }, { num: '14.', sv: 'fjortonde' }, { num: '15.', sv: 'femtonde' },
+        { num: '16.', sv: 'sextonde' }, { num: '17.', sv: 'sjuttonde' }, { num: '18.', sv: 'artonde' },
+        { num: '19.', sv: 'nittonde' }, { num: '20.', sv: 'tjugonde' }
+    ]},
+    { title: "Kymmenet (20.–90.)", items: [
+        { num: '20.', sv: 'tjugonde' }, { num: '30.', sv: 'trettionde' }, { num: '40.', sv: 'fyrtionde' },
+        { num: '50.', sv: 'femtionde' }, { num: '60.', sv: 'sextionde' }, { num: '70.', sv: 'sjuttionde' },
+        { num: '80.', sv: 'åttionde' }, { num: '90.', sv: 'nittionde' }
+    ]},
+    { title: "Säännöt", items: [
+        { num: '1-11', sv: 'Omat muodot (första, andra...)' },
+        { num: '12-19', sv: 'Perusluku + -de' },
+        { num: '20-90', sv: 'Kymmenen järjestysmuoto' },
+        { num: '21+', sv: 'Kymmenen perusmuoto + 1-9 järjestysmuoto (esim. tjugoförsta)' },
+        { num: '100+', sv: 'Hundra: hundrade, Tusen: tusende' }
+    ]}
+];
+
+let currentDifficulty = 0;
+let currentNumber = 0;
+let targetSvStr = '';
+let score = 0;
+let streak = 0;
+let swedishVoice = null;
+
+function loadVoices() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    swedishVoice = voices.find(v => v.lang === 'sv-SE' || v.lang.startsWith('sv')) || voices[0];
+}
+
+if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+}
+
+function speakText(text, onEndCallback) {
+    if (!speechEnabled) {
+        if (onEndCallback) onEndCallback();
+        return;
+    }
+    if (!('speechSynthesis' in window)) {
+        if (onEndCallback) onEndCallback();
+        return;
+    }
+
+    try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (swedishVoice) utterance.voice = swedishVoice;
+        utterance.lang = 'sv-SE';
+        utterance.rate = 0.85;
+
+        let finished = false;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            if (onEndCallback) onEndCallback();
+        };
+
+        utterance.onend = finish;
+        utterance.onerror = finish;
+        setTimeout(finish, 1500);
+
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        if (onEndCallback) onEndCallback();
+    }
+}
+
+function updateEncouragement() {
+    const list = swedishEncouragements[currentDifficulty] || swedishEncouragements[0];
+    const randomItem = list[Math.floor(Math.random() * list.length)];
+    document.getElementById('encSv').textContent = randomItem.sv;
+    document.getElementById('encFi').textContent = `"${randomItem.fi}"`;
+
+    const box = document.getElementById('encBox');
+    if (currentDifficulty === 5) box.classList.add('surstromming-theme');
+    else box.classList.remove('surstromming-theme');
+}
+
+function updateSidebarList() {
+    const container = document.getElementById('swedishList');
+    container.innerHTML = '';
+    const refData = (gameMode === 'ordinal') ? referenceDataOrdinal : referenceDataCardinal;
+
+    refData.forEach(section => {
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'sidebar-section-title';
+        titleDiv.textContent = section.title;
+        container.appendChild(titleDiv);
+
+        section.items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'swedish-item';
+            div.innerHTML = `<span class="swedish-num">${item.num}</span><span class="swedish-char">${item.sv}</span>`;
+            container.appendChild(div);
+        });
+    });
+}
+
+function setDifficulty(level, btnEl) {
+    currentDifficulty = level;
+    document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    newRound();
+}
+
+// Apufunktio ruotsin alle 1000 lukusanoille (yhdyssanoina)
+function getUnderThousandString(n) {
+    if (n === 0) return "";
+    let str = "";
+    const hundreds = Math.floor(n / 100);
+    const remainder = n % 100;
+
+    if (hundreds > 0) {
+        if (hundreds === 1) str += "hundra";
+        else str += numWords[hundreds] + "hundra";
+    }
+
+    if (remainder > 0) {
+        if (remainder <= 20) {
+            str += numWords[remainder];
+        } else {
+            const tens = Math.floor(remainder / 10) * 10;
+            const units = remainder % 10;
+            str += numWords[tens];
+            if (units > 0) {
+                str += numWords[units];
+            }
+        }
+    }
+    return str;
+}
+
+function getNumberBreakdown(n) {
+    if (n === 0) return [{ text: numWords[0], numericVal: 0, display: "0" }];
+
+    let parts = [];
+    let tempN = n;
+
+    // Miljoonat
+    if (tempN >= 1000000) {
+        const mils = Math.floor(tempN / 1000000);
+        let milWord = mils === 1 ? "en miljon" : getUnderThousandString(mils) + " miljoner";
+        parts.push({ text: milWord, numericVal: mils * 1000000, display: mils.toString() + "000000" });
+        tempN %= 1000000;
+    }
+
+    // Tuhannet
+    if (tempN >= 1000) {
+        const ths = Math.floor(tempN / 1000);
+        let thWord = ths === 1 ? "ett tusen" : getUnderThousandString(ths) + " tusen";
+        parts.push({ text: thWord, numericVal: ths * 1000, display: ths.toString() + "000" });
+        tempN %= 1000;
+    }
+
+    // Sataset ja alemmat
+    if (tempN > 0) {
+        parts.push({ text: getUnderThousandString(tempN), numericVal: tempN, display: tempN.toString() });
+    }
+
+    return parts;
+}
+
+function numberToSwedish(n) {
+    if (n === 0) return { sv: "noll" };
+    let breakdown = getNumberBreakdown(n);
+    return { sv: breakdown.map(p => p.text).join(" ") };
+}
+
+// Järjestysluvun muunnos
+function numberToSwedishOrdinal(n) {
+    if (n === 0) return "nollte";
+    if (n <= 20) return ordWords[n];
+    if (n < 100) {
+        const tens = Math.floor(n / 10) * 10;
+        const units = n % 10;
+        if (units === 0) return ordWords[tens];
+        return numWords[tens] + ordWords[units];
+    }
+    
+    // Sataset ja tuhatluvut (esim. 100. -> hundrade, 101. -> hundraförsta, 1000. -> tusende)
+    let card = numberToSwedish(n).sv;
+    
+    // Suorat tasaluvut (esim. 100 -> hundra -> hundrade, 1000 -> ett tusen -> ett tusende)
+    const remainder = n % 100;
+    if (remainder === 0) {
+        if (n % 1000000 === 0) return card.replace(/miljon(er)?$/, "miljonte");
+        if (n % 1000 === 0) return card + "de";
+        if (n % 100 === 0) return card + "de";
+    }
+
+    // Jos luku päättyy 1–99, muutetaan vain viimeinen osa järjestysluvuksi
+    const last100 = n % 100;
+    const basePart = numberToSwedish(n - last100).sv;
+    const ordPart = numberToSwedishOrdinal(last100);
+    
+    return basePart + ordPart;
+}
+
+function newRound() {
+    const feedback = document.getElementById('feedback');
+    if (feedback) {
+        feedback.textContent = '';
+        feedback.style.color = '#333';
+    }
+
+    document.getElementById('answerInput').value = '';
+    updateEncouragement();
+
+    let max = 10;
+    if (currentDifficulty === 1) max = 100;
+    else if (currentDifficulty === 2) max = 1000;
+    else if (currentDifficulty === 3) max = 10000;
+    else if (currentDifficulty === 4) max = 1000000;
+    else if (currentDifficulty === 5) max = 100000000;
+
+    currentNumber = Math.floor(Math.random() * (max + 1));
+    if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1;
+
+    if (gameMode === 'ordinal') {
+        targetSvStr = numberToSwedishOrdinal(currentNumber);
+    } else {
+        targetSvStr = numberToSwedish(currentNumber).sv;
+    }
+
+    renderClickableNumber(currentNumber);
+}
+
+function renderClickableNumber(n) {
+    const container = document.getElementById('targetNumber');
+    container.innerHTML = '';
+
+    const suffix = (gameMode === 'ordinal') ? '.' : '';
+
+    if (n === 0) {
+        let span = document.createElement('span');
+        span.className = 'num-digit';
+        span.textContent = '0' + suffix;
+        span.onclick = () => highlightAndSpeak(span, targetSvStr);
+        container.appendChild(span);
+        return;
+    }
+
+    const formattedStr = n.toLocaleString('sv-SE') + suffix;
+    
+    for (let i = 0; i < formattedStr.length; i++) {
+        let char = formattedStr[i];
+        let span = document.createElement('span');
+
+        if (char === ' ' || char === '\u00a0') {
+            span.textContent = ' ';
+            span.style.marginRight = '4px';
+            container.appendChild(span);
+            continue;
+        }
+
+        span.textContent = char;
+
+        if (char === '0') {
+            span.className = 'num-zero';
+        } else {
+            span.className = 'num-digit';
+            span.onclick = (function(currentIndex) {
+                return function() {
+                    let spokenText = (gameMode === 'ordinal') ? targetSvStr : getSpokenTextForDigit(n, currentIndex, formattedStr);
+                    if (spokenText) highlightAndSpeak(span, spokenText);
+                };
+            })(i);
+        }
+        container.appendChild(span);
+    }
+}
+
+function getSpokenTextForDigit(fullNum, index, formattedStr) {
+    let cleanStr = formattedStr.replace(/[\s\u00a0]/g, '');
+    let cleanIndex = 0;
+    for (let k = 0; k < index; k++) {
+        if (formattedStr[k] !== ' ' && formattedStr[k] !== '\u00a0') cleanIndex++;
+    }
+    let powerFromRight = cleanStr.length - 1 - cleanIndex;
+    let digitVal = parseInt(cleanStr[cleanIndex]);
+
+    if (powerFromRight >= 6) {
+        let mils = Math.floor(fullNum / 1000000);
+        return mils === 1 ? "en miljon" : getUnderThousandString(mils) + " miljoner";
+    } else if (powerFromRight >= 3 && powerFromRight < 6) {
+        let ths = Math.floor((fullNum % 1000000) / 1000);
+        return ths === 1 ? "ett tusen" : getUnderThousandString(ths) + " tusen";
+    } else if (powerFromRight === 2) {
+        return digitVal === 1 ? "hundra" : numWords[digitVal] + "hundra";
+    } else if (powerFromRight === 1) {
+        let rem = fullNum % 100;
+        if (rem >= 10 && rem <= 19) return numWords[rem];
+        return numWords[digitVal * 10];
+    } else {
+        let rem = fullNum % 100;
+        if (rem >= 10 && rem <= 19) return "";
+        if (digitVal === 0) return "";
+        return numWords[digitVal];
+    }
+}
+
+function highlightAndSpeak(element, swedishText) {
+    if (!speechEnabled || !swedishText) return;
+    document.querySelectorAll('.num-digit').forEach(p => p.classList.remove('highlighted'));
+    element.classList.add('highlighted');
+    speakText(swedishText, () => {
+        setTimeout(() => element.classList.remove('highlighted'), 400);
+    });
+}
+
+function clearInput() {
+    const input = document.getElementById('answerInput');
+    input.value = '';
+    input.focus();
+    const feedback = document.getElementById('feedback');
+    if (feedback) feedback.textContent = '';
+}
+
+// Normalisoi teksti vertailua varten (sallii yhdys- ja erilliskirjoituksen)
+function normalizeString(str) {
+    return str.toLowerCase()
+              .replace(/[\s\-]+/g, '')
+              .trim();
+}
+
+function checkAnswer() {
+    const input = document.getElementById('answerInput');
+    const userStr = input.value.trim();
+    const feedback = document.getElementById('feedback');
+
+    if (normalizeString(userStr) === normalizeString(targetSvStr)) {
+        score += 10 * (currentDifficulty + 1);
+        streak += 1;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+
+        if (feedback) {
+            feedback.textContent = 'Rätt! Jättebra!';
+            feedback.style.color = '#16a34a';
+        }
+
+        playSuccessBurstSound();
+        const burstEl = document.createElement('div');
+        burstEl.className = 'screen-burst-success';
+        document.body.appendChild(burstEl);
+        setTimeout(() => burstEl.remove(), 800);
+
+        setTimeout(() => {
+            speakText(targetSvStr, () => {
+                setTimeout(newRound, 1000);
+            });
+        }, 300);
+
+    } else {
+        streak = 0;
+        document.getElementById('streak').textContent = streak;
+
+        if (feedback) {
+            feedback.textContent = `Fel! Rätt svar: "${targetSvStr}"`;
+            feedback.style.color = '#ef4444';
+        }
+
+        playErrorSound();
+        const flashEl = document.createElement('div');
+        flashEl.className = 'screen-flash-error';
+        document.body.appendChild(flashEl);
+        setTimeout(() => flashEl.remove(), 450);
+    }
+}
+
+// Kuunnellaan Enter-näppäintä kirjoituskentässä
+window.addEventListener('DOMContentLoaded', () => {
+    updateSidebarList();
+    newRound();
+
+    const answerInput = document.getElementById('answerInput');
+    if (answerInput) {
+        answerInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                checkAnswer();
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>
