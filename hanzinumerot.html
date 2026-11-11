@@ -563,6 +563,8 @@ button.action-btn:hover {
     100% { transform: scale(1); }
 }
 
+
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-6px); }
@@ -641,6 +643,10 @@ button.action-btn:hover {
                 <span>5. 💥 Murskaamaton Tyhjyys</span>
                 <span class="welcome-diff-sub">不灭虚空 (Bùmiè Xūkōng) • 0–100M</span>
             </button>
+<button class="welcome-diff-btn impossible-btn" onclick="selectInitialDifficulty(6)">
+    <span>6. 👁️ Universumien Luoja</span>
+    <span class="welcome-diff-sub">创世天尊 (Chuàngshì Tiānzūn) • 0–10B</span>
+</button>
         </div>
     </div>
 </div>
@@ -705,6 +711,11 @@ button.action-btn:hover {
                 <span>5. Tyhjyys</span>
                 <span class="diff-sub">不灭虚空 • 0–100M</span>
             </button>
+<button id="diffBtn6" class="diff-btn impossible" onclick="setDifficulty(6, this)">
+    <span>6. Universumien Luoja</span>
+    <span class="diff-sub">创世天尊 • 0–10B</span>
+</button>
+
         </div>
 
         <!-- Wuxia-kannustusOsio -->
@@ -910,7 +921,21 @@ const wuxiaEncouragements = {
         { zh: "万界主宰，唯我独尊！", fi: "Olet kaikkien maailmojen hallitsija, ainoa ja voittamaton!" },
         { zh: "一念永恒，踏碎凌霄！", fi: "Yksi ajatus on ikuisuus; polje taivaat jalkojesi alle!" },
         { zh: "逆天改命，神魔俱灭！", fi: "Haasta itse kohtalo – jumalat ja demonit murtuvat edessäsi!" }
-    ]
+    ],
+6: [
+    {
+        zh: "大道无尽，创世为尊！",
+        fi: "Dao on ääretön, mutta sinä luot itse maailmat!"
+    },
+    {
+        zh: "一念生万界，一念灭诸天！",
+        fi: "Yhdellä ajatuksella synnytät maailmat, yhdellä hävität taivaat!"
+    },
+    {
+        zh: "掌控时空，执掌命运！",
+        fi: "Aika, avaruus ja kohtalo ovat käsissäsi!"
+    }
+]
 };
 
 const hanziReferenceData = [
@@ -929,10 +954,11 @@ const hanziReferenceData = [
     { num: '100', char: '百', pinyin: 'bǎi' },
     { num: '1 000', char: '千', pinyin: 'qiān' },
     { num: '10 000', char: '万', pinyin: 'wàn' },
-    { num: '100 000 000', char: '亿', pinyin: 'yì' }
+    { num: '100 000 000', char: '亿', pinyin: 'yì' },
+{ num: '1 000 000 000 000', char: '兆', pinyin: 'zhào' }
 ];
 
-let allPossibleHanzis = ['零', '一', '两', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+let allPossibleHanzis = ['零','一','两','二','三','四','五','六','七','八','九','十','百','千','万','亿','兆'];
 let currentDifficulty = 0;
 let currentNumber = 0;
 let targetHanziStr = '';
@@ -1022,7 +1048,7 @@ function updateEncouragement() {
     document.getElementById('encFi').textContent = `"${randomItem.fi}"`;
 
     const box = document.getElementById('encBox');
-    if (currentDifficulty === 5) {
+    if (currentDifficulty === 6) {
         box.classList.add('impossible-theme');
     } else {
         box.classList.remove('impossible-theme');
@@ -1110,21 +1136,30 @@ function numberToChinese(n) {
     if (n >= 100000000) {
         const yi = Math.floor(n / 100000000);
         const remainder = n % 100000000;
-        const yiPart = convertUnder10k(yi, true);
+
+        const yiPart = numberToChinese(yi);
+
         hz += yiPart.hanzi + '亿';
-        py.push(...yiPart.pinyin, 'yì');
+        py.push(yiPart.pinyin, 'yì');
 
         if (remainder > 0) {
-            if (remainder < 10000000) { hz += '零'; py.push('líng'); }
+            if (remainder < 10000000) {
+                hz += '零';
+                py.push('líng');
+            }
+
             const remRes = numberToChinese(remainder);
             hz += remRes.hanzi;
             py.push(remRes.pinyin);
         }
+
     } else if (n >= 10000) {
+
         const wan = Math.floor(n / 10000);
         const remainder = n % 10000;
 
         const wanPart = convertUnder10k(wan, true);
+
         hz += wanPart.hanzi + '万';
         py.push(...wanPart.pinyin, 'wàn');
 
@@ -1133,25 +1168,34 @@ function numberToChinese(n) {
                 hz += '零';
                 py.push('líng');
             }
+
             const remPart = convertUnder10k(remainder, false);
             hz += remPart.hanzi;
             py.push(...remPart.pinyin);
         }
+
     } else if (n === 10) {
+
         hz = '十';
         py = ['shí'];
+
     } else if (n > 10 && n < 20) {
+
         hz = '十' + hanziMap[n % 10];
         py = ['shí', pinyinMap[n % 10]];
+
     } else {
+
         const part = convertUnder10k(n, false);
         hz = part.hanzi;
         py = part.pinyin;
     }
 
-    return { hanzi: hz, pinyin: Array.isArray(py) ? py.join(' ') : py };
+    return {
+        hanzi: hz,
+        pinyin: Array.isArray(py) ? py.join(' ') : py
+    };
 }
-
 // Apufunktio: muotoilee numeron kiinalaisittain 4 numeron ryhmiin (esim. 1234567 -> "123 4567")
 function formatChineseNumber(n) {
     let s = n.toString();
@@ -1189,6 +1233,7 @@ function newRound() {
     else if (currentDifficulty === 3) max = 10000;
     else if (currentDifficulty === 4) max = 1000000;
     else if (currentDifficulty === 5) max = 100000000;
+else if (currentDifficulty === 6) max = 10000000000;
 
     currentNumber = Math.floor(Math.random() * (max + 1));
     if (currentDifficulty === 0 && currentNumber === 0) currentNumber = 1;
