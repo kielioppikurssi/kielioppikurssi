@@ -115,6 +115,21 @@ h2 {
     border: 1px solid #cbd5e1;
 }
 
+.rule-box {
+    background: #eff6ff;
+    border-left: 4px solid #0051ba;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+.rule-box b {
+    color: #002e66;
+}
+
 select {
     padding: 10px 14px;
     border-radius: 10px;
@@ -374,13 +389,18 @@ input[type="text"]:focus {
     <div class="card">
         <h1>🇸🇪 Ruotsin säännölliset verbit</h1>
 
-        <div class="settings-row">
-            <label>Valitse konjugaatiot treeniin:</label>
+        <div class="settings-row" style="flex-direction: column; align-items: stretch;">
+            <label style="margin-bottom: 8px;">Valitse konjugaatiot treeniin:</label>
             <div class="checkbox-group">
                 <label><input type="checkbox" id="conjI" checked onchange="refreshAll()"> Luokka I (-ar)</label>
                 <label><input type="checkbox" id="conjIIa" checked onchange="refreshAll()"> Luokka IIa (-er, sointuva)</label>
                 <label><input type="checkbox" id="conjIIb" checked onchange="refreshAll()"> Luokka IIb (-er, soinniton)</label>
                 <label><input type="checkbox" id="conjIII" checked onchange="refreshAll()"> Luokka III (-r)</label>
+            </div>
+            
+            <!-- Muistisääntö lisätty tähän -->
+            <div class="rule-box">
+                💡 <b>Muistisääntö:</b> IIb luokkaan kuuluvat II luokan verbit, joiden vartalo päättyy konsonantteihin <b>K, T, P, S, X</b>.
             </div>
         </div>
     </div>
@@ -433,7 +453,7 @@ input[type="text"]:focus {
         </div>
     </div>
 
-    <!-- Monivalinta-osio (Sijoitettu taulukon alapuolelle) -->
+    <!-- Monivalinta-osio -->
     <div class="card">
         <h2>Monivalintatesti</h2>
         <div class="settings-row">
@@ -473,7 +493,6 @@ input[type="text"]:focus {
 
 <script>
 const cleanVerbs = [
-    // Luokka I (-ar, -ade, -at)
     {conj:"I", fi:"puhua", forms:["tala", "talar", "talade", "talat"]},
     {conj:"I", fi:"kysyä", forms:["fråga", "frågar", "frågade", "frågat"]},
     {conj:"I", fi:"pelata, soittaa", forms:["spela", "spelar", "spelade", "spelat"]},
@@ -489,7 +508,6 @@ const cleanVerbs = [
     {conj:"I", fi:"hakea, onkia", forms:["hämta", "hämtar", "hämtade", "hämtat"]},
     {conj:"I", fi:"ladata", forms:["ladda", "laddar", "laddade", "laddat"]},
 
-    // Luokka IIa (-er, -de, -t / sointuva vartalo)
     {conj:"IIa", fi:"elää, asua", forms:["leva", "lever", "levde", "levt"]},
     {conj:"IIa", fi:"kuulla", forms:["höra", "hör", "hörde", "hört"]},
     {conj:"IIa", fi:"tuntea", forms:["känna", "känner", "kände", "känt"]},
@@ -502,7 +520,6 @@ const cleanVerbs = [
     {conj:"IIa", fi:"sulkea", forms:["stänga", "stänger", "stängde", "stängt"]},
     {conj:"IIa", fi:"rakentaa", forms:["bygga", "bygger", "byggde", "byggt"]},
 
-    // Luokka IIb (-er, -te, -t / soinniton vartalo)
     {conj:"IIb", fi:"ostaa", forms:["köpa", "köper", "köpte", "köpt"]},
     {conj:"IIb", fi:"matkustaa", forms:["resa", "reser", "reste", "rest"]},
     {conj:"IIb", fi:"lukea", forms:["läsa", "läser", "läste", "läst"]},
@@ -511,7 +528,6 @@ const cleanVerbs = [
     {conj:"IIb", fi:"yrittää", forms:["försöka", "försöker", "försökte", "försökt"]},
     {conj:"IIb", fi:"polttaa (tupakkaa)", forms:["röka", "röker", "rökte", "rökt"]},
 
-    // Luokka III (-r, -dde, -tt / lyhyet vokaaliloppuiset)
     {conj:"III", fi:"asua", forms:["bo", "bor", "bodde", "bott"]},
     {conj:"III", fi:"uskoa, luottaa", forms:["tro", "tror", "trodde", "trott"]},
     {conj:"III", fi:"tapahtua", forms:["ske", "sker", "skedde", "skett"]},
