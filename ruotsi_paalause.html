@@ -2,160 +2,697 @@
 <html lang="fi">
 <head>
 <meta charset="UTF-8">
-<title>Ruotsin sanajärjestys</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruotsin päälauseen sanajärjestys</title>
 <style>
-body{font-family:Palatino,"Palatino Linotype",Georgia,serif;max-width:1200px;margin:auto;padding:20px;background:linear-gradient(135deg,#d6e4ff,#fff5cc)}
-h1{text-align:center}.home-button{position:fixed;top:15px;left:15px;background:#003399;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-weight:bold}
-.area{background:white;border-radius:12px;padding:15px;margin:15px 0}#wordbank,#answer{display:flex;flex-wrap:wrap;gap:10px;min-height:80px}#answer{border:3px dashed #557}.word{background:#003399;color:white;padding:10px 16px;border-radius:10px;cursor:pointer;transition:.25s;user-select:none}.word:hover{transform:scale(1.06)}.move{animation:pop .3s}@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}button{padding:10px 20px;font-size:16px;margin:5px}#result{font-size:22px;font-weight:bold}.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55)}.popup-content{background:white;max-width:800px;margin:80px auto;padding:25px;border-radius:12px}.bad{background:#ffd0d0;padding:4px 6px;border-radius:5px}.good{background:#c8f7c5;padding:4px 6px;border-radius:5px}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Palatino, "Palatino Linotype", Georgia, serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 15px;
+    color: #1e293b;
+}
+
+.main-card {
+    background: #fdfbf7;
+    max-width: 900px;
+    width: 100%;
+    border-radius: 24px;
+    padding: 35px 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border: 3px solid #fecc00;
+    position: relative;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.home-button, .toggle-btn {
+    background: #0051ba;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #fecc00;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.home-button:hover, .toggle-btn:hover {
+    background: #003366;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 81, 186, 0.3);
+}
+
+.toggle-btn.muted {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+
+.toggle-btn.muted:hover {
+    background: #fee2e2;
+}
+
+.top-right-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stats-bar {
+    display: flex;
+    gap: 15px;
+    font-weight: bold;
+    font-size: 15px;
+    color: #002e66;
+    background: #eef2ff;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    align-items: center;
+}
+
+.stat-item span {
+    color: #0051ba;
+}
+
+h1 {
+    text-align: center;
+    color: #0051ba;
+    font-size: 28px;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.subtitle {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+.hint-box {
+    background: #fffbeb;
+    border-left: 5px solid #fecc00;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 16px;
+    color: #78350f;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.hint-box b {
+    color: #92400e;
+}
+
+.area-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.area {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+#answer {
+    min-height: 90px;
+    border: 2px dashed #0051ba;
+    background: #ffffff;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    align-content: flex-start;
+    padding: 12px;
+    border-radius: 14px;
+}
+
+#wordbank {
+    min-height: 90px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    align-content: flex-start;
+    padding: 6px 0;
+}
+
+.word {
+    background: #0051ba;
+    color: #ffffff;
+    padding: 12px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    user-select: none;
+    box-shadow: 0 4px 6px rgba(0, 81, 186, 0.2);
+    border: 1px solid #fecc00;
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    touch-action: manipulation;
+}
+
+.word:hover {
+    transform: translateY(-2px);
+    background: #003366;
+    box-shadow: 0 6px 12px rgba(0, 51, 102, 0.3);
+}
+
+.word:active {
+    transform: scale(0.96);
+}
+
+.word.move {
+    animation: pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pop {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.btn {
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: inherit;
+    border-radius: 12px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    touch-action: manipulation;
+}
+
+.btn-primary {
+    background: #0051ba;
+    color: white;
+    border: 2px solid #fecc00;
+    box-shadow: 0 4px 12px rgba(0, 81, 186, 0.3);
+}
+
+.btn-primary:hover {
+    background: #003366;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+.btn-speech {
+    background: #10b981;
+    color: white;
+    border: 1px solid #059669;
+}
+
+.btn-speech:hover {
+    background: #059669;
+}
+
+/* Modal Popup */
+.popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.popup-content {
+    background: #ffffff;
+    max-width: 550px;
+    width: 100%;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 2px solid #fecc00;
+    text-align: center;
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.popup h2 {
+    font-size: 26px;
+    margin-bottom: 15px;
+}
+
+.popup-text-block {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 15px 0;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.6;
+    border: 1px solid #e2e8f0;
+}
+
+.bad {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.good {
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+    .main-card {
+        padding: 20px 15px;
+    }
+    h1 {
+        font-size: 22px;
+    }
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .top-right-group {
+        justify-content: space-between;
+    }
+    .stats-bar {
+        justify-content: space-around;
+    }
+    .word {
+        padding: 10px 14px;
+        font-size: 15px;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
 </style>
 </head>
 <body>
-<a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-button">← Päävalikko</a>
-<h1>Ruotsin päälauseen sanajärjestys</h1>
-<div id="hint"></div>
-<div class="area"><h3>Sanat</h3><div id="wordbank"></div></div>
-<div class="area"><h3>Vastauksesi</h3><div id="answer"></div></div>
-<button onclick="checkAnswer()">Tarkista (Enter)</button>
-<button onclick="resetSentence()">Tyhjennä</button>
-<div id="result">Pisteet: 0</div>
-<div class="popup" id="popup"><div class="popup-content"><div id="popupText"></div></div></div>
+
+<div class="main-card">
+    <div class="top-bar">
+        <a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-button">
+            ← Päävalikkoon
+        </a>
+        <div class="top-right-group">
+            <button id="toggleSoundBtn" class="toggle-btn" onclick="toggleSound()">🔊 Äänet: Päällä</button>
+            <button id="toggleSpeechBtn" class="toggle-btn" onclick="toggleSpeech()">🗣️ Puhe: Päällä</button>
+        </div>
+    </div>
+
+    <div class="stats-bar" style="margin-bottom: 20px; justify-content: space-around;">
+        <div class="stat-item">Pisteet: <span id="score">0</span></div>
+        <div class="stat-item">Putki: <span id="streak">0</span></div>
+        <div class="stat-item">Ennätys: <span id="bestStreak">0</span></div>
+    </div>
+
+    <h1>Ruotsin päälauseen sanajärjestys</h1>
+    <p class="subtitle">Muodosta oikea ruotsinkielinen lause napsauttamalla sanoja järjestyksessä!</p>
+
+    <div id="hint" class="hint-box"></div>
+
+    <div class="area">
+        <div class="area-label">Vastauksesi:</div>
+        <div id="answer"></div>
+    </div>
+
+    <div class="area">
+        <div class="area-label">Sanat:</div>
+        <div id="wordbank"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" onclick="checkAnswer()">Tarkista (Enter)</button>
+        <button class="btn btn-secondary" onclick="resetSentence()">Tyhjennä</button>
+    </div>
+</div>
+
+<div class="popup" id="popup">
+    <div class="popup-content">
+        <div id="popupText"></div>
+    </div>
+</div>
+
 <script>
-const sentences=[
-{hint:'Aikamääre ensin',fi:'Tänään luen kirjaa.',correct:['Idag','läser','jag','en bok']},
-{hint:'Paikkamääre ensin',fi:'Koulussa oppilaat syövät lounasta.',correct:['I skolan','äter','eleverna','lunch']},
-{hint:'Tavallinen SVO',fi:'Siskoni ostaa huomenna uuden auton.',correct:['Min syster','köper','en ny bil','imorgon']},
-{hint:'Adverbi mukana',fi:'Syön usein pizzaa perjantaisin.',correct:['Jag','äter','ofta','pizza','på fredagar']},
-{hint:'V2-sääntö',fi:'Illalla katsomme televisiota.',correct:['På kvällen','tittar','vi','på tv']},
-{hint:'Aikamääre ensin',fi:'Huomenna pelaamme jalkapalloa.',correct:['Imorgon','ska','vi','spela fotboll']},
-{hint:'Paikkamääre ensin',fi:'Kirjastossa hän lukee sanomalehteä.',correct:['I biblioteket','läser','hon','en tidning']},
-{hint:'Aikamääre ensin',fi:'Maanantaina kurssi alkaa jälleen.',correct:['På måndag','börjar','kursen','igen']},
-{hint:'Paikkamääre ensin',fi:'Kotona katson televisiota.',correct:['Hemma','tittar','jag','på tv']},
-{hint:'Tavallinen SVO',fi:'Isäni juo kahvia joka aamu.',correct:['Min pappa','dricker','kaffe','varje morgon']},
-{hint:'Tavallinen SVO',fi:'Oppilaat tekevät kokeen tänään.',correct:['Eleverna','skriver','ett prov','idag']},
-{hint:'Adverbi mukana',fi:'Pyöräilen aina kouluun.',correct:['Jag','brukar','alltid','cykla','till skolan']},
-{hint:'Adverbi mukana',fi:'Hän tulee usein myöhässä.',correct:['Hon','kommer','ofta','för sent']},
-{hint:'V2-sääntö',fi:'Koulun jälkeen lapset syövät jäätelöä.',correct:['Efter skolan','äter','barnen','glass']},
-{hint:'V2-sääntö',fi:'Talvella laskettelemme.',correct:['På vintern','åker','vi','skidor']},
-{hint:'Paikkamääre ensin',fi:'Bussissa hän kuuntelee musiikkia.',correct:['På bussen','lyssnar','han','på musik']},
-{hint:'Aikamääre ensin',fi:'Eilen ostin uuden tietokoneen.',correct:['I går','köpte','jag','en ny dator']},
-{hint:'Paikkamääre ensin',fi:'Suomessa monet puhuvat ruotsia.',correct:['I Finland','talar','många','svenska']},
-{hint:'Tavallinen SVO',fi:'Ystäväni soittaa kitaraa erittäin hyvin.',correct:['Min vän','spelar','gitarr','mycket bra']},
-{hint:'Adverbi mukana',fi:'Syömme harvoin karkkia arkipäivisin.',correct:['Vi','äter','sällan','godis','på vardagar']},
-{hint:'V2-sääntö',fi:'Tunnin jälkeen oppilaat menevät kotiin.',correct:['Efter lektionen','går','eleverna','hem']},
-{hint:'V2-sääntö',fi:'Joka aamu hän lukee sanomalehden.',correct:['Varje morgon','läser','hon','tidningen']},
-{hint:'Paikkamääre ensin',fi:'Rannalla lapset rakentavat hiekkalinnan.',correct:['På stranden','bygger','barnen','ett sandslott']},
-{hint:'Aikamääre ensin',fi:'Ensi viikolla he matkustavat Ruotsiin.',correct:['Nästa vecka','reser','de','till Sverige']},
-{hint:'Tavallinen SVO',fi:'Opettaja selittää kielioppia selkeästi.',correct:['Läraren','förklarar','grammatiken','tydligt']},
-{hint:'Adverbi mukana',fi:'Olen jo tehnyt läksyn.',correct:['Jag','har','redan','gjort','läxan']},
-{hint:'Paikkamääre ensin',fi:'Luokassa keskustelemme tehtävästä.',correct:['I klassrummet','diskuterar','vi','uppgiften']},
-{hint:'V2-sääntö',fi:'Perjantaina hän tapaa ystävänsä.',correct:['På fredag','träffar','hon','sina vänner']},
-{hint:'Aikamääre ensin',fi:'Viime kesänä hän työskenteli Norjassa.',correct:['I somras','arbetade','han','i Norge']},
-{hint:'Tavallinen SVO',fi:'Tyttö avaa ikkunan varovasti.',correct:['Flickan','öppnar','fönstret','försiktigt']},
-{hint:'Aikamääre ensin',fi:'Maanantaina kurssi alkaa jälleen.',correct:['På måndag','börjar','kursen','igen']},
-{hint:'Paikkamääre ensin',fi:'Kotona katson televisiota.',correct:['Hemma','tittar','jag','på tv']},
-{hint:'Tavallinen SVO',fi:'Isäni juo kahvia joka aamu.',correct:['Min pappa','dricker','kaffe','varje morgon']},
-{hint:'Tavallinen SVO',fi:'Oppilaat tekevät kokeen tänään.',correct:['Eleverna','skriver','ett prov','idag']},
-{hint:'Adverbi mukana',fi:'Pyöräilen aina kouluun.',correct:['Jag','brukar','alltid','cykla','till skolan']},
-{hint:'Adverbi mukana',fi:'Hän tulee usein myöhässä.',correct:['Hon','kommer','ofta','för sent']},
-{hint:'V2-sääntö',fi:'Koulun jälkeen lapset syövät jäätelöä.',correct:['Efter skolan','äter','barnen','glass']},
-{hint:'V2-sääntö',fi:'Talvella laskettelemme.',correct:['På vintern','åker','vi','skidor']},
-{hint:'Paikkamääre ensin',fi:'Bussissa hän kuuntelee musiikkia.',correct:['På bussen','lyssnar','han','på musik']},
-{hint:'Aikamääre ensin',fi:'Eilen ostin uuden tietokoneen.',correct:['I går','köpte','jag','en ny dator']},
-{hint:'Paikkamääre ensin',fi:'Suomessa monet puhuvat ruotsia.',correct:['I Finland','talar','många','svenska']},
-{hint:'Tavallinen SVO',fi:'Ystäväni soittaa kitaraa erittäin hyvin.',correct:['Min vän','spelar','gitarr','mycket bra']},
-{hint:'Adverbi mukana',fi:'Syömme harvoin karkkia arkipäivisin.',correct:['Vi','äter','sällan','godis','på vardagar']},
-{hint:'V2-sääntö',fi:'Tunnin jälkeen oppilaat menevät kotiin.',correct:['Efter lektionen','går','eleverna','hem']},
-{hint:'V2-sääntö',fi:'Joka aamu hän lukee sanomalehden.',correct:['Varje morgon','läser','hon','tidningen']},
-{hint:'Paikkamääre ensin',fi:'Rannalla lapset rakentavat hiekkalinnan.',correct:['På stranden','bygger','barnen','ett sandslott']},
-{hint:'Aikamääre ensin',fi:'Ensi viikolla he matkustavat Ruotsiin.',correct:['Nästa vecka','reser','de','till Sverige']},
-{hint:'Tavallinen SVO',fi:'Opettaja selittää kielioppia selkeästi.',correct:['Läraren','förklarar','grammatiken','tydligt']},
-{hint:'Adverbi mukana',fi:'Olen jo tehnyt läksyn.',correct:['Jag','har','redan','gjort','läxan']},
-{hint:'Paikkamääre ensin',fi:'Luokassa keskustelemme tehtävästä.',correct:['I klassrummet','diskuterar','vi','uppgiften']},
-{hint:'V2-sääntö',fi:'Perjantaina hän tapaa ystävänsä.',correct:['På fredag','träffar','hon','sina vänner']},
-{hint:'Aikamääre ensin',fi:'Viime kesänä hän työskenteli Norjassa.',correct:['I somras','arbetade','han','i Norge']},
-{hint:'Tavallinen SVO',fi:'Tyttö avaa ikkunan varovasti.',correct:['Flickan','öppnar','fönstret','försiktigt']},
-{hint:'Paikkamääre ensin',fi:'Järven rannalla he kalastavat.',correct:['Vid sjön','fångar','de','fisk']},
-{hint:'Adverbi mukana',fi:'Hän ei voi tulla tänään.',correct:['Han','kan','inte','komma','idag']},
-{hint:'V2-sääntö',fi:'Töiden jälkeen isä laittaa ruokaa.',correct:['Efter jobbet','lagar','pappa','middag']},
-{hint:'Aikamääre ensin',fi:'Pian bussi saapuu pysäkille.',correct:['Snart','kommer','bussen','till hållplatsen']},
-{hint:'Paikkamääre ensin',fi:'Ruokalassa oppilaat syövät lounasta.',correct:['I matsalen','äter','eleverna','lunch']},
-{hint:'V2-sääntö',fi:'Illalla hän lukee romaania.',correct:['På kvällen','läser','hon','en roman']},
-{hint:'Tavallinen SVO',fi:'Lapset pelaavat salibandya koulun jälkeen.',correct:['Barnen','spelar','innebandy','efter skolan']},
-{hint:'Paikkamääre ensin',fi:'Metsässä perhe kerää sieniä.',correct:['I skogen','plockar','familjen','svamp']},
-{hint:'Adverbi mukana',fi:'Katsomme usein elokuvia viikonloppuna.',correct:['Vi','ser','ofta','filmer','på helgen']},
-{hint:'Aikamääre ensin',fi:'Kello kahdeksalta oppitunti alkaa.',correct:['Klockan åtta','börjar','lektionen']},
-{hint:'V2-sääntö',fi:'Illallisen jälkeen tiskaan lautaset.',correct:['Efter middagen','diskar','jag','tallrikarna']},
-{hint:'Tavallinen SVO',fi:'Veljeni opiskelee ruotsia koulussa.',correct:['Min bror','studerar','svenska','i skolan']},
-{hint:'Paikkamääre ensin',fi:'Toimistossa äiti työskentelee koko päivän.',correct:['På kontoret','arbetar','mamma','hela dagen']},
-{hint:'Adverbi mukana',fi:'Hän haluaa mielellään oppia ruotsia.',correct:['Hon','vill','gärna','lära sig','svenska']},
-{hint:'V2-sääntö',fi:'Huomenna aamulla matkustamme Helsinkiin.',correct:['I morgon bitti','åker','vi','till Helsingfors']},
-{hint:'Aikamääre ensin',fi:'Tänään kirjoitamme kokeen.',correct:['I dag','skriver','vi','ett prov']},
-{hint:'Aikamääre ensin',fi:'Tänä iltana tapaan ystäväni.',correct:['I kväll','träffar','jag','mina vänner']},
-{hint:'Aikamääre ensin',fi:'Lauantaina perhe siivoaa talon.',correct:['På lördag','städar','familjen','huset']},
-{hint:'Aikamääre ensin',fi:'Ensi vuonna hän muuttaa Tukholmaan.',correct:['Nästa år','flyttar','hon','till Stockholm']},
-{hint:'Aikamääre ensin',fi:'Tänä aamuna hän myöhästyi bussista.',correct:['I morse','missade','han','bussen']},
-
-{hint:'Paikkamääre ensin',fi:'Pihalla lapset leikkivät koko päivän.',correct:['På gården','leker','barnen','hela dagen']},
-{hint:'Paikkamääre ensin',fi:'Uimahallissa hän harjoittelee joka viikko.',correct:['I simhallen','tränar','hon','varje vecka']},
-{hint:'Paikkamääre ensin',fi:'Sairaalassa äitini työskentelee lääkärinä.',correct:['På sjukhuset','arbetar','min mamma','som läkare']},
-{hint:'Paikkamääre ensin',fi:'Kaupassa he ostavat tuoretta leipää.',correct:['I affären','köper','de','färskt bröd']},
-{hint:'Paikkamääre ensin',fi:'Olohuoneessa kissa nukkuu sohvalla.',correct:['I vardagsrummet','sover','katten','på soffan']},
-
-{hint:'V2-sääntö',fi:'Aamiaisen jälkeen harjaan hampaani.',correct:['Efter frukosten','borstar','jag','tänderna']},
-{hint:'V2-sääntö',fi:'Koulun jälkeen hän harjoittelee jääkiekkoa.',correct:['Efter skolan','tränar','han','ishockey']},
-{hint:'V2-sääntö',fi:'Sunnuntaisin käymme mummon luona.',correct:['På söndagar','besöker','vi','mormor']},
-{hint:'V2-sääntö',fi:'Kesällä hän työskentelee kahvilassa.',correct:['Under sommaren','jobbar','hon','på café']},
-{hint:'V2-sääntö',fi:'Välitunnilla oppilaat keskustelevat keskenään.',correct:['På rasten','pratar','eleverna','med varandra']},
-
-{hint:'Adverbi mukana',fi:'Juon aina teetä illalla.',correct:['Jag','dricker','alltid','te','på kvällen']},
-{hint:'Adverbi mukana',fi:'Hän pelaa usein shakkia kotona.',correct:['Hon','spelar','ofta','schack','hemma']},
-{hint:'Adverbi mukana',fi:'Syömme harvoin ulkona talvella.',correct:['Vi','äter','sällan','ute','på vintern']},
-{hint:'Adverbi mukana',fi:'Hän tulee melkein aina ajoissa.',correct:['Han','kommer','nästan alltid','i tid']},
-{hint:'Adverbi mukana',fi:'Kuuntelen mielelläni musiikkia lukiessani.',correct:['Jag','lyssnar','gärna','på musik','när jag läser']},
-{hint:'Tavallinen SVO',fi:'Opettaja korjaa kokeet illalla.',correct:['Läraren','rättar','proven','på kvällen']},
-{hint:'Tavallinen SVO',fi:'Naapurini kasvattaa tomaatteja puutarhassa.',correct:['Min granne','odlar','tomater','i trädgården']},
-{hint:'Tavallinen SVO',fi:'Oppilas vastaa kysymykseen heti.',correct:['Eleven','svarar','på frågan','direkt']},
-{hint:'Tavallinen SVO',fi:'Pojat rakentavat majan metsään.',correct:['Pojkarna','bygger','en koja','i skogen']},
-{hint:'Tavallinen SVO',fi:'Isoisäni lukee sanomalehteä joka aamu.',correct:['Min farfar','läser','tidningen','varje morgon']},
-
-{hint:'V2-sääntö',fi:'Konsertin jälkeen otimme paljon kuvia.',correct:['Efter konserten','tog','vi','många bilder']},
-{hint:'V2-sääntö',fi:'Talvella monet juovat kuumaa kaakaota.',correct:['På vintern','dricker','många','varm choklad']},
-{hint:'V2-sääntö',fi:'Kesäkuussa koulu päättyy kesäksi.',correct:['I juni','slutar','skolan','för sommaren']},
-{hint:'V2-sääntö',fi:'Tunnilla oppilaat esittävät paljon kysymyksiä.',correct:['Under lektionen','ställer','eleverna','många frågor']},
-{hint:'V2-sääntö',fi:'Iltapäivällä lapset pelaavat tietokonepelejä.',correct:['På eftermiddagen','spelar','barnen','dataspel']},
-
-{hint:'Adverbi mukana',fi:'Hän on jo syönyt aamiaisen.',correct:['Hon','har','redan','ätit','frukost']},
-{hint:'Adverbi mukana',fi:'Emme voi jäädä pitkäksi aikaa.',correct:['Vi','kan','inte','stanna','länge']},
-{hint:'Adverbi mukana',fi:'Hän todella haluaa vierailla Islannissa.',correct:['Han','vill','verkligen','besöka','Island']},
-{hint:'Adverbi mukana',fi:'En ole koskaan nähnyt karhua.',correct:['Jag','har','aldrig','sett','en björn']},
-{hint:'Adverbi mukana',fi:'He eivät ehdi tehdä kaikkea tänään.',correct:['De','hinner','inte','göra','allt idag']},
-
-{hint:'Paikkamääre ensin',fi:'Suomessa asuu noin viisi miljoonaa ihmistä.',correct:['I Finland','bor','ungefär fem miljoner människor']},
-{hint:'Paikkamääre ensin',fi:'Torilla maanviljelijä myy vihanneksia.',correct:['På torget','säljer','bonden','grönsaker']},
-{hint:'Paikkamääre ensin',fi:'Malmössä serkkuni opiskelee taloustiedettä.',correct:['I Malmö','studerar','min kusin','ekonomi']},
-{hint:'Paikkamääre ensin',fi:'Hotellissa vieraat odottavat bussia.',correct:['På hotellet','väntar','gästerna','på bussen']},
-{hint:'Paikkamääre ensin',fi:'Puutarhassa kasvaa paljon kukkia.',correct:['I trädgården','växer','många blommor']},
-
-{hint:'Aikamääre ensin',fi:'Pian elokuva alkaa televisiossa.',correct:['Snart','börjar','filmen','på tv']},
-{hint:'Aikamääre ensin',fi:'Ensi kuussa ostamme uuden auton.',correct:['Nästa månad','köper','vi','en ny bil']},
-{hint:'Aikamääre ensin',fi:'Joka päivä hän liikkuu tunnin.',correct:['Varje dag','motionerar','hon','en timme']},
-{hint:'Aikamääre ensin',fi:'Tulevaisuudessa haluan lääkäriksi.',correct:['I framtiden','vill','jag','bli läkare']},
-{hint:'Aikamääre ensin',fi:'Eilen illalla isä teki lasagnea.',correct:['I går kväll','lagade','pappa','lasagne']}
-
+const sentences = [
+    {hint:'Aikamääre ensin',fi:'Tänään luen kirjaa.',correct:['Idag','läser','jag','en bok']},
+    {hint:'Paikkamääre ensin',fi:'Koulussa oppilaat syövät lounasta.',correct:['I skolan','äter','eleverna','lunch']},
+    {hint:'Tavallinen SVO',fi:'Siskoni ostaa huomenna uuden auton.',correct:['Min syster','köper','en ny bil','imorgon']},
+    {hint:'Adverbi mukana',fi:'Syön usein pizzaa perjantaisin.',correct:['Jag','äter','ofta','pizza','på fredagar']},
+    {hint:'V2-sääntö',fi:'Illalla katsomme televisiota.',correct:['På kvällen','tittar','vi','på tv']},
+    {hint:'Aikamääre ensin',fi:'Huomenna pelaamme jalkapalloa.',correct:['Imorgon','ska','vi','spela fotboll']},
+    {hint:'Paikkamääre ensin',fi:'Kirjastossa hän lukee sanomalehteä.',correct:['I biblioteket','läser','hon','en tidning']},
+    {hint:'Aikamääre ensin',fi:'Maanantaina kurssi alkaa jälleen.',correct:['På måndag','börjar','kursen','igen']},
+    {hint:'Paikkamääre ensin',fi:'Kotona katson televisiota.',correct:['Hemma','tittar','jag','på tv']},
+    {hint:'Tavallinen SVO',fi:'Isäni juo kahvia joka aamu.',correct:['Min pappa','dricker','kaffe','varje morgon']},
+    {hint:'Tavallinen SVO',fi:'Oppilaat tekevät kokeen tänään.',correct:['Eleverna','skriver','ett prov','idag']},
+    {hint:'Adverbi mukana',fi:'Pyöräilen aina kouluun.',correct:['Jag','brukar','alltid','cykla','till skolan']},
+    {hint:'Adverbi mukana',fi:'Hän tulee usein myöhässä.',correct:['Hon','kommer','ofta','för sent']},
+    {hint:'V2-sääntö',fi:'Koulun jälkeen lapset syövät jäätelöä.',correct:['Efter skolan','äter','barnen','glass']},
+    {hint:'V2-sääntö',fi:'Talvella hiihdämme.',correct:['På vintern','åker','vi','skidor']},
+    {hint:'Paikkamääre ensin',fi:'Bussissa hän kuuntelee musiikkia.',correct:['På bussen','lyssnar','han','på musik']},
+    {hint:'Aikamääre ensin',fi:'Eilen ostin uuden tietokoneen.',correct:['I går','köpte','jag','en ny dator']},
+    {hint:'Paikkamääre ensin',fi:'Suomessa monet puhuvat ruotsia.',correct:['I Finland','talar','många','svenska']},
+    {hint:'Tavallinen SVO',fi:'Ystäväni soittaa kitaraa erittäin hyvin.',correct:['Min vän','spelar','gitarr','mycket bra']},
+    {hint:'Adverbi mukana',fi:'Syömme harvoin karkkia arkipäivisin.',correct:['Vi','äter','sällan','godis','på vardagar']},
+    {hint:'V2-sääntö',fi:'Tunnin jälkeen oppilaat menevät kotiin.',correct:['Efter lektionen','går','eleverna','hem']},
+    {hint:'V2-sääntö',fi:'Joka aamu hän lukee sanomalehden.',correct:['Varje morgon','läser','hon','tidningen']},
+    {hint:'Paikkamääre ensin',fi:'Rannalla lapset rakentavat hiekkalinnan.',correct:['På stranden','bygger','barnen','ett sandslott']},
+    {hint:'Aikamääre ensin',fi:'Ensi viikolla he matkustavat Ruotsiin.',correct:['Nästa vecka','reser','de','till Sverige']},
+    {hint:'Tavallinen SVO',fi:'Opettaja selittää kielioppia selkeästi.',correct:['Läraren','förklarar','grammatiken','tydligt']},
+    {hint:'Adverbi mukana',fi:'Olen jo tehnyt läksyn.',correct:['Jag','har','redan','gjort','läxan']},
+    {hint:'Paikkamääre ensin',fi:'Luokassa keskustelemme tehtävästä.',correct:['I klassrummet','diskuterar','vi','uppgiften']},
+    {hint:'V2-sääntö',fi:'Perjantaina hän tapaa ystävänsä.',correct:['På fredag','träffar','hon','sina vänner']},
+    {hint:'Aikamääre ensin',fi:'Viime kesänä hän työskenteli Norjassa.',correct:['I somras','arbetade','han','i Norge']},
+    {hint:'Tavallinen SVO',fi:'Tyttö avaa ikkunan varovasti.',correct:['Flickan','öppnar','fönstret','försiktigt']},
+    {hint:'Paikkamääre ensin',fi:'Järven rannalla he kalastavat.',correct:['Vid sjön','fångar','de','fisk']},
+    {hint:'Adverbi mukana',fi:'Hän ei voi tulla tänään.',correct:['Han','kan','inte','komma','idag']},
+    {hint:'V2-sääntö',fi:'Töiden jälkeen isä laittaa ruokaa.',correct:['Efter jobbet','lagar','pappa','middag']},
+    {hint:'Aikamääre ensin',fi:'Pian bussi saapuu pysäkille.',correct:['Snart','kommer','bussen','till hållplatsen']},
+    {hint:'Paikkamääre ensin',fi:'Ruokalassa oppilaat syövät lounasta.',correct:['I matsalen','äter','eleverna','lunch']},
+    {hint:'V2-sääntö',fi:'Illalla hän lukee romaania.',correct:['På kvällen','läser','hon','en roman']},
+    {hint:'Tavallinen SVO',fi:'Lapset pelaavat salibandya koulun jälkeen.',correct:['Barnen','spelar','innebandy','efter skolan']},
+    {hint:'Paikkamääre ensin',fi:'Metsässä perhe kerää sieniä.',correct:['I skogen','plockar','familjen','svamp']},
+    {hint:'Adverbi mukana',fi:'Katsomme usein elokuvia viikonloppuna.',correct:['Vi','ser','ofta','filmer','på helgen']},
+    {hint:'Aikamääre ensin',fi:'Kello kahdeksalta oppitunti alkaa.',correct:['Klockan åtta','börjar','lektionen']},
+    {hint:'V2-sääntö',fi:'Illallisen jälkeen tiskaan lautaset.',correct:['Efter middagen','diskar','jag','tallrikarna']},
+    {hint:'Tavallinen SVO',fi:'Veljeni opiskelee ruotsia koulussa.',correct:['Min bror','studerar','svenska','i skolan']},
+    {hint:'Paikkamääre ensin',fi:'Toimistossa äiti työskentelee koko päivän.',correct:['På kontoret','arbetar','mamma','hela dagen']},
+    {hint:'Adverbi mukana',fi:'Hän haluaa mielellään oppia ruotsia.',correct:['Hon','vill','gärna','lära sig','svenska']},
+    {hint:'V2-sääntö',fi:'Huomenna aamulla matkustamme Helsinkiin.',correct:['I morgon bitti','åker','vi','till Helsingfors']},
+    {hint:'Aikamääre ensin',fi:'Tänään kirjoitamme kokeen.',correct:['I dag','skriver','vi','ett prov']},
+    {hint:'Aikamääre ensin',fi:'Tänä iltana tapaan ystäväni.',correct:['I kväll','träffar','jag','mina vänner']},
+    {hint:'Aikamääre ensin',fi:'Lauantaina perhe siivoaa talon.',correct:['På lördag','städar','familjen','huset']},
+    {hint:'Aikamääre ensin',fi:'Ensi vuonna hän muuttaa Tukholmaan.',correct:['Nästa år','flyttar','hon','till Stockholm']},
+    {hint:'Aikamääre ensin',fi:'Tänä aamuna hän myöhästyi bussista.',correct:['I morse','missade','han','bussen']}
 ];
-let current,score=0;const shuffle=a=>[...a].sort(()=>Math.random()-.5);
-function createWord(t){const d=document.createElement('div');d.className='word';d.textContent=t;d.onclick=()=>moveWord(d);return d;}
-function moveWord(el){const target=el.parentElement.id==='wordbank'?answer:wordbank;target.appendChild(el);el.classList.remove('move');void el.offsetWidth;el.classList.add('move');}
-function newSentence(){current=sentences[Math.floor(Math.random()*sentences.length)];hint.innerHTML='<b>Vihje:</b> '+current.hint;wordbank.innerHTML='';answer.innerHTML='';shuffle(current.correct).forEach(w=>wordbank.appendChild(createWord(w)));}
-function resetSentence(){while(answer.firstChild)wordbank.appendChild(answer.firstChild);}
-function nextSentence(){popup.style.display='none';newSentence();}
-function checkAnswer(){const user=[...answer.children].map(x=>x.textContent);if(user.length!==current.correct.length)return;let wrong=[];for(let i=0;i<current.correct.length;i++){if(user[i]!==current.correct[i])wrong.push([user[i],current.correct[i]]);}if(!wrong.length){score++;result.textContent='Pisteet: '+score;popupText.innerHTML=`<h2 style="color:green">✓ Oikein!</h2><p><b>Ruotsi:</b><br>${current.correct.join(' ')}</p><p><b>Suomi:</b><br>${current.fi}</p><button onclick="nextSentence()">Seuraava lause (Enter)</button>`;popup.style.display='block';return;}let h=`<h2>Väärin</h2><p><b>Ruotsi:</b><br>${current.correct.join(' ')}</p><p><b>Suomi:</b><br>${current.fi}</p><hr><b>Virheet:</b><br>`;wrong.forEach(w=>h+=`<span class="bad">${w[0]}</span> → <span class="good">${w[1]}</span><br>`);h+='<br><button onclick="nextSentence()">Seuraava lause (Enter)</button>';popupText.innerHTML=h;popup.style.display='block';}
-document.addEventListener('keydown',e=>{
-    if(e.key!=='Enter') return;
 
-    if(popup.style.display==='block'){
+let current;
+let score = 0;
+let streak = 0;
+let bestStreak = parseInt(localStorage.getItem('sv_best_streak') || '0');
+let audioCtx = null;
+let swedishVoice = null;
+let soundEnabled = true;
+let speechEnabled = true;
+
+document.getElementById('bestStreak').textContent = bestStreak;
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('toggleSoundBtn');
+    if (soundEnabled) {
+        btn.textContent = "🔊 Äänet: Päällä";
+        btn.classList.remove('muted');
+    } else {
+        btn.textContent = "🔇 Äänet: Pois";
+        btn.classList.add('muted');
+    }
+}
+
+function toggleSpeech() {
+    speechEnabled = !speechEnabled;
+    const btn = document.getElementById('toggleSpeechBtn');
+    if (speechEnabled) {
+        btn.textContent = "🗣️ Puhe: Päällä";
+        btn.classList.remove('muted');
+    } else {
+        btn.textContent = "🤐 Puhe: Pois";
+        btn.classList.add('muted');
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+}
+
+// Puhesynteesin äänien lataus
+function loadVoices() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    swedishVoice = voices.find(v => v.lang === 'sv-SE' || v.lang.startsWith('sv')) || null;
+}
+if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+}
+
+function speakText(text) {
+    if (!speechEnabled || !('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (swedishVoice) utterance.voice = swedishVoice;
+        utterance.lang = 'sv-SE';
+        utterance.rate = 0.99;
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {}
+}
+
+// Äänitehosteet Web Audio API:lla
+function getAudioContext() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+}
+
+function playPopSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(350, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.06);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.06);
+    } catch(e) {}
+}
+
+function playSuccessSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        [523.25, 659.25, 783.99].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.25);
+        });
+    } catch(e) {}
+}
+
+function playErrorSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(160, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(90, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+}
+
+const shuffle = a => [...a].sort(() => Math.random() - 0.5);
+
+function createWord(t) {
+    const d = document.createElement('div');
+    d.className = 'word';
+    d.textContent = t;
+    d.onclick = () => moveWord(d);
+    return d;
+}
+
+function moveWord(el) {
+    playPopSound();
+    speakText(el.textContent); // Lukee sanan heti ääneen kun sitä klikataan
+    const wordbank = document.getElementById('wordbank');
+    const answer = document.getElementById('answer');
+    const target = el.parentElement.id === 'wordbank' ? answer : wordbank;
+    target.appendChild(el);
+    el.classList.remove('move');
+    void el.offsetWidth;
+    el.classList.add('move');
+}
+
+function newSentence() {
+    current = sentences[Math.floor(Math.random() * sentences.length)];
+    document.getElementById('hint').innerHTML = '<b>Suomennettuna:</b> ' + current.fi + ' <small style="opacity:0.75; margin-left:8px;">(' + current.hint + ')</small>';
+    const wordbank = document.getElementById('wordbank');
+    const answer = document.getElementById('answer');
+    wordbank.innerHTML = '';
+    answer.innerHTML = '';
+    shuffle(current.correct).forEach(w => wordbank.appendChild(createWord(w)));
+}
+
+function resetSentence() {
+    const wordbank = document.getElementById('wordbank');
+    const answer = document.getElementById('answer');
+    while (answer.firstChild) {
+        wordbank.appendChild(answer.firstChild);
+    }
+}
+
+function nextSentence() {
+    document.getElementById('popup').style.display = 'none';
+    newSentence();
+}
+
+function checkAnswer() {
+    const answer = document.getElementById('answer');
+    const popup = document.getElementById('popup');
+    const popupText = document.getElementById('popupText');
+    const user = [...answer.children].map(x => x.textContent);
+
+    if (user.length !== current.correct.length) return;
+
+    let wrong = [];
+    for (let i = 0; i < current.correct.length; i++) {
+        if (user[i] !== current.correct[i]) {
+            wrong.push([user[i], current.correct[i]]);
+        }
+    }
+
+    const fullCorrectSentence = current.correct.join(' ');
+
+    if (!wrong.length) {
+        playSuccessSound();
+        score++;
+        streak++;
+        if (streak > bestStreak) {
+            bestStreak = streak;
+            localStorage.setItem('sv_best_streak', bestStreak);
+            document.getElementById('bestStreak').textContent = bestStreak;
+        }
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+
+        popupText.innerHTML = `
+            <h2 style="color: #166534;">✓ Oikein!</h2>
+            <div class="popup-text-block">
+                <p><b>Ruotsiksi:</b><br>${fullCorrectSentence}</p>
+                <p style="margin-top: 8px;"><b>Suomeksi:</b><br>${current.fi}</p>
+            </div>
+            <div class="controls" style="margin-top: 15px;">
+                <button class="btn btn-speech" onclick="speakText('${fullCorrectSentence.replace(/'/g, "\\'")}')">🔊 Kuuntele</button>
+                <button class="btn btn-primary" onclick="nextSentence()">Seuraava lause (Enter)</button>
+            </div>
+        `;
+        popup.style.display = 'flex';
+        speakText(fullCorrectSentence);
+        return;
+    }
+
+    playErrorSound();
+    streak = 0;
+    document.getElementById('streak').textContent = streak;
+
+    let errorDetails = '';
+    wrong.forEach(w => {
+        errorDetails += `<span class="bad">${w[0]}</span> → <span class="good">${w[1]}</span><br>`;
+    });
+
+    popupText.innerHTML = `
+        <h2 style="color: #991b1b;">✕ Väärin</h2>
+        <div class="popup-text-block">
+            <p><b>Oikea ruotsinnos:</b><br>${fullCorrectSentence}</p>
+            <p style="margin-top: 6px;"><b>Suomeksi:</b><br>${current.fi}</p>
+            <hr style="margin: 10px 0; border: none; border-top: 1px solid #cbd5e1;">
+            <p><b>Virheet:</b><br>${errorDetails}</p>
+        </div>
+        <div class="controls" style="margin-top: 15px;">
+            <button class="btn btn-speech" onclick="speakText('${fullCorrectSentence.replace(/'/g, "\\'")}')">🔊 Kuuntele oikea</button>
+            <button class="btn btn-primary" onclick="nextSentence()">Seuraava lause (Enter)</button>
+        </div>
+    `;
+    popup.style.display = 'flex';
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const popup = document.getElementById('popup');
+    if (popup.style.display === 'flex') {
         nextSentence();
-    }else{
+    } else {
         checkAnswer();
     }
 });
