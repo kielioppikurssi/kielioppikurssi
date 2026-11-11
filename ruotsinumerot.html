@@ -1003,22 +1003,20 @@ if ('speechSynthesis' in window) {
     }
 }
 
-function speakText(text, onEndCallback) {
-    if (!speechEnabled) {
-        if (onEndCallback) onEndCallback();
-        return;
-    }
-    if (!('speechSynthesis' in window)) {
-        if (onEndCallback) onEndCallback();
-        return;
+function speakText(text) {
+    if (!speechEnabled || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'sv-SE'; // Pakotetaan ruotsi
+
+    if (swedishVoice) {
+        utterance.voice = swedishVoice;
     }
 
-    try {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        if (swedishVoice) utterance.voice = swedishVoice;
-        utterance.lang = 'sv-SE';
-        utterance.rate = 0.85;
+    utterance.rate = 0.85;
+    window.speechSynthesis.speak(utterance);
+}
 
         let finished = false;
         const finish = () => {
