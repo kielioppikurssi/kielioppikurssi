@@ -1008,7 +1008,7 @@ function speakText(text, onEndCallback) {
         const utterance = new SpeechSynthesisUtterance(text);
         if (chineseVoice) utterance.voice = chineseVoice;
         utterance.lang = 'zh-CN';
-        utterance.rate = 0.85;
+        utterance.rate = 0.99;
 
         let finished = false;
         const finish = () => {
