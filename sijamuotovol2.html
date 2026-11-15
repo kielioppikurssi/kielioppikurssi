@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venäjän sijamuototreeni</title>
+
+<style>
+    :root {
+        --bg-page: #f4f6f9;
+        --bg-card: #ffffff;
+        --primary: #003399;
+        --primary-hover: #0055cc;
+        
+        /* Värikoodit suvuille ja monikolle */
+        --masc-bg: #dbeafe;
+        --masc-border: #3b82f6;
+        --masc-text: #1e3a8a;
+
+        --fem-bg: #fee2e2;
+        --fem-border: #ef4444;
+        --fem-text: #7f1d1d;
+
+        --neut-bg: #fef9c3;
+        --neut-border: #eab308;
+        --neut-text: #713f12;
+
+        --plur-bg: #f3e8ff;
+        --plur-border: #a855f7;
+        --plur-text: #4c1d95;
+
+        --neutral-bg: #f1f5f9;
+        --neutral-border: #cbd5e1;
+        --neutral-text: #1e293b;
+    }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--bg-page);
+        margin: 0;
+        padding: 20px;
+        color: #1e293b;
+    }
+
+    .home-button {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: 0.2s;
+        z-index: 1000;
+    }
+
+    .home-button:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+
+    .container {
+        max-width: 850px;
+        margin: 45px auto 20px auto;
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        margin-top: 0;
+        color: #0f172a;
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    /* Asetuspaneeli */
+    .controls-panel {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+    }
+
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .control-group label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+    }
+
+    select, .toggle-btn {
+        padding: 9px 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.95rem;
+        background: white;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .toggle-btn.active {
+        background: #e0e7ff;
+        border-color: #4f46e5;
+        color: #3730a3;
+        font-weight: 700;
+    }
+
+    /* Värikoodiselite */
+    .legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        font-size: 0.85rem;
+    }
+
+    .legend-item {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+    .leg-m { background: var(--masc-bg); border-color: var(--masc-border); color: var(--masc-text); }
+    .leg-f { background: var(--fem-bg); border-color: var(--fem-border); color: var(--fem-text); }
+    .leg-n { background: var(--neut-bg); border-color: var(--neut-border); color: var(--neut-text); }
+    .leg-p { background: var(--plur-bg); border-color: var(--plur-border); color: var(--plur-text); }
+
+    /* Tehtäväkortti */
+    .task-card {
+        padding: 25px;
+        border-radius: 14px;
+        border: 2px solid var(--neutral-border);
+        background: var(--neutral-bg);
+        text-align: center;
+        margin-bottom: 20px;
+        transition: all 0.25s ease;
+    }
+
+    .card-m { background: var(--masc-bg); border-color: var(--masc-border); color: var(--masc-text); }
+    .card-f { background: var(--fem-bg); border-color: var(--fem-border); color: var(--fem-text); }
+    .card-n { background: var(--neut-bg); border-color: var(--neut-border); color: var(--neut-text); }
+    .card-p { background: var(--plur-bg); border-color: var(--plur-border); color: var(--plur-text); }
+
+    .badges {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.85);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .sentence-ru {
+        font-size: 1.55rem;
+        font-weight: 700;
+        margin: 12px 0;
+        line-height: 1.4;
+    }
+
+    .blank-highlight {
+        display: inline-block;
+        border-bottom: 3px solid currentColor;
+        min-width: 110px;
+        padding: 0 6px;
+        font-family: monospace;
+    }
+
+    .base-prompt-container {
+        margin-top: 10px;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255,255,255,0.75);
+        padding: 8px 18px;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .base-prompt {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .base-prompt-fi {
+        font-size: 0.95rem;
+        opacity: 0.8;
+        font-style: italic;
+        margin-top: 2px;
+    }
+
+    .sentence-fi {
+        font-size: 1rem;
+        margin-top: 12px;
+        opacity: 0.85;
+        font-style: italic;
+    }
+
+    /* Syöttökenttä */
+    input#answer {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.25rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        transition: border-color 0.2s;
+    }
+
+    input#answer:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    /* Toimintopainikkeet */
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .action-btn {
+        padding: 11px 22px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .btn-check { background: #16a34a; color: white; }
+    .btn-check:hover { background: #15803d; }
+
+    .btn-hint { background: #f59e0b; color: white; }
+    .btn-hint:hover { background: #d97706; }
+
+    .btn-next { background: var(--primary); color: white; }
+    .btn-next:hover { background: var(--primary-hover); }
+
+    #hintBox {
+        margin-top: 15px;
+        padding: 12px;
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        border-radius: 6px;
+        color: #92400e;
+        font-size: 0.95rem;
+        display: none;
+        text-align: left;
+    }
+
+    #result {
+        margin-top: 18px;
+        font-size: 1.15rem;
+        text-align: center;
+        min-height: 50px;
+    }
+
+    .correct { color: #16a34a; font-weight: bold; }
+    .wrong { color: #dc2626; font-weight: bold; }
+
+    .stats {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+        font-weight: 600;
+    }
+</style>
+</head>
+<body>
+
+<a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-button">
+    ← Päävalikko
+</a>
+
+<div class="container">
+    <h1>Venäjän sijamuototreeni</h1>
+
+    <!-- ASETUSPANEELI -->
+    <div class="controls-panel">
+        <div class="control-group">
+            <label for="caseSelect">1. Sijamuoto</label>
+            <select id="caseSelect" onchange="nextQuestion()">
+                <option value="roulette">🎲 Sijamuotoruletti (kaikki)</option>
+                <option value="nom">Nominatiivi (Kuka? Mikä?)</option>
+                <option value="acc">Akkusatiivi (Kenet? Mitä?)</option>
+                <option value="gen">Genetiivi (Kenen? Minkä?)</option>
+                <option value="dat">Datiivi (Kenelle? Mille?)</option>
+                <option value="ins">Instrumentaali (Kenellä? Millä?)</option>
+                <option value="pre">Prepositionaali (Missä? Kenestä?)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="numberSelect">2. Luku</label>
+            <select id="numberSelect" onchange="nextQuestion()">
+                <option value="both">Yksiköt & Monikot</option>
+                <option value="sg">Vain yksikkö</option>
+                <option value="pl">Vain monikko</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="phraseSelect">3. Fraasityyppi</label>
+            <select id="phraseSelect" onchange="nextQuestion()">
+                <option value="adj_noun">Adjektiivi + Substantiivi</option>
+                <option value="noun_only">Vain substantiivi</option>
+                <option value="mixed">Sekaisin</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>4. Apuvärit</label>
+            <button id="colorToggleBtn" class="toggle-btn active" onclick="toggleColors()">
+                🎨 Värikoodaus: PÄÄLLÄ
+            </button>
+        </div>
+    </div>
+
+    <!-- VÄRIKOODISELITE -->
+    <div class="legend" id="colorLegend">
+        <span class="legend-item leg-m">Sininen = Maskuliini (sg)</span>
+        <span class="legend-item leg-f">Punainen = Feminiini (sg)</span>
+        <span class="legend-item leg-n">Keltainen = Neutri (sg)</span>
+        <span class="legend-item leg-p">Violetti = Monikko (pl)</span>
+    </div>
+
+    <!-- TEHTÄVÄKORTTI -->
+    <div class="task-card" id="taskCard">
+        <div class="badges" id="badgesArea"></div>
+        <div class="sentence-ru" id="sentenceRu"></div>
+        <div class="base-prompt-container">
+            <div class="base-prompt" id="basePrompt"></div>
+            <div class="base-prompt-fi" id="basePromptFi"></div>
+        </div>
+        <div class="sentence-fi" id="sentenceFi"></div>
+    </div>
+
+    <!-- VASTAUSKENTTÄ -->
+    <input id="answer" autocomplete="off" placeholder="Kirjoita puuttuva muoto tähän...">
+
+    <!-- PAINIKKEET -->
+    <div class="buttons">
+        <button class="action-btn btn-check" onclick="checkAnswer()">Tarkista (Enter)</button>
+        <button class="action-btn btn-hint" onclick="showHint()">💡 Vihje (<span id="hintCount">0</span>/3)</button>
+        <button class="action-btn btn-next" onclick="nextQuestion()">Seuraava lause →</button>
+    </div>
+
+    <div id="hintBox"></div>
+    <div id="result"></div>
+
+    <div class="stats">
+        <span>Oikein: <strong id="correctCount" style="color:#16a34a">0</strong></span>
+        <span>Putki: <strong id="streakCount" style="color:#003399">0</strong> 🔥</span>
+        <span>Väärin: <strong id="wrongCount" style="color:#dc2626">0</strong></span>
+    </div>
+</div>
+
+<script>
+/* ============================================================================
+   SANAT:
+   - tag: 'person' (ihmiset), 'place' (paikat/rakennukset), 'object' (esineet/asiat)
+   - forbiddenAdjs: Lista adjektiivien stemmeistä, joita EI SAA yhdistää tähän sanaan
+   ============================================================================ */
+const NOUNS = [
+    // --- MASKULIINIT (ELOLLISET / PERSON) ---
+    {
+        base: "брат", fi: "veli", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "брат", acc: "брата", gen: "брата", dat: "брату", ins: "братом", pre: "брате" },
+        pl: { nom: "братья", acc: "братьев", gen: "братьев", dat: "братьям", ins: "братьями", pre: "братьях" }
+    },
+    {
+        base: "отец", fi: "isä", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "отец", acc: "отца", gen: "отца", dat: "отцу", ins: "отцом", pre: "отце" },
+        pl: { nom: "отцы", acc: "отцов", gen: "отцов", dat: "отцам", ins: "отцами", pre: "отцах" }
+    },
+    {
+        base: "сын", fi: "poika (lapsi)", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "сын", acc: "сына", gen: "сына", dat: "сыну", ins: "сыном", pre: "сыне" },
+        pl: { nom: "сыновья", acc: "сыновей", gen: "сыновей", dat: "сыновьям", ins: "сыновьями", pre: "сыновьях" }
+    },
+    {
+        base: "муж", fi: "aviomies", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "муж", acc: "мужа", gen: "мужа", dat: "мужу", ins: "мужем", pre: "муже" },
+        pl: { nom: "мужья", acc: "мужьев", gen: "мужьев", dat: "мужьям", ins: "мужьями", pre: "мужьях" }
+    },
+    {
+        base: "дедушка", fi: "isoisä", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "дедушка", acc: "дедушку", gen: "дедушки", dat: "дедушке", ins: "дедушкой", pre: "дедушке" },
+        pl: { nom: "дедушки", acc: "дедушек", gen: "дедушек", dat: "дедушкам", ins: "дедушками", pre: "дедушках" }
+    },
+    {
+        base: "дядя", fi: "eno / setä", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "дядя", acc: "дядю", gen: "дяди", dat: "дяде", ins: "дядей", pre: "дяде" },
+        pl: { nom: "дяди", acc: "дядей", gen: "дядей", dat: "дядям", ins: "дядями", pre: "дядях" }
+    },
+    {
+        base: "парень", fi: "poika / nuorimies", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "парень", acc: "парня", gen: "парня", dat: "парню", ins: "парнем", pre: "парне" },
+        pl: { nom: "парни", acc: "парней", gen: "парней", dat: "парням", ins: "парнями", pre: "парнях" }
+    },
+    {
+        base: "мужчина", fi: "mies", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "мужчина", acc: "мужчину", gen: "мужчины", dat: "мужчине", ins: "мужчиной", pre: "мужчине" },
+        pl: { nom: "мужчины", acc: "мужчин", gen: "мужчин", dat: "мужчинам", ins: "мужчинами", pre: "мужчинах" }
+    },
+    {
+        base: "человек", fi: "ihminen", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "человек", acc: "человека", gen: "человека", dat: "человеку", ins: "человеком", pre: "человеке" },
+        pl: { nom: "люди", acc: "людей", gen: "людей", dat: "людям", ins: "людьми", pre: "людях" }
+    },
+    {
+        base: "ребёнок", fi: "lapsi", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "ребёнок", acc: "ребёнка", gen: "ребёнка", dat: "ребёнку", ins: "ребёнком", pre: "ребёнке" },
+        pl: { nom: "дети", acc: "детей", gen: "детей", dat: "детям", ins: "детьми", pre: "детях" }
+    },
+    {
+        base: "преподаватель", fi: "opettaja (yliopisto)", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "преподаватель", acc: "преподавателя", gen: "преподавателя", dat: "преподавателю", ins: "преподавателем", pre: "преподавателе" },
+        pl: { nom: "преподаватели", acc: "преподавателей", gen: "преподавателей", dat: "преподавателям", ins: "преподавателями", pre: "преподавателях" }
+    },
+    {
+        base: "учитель", fi: "opettaja (koulu)", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "учитель", acc: "учителя", gen: "учителя", dat: "учителю", ins: "учителем", pre: "учителе" },
+        pl: { nom: "учителя", acc: "учителей", gen: "учителей", dat: "учителям", ins: "учителями", pre: "учителях" }
+    },
+    {
+        base: "ученик", fi: "oppilas", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "ученик", acc: "ученика", gen: "ученика", dat: "ученику", ins: "учеником", pre: "ученике" },
+        pl: { nom: "ученики", acc: "учеников", gen: "учеников", dat: "ученикам", ins: "учениками", pre: "учениках" }
+    },
+    {
+        base: "мальчик", fi: "pikkupoika", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "мальчик", acc: "мальчика", gen: "мальчика", dat: "мальчику", ins: "мальчиком", pre: "мальчике" },
+        pl: { nom: "мальчики", acc: "мальчиков", gen: "мальчиков", dat: "мальчикам", ins: "мальчиками", pre: "мальчиках" }
+    },
+    {
+        base: "товарищ", fi: "toveri / kaveri", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "товарищ", acc: "товарища", gen: "товарища", dat: "товарищу", ins: "товарищем", pre: "товарище" },
+        pl: { nom: "товарищи", acc: "товарищей", gen: "товарищей", dat: "товарищам", ins: "товарищами", pre: "товарищах" }
+    },
+    {
+        base: "коллега", fi: "kollega", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "коллега", acc: "коллегу", gen: "коллеги", dat: "коллеге", ins: "коллегой", pre: "коллеге" },
+        pl: { nom: "коллеги", acc: "коллег", gen: "коллег", dat: "коллегам", ins: "коллегами", pre: "коллегах" }
+    },
+    {
+        base: "директор", fi: "johtaja", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "директор", acc: "директора", gen: "директора", dat: "директору", ins: "директором", pre: "директоре" },
+        pl: { nom: "директора", acc: "директоров", gen: "директоров", dat: "директорам", ins: "директорами", pre: "директорах" }
+    },
+    {
+        base: "писатель", fi: "kirjailija", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "писатель", acc: "писателя", gen: "писателя", dat: "писателю", ins: "писателем", pre: "писателе" },
+        pl: { nom: "писатели", acc: "писателей", gen: "писателей", dat: "писателям", ins: "писателями", pre: "писателях" }
+    },
+    {
+        base: "художник", fi: "taiteilija", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "художник", acc: "художника", gen: "художника", dat: "художнику", ins: "художником", pre: "художнике" },
+        pl: { nom: "художники", acc: "художников", gen: "художников", dat: "художникам", ins: "художниками", pre: "художниках" }
+    },
+    {
+        base: "сосед", fi: "naapuri", gender: "m", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "сосед", acc: "соседа", gen: "соседа", dat: "соседу", ins: "соседом", pre: "соседе" },
+        pl: { nom: "соседи", acc: "соседей", gen: "соседей", dat: "соседям", ins: "соседями", pre: "соседях" }
+    },
+    
+    // --- FEMINIINIT / PLASE & OBJECT ---
+    {
+        base: "комната", fi: "huone", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "комната", acc: "комнату", gen: "комнаты", dat: "комнате", ins: "комнатой", pre: "комнате" },
+        pl: { nom: "комнаты", acc: "комнаты", gen: "комнат", dat: "комнатам", ins: "комнатами", pre: "комнатах" }
+    },
+    {
+        base: "улица", fi: "katu", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "улица", acc: "улицу", gen: "улицы", dat: "улице", ins: "улицей", pre: "улице" },
+        pl: { nom: "улицы", acc: "улицы", gen: "улиц", dat: "улицам", ins: "улицами", pre: "улицах" }
+    },
+    {
+        base: "квартира", fi: "asunto", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "квартира", acc: "квартиру", gen: "квартиры", dat: "квартире", ins: "квартирой", pre: "квартире" },
+        pl: { nom: "квартиры", acc: "квартиры", gen: "квартир", dat: "квартирам", ins: "квартирами", pre: "квартирах" }
+    },
+    {
+        base: "кухня", fi: "keittiö", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "кухня", acc: "кухню", gen: "кухни", dat: "кухне", ins: "кухней", pre: "кухне" },
+        pl: { nom: "кухни", acc: "кухни", gen: "кухонь", dat: "кухням", ins: "кухнями", pre: "кухнях" }
+    },
+    {
+        base: "больница", fi: "sairaala", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "больница", acc: "больницу", gen: "больницы", dat: "больнице", ins: "больницей", pre: "больнице" },
+        pl: { nom: "больницы", acc: "больницы", gen: "больниц", dat: "больницам", ins: "больницами", pre: "больницах" }
+    },
+    {
+        base: "аптека", fi: "apteekki", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "аптека", acc: "аптеку", gen: "аптеки", dat: "аптеке", ins: "аптекой", pre: "аптеке" },
+        pl: { nom: "аптеки", acc: "аптеки", gen: "аптек", dat: "аптекам", ins: "аптеками", pre: "аптеках" }
+    },
+    {
+        base: "библиотека", fi: "kirjasto", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "библиотека", acc: "библиотеку", gen: "библиотеки", dat: "библиотеке", ins: "библиотекой", pre: "библиотеке" },
+        pl: { nom: "библиотеки", acc: "библиотеки", gen: "библиотек", dat: "библиотекам", ins: "библиотеками", pre: "библиотеках" }
+    },
+    {
+        base: "страна", fi: "maa / valtio", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "страна", acc: "страну", gen: "страны", dat: "стране", ins: "страной", pre: "стране" },
+        pl: { nom: "страны", acc: "страны", gen: "стран", dat: "странам", ins: "странами", pre: "странах" }
+    },
+    {
+        base: "земля", fi: "maa / maaperä", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "земля", acc: "землю", gen: "земли", dat: "земле", ins: "землёй", pre: "земле" },
+        pl: { nom: "земли", acc: "земли", gen: "земель", dat: "землям", ins: "землями", pre: "землях" }
+    },
+    {
+        base: "река", fi: "joki", gender: "f", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "река", acc: "реку", gen: "реки", dat: "реке", ins: "рекой", pre: "реке" },
+        pl: { nom: "реки", acc: "реки", gen: "рек", dat: "рекам", ins: "реками", pre: "реках" }
+    },
+    {
+        base: "статья", fi: "artikkeli", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "статья", acc: "статью", gen: "статьи", dat: "статье", ins: "статьёй", pre: "статье" },
+        pl: { nom: "статьи", acc: "статьи", gen: "статей", dat: "статьям", ins: "статьями", pre: "статьях" }
+    },
+    {
+        base: "газета", fi: "sanomalehti", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "газета", acc: "газету", gen: "газеты", dat: "газете", ins: "газетой", pre: "газете" },
+        pl: { nom: "газеты", acc: "газеты", gen: "газет", dat: "газетам", ins: "газетами", pre: "газетах" }
+    },
+    {
+        base: "жизнь", fi: "elämä", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "жизнь", acc: "жизнь", gen: "жизни", dat: "жизни", ins: "жизнью", pre: "жизни" },
+        pl: { nom: "жизни", acc: "жизни", gen: "жизней", dat: "жизням", ins: "жизнями", pre: "жизнях" }
+    },
+    {
+        base: "новости", fi: "uutiset", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "новость", acc: "новость", gen: "новости", dat: "новости", ins: "новостью", pre: "новости" },
+        pl: { nom: "новости", acc: "новости", gen: "новостей", dat: "новостям", ins: "новостями", pre: "новостях" }
+    },
+    {
+        base: "погода", fi: "sää", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "погода", acc: "погоду", gen: "погоды", dat: "погоде", ins: "погодой", pre: "погоде" },
+        pl: { nom: "погоды", acc: "погоды", gen: "погод", dat: "погодам", ins: "погодами", pre: "погодах" }
+    },
+    {
+        base: "музыка", fi: "musiikki", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "музыка", acc: "музыку", gen: "музыки", dat: "музыке", ins: "музыкой", pre: "музыке" },
+        pl: { nom: "музыки", acc: "музыки", gen: "музык", dat: "музыкам", ins: "музыками", pre: "музыках" }
+    },
+    {
+        base: "песня", fi: "laulu", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "песня", acc: "песню", gen: "песни", dat: "песне", ins: "песней", pre: "песне" },
+        pl: { nom: "песни", acc: "песни", gen: "песен", dat: "песням", ins: "песнями", pre: "песнях" }
+    },
+    {
+        base: "сумка", fi: "laukku", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "сумка", acc: "сумку", gen: "сумки", dat: "сумке", ins: "сумкой", pre: "сумке" },
+        pl: { nom: "сумки", acc: "сумки", gen: "сумок", dat: "сумкам", ins: "сумками", pre: "сумках" }
+    },
+    {
+        base: "ручка", fi: "kynä (kuulakynä)", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "ручка", acc: "ручку", gen: "ручки", dat: "ручке", ins: "ручкой", pre: "ручке" },
+        pl: { nom: "ручки", acc: "ручки", gen: "ручек", dat: "ручкам", ins: "ручками", pre: "ручках" }
+    },
+    {
+        base: "неделя", fi: "viikko", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "неделя", acc: "неделю", gen: "недели", dat: "неделе", ins: "неделей", pre: "неделе" },
+        pl: { nom: "недели", acc: "недели", gen: "недель", dat: "неделям", ins: "неделями", pre: "неделях" }
+    },
+    {
+        base: "минута", fi: "minuutti", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "минута", acc: "минуту", gen: "минуты", dat: "минуте", ins: "минутой", pre: "минуте" },
+        pl: { nom: "минуты", acc: "минуты", gen: "минут", dat: "минутам", ins: "минутами", pre: "минутах" }
+    },
+    {
+        base: "история", fi: "historia / tarina", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "история", acc: "историю", gen: "истории", dat: "истории", ins: "историей", pre: "истории" },
+        pl: { nom: "истории", acc: "истории", gen: "историй", dat: "историям", ins: "историями", pre: "историях" }
+    },
+    {
+        base: "картина", fi: "maalaus / taulu", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "картина", acc: "картину", gen: "картины", dat: "картине", ins: "картиной", pre: "картине" },
+        pl: { nom: "картины", acc: "картины", gen: "картин", dat: "картинам", ins: "картинами", pre: "картинах" }
+    },
+    {
+        base: "стена", fi: "seinä", gender: "f", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "стена", acc: "стену", gen: "стены", dat: "стене", ins: "стеной", pre: "стене" },
+        pl: { nom: "стены", acc: "стены", gen: "стен", dat: "стенам", ins: "стенами", pre: "стенах" }
+    },
+    
+    // --- FEMINIINIT (ELOLLISET / PERSON) ---
+    {
+        base: "мать", fi: "äiti", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "мать", acc: "мать", gen: "матери", dat: "матери", ins: "матерью", pre: "матери" },
+        pl: { nom: "матери", acc: "матерей", gen: "матерей", dat: "матерям", ins: "матерями", pre: "матерях" }
+    },
+    {
+        base: "мама", fi: "äiti (ark.)", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "мама", acc: "маму", gen: "мамы", dat: "маме", ins: "мамой", pre: "маме" },
+        pl: { nom: "мамы", acc: "мам", gen: "мам", dat: "мамам", ins: "мамами", pre: "мамах" }
+    },
+    {
+        base: "дочь", fi: "tytär", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "дочь", acc: "дочь", gen: "дочери", dat: "дочери", ins: "дочерью", pre: "дочери" },
+        pl: { nom: "дочери", acc: "дочерей", gen: "дочерей", dat: "дочерям", ins: "дочерьми", pre: "дочерях" }
+    },
+    {
+        base: "жена", fi: "vaimo", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "жена", acc: "жену", gen: "жены", dat: "жене", ins: "женой", pre: "жене" },
+        pl: { nom: "жёны", acc: "жён", gen: "жён", dat: "жёнам", ins: "жёнами", pre: "жёнах" }
+    },
+    {
+        base: "бабушка", fi: "isoäiti", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "бабушка", acc: "бабушку", gen: "бабушки", dat: "бабушке", ins: "бабушкой", pre: "бабушке" },
+        pl: { nom: "бабушки", acc: "бабушек", gen: "бабушек", dat: "бабушкам", ins: "бабушками", pre: "бабушках" }
+    },
+    {
+        base: "тётя", fi: "täti", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "тётя", acc: "тётю", gen: "тёти", dat: "тёте", ins: "тётей", pre: "тёте" },
+        pl: { nom: "тёти", acc: "тёть", gen: "тёть", dat: "тётям", ins: "тётями", pre: "тётях" }
+    },
+    {
+        base: "женщина", fi: "nainen", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "женщина", acc: "женщину", gen: "женщины", dat: "женщине", ins: "женщиной", pre: "женщине" },
+        pl: { nom: "женщины", acc: "женщин", gen: "женщин", dat: "женщинам", ins: "женщинами", pre: "женщинах" }
+    },
+    {
+        base: "девушка", fi: "nuori nainen / tyttöystävä", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "девушка", acc: "девушку", gen: "девушки", dat: "девушке", ins: "девушкой", pre: "девушке" },
+        pl: { nom: "девушки", acc: "девушек", gen: "девушек", dat: "девушкам", ins: "девушками", pre: "девушках" }
+    },
+    {
+        base: "девочка", fi: "pikkutyttö", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "девочка", acc: "девочку", gen: "девочки", dat: "девочке", ins: "девочкой", pre: "девочке" },
+        pl: { nom: "девочки", acc: "девочек", gen: "девочек", dat: "девочкам", ins: "девочками", pre: "девочках" }
+    },
+    {
+        base: "студентка", fi: "naisopiskelija", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "студентка", acc: "студентку", gen: "студентки", dat: "студентке", ins: "студенткой", pre: "студентке" },
+        pl: { nom: "студентки", acc: "студенток", gen: "студенток", dat: "студенткам", ins: "студентками", pre: "студентках" }
+    },
+    {
+        base: "учительница", fi: "naisopettaja (koulu)", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "учительница", acc: "учительницу", gen: "учительницы", dat: "учительнице", ins: "учительницей", pre: "учительнице" },
+        pl: { nom: "учительницы", acc: "учительниц", gen: "учительниц", dat: "учительницам", ins: "учительницами", pre: "учительницах" }
+    },
+    {
+        base: "ученица", fi: "naisoppilas", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "ученица", acc: "ученицу", gen: "ученицы", dat: "ученице", ins: "ученицей", pre: "ученице" },
+        pl: { nom: "ученицы", acc: "учениц", gen: "учениц", dat: "ученицам", ins: "ученицами", pre: "ученицах" }
+    },
+    {
+        base: "соседка", fi: "naisnainen / naisnaapuri", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "соседка", acc: "соседку", gen: "соседки", dat: "соседке", ins: "соседкой", pre: "соседке" },
+        pl: { nom: "соседки", acc: "соседок", gen: "соседок", dat: "соседкам", ins: "соседками", pre: "соседках" }
+    },
+    {
+        base: "писательница", fi: "naiskirjailija", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "писательница", acc: "писательницу", gen: "писательницы", dat: "писательнице", ins: "писательницей", pre: "писательнице" },
+        pl: { nom: "писательницы", acc: "писательниц", gen: "писательниц", dat: "писательницам", ins: "писательницами", pre: "писательницах" }
+    },
+    {
+        base: "актриса", fi: "näyttelijätär", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "актриса", acc: "актрису", gen: "актрисы", dat: "актрисе", ins: "актрисой", pre: "актрисе" },
+        pl: { nom: "актрисы", acc: "актрис", gen: "актрис", dat: "актрисам", ins: "актрисами", pre: "актрисах" }
+    },
+    {
+        base: "певица", fi: "naislaulaja", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "певица", acc: "певицу", gen: "певицы", dat: "певице", ins: "певицей", pre: "певице" },
+        pl: { nom: "певицы", acc: "певиц", gen: "певиц", dat: "певицам", ins: "певицами", pre: "певицах" }
+    },
+    {
+        base: "журналистка", fi: "naistoimittaja", gender: "f", animate: true, tag: "person",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        sg: { nom: "журналистка", acc: "журналистку", gen: "журналистки", dat: "журналистке", ins: "журналисткой", pre: "журналистке" },
+        pl: { nom: "журналистки", acc: "журналисток", gen: "журналисток", dat: "журналисткам", ins: "журналистками", pre: "журналистках" }
+    },
+    
+    // --- NEUTRIT / OBJECT & PLACE ---
+    {
+        base: "слово", fi: "sana", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "слово", acc: "слово", gen: "слова", dat: "слову", ins: "словом", pre: "слове" },
+        pl: { nom: "слова", acc: "слова", gen: "слов", dat: "словам", ins: "словами", pre: "словах" }
+    },
+    {
+        base: "дело", fi: "asia / teko", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "дело", acc: "дело", gen: "дела", dat: "делу", ins: "делом", pre: "деле" },
+        pl: { nom: "дела", acc: "дела", gen: "дел", dat: "делам", ins: "делами", pre: "делах" }
+    },
+    {
+        base: "время", fi: "aika", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "время", acc: "время", gen: "времени", dat: "времени", ins: "временем", pre: "времени" },
+        pl: { nom: "времена", acc: "времена", gen: "времён", dat: "времёнам", ins: "времёнами", pre: "времёнах" }
+    },
+    {
+        base: "имя", fi: "nimi", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "имя", acc: "имя", gen: "имени", dat: "имени", ins: "именем", pre: "имени" },
+        pl: { nom: "имена", acc: "имена", gen: "имён", dat: "имёнам", ins: "имёнами", pre: "имёнах" }
+    },
+    {
+        base: "море", fi: "meri", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "море", acc: "море", gen: "моря", dat: "морю", ins: "морем", pre: "море" },
+        pl: { nom: "моря", acc: "моря", gen: "морей", dat: "морям", ins: "морями", pre: "морях" }
+    },
+    {
+        base: "озеро", fi: "järvi", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "озеро", acc: "озеро", gen: "озера", dat: "озеру", ins: "озером", pre: "озере" },
+        pl: { nom: "озёра", acc: "озёра", gen: "озёр", dat: "озёрам", ins: "озёрами", pre: "озёрах" }
+    },
+    {
+        base: "поле", fi: "pello", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "поле", acc: "поле", gen: "поля", dat: "полю", ins: "полем", pre: "поле" },
+        pl: { nom: "поля", acc: "поля", gen: "полей", dat: "полям", ins: "полями", pre: "полях" }
+    },
+    {
+        base: "небо", fi: "taivas", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "небо", acc: "небо", gen: "неба", dat: "небу", ins: "небом", pre: "небе" },
+        pl: { nom: "небеса", acc: "небеса", gen: "небес", dat: "небесам", ins: "небесами", pre: "небесах" }
+    },
+    {
+        base: "солнце", fi: "aurinko", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "солнце", acc: "солнце", gen: "солнца", dat: "солнцу", ins: "солнцем", pre: "солнце" },
+        pl: { nom: "солнца", acc: "солнца", gen: "солнц", dat: "солнцам", ins: "солнцами", pre: "солнцах" }
+    },
+    {
+        base: "дерево", fi: "puu", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "дерево", acc: "дерево", gen: "дерева", dat: "дереву", ins: "деревом", pre: "дереве" },
+        pl: { nom: "деревья", acc: "деревья", gen: "деревьев", dat: "деревьям", ins: "деревьями", pre: "деревьях" }
+    },
+    {
+        base: "пальто", fi: "takki (päällystakki)", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "пальто", acc: "пальто", gen: "пальто", dat: "пальто", ins: "пальто", pre: "пальто" },
+        pl: { nom: "пальто", acc: "пальто", gen: "пальто", dat: "пальто", ins: "пальто", pre: "пальто" }
+    },
+    {
+        base: "метро", fi: "metro", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "метро", acc: "метро", gen: "метро", dat: "метро", ins: "метро", pre: "метро" },
+        pl: { nom: "метро", acc: "метро", gen: "метро", dat: "метро", ins: "метро", pre: "метро" }
+    },
+    {
+        base: "кафе", fi: "kahvila", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "кафе", acc: "кафе", gen: "кафе", dat: "кафе", ins: "кафе", pre: "кафе" },
+        pl: { nom: "кафе", acc: "кафе", gen: "кафе", dat: "кафе", ins: "кафе", pre: "кафе" }
+    },
+    {
+        base: "письмо", fi: "kirje", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "письмо", acc: "письмо", gen: "письма", dat: "письму", ins: "письмом", pre: "письме" },
+        pl: { nom: "письма", acc: "письма", gen: "писем", dat: "письмам", ins: "письмами", pre: "письмах" }
+    },
+    {
+        base: "окно", fi: "ikkuna", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "окно", acc: "окно", gen: "окна", dat: "окну", ins: "окном", pre: "окне" },
+        pl: { nom: "окна", acc: "окна", gen: "окон", dat: "окнам", ins: "окнами", pre: "окнах" }
+    },
+    {
+        base: "здание", fi: "rakennus", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "здание", acc: "здание", gen: "здания", dat: "зданию", ins: "зданием", pre: "здании" },
+        pl: { nom: "здания", acc: "здания", gen: "зданий", dat: "зданиям", ins: "зданиями", pre: "зданиях" }
+    },
+    {
+        base: "утро", fi: "aamu", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "утро", acc: "утро", gen: "утра", dat: "утру", ins: "утром", pre: "утре" },
+        pl: { nom: "утра", acc: "утра", gen: "утров", dat: "утрам", ins: "утрами", pre: "утрах" }
+    },
+    {
+        base: "путешествие", fi: "matka", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "путешествие", acc: "путешествие", gen: "путешествия", dat: "путешествию", ins: "путешествием", pre: "путешествии" },
+        pl: { nom: "путешествия", acc: "путешествия", gen: "путешествий", dat: "путешествиям", ins: "путешествиями", pre: "путешествиях" }
+    },
+    {
+        base: "платье", fi: "mekko", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "платье", acc: "платье", gen: "платья", dat: "платью", ins: "платьем", pre: "платье" },
+        pl: { nom: "платья", acc: "платья", gen: "платьев", dat: "платьям", ins: "платьями", pre: "платьях" }
+    },
+    {
+        base: "молоко", fi: "maito", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "молоко", acc: "молоко", gen: "молока", dat: "молоку", ins: "молоком", pre: "молоке" },
+        pl: { nom: "молока", acc: "молока", gen: "молоков", dat: "молокам", ins: "молоками", pre: "молоках" }
+    },
+    {
+        base: "мясо", fi: "liha", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "мясо", acc: "мясо", gen: "мяса", dat: "мясу", ins: "мясом", pre: "мясе" },
+        pl: { nom: "мяса", acc: "мяса", gen: "мясов", dat: "мясам", ins: "мясами", pre: "мясах" }
+    },
+    {
+        base: "зеркало", fi: "peili", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "зеркало", acc: "зеркало", gen: "зеркала", dat: "зеркалу", ins: "зеркалом", pre: "зеркале" },
+        pl: { nom: "зеркала", acc: "зеркала", gen: "зеркал", dat: "зеркалам", ins: "зеркалами", pre: "зеркалах" }
+    },
+    {
+        base: "кресло", fi: "nojatuoli", gender: "n", animate: false, tag: "object",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "кресло", acc: "кресло", gen: "кресла", dat: "креслу", ins: "креслом", pre: "кресле" },
+        pl: { nom: "кресла", acc: "кресла", gen: "кресел", dat: "креслам", ins: "креслами", pre: "креслах" }
+    },
+    {
+        base: "собрание", fi: "kokous", gender: "n", animate: false, tag: "place",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        sg: { nom: "собрание", acc: "собрание", gen: "собрания", dat: "собранию", ins: "собранием", pre: "собрании" },
+        pl: { nom: "собрания", acc: "собрания", gen: "собраний", dat: "собраниям", ins: "собраниями", pre: "собраниях" }
+    }
+];
+
+const ADJECTIVES = [
+    { stem: "нов", type: "hard", stressedEnd: false, fi: "uusi", allowedTags: ["place", "object"] },
+    { stem: "стар", type: "hard", stressedEnd: false, fi: "vanha", allowedTags: ["place", "object", "person"] },
+    { stem: "интересн", type: "hard", stressedEnd: false, fi: "mielenkiintoinen", allowedTags: ["place", "object", "person"] },
+    { stem: "красив", type: "hard", stressedEnd: false, fi: "kaunis", allowedTags: ["place", "object", "person"] },
+    { stem: "маленьк", type: "velar", stressedEnd: false, fi: "pieni", allowedTags: ["place", "object", "person"] },
+    { stem: "хорош", type: "soft", stressedEnd: false, fi: "hyvä", allowedTags: ["place", "object", "person"] },
+    { stem: "плох", type: "velar", stressedEnd: true, fi: "huono", allowedTags: ["place", "object", "person"] },
+    { stem: "важн", type: "hard", stressedEnd: false, fi: "tärkeä", allowedTags: ["object", "person"] },
+    { stem: "известн", type: "hard", stressedEnd: false, fi: "tunnettu / kuuluisa", allowedTags: ["place", "object", "person"] },
+    { stem: "современн", type: "hard", stressedEnd: false, fi: "nykyaikainen", allowedTags: ["place", "object"] },
+    { stem: "главн", type: "hard", stressedEnd: false, fi: "pää- / tärkein", allowedTags: ["place", "object"] },
+    { stem: "добр", type: "hard", stressedEnd: false, fi: "kiltti / hyväsydäminen", allowedTags: ["person"] },
+    { stem: "умн", type: "hard", stressedEnd: false, fi: "fiksu / älykäs", allowedTags: ["person"] },
+    { stem: "молод", type: "hard", stressedEnd: true, fi: "nuori", allowedTags: ["person"] },
+    { stem: "бел", type: "hard", stressedEnd: false, fi: "valkoinen", allowedTags: ["place", "object"] },
+    { stem: "чёрн", type: "hard", stressedEnd: false, fi: "musta", allowedTags: ["object"] },
+    { stem: "красн", type: "hard", stressedEnd: false, fi: "punainen", allowedTags: ["place", "object"] },
+    { stem: "син", type: "soft", stressedEnd: false, fi: "sininen", allowedTags: ["object"] },
+    { stem: "зелён", type: "hard", stressedEnd: false, fi: "vihreä", allowedTags: ["place", "object"] },
+    { stem: "дорог", type: "velar", stressedEnd: true, fi: "kallis / rakas", allowedTags: ["place", "object", "person"] },
+    { stem: "дешёв", type: "hard", stressedEnd: false, fi: "halpa", allowedTags: ["place", "object"] },
+    { stem: "высок", type: "velar", stressedEnd: false, fi: "korkea / pitkä", allowedTags: ["place", "person"] },
+    { stem: "тёпл", type: "hard", stressedEnd: false, fi: "lämmin", allowedTags: ["place", "object"] },
+    { stem: "холодн", type: "hard", stressedEnd: false, fi: "kylmä", allowedTags: ["place", "object"] },
+    { stem: "светл", type: "hard", stressedEnd: false, fi: "valoisa / vaalea", allowedTags: ["place", "object"] },
+    { stem: "тёмн", type: "hard", stressedEnd: false, fi: "pimeä / tumma", allowedTags: ["place", "object"] },
+    { stem: "финск", type: "velar", stressedEnd: false, fi: "suomalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "английск", type: "velar", stressedEnd: false, fi: "englantilainen", allowedTags: ["place", "object", "person"] },
+    { stem: "следующ", type: "soft", stressedEnd: false, fi: "seuraava", allowedTags: ["place", "object"] },
+    // --- LISÄTTYJÄ KANSALLISUUDET JA KIELIOPPINIMIKE-ADJEKTIIVIT ---
+    { stem: "русск", type: "velar", stressedEnd: false, fi: "venäläinen", allowedTags: ["place", "object", "person"] },
+    { stem: "шведск", type: "velar", stressedEnd: false, fi: "ruotsalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "норвежск", type: "velar", stressedEnd: false, fi: "norjalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "эстонск", type: "velar", stressedEnd: false, fi: "virolainen", allowedTags: ["place", "object", "person"] },
+    { stem: "немецк", type: "velar", stressedEnd: false, fi: "saksalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "американск", type: "velar", stressedEnd: false, fi: "amerikkalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "французск", type: "velar", stressedEnd: false, fi: "ranskalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "итальянск", type: "velar", stressedEnd: false, fi: "italialainen", allowedTags: ["place", "object", "person"] },
+    { stem: "испанск", type: "velar", stressedEnd: false, fi: "espanjalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "японск", type: "velar", stressedEnd: false, fi: "japanilainen", allowedTags: ["place", "object", "person"] }
+];
+
+function inflectAdjective(adj, gender, number, caseName, animate) {
+    const s = adj.stem;
+    const isSoft = adj.type === "soft";
+    const isVelar = adj.type === "velar";
+
+    if (number === "sg") {
+        if (gender === "m") {
+            let nomEnd = adj.stressedEnd ? "ой" : (isSoft || isVelar ? "ий" : "ый");
+            if (caseName === "nom") return s + nomEnd;
+            if (caseName === "acc") return animate ? (s + (isSoft ? "его" : "ого")) : (s + nomEnd);
+            if (caseName === "gen") return s + (isSoft ? "его" : "ого");
+            if (caseName === "dat") return s + (isSoft ? "ему" : "ому");
+            if (caseName === "ins") return s + (isSoft || isVelar ? "им" : "ым");
+            if (caseName === "pre") return s + (isSoft ? "ем" : "ом");
+        }
+        if (gender === "f") {
+            if (caseName === "nom") return s + (isSoft ? "яя" : "ая");
+            if (caseName === "acc") return s + (isSoft ? "юю" : "ую");
+            return s + (isSoft ? "ей" : "ой");
+        }
+        if (gender === "n") {
+            if (caseName === "nom" || caseName === "acc") return s + (isSoft ? "ее" : "ое");
+            if (caseName === "gen") return s + (isSoft ? "его" : "ого");
+            if (caseName === "dat") return s + (isSoft ? "ему" : "ому");
+            if (caseName === "ins") return s + (isSoft || isVelar ? "им" : "ым");
+            if (caseName === "pre") return s + (isSoft ? "ем" : "ом");
+        }
+    }
+
+    if (number === "pl") {
+        const nomEnd = (isSoft || isVelar) ? "ие" : "ые";
+        const genEnd = (isSoft || isVelar) ? "их" : "ых";
+        if (caseName === "nom") return s + nomEnd;
+        if (caseName === "acc") return animate ? (s + genEnd) : (s + nomEnd);
+        if (caseName === "gen" || caseName === "pre") return s + genEnd;
+        if (caseName === "dat") return s + ((isSoft || isVelar) ? "им" : "ым");
+        if (caseName === "ins") return s + ((isSoft || isVelar) ? "ими" : "ыми");
+    }
+    return s;
+}
+
+const SENTENCES = [
+    {
+        case: "nom", tags: ["place", "object", "person"],
+        ru: "Это — ___.",
+        fi: "Tässä on / Tämä on",
+        hint: "Subjekti on aina perusmuodossa eli nominatiivissa."
+    },
+    {
+        case: "acc", tags: ["place", "object", "person"],
+        ru: "Я вижу ___.",
+        fi: "Näen",
+        hint: "Verbi 'видеть' vaatii akkusatiivin."
+    },
+    {
+        case: "gen", tags: ["place", "object", "person"],
+        ru: "У меня нет ___.",
+        fi: "Minulla ei ole",
+        hint: "Kieltosana 'нет' vaatii aina genetiivin."
+    },
+    {
+        case: "dat", tags: ["person"],
+        ru: "Я звоню ___.",
+        fi: "Soitan",
+        hint: "Verbi 'звонить' vaatii datiivin."
+    },
+    {
+        case: "ins", tags: ["person"],
+        ru: "Я гуляю с ___.",
+        fi: "Kävelen",
+        hint: "Prepositio 'с' vaatii instrumentaalin."
+    },
+    {
+        case: "pre", tags: ["place"],
+        ru: "Мы находимся в ___.",
+        fi: "Olemme",
+        hint: "Sijaintia ilmaiseva 'в' vaatii prepositionaalin."
+    }
+];
+
+const CASE_NAMES_FI = {
+    nom: "Nominatiivi",
+    acc: "Akkusatiivi",
+    gen: "Genetiivi",
+    dat: "Datiivi",
+    ins: "Instrumentaali",
+    pre: "Prepositionaali"
+};
+
+const GENDER_NAMES_FI = {
+    m: "Maskuliini",
+    f: "Feminiini",
+    n: "Neutri"
+};
+
+let currentTask = null;
+let colorCodingEnabled = true;
+let hintLevel = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let streakCount = 0;
+let answeredCurrent = false;
+
+function toggleColors() {
+    colorCodingEnabled = !colorCodingEnabled;
+    const btn = document.getElementById("colorToggleBtn");
+    const legend = document.getElementById("colorLegend");
+    if (colorCodingEnabled) {
+        btn.classList.add("active");
+        btn.textContent = "🎨 Värikoodaus: PÄÄLLÄ";
+        legend.style.display = "flex";
+    } else {
+        btn.classList.remove("active");
+        btn.textContent = "⚪ Värikoodaus: POIS (Testitila)";
+        legend.style.display = "none";
+    }
+    applyCardColor();
+}
+
+function applyCardColor() {
+    const card = document.getElementById("taskCard");
+    card.className = "task-card";
+    if (!colorCodingEnabled || !currentTask) return;
+
+    if (currentTask.number === "pl") {
+        card.classList.add("card-p");
+    } else {
+        card.classList.add("card-" + currentTask.noun.gender);
+    }
+}
+
+function nextQuestion() {
+    hintLevel = 0;
+    answeredCurrent = false;
+    document.getElementById("hintCount").textContent = "0";
+    document.getElementById("hintBox").style.display = "none";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("answer").value = "";
+
+    const caseChoice = document.getElementById("caseSelect").value;
+    const allCases = ["nom", "acc", "gen", "dat", "ins", "pre"];
+    const targetCase = (caseChoice === "roulette")
+        ? allCases[Math.floor(Math.random() * allCases.length)]
+        : caseChoice;
+
+    const numChoice = document.getElementById("numberSelect").value;
+    const targetNumber = (numChoice === "both")
+        ? (Math.random() < 0.5 ? "sg" : "pl")
+        : numChoice;
+
+    const phraseChoice = document.getElementById("phraseSelect").value;
+    const useAdjective = (phraseChoice === "adj_noun")
+        ? true
+        : (phraseChoice === "noun_only" ? false : Math.random() < 0.6);
+
+    const matchingSentences = SENTENCES.filter(s => s.case === targetCase);
+    const sentence = matchingSentences[Math.floor(Math.random() * matchingSentences.length)];
+
+    const matchingNouns = NOUNS.filter(n => sentence.tags.includes(n.tag));
+    const noun = matchingNouns[Math.floor(Math.random() * matchingNouns.length)];
+
+    let basePromptStr = "";
+    let basePromptFiStr = "";
+    let expectedAnswer = "";
+
+    if (useAdjective) {
+        // Valitaan adjektiivi, joka sopii substantiivin teemaan EIKÄ ole kielletty listalla
+        const compatibleAdjs = ADJECTIVES.filter(a => 
+            a.allowedTags.includes(noun.tag) && 
+            (!noun.forbiddenAdjs || !noun.forbiddenAdjs.includes(a.stem))
+        );
+        
+        const adj = compatibleAdjs[Math.floor(Math.random() * compatibleAdjs.length)];
+
+        const baseAdj = inflectAdjective(adj, noun.gender, targetNumber, "nom", noun.animate);
+        const baseNoun = noun[targetNumber].nom;
+        basePromptStr = `${baseAdj} ${baseNoun}`;
+
+        const isPlural = targetNumber === "pl";
+        basePromptFiStr = `${adj.fi} ${noun.fi}` + (isPlural ? " (mon.)" : "");
+
+        const targetAdj = inflectAdjective(adj, noun.gender, targetNumber, targetCase, noun.animate);
+        const targetNoun = noun[targetNumber][targetCase];
+        expectedAnswer = `${targetAdj} ${targetNoun}`;
+    } else {
+        basePromptStr = noun[targetNumber].nom;
+        const isPlural = targetNumber === "pl";
+        basePromptFiStr = noun.fi + (isPlural ? " (mon.)" : "");
+        expectedAnswer = noun[targetNumber][targetCase];
+    }
+
+    currentTask = {
+        case: targetCase,
+        number: targetNumber,
+        useAdjective: useAdjective,
+        noun: noun,
+        sentence: sentence,
+        basePrompt: basePromptStr,
+        basePromptFi: basePromptFiStr,
+        expected: expectedAnswer
+    };
+
+    renderTask();
+}
+
+function renderTask() {
+    applyCardColor();
+
+    const badgesArea = document.getElementById("badgesArea");
+    const animBadge = currentTask.noun.animate ? "👤 Elollinen" : "📦 Eloton";
+    const numText = currentTask.number === "sg" ? "Yksikkö" : "Monikko";
+    const genderBadge = colorCodingEnabled
+        ? `<span class="badge">${GENDER_NAMES_FI[currentTask.noun.gender]}</span>`
+        : "";
+
+    badgesArea.innerHTML = `
+        <span class="badge">🎯 ${CASE_NAMES_FI[currentTask.case]}</span>
+        <span class="badge">🔢 ${numText}</span>
+        ${genderBadge}
+        <span class="badge">${animBadge}</span>
+    `;
+
+    const sentenceHtml = currentTask.sentence.ru.replace(
+        "___",
+        `<span class="blank-highlight">?</span>`
+    );
+    document.getElementById("sentenceRu").innerHTML = sentenceHtml;
+
+    document.getElementById("basePrompt").textContent = `(${currentTask.basePrompt})`;
+    document.getElementById("basePromptFi").textContent = currentTask.basePromptFi;
+
+    document.getElementById("sentenceFi").innerHTML = `Suomennos: "${currentTask.sentence.fi} ..."`;
+
+    document.getElementById("answer").focus();
+}
+
+function showHint() {
+    if (!currentTask) return;
+    hintLevel = Math.min(hintLevel + 1, 3);
+    document.getElementById("hintCount").textContent = hintLevel;
+
+    const hintBox = document.getElementById("hintBox");
+    hintBox.style.display = "block";
+
+    let hints = [];
+    hints.push(`<strong>1. Sääntö:</strong> ${currentTask.sentence.hint}`);
+
+    if (hintLevel >= 2) {
+        const gName = GENDER_NAMES_FI[currentTask.noun.gender].toLowerCase();
+        const animNote = (currentTask.case === "acc" && currentTask.noun.animate && (currentTask.noun.gender === "m" || currentTask.number === "pl"))
+            ? " Koska sana on <b>elollinen</b>, sen akkusatiivi on samanlainen kuin genetiivi!"
+            : "";
+        hints.push(`<strong>2. Ominaisuudet:</strong> Sana on <b>${gName}</b> (${currentTask.noun.animate ? "elollinen" : "eloton"}).${animNote}`);
+    }
+
+    if (hintLevel >= 3) {
+        const words = currentTask.expected.split(" ");
+        const masked = words.map(w => w.slice(0, Math.max(2, w.length - 2)) + "...").join(" ");
+        hints.push(`<strong>3. Alkuosa:</strong> <code>${masked}</code>`);
+    }
+
+    hintBox.innerHTML = hints.join("<br>");
+}
+
+function checkAnswer() {
+    if (!currentTask) return;
+
+    const userRaw = document.getElementById("answer").value
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+
+    if (!userRaw) return;
+
+    const normalize = str => str.toLowerCase().replace(/ё/g, "е");
+    const isCorrect = normalize(userRaw) === normalize(currentTask.expected);
+    const resultDiv = document.getElementById("result");
+
+    if (isCorrect) {
+        if (!answeredCurrent) {
+            correctCount++;
+            streakCount++;
+            answeredCurrent = true;
+            document.getElementById("correctCount").textContent = correctCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        const fullSentence = currentTask.sentence.ru.replace("___", `<u>${currentTask.expected}</u>`);
+        resultDiv.innerHTML = `
+            <span class="correct">✓ Oikein!</span><br>
+            <span style="color:#334155; font-size:1.05rem;">${fullSentence}</span>
+        `;
+    } else {
+        if (!answeredCurrent) {
+            wrongCount++;
+            streakCount = 0;
+            answeredCurrent = true;
+            document.getElementById("wrongCount").textContent = wrongCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        resultDiv.innerHTML = `
+            <span class="wrong">✗ Väärin</span><br>
+            Oikea muoto: <strong>${currentTask.expected}</strong>
+        `;
+    }
+}
+
+document.getElementById("answer").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        if (answeredCurrent) {
+            nextQuestion();
+        } else {
+            checkAnswer();
+        }
+    }
+});
+
+nextQuestion();
+</script>
+
+</body>
+</html>
