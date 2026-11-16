@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruotsin demonstratiivipronominitreeni</title>
+
+<style>
+    :root {
+        --bg-page: #f4f6f9;
+        --bg-card: #ffffff;
+        --primary: #004b87; /* Ruotsin sininen */
+        --primary-hover: #003666;
+        
+        /* Värikoodit suvuille ja monikolle */
+        --en-bg: #dbeafe;
+        --en-border: #3b82f6;
+        --en-text: #1e3a8a;
+
+        --ett-bg: #fef9c3;
+        --ett-border: #eab308;
+        --ett-text: #713f12;
+
+        --plur-bg: #f3e8ff;
+        --plur-border: #a855f7;
+        --plur-text: #4c1d95;
+
+        --neutral-bg: #f1f5f9;
+        --neutral-border: #cbd5e1;
+        --neutral-text: #1e293b;
+    }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--bg-page);
+        margin: 0;
+        padding: 20px;
+        color: #1e293b;
+    }
+
+    .container {
+        max-width: 880px;
+        margin: 25px auto;
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        margin-top: 0;
+        color: #0f172a;
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    /* Asetuspaneeli */
+    .controls-panel {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 15px;
+    }
+
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .control-group label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+    }
+
+    select, .toggle-btn {
+        padding: 9px 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.95rem;
+        background: white;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .toggle-btn.active {
+        background: #e0e7ff;
+        border-color: #4f46e5;
+        color: #3730a3;
+        font-weight: 700;
+    }
+
+    /* Värikoodiselite */
+    .legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-size: 0.88rem;
+    }
+
+    .legend-item {
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+    .leg-en { background: var(--en-bg); border-color: var(--en-border); color: var(--en-text); }
+    .leg-ett { background: var(--ett-bg); border-color: var(--ett-border); color: var(--ett-text); }
+    .leg-pl { background: var(--plur-bg); border-color: var(--plur-border); color: var(--plur-text); }
+
+    /* Tehtäväkortti */
+    .task-card {
+        padding: 25px;
+        border-radius: 14px;
+        border: 2px solid var(--neutral-border);
+        background: var(--neutral-bg);
+        text-align: center;
+        margin-bottom: 20px;
+        transition: all 0.25s ease;
+    }
+
+    .card-en { background: var(--en-bg); border-color: var(--en-border); color: var(--en-text); }
+    .card-ett { background: var(--ett-bg); border-color: var(--ett-border); color: var(--ett-text); }
+    .card-pl { background: var(--plur-bg); border-color: var(--plur-border); color: var(--plur-text); }
+
+    .badges {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.88);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .badge-rule {
+        background: #1e293b;
+        color: #ffffff;
+    }
+
+    .sentence-sv {
+        font-size: 1.55rem;
+        font-weight: 700;
+        margin: 12px 0;
+        line-height: 1.4;
+    }
+
+    .blank-highlight {
+        display: inline-block;
+        border-bottom: 3px solid currentColor;
+        min-width: 140px;
+        padding: 0 6px;
+        font-family: monospace;
+    }
+
+    .base-prompt-container {
+        margin-top: 10px;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255,255,255,0.82);
+        padding: 10px 20px;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .base-prompt {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .base-prompt-fi {
+        font-size: 0.98rem;
+        opacity: 0.9;
+        font-style: italic;
+        margin-top: 3px;
+    }
+
+    .sentence-fi {
+        font-size: 1.05rem;
+        margin-top: 14px;
+        opacity: 0.9;
+        font-style: italic;
+    }
+
+    /* Syöttökenttä */
+    input#answer {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.25rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        transition: border-color 0.2s;
+    }
+
+    input#answer:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    /* Toimintopainikkeet */
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .action-btn {
+        padding: 11px 22px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .btn-check { background: #16a34a; color: white; }
+    .btn-check:hover { background: #15803d; }
+
+    .btn-hint { background: #f59e0b; color: white; }
+    .btn-hint:hover { background: #d97706; }
+
+    .btn-next { background: var(--primary); color: white; }
+    .btn-next:hover { background: var(--primary-hover); }
+
+    #hintBox {
+        margin-top: 15px;
+        padding: 14px;
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        border-radius: 6px;
+        color: #92400e;
+        font-size: 0.95rem;
+        display: none;
+        text-align: left;
+        line-height: 1.5;
+    }
+
+    #result {
+        margin-top: 18px;
+        font-size: 1.15rem;
+        text-align: center;
+        min-height: 55px;
+        line-height: 1.5;
+    }
+
+    .correct { color: #16a34a; font-weight: bold; }
+    .wrong { color: #dc2626; font-weight: bold; }
+
+    .stats {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    /* Kielioppitaulukko alhaalla */
+    details.grammar-cheat {
+        margin-top: 25px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+    details.grammar-cheat summary {
+        cursor: pointer;
+        font-weight: 700;
+        color: #004b87;
+    }
+    table.cheat-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        text-align: left;
+    }
+    table.cheat-table th, table.cheat-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #cbd5e1;
+    }
+    table.cheat-table th {
+        background: #e2e8f0;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🇸🇪 Ruotsin demonstratiivipronominit</h1>
+
+    <!-- ASETUSPANEELI -->
+    <div class="controls-panel">
+        <div class="control-group">
+            <label for="pronounGroupSelect">1. Pronominiryhmä</label>
+            <select id="pronounGroupSelect" onchange="nextQuestion()">
+                <option value="all">🎲 Kaikki pronominit sekaisin</option>
+                <option value="den_har">den här, det här, de här (tämä/nämä)</option>
+                <option value="denna">denna, detta, dessa (tämä/nämä)</option>
+                <option value="den_dar">den där, det där, de där (tuo/nuo)</option>
+                <option value="sadan">en sådan, ett sådant, sådana (sellainen)</option>
+                <option value="sadan_har_dar">sådan här / sådan där (tällainen / tuollainen)</option>
+                <option value="likadan">en likadan, ett likadant, likadana (samanlainen)</option>
+                <option value="samma">samma (sama)</option>
+                <option value="densamma">densamma, detsamma, desamma (sama)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="numberSelect">2. Luku</label>
+            <select id="numberSelect" onchange="nextQuestion()">
+                <option value="both">Yksiköt & Monikot</option>
+                <option value="sg">Vain yksikkö (en / ett)</option>
+                <option value="pl">Vain monikko (de / dessa / jne.)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>3. Apuvärit (Suku & Luku)</label>
+            <button id="colorToggleBtn" class="toggle-btn active" onclick="toggleColors()">
+                🎨 Värikoodaus: PÄÄLLÄ
+            </button>
+        </div>
+    </div>
+
+    <!-- VÄRIKOODISELITE -->
+    <div class="legend" id="colorLegend">
+        <span class="legend-item leg-en">Sininen = En-suku (utrum, yks.)</span>
+        <span class="legend-item leg-ett">Keltainen = Ett-suku (neutrum, yks.)</span>
+        <span class="legend-item leg-pl">Violetti = Monikko (plural)</span>
+    </div>
+
+    <!-- TEHTÄVÄKORTTI -->
+    <div class="task-card" id="taskCard">
+        <div class="badges" id="badgesArea"></div>
+        <div class="sentence-sv" id="sentenceSv"></div>
+        <div class="base-prompt-container">
+            <div class="base-prompt" id="basePrompt"></div>
+            <div class="base-prompt-fi" id="basePromptFi"></div>
+        </div>
+        <div class="sentence-fi" id="sentenceFi"></div>
+    </div>
+
+    <!-- VASTAUSKENTTÄ -->
+    <input id="answer" autocomplete="off" placeholder="Kirjoita pronomini + adjektiivi + substantiivi...">
+
+    <!-- PAINIKKEET -->
+    <div class="buttons">
+        <button class="action-btn btn-check" onclick="checkAnswer()">Tarkista (Enter)</button>
+        <button class="action-btn btn-hint" onclick="showHint()">💡 Vihje (<span id="hintCount">0</span>/3)</button>
+        <button class="action-btn btn-next" onclick="nextQuestion()">Seuraava lause →</button>
+    </div>
+
+    <div id="hintBox"></div>
+    <div id="result"></div>
+
+    <div class="stats">
+        <span>Oikein: <strong id="correctCount" style="color:#16a34a">0</strong></span>
+        <span>Putki: <strong id="streakCount" style="color:#004b87">0</strong> 🔥</span>
+        <span>Väärin: <strong id="wrongCount" style="color:#dc2626">0</strong></span>
+    </div>
+
+    <!-- PIKAOPAS -->
+    <details class="grammar-cheat">
+        <summary>📚 Pikaopas: Adjektiivin ja substantiivin muodot pronominin jälkeen</summary>
+        <table class="cheat-table">
+            <thead>
+                <tr>
+                    <th>Pronomini</th>
+                    <th>Adjektiivi</th>
+                    <th>Substantiivi</th>
+                    <th>Esimerkki</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>den här / det här / de här</strong><br><strong>den där / det där / de där</strong></td>
+                    <td>Määräinen (<strong>-a</strong>)</td>
+                    <td><strong>Määräinen</strong> (-n, -t, -na/-en)</td>
+                    <td><em>den här röda bilen<br>det där stora huset</em></td>
+                </tr>
+                <tr>
+                    <td><strong>denna / detta / dessa</strong></td>
+                    <td>Määräinen (<strong>-a</strong>)</td>
+                    <td><strong>Epämääräinen</strong> (perusmuoto)</td>
+                    <td><em>denna röda bil<br>dessa stora hus</em></td>
+                </tr>
+                <tr>
+                    <td><strong>en sådan / ett sådant / sådana</strong><br><strong>sådan här / sådan där</strong><br><strong>en likadan / ett likadant / likadana</strong></td>
+                    <td>Epämääräinen<br>(en: -, ett: -t, mon: -a)</td>
+                    <td><strong>Epämääräinen</strong></td>
+                    <td><em>en sådan röd bil<br>ett sådant här stort hus<br>likadana röda bilar</em></td>
+                </tr>
+                <tr>
+                    <td><strong>samma</strong></td>
+                    <td>Määräinen (<strong>-a</strong>)</td>
+                    <td><strong>Epämääräinen</strong></td>
+                    <td><em>samma röda bil<br>samma stora hus</em></td>
+                </tr>
+                <tr>
+                    <td><strong>densamma / detsamma / desamma</strong></td>
+                    <td>Määräinen (<strong>-a</strong>)</td>
+                    <td><strong>Epämääräinen</strong></td>
+                    <td><em>densamma röda bil<br>desamma stora hus</em></td>
+                </tr>
+            </tbody>
+        </table>
+    </details>
+</div>
+
+<script>
+/* ============================================================================
+   SUBSTANTIIVIT (en / ett, epämääräinen ja määräinen yksikkö & monikko)
+   ============================================================================ */
+const NOUNS = [
+    // --- EN-SUKU (UTRUM) ---
+    {
+        gender: "en", fi_sg: "auto", fi_pl: "autot", tag: "object",
+        sg_indef: "bil", sg_def: "bilen", pl_indef: "bilar", pl_def: "bilarna"
+    },
+    {
+        gender: "en", fi_sg: "kirja", fi_pl: "kirjat", tag: "object",
+        sg_indef: "bok", sg_def: "boken", pl_indef: "böcker", pl_def: "böckerna"
+    },
+    {
+        gender: "en", fi_sg: "koira", fi_pl: "koirat", tag: "animate",
+        sg_indef: "hund", sg_def: "hunden", pl_indef: "hundar", pl_def: "hundarna"
+    },
+    {
+        gender: "en", fi_sg: "kissa", fi_pl: "kissat", tag: "animate",
+        sg_indef: "katt", sg_def: "katten", pl_indef: "katter", pl_def: "katterna"
+    },
+    {
+        gender: "en", fi_sg: "takki", fi_pl: "takit", tag: "clothes",
+        sg_indef: "jacka", sg_def: "jackan", pl_indef: "jackor", pl_def: "jackorna"
+    },
+    {
+        gender: "en", fi_sg: "paita", fi_pl: "paidat", tag: "clothes",
+        sg_indef: "skjorta", sg_def: "skjortan", pl_indef: "skjortor", pl_def: "skjortorna"
+    },
+    {
+        gender: "en", fi_sg: "laukku", fi_pl: "laukut", tag: "object",
+        sg_indef: "väska", sg_def: "väskan", pl_indef: "väskor", pl_def: "väskorna"
+    },
+    {
+        gender: "en", fi_sg: "puhelin", fi_pl: "puhelimet", tag: "object",
+        sg_indef: "telefon", sg_def: "telefonen", pl_indef: "telefoner", pl_def: "telefonerna"
+    },
+    {
+        gender: "en", fi_sg: "tietokone", fi_pl: "tietokoneet", tag: "object",
+        sg_indef: "dator", sg_def: "datorn", pl_indef: "datorer", pl_def: "datorerna"
+    },
+    {
+        gender: "en", fi_sg: "tuoli", fi_pl: "tuolit", tag: "object",
+        sg_indef: "stol", sg_def: "stolen", pl_indef: "stolar", pl_def: "stolarna"
+    },
+    {
+        gender: "en", fi_sg: "kukka", fi_pl: "kukat", tag: "object",
+        sg_indef: "blomma", sg_def: "blomman", pl_indef: "blommor", pl_def: "blommorna"
+    },
+    {
+        gender: "en", fi_sg: "kaupunki", fi_pl: "kaupungit", tag: "place",
+        sg_indef: "stad", sg_def: "staden", pl_indef: "städer", pl_def: "städerna"
+    },
+    {
+        gender: "en", fi_sg: "elokuva", fi_pl: "elokuvat", tag: "abstract",
+        sg_indef: "film", sg_def: "filmen", pl_indef: "filmer", pl_def: "filmerna"
+    },
+    {
+        gender: "en", fi_sg: "laulu", fi_pl: "laulut", tag: "abstract",
+        sg_indef: "låt", sg_def: "låten", pl_indef: "låtar", pl_def: "låtarna"
+    },
+    {
+        gender: "en", fi_sg: "idea", fi_pl: "ideat", tag: "abstract",
+        sg_indef: "idé", sg_def: "idén", pl_indef: "idéer", pl_def: "idéerna"
+    },
+    {
+        gender: "en", fi_sg: "kysymys", fi_pl: "kysymykset", tag: "abstract",
+        sg_indef: "fråga", sg_def: "frågan", pl_indef: "frågor", pl_def: "frågorna"
+    },
+    {
+        gender: "en", fi_sg: "päivä", fi_pl: "päivät", tag: "abstract",
+        sg_indef: "dag", sg_def: "dagen", pl_indef: "dagar", pl_def: "dagarna"
+    },
+    {
+        gender: "en", fi_sg: "polkupyörä", fi_pl: "polkupyörät", tag: "object",
+        sg_indef: "cykel", sg_def: "cykeln", pl_indef: "cyklar", pl_def: "cyklarna"
+    },
+
+    // --- ETT-SUKU (NEUTRUM) ---
+    {
+        gender: "ett", fi_sg: "talo", fi_pl: "talot", tag: "place",
+        sg_indef: "hus", sg_def: "huset", pl_indef: "hus", pl_def: "husen"
+    },
+    {
+        gender: "ett", fi_sg: "pöytä", fi_pl: "pöydät", tag: "object",
+        sg_indef: "bord", sg_def: "bordet", pl_indef: "bord", pl_def: "borden"
+    },
+    {
+        gender: "ett", fi_sg: "huone", fi_pl: "huoneet", tag: "place",
+        sg_indef: "rum", sg_def: "rummet", pl_indef: "rum", pl_def: "rummen"
+    },
+    {
+        gender: "ett", fi_sg: "omena", fi_pl: "omenat", tag: "object",
+        sg_indef: "äpple", sg_def: "äpplet", pl_indef: "äpplen", pl_def: "äpplena"
+    },
+    {
+        gender: "ett", fi_sg: "kirje", fi_pl: "kirjeet", tag: "object",
+        sg_indef: "brev", sg_def: "brevet", pl_indef: "brev", pl_def: "breven"
+    },
+    {
+        gender: "ett", fi_sg: "ongelma", fi_pl: "ongelmat", tag: "abstract",
+        sg_indef: "problem", sg_def: "problemet", pl_indef: "problem", pl_def: "problemen"
+    },
+    {
+        gender: "ett", fi_sg: "ikkuna", fi_pl: "ikkunat", tag: "object",
+        sg_indef: "fönster", sg_def: "fönstret", pl_indef: "fönster", pl_def: "fönstren"
+    },
+    {
+        gender: "ett", fi_sg: "puu", fi_pl: "puut", tag: "object",
+        sg_indef: "träd", sg_def: "trädet", pl_indef: "träd", pl_def: "träden"
+    },
+    {
+        gender: "ett", fi_sg: "maa (valtio)", fi_pl: "maat", tag: "place",
+        sg_indef: "land", sg_def: "landet", pl_indef: "länder", pl_def: "länderna"
+    },
+    {
+        gender: "ett", fi_sg: "pari kenkiä", fi_pl: "kenkäparit", tag: "clothes",
+        sg_indef: "par skor", sg_def: "paret skor", pl_indef: "par skor", pl_def: "paren skor"
+    },
+    {
+        gender: "ett", fi_sg: "sana", fi_pl: "sanat", tag: "abstract",
+        sg_indef: "ord", sg_def: "ordet", pl_indef: "ord", pl_def: "orden"
+    },
+    {
+        gender: "ett", fi_sg: "hotelli", fi_pl: "hotellit", tag: "place",
+        sg_indef: "hotell", sg_def: "hotellet", pl_indef: "hotell", pl_def: "hotellen"
+    },
+    {
+        gender: "ett", fi_sg: "kasvot", fi_pl: "kasvot", tag: "object",
+        sg_indef: "ansikte", sg_def: "ansiktet", pl_indef: "ansikten", pl_def: "ansiktena"
+    },
+    {
+        gender: "ett", fi_sg: "leipomo", fi_pl: "leipomot", tag: "place",
+        sg_indef: "bageri", sg_def: "bageriet", pl_indef: "bagerier", pl_def: "bagerierna"
+    }
+];
+
+/* ============================================================================
+   ADJEKTIIVIT (en-muoto, ett-muoto, monikko/määräinen -a)
+   ============================================================================ */
+const ADJECTIVES = [
+    { en: "stor", ett: "stort", pl_def: "stora", fi: "iso", allowedTags: ["object", "place", "animate"] },
+    { en: "ny", ett: "nytt", pl_def: "nya", fi: "uusi", allowedTags: ["object", "place", "clothes", "abstract"] },
+    { en: "gammal", ett: "gammalt", pl_def: "gamla", fi: "vanha", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "fin", ett: "fint", pl_def: "fina", fi: "hieno / kaunis", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "vacker", ett: "vackert", pl_def: "vackra", fi: "kaunis", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "röd", ett: "rött", pl_def: "röda", fi: "punainen", allowedTags: ["object", "place", "clothes"] },
+    { en: "blå", ett: "blått", pl_def: "blåa", fi: "sininen", allowedTags: ["object", "place", "clothes"] },
+    { en: "grön", ett: "grönt", pl_def: "gröna", fi: "vihreä", allowedTags: ["object", "place", "clothes"] },
+    { en: "vit", ett: "vitt", pl_def: "vita", fi: "valkoinen", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "svart", ett: "svart", pl_def: "svarta", fi: "musta", allowedTags: ["object", "animate", "clothes"] },
+    { en: "gul", ett: "gult", pl_def: "gula", fi: "keltainen", allowedTags: ["object", "place", "clothes"] },
+    { en: "dyr", ett: "dyrt", pl_def: "dyra", fi: "kallis", allowedTags: ["object", "place", "clothes"] },
+    { en: "billig", ett: "billigt", pl_def: "billiga", fi: "halpa", allowedTags: ["object", "place", "clothes"] },
+    { en: "bra", ett: "bra", pl_def: "bra", fi: "hyvä", allowedTags: ["object", "place", "abstract", "clothes"] },
+    { en: "dålig", ett: "dåligt", pl_def: "dåliga", fi: "huono", allowedTags: ["object", "place", "abstract", "clothes"] },
+    { en: "intressant", ett: "intressant", pl_def: "intressanta", fi: "mielenkiintoinen", allowedTags: ["object", "place", "abstract"] },
+    { en: "svår", ett: "svårt", pl_def: "svåra", fi: "vaikea", allowedTags: ["abstract"] },
+    { en: "lätt", ett: "lätt", pl_def: "lätta", fi: "helppo / kevyt", allowedTags: ["object", "abstract"] },
+    { en: "viktig", ett: "viktigt", pl_def: "viktiga", fi: "tärkeä", allowedTags: ["abstract"] },
+    { en: "trevlig", ett: "trevligt", pl_def: "trevliga", fi: "mukava", allowedTags: ["place", "animate", "abstract"] },
+    { en: "liten", ett: "litet", pl_def: "små", def_sg: "lilla", fi: "pieni", isLiten: true, allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "modern", ett: "modernt", pl_def: "moderna", fi: "nykyaikainen", allowedTags: ["object", "place", "clothes"] },
+    { en: "ren", ett: "rent", pl_def: "rena", fi: "puhdas", allowedTags: ["object", "place", "clothes"] },
+    { en: "varm", ett: "varmt", pl_def: "varma", fi: "lämmin", allowedTags: ["place", "clothes", "abstract"] },
+    { en: "kall", ett: "kallt", pl_def: "kalla", fi: "kylmä", allowedTags: ["place", "clothes", "abstract"] }
+];
+
+/* ============================================================================
+   DEMONSTRATIIVIPRONOMINIT & SÄÄNNÖT
+   - adjForm: 'def' (määräinen -a) tai 'indef' (epämääräinen -, -t, -a)
+   - nounForm: 'def' (määräinen) tai 'indef' (epämääräinen)
+   ============================================================================ */
+const PRONOUN_TYPES = [
+    {
+        id: "den_har",
+        group: "den_har",
+        fi_sg: "tämä",
+        fi_pl: "nämä",
+        forms: { en: "den här", ett: "det här", pl: "de här" },
+        adjForm: "def",
+        nounForm: "def",
+        ruleBadge: "Määräinen adj. + Määräinen subst.",
+        hintRule: "<strong>den här / det här / de här</strong> vaatii sekä adjektiivista <b>määräisen muodon (-a)</b> että substantiivista <b>määräisen muodon</b> (loppuartikkeli)."
+    },
+    {
+        id: "denna",
+        group: "denna",
+        fi_sg: "tämä",
+        fi_pl: "nämä",
+        forms: { en: "denna", ett: "detta", pl: "dessa" },
+        adjForm: "def",
+        nounForm: "indef",
+        ruleBadge: "Määräinen adj. + Epämääräinen subst.",
+        hintRule: "<strong>denna / detta / dessa</strong> vaatii adjektiivista <b>määräisen muodon (-a)</b>, mutta substantiivi jää <b>epämääräiseen muotoon</b> (ei loppuartikkelia)!"
+    },
+    {
+        id: "den_dar",
+        group: "den_dar",
+        fi_sg: "tuo",
+        fi_pl: "nuo",
+        forms: { en: "den där", ett: "det där", pl: "de där" },
+        adjForm: "def",
+        nounForm: "def",
+        ruleBadge: "Määräinen adj. + Määräinen subst.",
+        hintRule: "<strong>den där / det där / de där</strong> toimii kuten <i>den här</i>: sekä adjektiivi (-a) että substantiivi ovat <b>määräisessä muodossa</b>."
+    },
+    {
+        id: "sadan",
+        group: "sadan",
+        fi_sg: "sellainen",
+        fi_pl: "sellaiset",
+        forms: { en: "en sådan", ett: "ett sådant", pl: "sådana" },
+        adjForm: "indef",
+        nounForm: "indef",
+        ruleBadge: "Epämääräinen adj. + Epämääräinen subst.",
+        hintRule: "<strong>en sådan / ett sådant / sådana</strong> on epämääräinen rakenne: sekä adjektiivi (<i>-, -t, -a</i>) että substantiivi ovat <b>epämääräisessä muodossa</b>."
+    },
+    {
+        id: "sadan_har",
+        group: "sadan_har_dar",
+        fi_sg: "tällainen",
+        fi_pl: "tällaiset",
+        forms: { en: "en sådan här", ett: "ett sådant här", pl: "sådana här" },
+        adjForm: "indef",
+        nounForm: "indef",
+        ruleBadge: "Epämääräinen adj. + Epämääräinen subst.",
+        hintRule: "<strong>en sådan här / ett sådant här / sådana här</strong> noudattaa <i>sådan</i>-sääntöä: sekä adjektiivi että substantiivi ovat <b>epämääräisessä muodossa</b>."
+    },
+    {
+        id: "sadan_dar",
+        group: "sadan_har_dar",
+        fi_sg: "tuollainen",
+        fi_pl: "tuollaiset",
+        forms: { en: "en sådan där", ett: "ett sådant där", pl: "sådana där" },
+        adjForm: "indef",
+        nounForm: "indef",
+        ruleBadge: "Epämääräinen adj. + Epämääräinen subst.",
+        hintRule: "<strong>en sådan där / ett sådant där / sådana där</strong> noudattaa <i>sådan</i>-sääntöä: sekä adjektiivi että substantiivi ovat <b>epämääräisessä muodossa</b>."
+    },
+    {
+        id: "likadan",
+        group: "likadan",
+        fi_sg: "samanlainen",
+        fi_pl: "samanlaiset",
+        forms: { en: "en likadan", ett: "ett likadant", pl: "likadana" },
+        adjForm: "indef",
+        nounForm: "indef",
+        ruleBadge: "Epämääräinen adj. + Epämääräinen subst.",
+        hintRule: "<strong>en likadan / ett likadant / likadana</strong> toimii kuin <i>en sådan</i>: sekä adjektiivi että substantiivi ovat <b>epämääräisessä muodossa</b>."
+    },
+    {
+        id: "samma",
+        group: "samma",
+        fi_sg: "sama",
+        fi_pl: "samat",
+        forms: { en: "samma", ett: "samma", pl: "samma" },
+        adjForm: "def",
+        nounForm: "indef",
+        ruleBadge: "Määräinen adj. + Epämääräinen subst.",
+        hintRule: "<strong>samma</strong> on taipumaton! Sen jälkeen adjektiivi on <b>määräisessä muodossa (-a)</b>, mutta substantiivi on <b>epämääräinen</b> (ei loppuartikkelia)."
+    },
+    {
+        id: "densamma",
+        group: "densamma",
+        fi_sg: "sama (juuri se sama)",
+        fi_pl: "samat (juuri ne samat)",
+        forms: { en: "densamma", ett: "detsamma", pl: "desamma" },
+        adjForm: "def",
+        nounForm: "indef",
+        ruleBadge: "Määräinen adj. + Epämääräinen subst.",
+        hintRule: "<strong>densamma / detsamma / desamma</strong> vaatii adjektiivista <b>määräisen muodon (-a)</b> ja substantiivista <b>epämääräisen muodon</b> (kuten <i>denna</i>)."
+    }
+];
+
+/* ============================================================================
+   LAUSEPOHJAT
+   ============================================================================ */
+const SENTENCE_TEMPLATES = [
+    {
+        sv_sg: "Titta på ___!",
+        sv_pl: "Titta på ___!",
+        fi_sg: "Katso {pron} {adj} {noun_part}!",
+        fi_pl: "Katso {pron} {adj_pl} {noun_part_pl}!",
+        allowedPronouns: ["den_har", "denna", "den_dar", "sadan", "sadan_har", "sadan_dar", "likadan"]
+    },
+    {
+        sv_sg: "Jag vill köpa ___.",
+        sv_pl: "Jag vill köpa ___.",
+        fi_sg: "Haluan ostaa {pron_gen} {adj_gen} {noun_gen}.",
+        fi_pl: "Haluan ostaa {pron_pl} {adj_pl} {noun_pl}.",
+        allowedPronouns: ["den_har", "denna", "den_dar", "sadan", "sadan_har", "sadan_dar", "likadan"],
+        allowedTags: ["object", "clothes", "place"]
+    },
+    {
+        sv_sg: "Vi bor i ___.",
+        sv_pl: "Vi har besökt ___.",
+        fi_sg: "Asumme {pron_ssa} {adj_ssa} {noun_ssa}.",
+        fi_pl: "Olemme vierailleet {pron_ssa_pl} {adj_ssa_pl} {noun_ssa_pl}.",
+        allowedPronouns: ["den_har", "denna", "den_dar", "samma", "densamma"],
+        allowedTags: ["place"]
+    },
+    {
+        sv_sg: "Hon pratade om ___ hela dagen.",
+        sv_pl: "Hon pratade om ___ hela dagen.",
+        fi_sg: "Hän puhui koko päivän {pron_sta} {adj_sta} {noun_sta}.",
+        fi_pl: "Hän puhui koko päivän {pron_sta_pl} {adj_sta_pl} {noun_sta_pl}.",
+        allowedPronouns: ["den_har", "denna", "den_dar", "samma", "densamma", "sadan_har", "sadan_dar"]
+    },
+    {
+        sv_sg: "Vi använder alltid ___.",
+        sv_pl: "Vi använder alltid ___.",
+        fi_sg: "Käytämme aina {pron_gen} {adj_gen} {noun_gen}.",
+        fi_pl: "Käytämme aina {pron_pl} {adj_pl} {noun_pl}.",
+        allowedPronouns: ["samma", "densamma", "sadan", "likadan"],
+        allowedTags: ["object", "clothes"]
+    },
+    {
+        sv_sg: "Har du sett ___ förut?",
+        sv_pl: "Har du sett ___ förut?",
+        fi_sg: "Oletko nähnyt {pron_part} {adj_part} {noun_part} aiemmin?",
+        fi_pl: "Oletko nähnyt {pron_pl} {adj_pl} {noun_pl} aiemmin?",
+        allowedPronouns: ["den_har", "denna", "den_dar", "sadan", "sadan_har", "sadan_dar", "likadan", "samma", "densamma"]
+    }
+];
+
+let currentTask = null;
+let colorCodingEnabled = true;
+let hintLevel = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let streakCount = 0;
+let answeredCurrent = false;
+
+function toggleColors() {
+    colorCodingEnabled = !colorCodingEnabled;
+    const btn = document.getElementById("colorToggleBtn");
+    const legend = document.getElementById("colorLegend");
+    if (colorCodingEnabled) {
+        btn.classList.add("active");
+        btn.textContent = "🎨 Värikoodaus: PÄÄLLÄ";
+        legend.style.display = "flex";
+    } else {
+        btn.classList.remove("active");
+        btn.textContent = "⚪ Värikoodaus: POIS (Testitila)";
+        legend.style.display = "none";
+    }
+    applyCardColor();
+    renderTask();
+}
+
+function applyCardColor() {
+    const card = document.getElementById("taskCard");
+    card.className = "task-card";
+    if (!colorCodingEnabled || !currentTask) return;
+
+    if (currentTask.number === "pl") {
+        card.classList.add("card-pl");
+    } else {
+        card.classList.add("card-" + currentTask.noun.gender);
+    }
+}
+
+function getAdjectiveForm(adj, gender, number, adjFormType) {
+    if (adj.isLiten) {
+        if (adjFormType === "def") {
+            return number === "pl" ? "små" : "lilla";
+        } else {
+            if (number === "pl") return "små";
+            return gender === "en" ? "liten" : "litet";
+        }
+    }
+
+    if (adjFormType === "def") {
+        return adj.pl_def;
+    } else {
+        if (number === "pl") return adj.pl_def;
+        return gender === "en" ? adj.en : adj.ett;
+    }
+}
+
+function getNounForm(noun, number, nounFormType) {
+    if (number === "sg") {
+        return nounFormType === "def" ? noun.sg_def : noun.sg_indef;
+    } else {
+        return nounFormType === "def" ? noun.pl_def : noun.pl_indef;
+    }
+}
+
+function nextQuestion() {
+    hintLevel = 0;
+    answeredCurrent = false;
+    document.getElementById("hintCount").textContent = "0";
+    document.getElementById("hintBox").style.display = "none";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("answer").value = "";
+
+    // 1. Valitse pronomini
+    const groupChoice = document.getElementById("pronounGroupSelect").value;
+    let candidatePronouns = PRONOUN_TYPES;
+    if (groupChoice !== "all") {
+        candidatePronouns = PRONOUN_TYPES.filter(p => p.group === groupChoice);
+    }
+    const pronoun = candidatePronouns[Math.floor(Math.random() * candidatePronouns.length)];
+
+    // 2. Valitse luku (sg / pl)
+    const numChoice = document.getElementById("numberSelect").value;
+    const targetNumber = (numChoice === "both")
+        ? (Math.random() < 0.5 ? "sg" : "pl")
+        : numChoice;
+
+    // 3. Valitse sopiva lausepohja
+    let candidateSentences = SENTENCE_TEMPLATES.filter(s => s.allowedPronouns.includes(pronoun.id));
+    if (candidateSentences.length === 0) candidateSentences = SENTENCE_TEMPLATES;
+    const sentence = candidateSentences[Math.floor(Math.random() * candidateSentences.length)];
+
+    // 4. Valitse substantiivi
+    let candidateNouns = NOUNS;
+    if (sentence.allowedTags) {
+        candidateNouns = NOUNS.filter(n => sentence.allowedTags.includes(n.tag));
+    }
+    const noun = candidateNouns[Math.floor(Math.random() * candidateNouns.length)];
+
+    // 5. Valitse yhteensopiva adjektiivi
+    const candidateAdjs = ADJECTIVES.filter(a => a.allowedTags.includes(noun.tag));
+    const adj = candidateAdjs[Math.floor(Math.random() * candidateAdjs.length)];
+
+    // 6. Rakenna oikea vastaus
+    const pronStr = targetNumber === "pl" ? pronoun.forms.pl : pronoun.forms[noun.gender];
+    const adjStr = getAdjectiveForm(adj, noun.gender, targetNumber, pronoun.adjForm);
+    const nounStr = getNounForm(noun, targetNumber, pronoun.nounForm);
+    const expectedAnswer = `${pronStr} ${adjStr} ${nounStr}`;
+
+    // Vihjeen perusmuodot
+    const pronHint = targetNumber === "sg" ? pronoun.fi_sg : pronoun.fi_pl;
+    const baseNounWithArticle = `${noun.gender} ${noun.sg_indef}`;
+
+    currentTask = {
+        pronoun: pronoun,
+        number: targetNumber,
+        noun: noun,
+        adj: adj,
+        sentence: sentence,
+        expected: expectedAnswer,
+        pronStr: pronStr,
+        adjStr: adjStr,
+        nounStr: nounStr,
+        pronHint: pronHint,
+        baseNounWithArticle: baseNounWithArticle
+    };
+
+    renderTask();
+}
+
+function renderTask() {
+    applyCardColor();
+
+    const badgesArea = document.getElementById("badgesArea");
+    const numText = currentTask.number === "sg" ? "Yksikkö" : "Monikko";
+    const genderText = currentTask.noun.gender === "en" ? "En-suku (utrum)" : "Ett-suku (neutrum)";
+    const genderBadge = colorCodingEnabled
+        ? `<span class="badge">${genderText}</span>`
+        : "";
+
+    badgesArea.innerHTML = `
+        <span class="badge">🔢 ${numText}</span>
+        ${genderBadge}
+        <span class="badge badge-rule">${currentTask.pronoun.ruleBadge}</span>
+    `;
+
+    const rawSv = currentTask.number === "sg" ? currentTask.sentence.sv_sg : currentTask.sentence.sv_pl;
+    const sentenceHtml = rawSv.replace(
+        "___",
+        `<span class="blank-highlight">?</span>`
+    );
+    document.getElementById("sentenceSv").innerHTML = sentenceHtml;
+
+    // Näytetään perusmuodot selkeästi
+    const nounBaseDisplay = colorCodingEnabled
+        ? `${currentTask.noun.gender} ${currentTask.noun.sg_indef}`
+        : `${currentTask.noun.sg_indef} (${currentTask.noun.gender})`;
+
+    document.getElementById("basePrompt").textContent =
+        `[${currentTask.pronHint}] + ${currentTask.adj.en} + ${nounBaseDisplay}`;
+
+    const fiNoun = currentTask.number === "sg" ? currentTask.noun.fi_sg : currentTask.noun.fi_pl;
+    document.getElementById("basePromptFi").textContent =
+        `"${currentTask.pronHint} ${currentTask.adj.fi} ${fiNoun}"`;
+
+    document.getElementById("sentenceFi").innerHTML =
+        `Lauseen merkitys: <em>${rawSv.replace("___", "...")}</em>`;
+
+    document.getElementById("answer").focus();
+}
+
+function showHint() {
+    if (!currentTask) return;
+    hintLevel = Math.min(hintLevel + 1, 3);
+    document.getElementById("hintCount").textContent = hintLevel;
+
+    const hintBox = document.getElementById("hintBox");
+    hintBox.style.display = "block";
+
+    let hints = [];
+    hints.push(`<strong>1. Rakenne:</strong> ${currentTask.pronoun.hintRule}`);
+
+    if (hintLevel >= 2) {
+        const gInfo = currentTask.noun.gender === "en" ? "<b>en</b>-sukuinen" : "<b>ett</b>-sukuinen";
+        const nInfo = currentTask.number === "sg" ? "yksikössä" : "monikossa";
+        hints.push(`<strong>2. Sana ja luku:</strong> Substantiivi <i>${currentTask.noun.sg_indef}</i> on ${gInfo} ja lause on ${nInfo}. Pronomini on siis <b>${currentTask.pronStr}</b>.`);
+    }
+
+    if (hintLevel >= 3) {
+        hints.push(`<strong>3. Adjektiivi & Substantiivi:</strong> Adjektiivista tulee <b>${currentTask.adjStr}</b> ja substantiivista <b>${currentTask.nounStr}</b>.`);
+    }
+
+    hintBox.innerHTML = hints.join("<br>");
+}
+
+function checkAnswer() {
+    if (!currentTask) return;
+
+    const userRaw = document.getElementById("answer").value
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+
+    if (!userRaw) return;
+
+    // Hyväksytään myös "en sån / ett sånt / såna" puhekieliset muodot jos käyttäjä kirjoittaa ne
+    const normalize = str => str
+        .toLowerCase()
+        .replace(/sådan/g, "sån")
+        .replace(/sådant/g, "sånt")
+        .replace(/sådana/g, "såna");
+
+    const isCorrect = normalize(userRaw) === normalize(currentTask.expected);
+    const resultDiv = document.getElementById("result");
+
+    if (isCorrect) {
+        if (!answeredCurrent) {
+            correctCount++;
+            streakCount++;
+            answeredCurrent = true;
+            document.getElementById("correctCount").textContent = correctCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        const rawSv = currentTask.number === "sg" ? currentTask.sentence.sv_sg : currentTask.sentence.sv_pl;
+        const fullSentence = rawSv.replace("___", `<u>${currentTask.expected}</u>`);
+        resultDiv.innerHTML = `
+            <span class="correct">✓ Oikein!</span><br>
+            <span style="color:#334155; font-size:1.1rem;">${fullSentence}</span>
+        `;
+    } else {
+        if (!answeredCurrent) {
+            wrongCount++;
+            streakCount = 0;
+            answeredCurrent = true;
+            document.getElementById("wrongCount").textContent = wrongCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        resultDiv.innerHTML = `
+            <span class="wrong">✗ Väärin</span><br>
+            Oikea muoto: <strong>${currentTask.expected}</strong><br>
+            <span style="font-size:0.9rem; color:#475569;">(${currentTask.pronoun.ruleBadge})</span>
+        `;
+    }
+}
+
+document.getElementById("answer").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        if (answeredCurrent) {
+            nextQuestion();
+        } else {
+            checkAnswer();
+        }
+    }
+});
+
+nextQuestion();
+</script>
+
+</body>
+</html>
