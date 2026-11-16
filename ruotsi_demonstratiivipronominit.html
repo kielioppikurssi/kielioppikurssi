@@ -343,7 +343,6 @@
                 <option value="sadan_har_dar">sådan här / sådan där (tällainen / tuollainen)</option>
                 <option value="likadan">en likadan, ett likadant, likadana (samanlainen)</option>
                 <option value="samma">samma (sama)</option>
-                <option value="densamma">densamma, detsamma, desamma (sama)</option>
             </select>
         </div>
 
@@ -437,12 +436,6 @@
                     <td>Määräinen (<strong>-a</strong>)</td>
                     <td><strong>Epämääräinen</strong></td>
                     <td><em>samma röda bil<br>samma stora hus</em></td>
-                </tr>
-                <tr>
-                    <td><strong>densamma / detsamma / desamma</strong></td>
-                    <td>Määräinen (<strong>-a</strong>)</td>
-                    <td><strong>Epämääräinen</strong></td>
-                    <td><em>densamma röda bil<br>desamma stora hus</em></td>
                 </tr>
             </tbody>
         </table>
@@ -712,17 +705,7 @@ const PRONOUN_TYPES = [
         ruleBadge: "Määräinen adj. + Epämääräinen subst.",
         hintRule: "<strong>samma</strong> on taipumaton! Sen jälkeen adjektiivi on <b>määräisessä muodossa (-a)</b>, mutta substantiivi on <b>epämääräinen</b> (ei loppuartikkelia)."
     },
-    {
-        id: "densamma",
-        group: "densamma",
-        fi_sg: "sama (juuri se sama)",
-        fi_pl: "samat (juuri ne samat)",
-        forms: { en: "densamma", ett: "detsamma", pl: "desamma" },
-        adjForm: "def",
-        nounForm: "indef",
-        ruleBadge: "Määräinen adj. + Epämääräinen subst.",
-        hintRule: "<strong>densamma / detsamma / desamma</strong> vaatii adjektiivista <b>määräisen muodon (-a)</b> ja substantiivista <b>epämääräisen muodon</b> (kuten <i>denna</i>)."
-    }
+   
 ];
 
 /* ============================================================================
@@ -749,7 +732,7 @@ const SENTENCE_TEMPLATES = [
         sv_pl: "Vi har besökt ___.",
         fi_sg: "Asumme {pron_ssa} {adj_ssa} {noun_ssa}.",
         fi_pl: "Olemme vierailleet {pron_ssa_pl} {adj_ssa_pl} {noun_ssa_pl}.",
-        allowedPronouns: ["den_har", "denna", "den_dar", "samma", "densamma"],
+        allowedPronouns: ["den_har", "denna", "den_dar", "samma"],
         allowedTags: ["place"]
     },
     {
@@ -757,14 +740,22 @@ const SENTENCE_TEMPLATES = [
         sv_pl: "Hon pratade om ___ hela dagen.",
         fi_sg: "Hän puhui koko päivän {pron_sta} {adj_sta} {noun_sta}.",
         fi_pl: "Hän puhui koko päivän {pron_sta_pl} {adj_sta_pl} {noun_sta_pl}.",
-        allowedPronouns: ["den_har", "denna", "den_dar", "samma", "densamma", "sadan_har", "sadan_dar"]
+        allowedPronouns: ["den_har", "denna", "den_dar", "samma", "sadan_har", "sadan_dar"]
     },
     {
         sv_sg: "Vi använder alltid ___.",
         sv_pl: "Vi använder alltid ___.",
         fi_sg: "Käytämme aina {pron_gen} {adj_gen} {noun_gen}.",
         fi_pl: "Käytämme aina {pron_pl} {adj_pl} {noun_pl}.",
-        allowedPronouns: ["samma", "densamma", "sadan", "likadan"],
+        allowedPronouns: ["samma", "sadan", "likadan"],
+        allowedTags: ["object", "clothes"]
+    },
+        {
+        sv_sg: "Vi använder alltid ___.",
+        sv_pl: "Vi använder alltid ___.",
+        fi_sg: "Käytämme aina {pron_gen} {adj_gen} {noun_gen}.",
+        fi_pl: "Käytämme aina {pron_pl} {adj_pl} {noun_pl}.",
+        allowedPronouns: ["samma", "sadan", "likadan"],
         allowedTags: ["object", "clothes"]
     },
     {
@@ -772,7 +763,7 @@ const SENTENCE_TEMPLATES = [
         sv_pl: "Har du sett ___ förut?",
         fi_sg: "Oletko nähnyt {pron_part} {adj_part} {noun_part} aiemmin?",
         fi_pl: "Oletko nähnyt {pron_pl} {adj_pl} {noun_pl} aiemmin?",
-        allowedPronouns: ["den_har", "denna", "den_dar", "sadan", "sadan_har", "sadan_dar", "likadan", "samma", "densamma"]
+        allowedPronouns: ["den_har", "denna", "den_dar", "sadan", "sadan_har", "sadan_dar", "likadan", "samma"]
     }
 ];
 
