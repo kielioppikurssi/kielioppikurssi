@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmistA lyhyesti – Ruotsin omistuspronominit</title>
+
+<style>
+    :root {
+        --bg-page: #f4f6f9;
+        --bg-card: #ffffff;
+        --primary: #004b87;
+        --primary-hover: #003666;
+        
+        /* Värikoodit jokaiselle persoonalle erikseen */
+        /* 1. pers. yksikkö (min/mitt/mina) - Sininen */
+        --min-bg: #dbeafe;
+        --min-border: #3b82f6;
+        --min-text: #1e3a8a;
+
+        /* 2. pers. yksikkö (din/ditt/dina) - Vihreä */
+        --din-bg: #dcfce7;
+        --din-border: #22c55e;
+        --din-text: #14532d;
+
+        /* 3. pers. yksikkö mies (hans) - Turkoosi */
+        --hans-bg: #cffafe;
+        --hans-border: #06b6d4;
+        --hans-text: #164e63;
+
+        /* 3. pers. yksikkö nainen (hennes) - Roosa */
+        --hennes-bg: #fce7f3;
+        --hennes-border: #ec4899;
+        --hennes-text: #831843;
+
+        /* 3. pers. yksikkö neutraali (hens) - Keltainen */
+        --hens-bg: #fef9c3;
+        --hens-border: #eab308;
+        --hens-text: #713f12;
+
+        /* 1. pers. monikko (vår/vårt/våra) - Indigo */
+        --var-bg: #e0e7ff;
+        --var-border: #6366f1;
+        --var-text: #312e81;
+
+        /* 2. pers. monikko (er/ert/era) - Oranssi */
+        --er-bg: #ffedd5;
+        --er-border: #f97316;
+        --er-text: #7c2d12;
+
+        /* 3. pers. monikko (deras) - Violetti */
+        --deras-bg: #f3e8ff;
+        --deras-border: #a855f7;
+        --deras-text: #4c1d95;
+
+        --neutral-bg: #f1f5f9;
+        --neutral-border: #cbd5e1;
+        --neutral-text: #1e293b;
+    }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--bg-page);
+        margin: 0;
+        padding: 20px;
+        color: #1e293b;
+    }
+
+    .home-button {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: 0.2s;
+        z-index: 1000;
+    }
+
+    .home-button:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 45px auto 20px auto;
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        color: #0f172a;
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .highlight-a {
+        color: #d97706;
+        text-decoration: underline;
+    }
+
+    /* Muistisääntölaatikko alussa */
+    .rule-banner {
+        background: #eff6ff;
+        border: 2px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 22px;
+        text-align: center;
+        font-size: 1.05rem;
+        color: #1e3a8a;
+        line-height: 1.5;
+    }
+
+    .rule-formula {
+        display: inline-block;
+        margin-top: 6px;
+        background: #ffffff;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-weight: 700;
+        border: 1px solid #93c5fd;
+        color: #0f172a;
+    }
+
+    /* Asetuspaneeli */
+    .controls-panel {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 18px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+    }
+
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .control-group label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+    }
+
+    select, .toggle-btn {
+        padding: 9px 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.95rem;
+        background: white;
+        cursor: pointer;
+        font-weight: 500;
+        transition: 0.15s;
+    }
+
+    .toggle-btn.active {
+        background: #e0e7ff;
+        border-color: #4f46e5;
+        color: #3730a3;
+        font-weight: 700;
+    }
+
+    /* Värikoodiselite: Yksiköt ja monikot erikseen */
+    .legend-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 20px;
+        font-size: 0.84rem;
+    }
+
+    .legend-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-title {
+        font-weight: 700;
+        color: #475569;
+        margin-right: 4px;
+        min-width: 75px;
+        text-align: right;
+    }
+
+    .legend-item {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+
+    .leg-min { background: var(--min-bg); border-color: var(--min-border); color: var(--min-text); }
+    .leg-din { background: var(--din-bg); border-color: var(--din-border); color: var(--din-text); }
+    .leg-hans { background: var(--hans-bg); border-color: var(--hans-border); color: var(--hans-text); }
+    .leg-hennes { background: var(--hennes-bg); border-color: var(--hennes-border); color: var(--hennes-text); }
+    .leg-hens { background: var(--hens-bg); border-color: var(--hens-border); color: var(--hens-text); }
+    .leg-var { background: var(--var-bg); border-color: var(--var-border); color: var(--var-text); }
+    .leg-er { background: var(--er-bg); border-color: var(--er-border); color: var(--er-text); }
+    .leg-deras { background: var(--deras-bg); border-color: var(--deras-border); color: var(--deras-text); }
+
+    /* Tehtäväkortti */
+    .task-card {
+        padding: 25px;
+        border-radius: 14px;
+        border: 2px solid var(--neutral-border);
+        background: var(--neutral-bg);
+        text-align: center;
+        margin-bottom: 20px;
+        transition: all 0.25s ease;
+    }
+
+    .card-min { background: var(--min-bg); border-color: var(--min-border); color: var(--min-text); }
+    .card-din { background: var(--din-bg); border-color: var(--din-border); color: var(--din-text); }
+    .card-hans { background: var(--hans-bg); border-color: var(--hans-border); color: var(--hans-text); }
+    .card-hennes { background: var(--hennes-bg); border-color: var(--hennes-border); color: var(--hennes-text); }
+    .card-hens { background: var(--hens-bg); border-color: var(--hens-border); color: var(--hens-text); }
+    .card-var { background: var(--var-bg); border-color: var(--var-border); color: var(--var-text); }
+    .card-er { background: var(--er-bg); border-color: var(--er-border); color: var(--er-text); }
+    .card-deras { background: var(--deras-bg); border-color: var(--deras-border); color: var(--deras-text); }
+
+    .badges {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.92);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .sentence-sv {
+        font-size: 1.55rem;
+        font-weight: 700;
+        margin: 12px 0;
+        line-height: 1.4;
+    }
+
+    .blank-highlight {
+        display: inline-block;
+        border-bottom: 3px solid currentColor;
+        min-width: 150px;
+        padding: 0 6px;
+        font-family: monospace;
+    }
+
+    .base-prompt-container {
+        margin-top: 10px;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255,255,255,0.88);
+        padding: 10px 22px;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .base-prompt {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .base-prompt-fi {
+        font-size: 0.98rem;
+        color: #334155;
+        font-style: italic;
+        margin-top: 4px;
+    }
+
+    .sentence-fi {
+        font-size: 1.02rem;
+        margin-top: 14px;
+        opacity: 0.9;
+        font-style: italic;
+    }
+
+    /* Syöttökenttä */
+    input#answer {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.25rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        transition: border-color 0.2s;
+    }
+
+    input#answer:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    /* Toimintopainikkeet */
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .action-btn {
+        padding: 11px 22px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .btn-check { background: #16a34a; color: white; }
+    .btn-check:hover { background: #15803d; }
+
+    .btn-hint { background: #f59e0b; color: white; }
+    .btn-hint:hover { background: #d97706; }
+
+    .btn-next { background: var(--primary); color: white; }
+    .btn-next:hover { background: var(--primary-hover); }
+
+    #hintBox {
+        margin-top: 15px;
+        padding: 14px;
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        border-radius: 6px;
+        color: #92400e;
+        font-size: 0.95rem;
+        display: none;
+        text-align: left;
+        line-height: 1.6;
+    }
+
+    #result {
+        margin-top: 18px;
+        font-size: 1.15rem;
+        text-align: center;
+        min-height: 55px;
+        line-height: 1.5;
+    }
+
+    .correct { color: #16a34a; font-weight: bold; }
+    .wrong { color: #dc2626; font-weight: bold; }
+
+    .stats {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    /* Cheatsheet */
+    details.grammar-cheat {
+        margin-top: 25px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 0.92rem;
+    }
+    details.grammar-cheat summary {
+        cursor: pointer;
+        font-weight: 700;
+        color: #004b87;
+        font-size: 1rem;
+    }
+    table.cheat-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        text-align: left;
+    }
+    table.cheat-table th, table.cheat-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #cbd5e1;
+    }
+    table.cheat-table th {
+        background: #e2e8f0;
+    }
+    .section-header-row td {
+        background: #e2e8f0;
+        font-weight: 700;
+        color: #1e293b;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+</style>
+</head>
+<body>
+
+<a href="https://kielioppikurssi.github.io/kielioppikurssi" class="home-button">
+    ← Päävalikkoon
+</a>
+
+<div class="container">
+    <h1>🇸🇪 Omist<span class="highlight-a">A</span> lyhyesti</h1>
+
+    <!-- MUISTISÄÄNTÖ ALKUUN -->
+    <div class="rule-banner">
+        <div><strong>Kultainen sääntö:</strong> Omistuspronominin jälkeen adjektiivista tulee aina <strong>määräinen -a-muoto</strong>, mutta substantiivi jää <strong>lyhyeksi eli epämääräiseksi</strong> (ei loppuartikkelia)!</div>
+        <div class="rule-formula">omistussana + adjektiivin -a-muoto + epämääräinen substantiivi</div>
+    </div>
+
+    <!-- ASETUSPANEELI -->
+    <div class="controls-panel">
+        <div class="control-group">
+            <label for="personSelect">1. Omistaja (Yksikkö / Monikko)</label>
+            <select id="personSelect" onchange="nextQuestion()">
+                <option value="all">🎲 Kaikki persoonat sekaisin</option>
+                <optgroup label="Yksikön persoonat">
+                    <option value="sg_all">Kaikki yksikön persoonat (min, din, hans, hennes, hens)</option>
+                    <option value="min">1. pers. yks. – min / mitt / mina</option>
+                    <option value="din">2. pers. yks. – din / ditt / dina</option>
+                    <option value="hans">3. pers. yks. (mies) – hans</option>
+                    <option value="hennes">3. pers. yks. (nainen) – hennes</option>
+                    <option value="hens">3. pers. yks. (neutraali) – hens</option>
+                </optgroup>
+                <optgroup label="Monikon persoonat">
+                    <option value="pl_all">Kaikki monikon persoonat (vår, er, deras)</option>
+                    <option value="var">1. pers. mon. – vår / vårt / våra</option>
+                    <option value="er">2. pers. mon. – er / ert / era</option>
+                    <option value="deras">3. pers. mon. – deras</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>2. Värikoodit (Persoonat)</label>
+            <button id="colorToggleBtn" class="toggle-btn active" onclick="toggleColors()">
+                🎨 Värikoodaus: PÄÄLLÄ
+            </button>
+        </div>
+
+        <div class="control-group">
+            <label>3. Suomennos</label>
+            <button id="transToggleBtn" class="toggle-btn" onclick="toggleTranslation()">
+                🇫🇮 Suomennos: POIS
+            </button>
+        </div>
+    </div>
+
+    <!-- VÄRIKOODISELITE: YKSIKÖT JA MONIKOT ERIKSEEN, JOKAISELLE OMA VÄRI -->
+    <div class="legend-wrapper" id="colorLegend">
+        <div class="legend-row">
+            <span class="legend-title">Yksikkö:</span>
+            <span class="legend-item leg-min">Sininen = min/mitt/mina</span>
+            <span class="legend-item leg-din">Vihreä = din/ditt/dina</span>
+            <span class="legend-item leg-hans">Turkoosi = hans</span>
+            <span class="legend-item leg-hennes">Roosa = hennes</span>
+            <span class="legend-item leg-hens">Keltainen = hens</span>
+        </div>
+        <div class="legend-row">
+            <span class="legend-title">Monikko:</span>
+            <span class="legend-item leg-var">Indigo = vår/vårt/våra</span>
+            <span class="legend-item leg-er">Oranssi = er/ert/era</span>
+            <span class="legend-item leg-deras">Violetti = deras</span>
+        </div>
+    </div>
+
+    <!-- TEHTÄVÄKORTTI -->
+    <div class="task-card" id="taskCard">
+        <div class="badges" id="badgesArea"></div>
+        <div class="sentence-sv" id="sentenceSv"></div>
+        <div class="base-prompt-container">
+            <div class="base-prompt" id="basePrompt"></div>
+            <div class="base-prompt-fi" id="basePromptFi" style="display:none;"></div>
+        </div>
+        <div class="sentence-fi" id="sentenceFi" style="display:none;"></div>
+    </div>
+
+    <!-- VASTAUSKENTTÄ -->
+    <input id="answer" autocomplete="off" placeholder="Kirjoita omistuspronomini + adjektiivi (-a) + substantiivi...">
+
+    <!-- PAINIKKEET -->
+    <div class="buttons">
+        <button class="action-btn btn-check" onclick="checkAnswer()">Tarkista (Enter)</button>
+        <button class="action-btn btn-hint" onclick="showHint()">💡 Vihje (<span id="hintCount">0</span>/3)</button>
+        <button class="action-btn btn-next" onclick="nextQuestion()">Seuraava lause →</button>
+    </div>
+
+    <div id="hintBox"></div>
+    <div id="result"></div>
+
+    <div class="stats">
+        <span>Oikein: <strong id="correctCount" style="color:#16a34a">0</strong></span>
+        <span>Putki: <strong id="streakCount" style="color:#004b87">0</strong> 🔥</span>
+        <span>Väärin: <strong id="wrongCount" style="color:#dc2626">0</strong></span>
+    </div>
+
+    <!-- CHEATSHEET: KAIKKI PRONOMINIT JAETTUNA YKSIKKÖÖN JA MONIKKOON -->
+    <details class="grammar-cheat">
+        <summary>📚 Hjälp: Kaikki omistuspronominit (yksikkö & monikko)</summary>
+        <p style="margin: 10px 0 6px 0;"><strong>Kaava:</strong> <code>omistuspronomini + adjektiivi (-a / lilla / små) + substantiivi (epämääräinen)</code><br>
+        Esim. <em>min röd<strong>a</strong> bil</em> (punainen autoni), <em>mitt stor<strong>a</strong> hus</em> (iso taloni), <em>deras ny<strong>a</strong> böcker</em> (heidän uudet kirjansa).</p>
+        <table class="cheat-table">
+            <thead>
+                <tr>
+                    <th>Omistaja</th>
+                    <th>En-suku (yks.)</th>
+                    <th>Ett-suku (yks.)</th>
+                    <th>Monikko</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="section-header-row">
+                    <td colspan="4">Yksikön persoonat</td>
+                </tr>
+                <tr class="leg-min">
+                    <td><strong>minun</strong> (jag)</td>
+                    <td>min</td>
+                    <td>mitt</td>
+                    <td>mina</td>
+                </tr>
+                <tr class="leg-din">
+                    <td><strong>sinun</strong> (du)</td>
+                    <td>din</td>
+                    <td>ditt</td>
+                    <td>dina</td>
+                </tr>
+                <tr class="leg-hans">
+                    <td><strong>hänen</strong> (han – mies)</td>
+                    <td>hans</td>
+                    <td>hans</td>
+                    <td>hans</td>
+                </tr>
+                <tr class="leg-hennes">
+                    <td><strong>hänen</strong> (hon – nainen)</td>
+                    <td>hennes</td>
+                    <td>hennes</td>
+                    <td>hennes</td>
+                </tr>
+                <tr class="leg-hens">
+                    <td><strong>hänen</strong> (hen – sukupuolineutraali)</td>
+                    <td>hens</td>
+                    <td>hens</td>
+                    <td>hens</td>
+                </tr>
+                <tr class="section-header-row">
+                    <td colspan="4">Monikon persoonat</td>
+                </tr>
+                <tr class="leg-var">
+                    <td><strong>meidän</strong> (vi)</td>
+                    <td>vår</td>
+                    <td>vårt</td>
+                    <td>våra</td>
+                </tr>
+                <tr class="leg-er">
+                    <td><strong>teidän</strong> (ni)</td>
+                    <td>er</td>
+                    <td>ert</td>
+                    <td>era</td>
+                </tr>
+                <tr class="leg-deras">
+                    <td><strong>heidän</strong> (de)</td>
+                    <td>deras</td>
+                    <td>deras</td>
+                    <td>deras</td>
+                </tr>
+            </tbody>
+        </table>
+    </details>
+</div>
+
+<script>
+/* ============================================================================
+   SUBSTANTIIVIT (en / ett, epämääräinen yksikkö & monikko)
+   ============================================================================ */
+const NOUNS = [
+    // --- EN-SUKU ---
+    { gender: "en", sg_indef: "bil", pl_indef: "bilar", fi_sg: "auto", fi_pl: "autot", tag: "object" },
+    { gender: "en", sg_indef: "bok", pl_indef: "böcker", fi_sg: "kirja", fi_pl: "kirjat", tag: "object" },
+    { gender: "en", sg_indef: "hund", pl_indef: "hundar", fi_sg: "koira", fi_pl: "koirat", tag: "animate" },
+    { gender: "en", sg_indef: "katt", pl_indef: "katter", fi_sg: "kissa", fi_pl: "kissat", tag: "animate" },
+    { gender: "en", sg_indef: "jacka", pl_indef: "jackor", fi_sg: "takki", fi_pl: "takit", tag: "clothes" },
+    { gender: "en", sg_indef: "skjorta", pl_indef: "skjortor", fi_sg: "paita", fi_pl: "paidat", tag: "clothes" },
+    { gender: "en", sg_indef: "väska", pl_indef: "väskor", fi_sg: "laukku", fi_pl: "laukut", tag: "object" },
+    { gender: "en", sg_indef: "telefon", pl_indef: "telefoner", fi_sg: "puhelin", fi_pl: "puhelimet", tag: "object" },
+    { gender: "en", sg_indef: "dator", pl_indef: "datorer", fi_sg: "tietokone", fi_pl: "tietokoneet", tag: "object" },
+    { gender: "en", sg_indef: "stol", pl_indef: "stolar", fi_sg: "tuoli", fi_pl: "tuolit", tag: "object" },
+    { gender: "en", sg_indef: "blomma", pl_indef: "blommor", fi_sg: "kukka", fi_pl: "kukat", tag: "object" },
+    { gender: "en", sg_indef: "lägenhet", pl_indef: "lägenheter", fi_sg: "asunto", fi_pl: "asunnot", tag: "place" },
+    { gender: "en", sg_indef: "idé", pl_indef: "idéer", fi_sg: "idea", fi_pl: "ideat", tag: "abstract" },
+    { gender: "en", sg_indef: "fråga", pl_indef: "frågor", fi_sg: "kysymys", fi_pl: "kysymykset", tag: "abstract" },
+    { gender: "en", sg_indef: "cykel", pl_indef: "cyklar", fi_sg: "polkupyörä", fi_pl: "polkupyörät", tag: "object" },
+    { gender: "en", sg_indef: "vän", pl_indef: "vänner", fi_sg: "ystävä", fi_pl: "ystävät", tag: "animate" },
+
+    // --- ETT-SUKU ---
+    { gender: "ett", sg_indef: "hus", pl_indef: "hus", fi_sg: "talo", fi_pl: "talot", tag: "place" },
+    { gender: "ett", sg_indef: "bord", pl_indef: "bord", fi_sg: "pöytä", fi_pl: "pöydät", tag: "object" },
+    { gender: "ett", sg_indef: "rum", pl_indef: "rum", fi_sg: "huone", fi_pl: "huoneet", tag: "place" },
+    { gender: "ett", sg_indef: "äpple", pl_indef: "äpplen", fi_sg: "omena", fi_pl: "omenat", tag: "object" },
+    { gender: "ett", sg_indef: "brev", pl_indef: "brev", fi_sg: "kirje", fi_pl: "kirjeet", tag: "object" },
+    { gender: "ett", sg_indef: "problem", pl_indef: "problem", fi_sg: "ongelma", fi_pl: "ongelmat", tag: "abstract" },
+    { gender: "ett", sg_indef: "fönster", pl_indef: "fönster", fi_sg: "ikkuna", fi_pl: "ikkunat", tag: "object" },
+    { gender: "ett", sg_indef: "träd", pl_indef: "träd", fi_sg: "puu", fi_pl: "puut", tag: "object" },
+    { gender: "ett", sg_indef: "par skor", pl_indef: "par skor", fi_sg: "kenkäpari", fi_pl: "kenkäparit", tag: "clothes" },
+    { gender: "ett", sg_indef: "barn", pl_indef: "barn", fi_sg: "lapsi", fi_pl: "lapset", tag: "animate" },
+    { gender: "ett", sg_indef: "foto", pl_indef: "foton", fi_sg: "valokuva", fi_pl: "valokuvat", tag: "object" },
+    { gender: "ett", sg_indef: "namn", pl_indef: "namn", fi_sg: "nimi", fi_pl: "nimet", tag: "abstract" }
+];
+
+/* ============================================================================
+   ADJEKTIIVIT
+   ============================================================================ */
+const ADJECTIVES = [
+    { en: "stor", a_sg: "stora", a_pl: "stora", fi: "iso", allowedTags: ["object", "place", "animate"] },
+    { en: "ny", a_sg: "nya", a_pl: "nya", fi: "uusi", allowedTags: ["object", "place", "clothes", "abstract"] },
+    { en: "gammal", a_sg: "gamla", a_pl: "gamla", fi: "vanha", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "fin", a_sg: "fina", a_pl: "fina", fi: "hieno", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "vacker", a_sg: "vackra", a_pl: "vackra", fi: "kaunis", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "röd", a_sg: "röda", a_pl: "röda", fi: "punainen", allowedTags: ["object", "place", "clothes"] },
+    { en: "blå", a_sg: "blåa", a_pl: "blåa", fi: "sininen", allowedTags: ["object", "place", "clothes"] },
+    { en: "grön", a_sg: "gröna", a_pl: "gröna", fi: "vihreä", allowedTags: ["object", "place", "clothes"] },
+    { en: "vit", a_sg: "vita", a_pl: "vita", fi: "valkoinen", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "svart", a_sg: "svarta", a_pl: "svarta", fi: "musta", allowedTags: ["object", "animate", "clothes"] },
+    { en: "gul", a_sg: "gula", a_pl: "gula", fi: "keltainen", allowedTags: ["object", "place", "clothes"] },
+    { en: "dyr", a_sg: "dyra", a_pl: "dyra", fi: "kallis", allowedTags: ["object", "place", "clothes"] },
+    { en: "billig", a_sg: "billiga", a_pl: "billiga", fi: "halpa", allowedTags: ["object", "place", "clothes"] },
+    { en: "bra", a_sg: "bra", a_pl: "bra", fi: "hyvä", allowedTags: ["object", "place", "abstract", "clothes"] },
+    { en: "intressant", a_sg: "intressanta", a_pl: "intressanta", fi: "mielenkiintoinen", allowedTags: ["object", "place", "abstract"] },
+    { en: "svår", a_sg: "svåra", a_pl: "svåra", fi: "vaikea", allowedTags: ["abstract"] },
+    { en: "viktig", a_sg: "viktiga", a_pl: "viktiga", fi: "tärkeä", allowedTags: ["abstract"] },
+    { en: "trevlig", a_sg: "trevliga", a_pl: "trevliga", fi: "mukava", allowedTags: ["place", "animate", "abstract"] },
+    { en: "liten", a_sg: "lilla", a_pl: "små", fi: "pieni", allowedTags: ["object", "place", "animate", "clothes"] },
+    { en: "modern", a_sg: "moderna", a_pl: "moderna", fi: "nykyaikainen", allowedTags: ["object", "place", "clothes"] },
+    { en: "varm", a_sg: "varma", a_pl: "varma", fi: "lämmin", allowedTags: ["place", "clothes", "abstract"] }
+];
+
+/* ============================================================================
+   OMISTUSPRONOMINIT (jaettu yksikköön & monikkoon, jokaisella oma väri)
+   ============================================================================ */
+const POSSESSIVES = [
+    // --- YKSIKKÖ ---
+    {
+        id: "min",
+        ownerNumber: "sg",
+        personLabel: "Yksikön 1. persoona",
+        promptLabel: "minun",
+        forms: { en: "min", ett: "mitt", pl: "mina" },
+        context: { sv: "Jag gillar ___.", fi: "Pidän..." }
+    },
+    {
+        id: "din",
+        ownerNumber: "sg",
+        personLabel: "Yksikön 2. persoona",
+        promptLabel: "sinun",
+        forms: { en: "din", ett: "ditt", pl: "dina" },
+        context: { sv: "Var är ___?", fi: "Missä on/ovat..." }
+    },
+    {
+        id: "hans",
+        ownerNumber: "sg",
+        personLabel: "Yksikön 3. persoona (mies)",
+        promptLabel: "hänen (mies)",
+        forms: { en: "hans", ett: "hans", pl: "hans" },
+        context: { sv: "Vi tittar på ___.", fi: "Katsomme..." }
+    },
+    {
+        id: "hennes",
+        ownerNumber: "sg",
+        personLabel: "Yksikön 3. persoona (nainen)",
+        promptLabel: "hänen (nainen)",
+        forms: { en: "hennes", ett: "hennes", pl: "hennes" },
+        context: { sv: "Jag har sett ___.", fi: "Olen nähnyt..." }
+    },
+    {
+        id: "hens",
+        ownerNumber: "sg",
+        personLabel: "Yksikön 3. persoona (sukupuolineutraali)",
+        promptLabel: "hänen (hen)",
+        forms: { en: "hens", ett: "hens", pl: "hens" },
+        context: { sv: "Det här är ___.", fi: "Tässä on / Nämä ovat..." }
+    },
+
+    // --- MONIKKO ---
+    {
+        id: "var",
+        ownerNumber: "pl",
+        personLabel: "Monikon 1. persoona",
+        promptLabel: "meidän",
+        forms: { en: "vår", ett: "vårt", pl: "våra" },
+        context: { sv: "Vi älskar ___.", fi: "Rakastamme..." }
+    },
+    {
+        id: "er",
+        ownerNumber: "pl",
+        personLabel: "Monikon 2. persoona",
+        promptLabel: "teidän",
+        forms: { en: "er", ett: "ert", pl: "era" },
+        context: { sv: "Är det där ___?", fi: "Onko tuo / Ovatko nuo..." }
+    },
+    {
+        id: "deras",
+        ownerNumber: "pl",
+        personLabel: "Monikon 3. persoona",
+        promptLabel: "heidän",
+        forms: { en: "deras", ett: "deras", pl: "deras" },
+        context: { sv: "Alla pratar om ___.", fi: "Kaikki puhuvat..." }
+    }
+];
+
+let currentTask = null;
+let colorCodingEnabled = true;
+let translationEnabled = false;
+let hintLevel = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let streakCount = 0;
+let answeredCurrent = false;
+
+function toggleColors() {
+    colorCodingEnabled = !colorCodingEnabled;
+    const btn = document.getElementById("colorToggleBtn");
+    const legend = document.getElementById("colorLegend");
+    if (colorCodingEnabled) {
+        btn.classList.add("active");
+        btn.textContent = "🎨 Värikoodaus: PÄÄLLÄ";
+        legend.style.display = "flex";
+    } else {
+        btn.classList.remove("active");
+        btn.textContent = "⚪ Värikoodaus: POIS";
+        legend.style.display = "none";
+    }
+    applyCardColor();
+}
+
+function toggleTranslation() {
+    translationEnabled = !translationEnabled;
+    const btn = document.getElementById("transToggleBtn");
+    const promptFi = document.getElementById("basePromptFi");
+    const sentFi = document.getElementById("sentenceFi");
+
+    if (translationEnabled) {
+        btn.classList.add("active");
+        btn.textContent = "🇫🇮 Suomennos: PÄÄLLÄ";
+        promptFi.style.display = "block";
+        sentFi.style.display = "block";
+    } else {
+        btn.classList.remove("active");
+        btn.textContent = "🇫🇮 Suomennos: POIS";
+        promptFi.style.display = "none";
+        sentFi.style.display = "none";
+    }
+}
+
+function applyCardColor() {
+    const card = document.getElementById("taskCard");
+    card.className = "task-card";
+    if (!colorCodingEnabled || !currentTask) return;
+
+    card.classList.add("card-" + currentTask.possessive.id);
+}
+
+function nextQuestion() {
+    hintLevel = 0;
+    answeredCurrent = false;
+    document.getElementById("hintCount").textContent = "0";
+    document.getElementById("hintBox").style.display = "none";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("answer").value = "";
+
+    // 1. Valitse omistussana suodattimen mukaan
+    const choice = document.getElementById("personSelect").value;
+    let candidatePoss = POSSESSIVES;
+    if (choice === "sg_all") {
+        candidatePoss = POSSESSIVES.filter(p => p.ownerNumber === "sg");
+    } else if (choice === "pl_all") {
+        candidatePoss = POSSESSIVES.filter(p => p.ownerNumber === "pl");
+    } else if (choice !== "all") {
+        candidatePoss = POSSESSIVES.filter(p => p.id === choice);
+    }
+    const poss = candidatePoss[Math.floor(Math.random() * candidatePoss.length)];
+
+    // 2. Arvo omistettavan asian luku (sg tai pl)
+    const targetNumber = Math.random() < 0.55 ? "sg" : "pl";
+
+    // 3. Arvo substantiivi
+    const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+
+    // 4. Arvo sopiva adjektiivi
+    const candidateAdjs = ADJECTIVES.filter(a => a.allowedTags.includes(noun.tag));
+    const adj = candidateAdjs[Math.floor(Math.random() * candidateAdjs.length)];
+
+    // 5. Rakenna oikea vastaus
+    const pronStr = targetNumber === "pl" ? poss.forms.pl : poss.forms[noun.gender];
+    const adjStr = targetNumber === "pl" ? adj.a_pl : adj.a_sg;
+    const nounStr = targetNumber === "pl" ? noun.pl_indef : noun.sg_indef;
+    const expectedAnswer = `${pronStr} ${adjStr} ${nounStr}`;
+
+    currentTask = {
+        possessive: poss,
+        number: targetNumber,
+        noun: noun,
+        adj: adj,
+        pronStr: pronStr,
+        adjStr: adjStr,
+        nounStr: nounStr,
+        expected: expectedAnswer
+    };
+
+    renderTask();
+}
+
+function renderTask() {
+    applyCardColor();
+
+    // Näytetään luku (Yksikkö / Monikko) selkeänä tunnisteena, mutta suku (en/ett) pysyy piilossa Vihje-napin takana!
+    const numLabel = currentTask.number === "sg" ? "1️⃣ Yksikkö" : "🔢 Monikko";
+    const badgesArea = document.getElementById("badgesArea");
+    badgesArea.innerHTML = `
+        <span class="badge">👤 ${currentTask.possessive.personLabel}</span>
+        <span class="badge">${numLabel}</span>
+        <span class="badge">🔒 Suku (en/ett): katso Vihje</span>
+    `;
+
+    const sentenceHtml = currentTask.possessive.context.sv.replace(
+        "___",
+        `<span class="blank-highlight">?</span>`
+    );
+    document.getElementById("sentenceSv").innerHTML = sentenceHtml;
+
+    // Näytetään myös vihjesanassa (yks. / mon.), jotta luvusta ei ole epäselvyyttä, mutta suku pysyy piilossa
+    const nounBaseDisplay = currentTask.noun.sg_indef;
+    const numTag = currentTask.number === "sg" ? "(yks.)" : "(mon.)";
+    document.getElementById("basePrompt").textContent =
+        `[${currentTask.possessive.promptLabel}] + ${currentTask.adj.en} + ${nounBaseDisplay} ${numTag}`;
+
+    // Suomennos (piilossa kunnes toggle laitetaan päälle)
+    const fiNoun = currentTask.number === "sg" ? currentTask.noun.fi_sg : currentTask.noun.fi_pl;
+    document.getElementById("basePromptFi").textContent =
+        `"${currentTask.possessive.promptLabel} ${currentTask.adj.fi} ${fiNoun}"`;
+
+    document.getElementById("sentenceFi").textContent =
+        `Lauseen alku: "${currentTask.possessive.context.fi}"`;
+
+    document.getElementById("answer").focus();
+}
+
+function showHint() {
+    if (!currentTask) return;
+    hintLevel = Math.min(hintLevel + 1, 3);
+    document.getElementById("hintCount").textContent = hintLevel;
+
+    const hintBox = document.getElementById("hintBox");
+    hintBox.style.display = "block";
+
+    let hints = [];
+    // Vihje 1 paljastaa substantiivin suvun (en/ett)!
+    const genderFi = currentTask.noun.gender === "en" ? "en-suku (utrum)" : "ett-suku (neutrum)";
+    hints.push(`<strong>1. Substantiivin suku:</strong> Sana <i>${currentTask.noun.sg_indef}</i> on <b>${genderFi}</b>.`);
+
+    if (hintLevel >= 2) {
+        hints.push(`<strong>2. Omistussana & Adjektiivi:</strong> Omistuspronomini on <b>${currentTask.pronStr}</b> ja adjektiivin -a-muoto on <b>${currentTask.adjStr}</b>.`);
+    }
+
+    if (hintLevel >= 3) {
+        hints.push(`<strong>3. Substantiivi (epämääräinen):</strong> Substantiivista tulee <b>${currentTask.nounStr}</b>.`);
+    }
+
+    hintBox.innerHTML = hints.join("<br>");
+}
+
+function checkAnswer() {
+    if (!currentTask) return;
+
+    const userRaw = document.getElementById("answer").value
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+
+    if (!userRaw) return;
+
+    const isCorrect = userRaw === currentTask.expected.toLowerCase();
+    const resultDiv = document.getElementById("result");
+
+    if (isCorrect) {
+        if (!answeredCurrent) {
+            correctCount++;
+            streakCount++;
+            answeredCurrent = true;
+            document.getElementById("correctCount").textContent = correctCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        const fullSentence = currentTask.possessive.context.sv.replace("___", `<u>${currentTask.expected}</u>`);
+        resultDiv.innerHTML = `
+            <span class="correct">✓ Oikein!</span><br>
+            <span style="color:#334155; font-size:1.1rem;">${fullSentence}</span>
+        `;
+    } else {
+        if (!answeredCurrent) {
+            wrongCount++;
+            streakCount = 0;
+            answeredCurrent = true;
+            document.getElementById("wrongCount").textContent = wrongCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        const numFi = currentTask.number === "sg" ? "yksikkö" : "monikko";
+        resultDiv.innerHTML = `
+            <span class="wrong">✗ Väärin</span><br>
+            Oikea muoto: <strong>${currentTask.expected}</strong><br>
+            <span style="font-size:0.9rem; color:#475569;">(${currentTask.noun.gender}-suku, ${numFi})</span>
+        `;
+    }
+}
+
+document.getElementById("answer").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        if (answeredCurrent) {
+            nextQuestion();
+        } else {
+            checkAnswer();
+        }
+    }
+});
+
+nextQuestion();
+</script>
+
+</body>
+</html>
