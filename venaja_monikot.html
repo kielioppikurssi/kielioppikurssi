@@ -179,6 +179,46 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
+    /* POIKKEUSILMOITUS SANAN YLÄPUOLELLE */
+    .exception-banner-wrap {
+        margin-bottom: 12px;
+    }
+
+    .exception-banner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #fff1f2;
+        border: 2px solid #e11d48;
+        color: #9f1239;
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 0.92rem;
+        font-weight: 800;
+        box-shadow: 0 2px 6px rgba(225, 29, 72, 0.16);
+        animation: popIn 0.25s ease-out;
+    }
+
+    .exception-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #e11d48;
+        color: #ffffff;
+        font-weight: 900;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    @keyframes popIn {
+        0% { transform: scale(0.92); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
     .word-prompt-box {
         background: rgba(255, 255, 255, 0.85);
         display: inline-block;
@@ -186,6 +226,10 @@
         border-radius: 12px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         margin-bottom: 10px;
+    }
+
+    .word-prompt-box.is-exception {
+        border: 2px dashed #e11d48;
     }
 
     .singular-word {
@@ -358,37 +402,6 @@
         border: 1px solid rgba(0,0,0,0.12);
     }
 
-    .rules-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 16px;
-        margin-top: 16px;
-    }
-
-    .rule-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 15px;
-        font-size: 0.92rem;
-    }
-
-    .rule-card h3 {
-        margin-top: 0;
-        margin-bottom: 8px;
-        font-size: 1.05rem;
-        color: #0f172a;
-    }
-
-    .rule-card ul {
-        margin: 0;
-        padding-left: 18px;
-    }
-
-    .rule-card li {
-        margin-bottom: 5px;
-    }
-
     @media (max-width: 600px) {
         .container, .cheatsheet-section {
             padding: 20px 16px;
@@ -396,6 +409,10 @@
         }
         .singular-word {
             font-size: 1.65rem;
+        }
+        .exception-banner {
+            font-size: 0.84rem;
+            padding: 6px 12px;
         }
     }
 </style>
@@ -431,9 +448,25 @@
         </div>
 
         <div class="control-group">
-            <label>3. Sukujen värikoodaus</label>
+            <label for="exceptionSelect">3. Sanojen valikoima</label>
+            <select id="exceptionSelect" onchange="nextQuestion()">
+                <option value="all">Kaikki sanat (säännölliset + poikkeukset)</option>
+                <option value="exceptions_only">❗ Vain poikkeavat monikot</option>
+                <option value="regular_only">Vain säännölliset monikot</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>4. Sukujen värikoodaus</label>
             <button id="colorToggleBtn" class="toggle-btn active" onclick="toggleColors()">
                 🎨 Värikoodaus: PÄÄLLÄ
+            </button>
+        </div>
+
+        <div class="control-group">
+            <label>5. Poikkeusvaroitus (❗)</label>
+            <button id="exceptionToggleBtn" class="toggle-btn active" onclick="toggleExceptionAlert()">
+                ❗ Poikkeusilmoitus: PÄÄLLÄ
             </button>
         </div>
     </div>
@@ -446,7 +479,8 @@
 
     <div class="task-card" id="taskCard">
         <div class="badges" id="badgesArea"></div>
-        <div class="word-prompt-box">
+        <div class="exception-banner-wrap" id="exceptionBannerArea"></div>
+        <div class="word-prompt-box" id="wordPromptBox">
             <div class="singular-word" id="singularPrompt"></div>
             <div class="word-translation" id="wordTranslation"></div>
         </div>
@@ -509,35 +543,35 @@
 const NOUNS = [
     // MASKULIINIT
     { base: "стол", fi: "pöytä", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "столы" },
-    { base: "стул", fi: "tuoli", gender: "m", tag: "object", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "стулья" },
-    { base: "дом", fi: "talo", gender: "m", tag: "place", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "дома" },
-    { base: "город", fi: "kaupunki", gender: "m", tag: "place", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "города" },
+    { base: "стул", fi: "tuoli", gender: "m", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: pehmeä -ья pääte (стулья)", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "стулья" },
+    { base: "дом", fi: "talo", gender: "m", tag: "place", isException: true, exceptionLabel: "Poikkeava monikko: painollinen -а pääte maskuliinilla", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "дома" },
+    { base: "город", fi: "kaupunki", gender: "m", tag: "place", isException: true, exceptionLabel: "Poikkeava monikko: painollinen -а pääte maskuliinilla", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "города" },
     { base: "парк", fi: "puisto", gender: "m", tag: "place", softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee pehmeä pääte.", ending: "-и", plNom: "парки" },
     { base: "банк", fi: "pankki", gender: "m", tag: "place", softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee pehmeä pääte.", ending: "-и", plNom: "банки" },
     { base: "магазин", fi: "kauppa", gender: "m", tag: "place", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "магазины" },
     { base: "университет", fi: "yliopisto", gender: "m", tag: "place", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "университеты" },
     { base: "театр", fi: "teatteri", gender: "m", tag: "place", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "театры" },
     { base: "автобус", fi: "bussi", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "автобусы" },
-    { base: "поезд", fi: "juna", gender: "m", tag: "object", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "поезда" },
+    { base: "поезд", fi: "juna", gender: "m", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: painollinen -а pääte maskuliinilla", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "поезда" },
     { base: "самолёт", fi: "lentokone", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "самолёты" },
     { base: "телефон", fi: "puhelin", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "телефоны" },
     { base: "компьютер", fi: "tietokone", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "компьютеры" },
     { base: "карандаш", fi: "lyijykynä", gender: "m", tag: "object", softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: ш-kirjaimen jälkeen tulee pehmeä pääte.", ending: "-и", plNom: "карандаши" },
     { base: "нож", fi: "veitsi", gender: "m", tag: "object", softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: ж-kirjaimen jälkeen tulee pehmeä pääte.", ending: "-и", plNom: "ножи" },
-    { base: "ключ", fi: "avain", gender: "m", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -й loppuinen maskuliini.", ending: "-и", plNom: "ключи" },
+    { base: "ключ", fi: "avain", gender: "m", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -ч loppuinen maskuliini (7 kirjaimen sääntö).", ending: "-и", plNom: "ключи" },
     { base: "врач", fi: "lääkäri", gender: "m", tag: "person", softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: ч-kirjaimen jälkeen tulee pehmeä pääte.", ending: "-и", plNom: "врачи" },
-    { base: "друг", fi: "ystävä", gender: "m", tag: "person", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "друзья" },
+    { base: "друг", fi: "ystävä", gender: "m", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: vartalonvaihtelu (г→з) ja -ья pääte", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "друзья" },
     { base: "студент", fi: "opiskelija", gender: "m", tag: "person", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "студенты" },
     { base: "турист", fi: "turisti", gender: "m", tag: "person", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "туристы" },
     { base: "билет", fi: "lippu", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "билеты" },
-    { base: "паспорт", fi: "passi", gender: "m", tag: "object", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "паспорта" },
+    { base: "паспорт", fi: "passi", gender: "m", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: painollinen -а pääte maskuliinilla", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "паспорта" },
     { base: "вопрос", fi: "kysymys", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "вопросы" },
     { base: "ответ", fi: "vastaus", gender: "m", tag: "object", softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы", plNom: "ответы" },
     { base: "урок", fi: "tunti", gender: "m", tag: "object", softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee pehmeä pääte.", ending: "-и", plNom: "уроки" },
     { base: "язык", fi: "kieli", gender: "m", tag: "object", softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee pehmeä pääte.", ending: "-и", plNom: "языки" },
-    { base: "цвет", fi: "väri", gender: "m", tag: "object", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "цвета" },
-    { base: "цветок", fi: "kukka", gender: "m", tag: "object", softHard: "kova", hintType: "Kova maskuliini (liikkuva ё).", ending: "-ы", plNom: "цветы" },
-    { base: "глаз", fi: "silmä", gender: "m", tag: "object", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "глаза" },
+    { base: "цвет", fi: "väri", gender: "m", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: painollinen -а pääte maskuliinilla", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "цвета" },
+    { base: "цветок", fi: "kukka", gender: "m", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: -ок-suffiksi katoaa (цветы)", softHard: "poikkeus (vartalo lyhenee)", hintType: "Poikkeusmaskuliini: -ок katoaa ja pääte on -ы (цветы).", ending: "-ы", plNom: "цветы" },
+    { base: "глаз", fi: "silmä", gender: "m", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: painollinen -а pääte maskuliinilla", softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а", plNom: "глаза" },
     { base: "словарь", fi: "sanakirja", gender: "m", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -ь loppuinen maskuliini.", ending: "-и", plNom: "словари" },
     { base: "день", fi: "päivä", gender: "m", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -ь loppuinen maskuliini (liikkuva е).", ending: "-и", plNom: "дни" },
     { base: "дождь", fi: "sade", gender: "m", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -ь loppuinen maskuliini.", ending: "-и", plNom: "дожди" },
@@ -546,13 +580,13 @@ const NOUNS = [
     { base: "герой", fi: "sankari", gender: "m", tag: "person", softHard: "pehmeä", hintType: "Pehmeä -й loppuinen maskuliini.", ending: "-и", plNom: "герои" },
     { base: "гость", fi: "vieras", gender: "m", tag: "person", softHard: "pehmeä", hintType: "Pehmeä -ь loppuinen maskuliini.", ending: "-и", plNom: "гости" },
     { base: "рубль", fi: "rupla", gender: "m", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -ь loppuinen maskuliini.", ending: "-и", plNom: "рубли" },
-    { base: "брат", fi: "veli", gender: "m", tag: "person", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "братья" },
+    { base: "брат", fi: "veli", gender: "m", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: pehmeä -ья pääte (братья)", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "братья" },
     { base: "отец", fi: "isä", gender: "m", tag: "person", softHard: "kova", hintType: "Kova maskuliini (liikkuva е).", ending: "-ы", plNom: "отцы" },
-    { base: "сын", fi: "poika", gender: "m", tag: "person", softHard: "poikkeus (pehmeä -овья)", hintType: "Poikkeusmaskuliini, jonka monikkoon on lisätty tavu -ов- ja päätteeksi pehmeä -ья.", ending: "-ья", plNom: "сыновья" },
-    { base: "муж", fi: "mies", gender: "m", tag: "person", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "мужья" },
-    { base: "человек", fi: "ihminen", gender: "m", tag: "person", softHard: "poikkeus (eri sana)", hintType: "Täysin epäsäännöllinen monikko.", ending: "люди", plNom: "люди" },
-    { base: "ребёнок", fi: "lapsi", gender: "m", tag: "person", softHard: "poikkeus (eri sana)", hintType: "Täysin epäsäännöllinen monikko.", ending: "дети", plNom: "дети" },
-    { base: "учитель", fi: "opettaja", gender: "m", tag: "person", softHard: "poikkeus (pehmeä -я)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -я.", ending: "-я", plNom: "учителя" },
+    { base: "сын", fi: "poika", gender: "m", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: -овья pääte (сыновья)", softHard: "poikkeus (pehmeä -овья)", hintType: "Poikkeusmaskuliini, jonka monikkoon on lisätty tavu -ов- ja päätteeksi pehmeä -ья.", ending: "-ья", plNom: "сыновья" },
+    { base: "муж", fi: "mies / aviomies", gender: "m", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: pehmeä -ья pääte (мужья)", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "мужья" },
+    { base: "человек", fi: "ihminen", gender: "m", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: eri sanavartalo (люди)", softHard: "poikkeus (eri sana)", hintType: "Täysin epäsäännöllinen monikko.", ending: "люди", plNom: "люди" },
+    { base: "ребёнок", fi: "lapsi", gender: "m", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: eri sanavartalo (дети)", softHard: "poikkeus (eri sana)", hintType: "Täysin epäsäännöllinen monikko.", ending: "дети", plNom: "дети" },
+    { base: "учитель", fi: "opettaja", gender: "m", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: painollinen -я pääte maskuliinilla", softHard: "poikkeus (pehmeä -я)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -я.", ending: "-я", plNom: "учителя" },
 
     // FEMINIINIT
     { base: "комната", fi: "huone", gender: "f", tag: "place", softHard: "kova", hintType: "Kova -а loppuinen feminiini.", ending: "-ы", plNom: "комнаты" },
@@ -579,8 +613,8 @@ const NOUNS = [
     { base: "история", fi: "historia", gender: "f", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -ия loppuinen feminiini.", ending: "-и", plNom: "истории" },
     { base: "картина", fi: "maalaus", gender: "f", tag: "object", softHard: "kova", hintType: "Kova -а loppuinen feminiini.", ending: "-ы", plNom: "картины" },
     { base: "стена", fi: "seinä", gender: "f", tag: "object", softHard: "kova", hintType: "Kova -а loppuinen feminiini.", ending: "-ы", plNom: "стены" },
-    { base: "мать", fi: "äiti", gender: "f", tag: "person", softHard: "poikkeus (pehmeä -и)", hintType: "Poikkeusfeminiini, vartalo pitenee (матер-).", ending: "-и", plNom: "матери" },
-    { base: "дочь", fi: "tytär", gender: "f", tag: "person", softHard: "poikkeus (pehmeä -и)", hintType: "Poikkeusfeminiini, vartalo pitenee (дочер-).", ending: "-и", plNom: "дочери" },
+    { base: "мать", fi: "äiti", gender: "f", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: vartalo pitenee (матер-)", softHard: "poikkeus (pehmeä -и)", hintType: "Poikkeusfeminiini, vartalo pitenee (матер-).", ending: "-и", plNom: "матери" },
+    { base: "дочь", fi: "tytär", gender: "f", tag: "person", isException: true, exceptionLabel: "Poikkeava monikko: vartalo pitenee (дочер-)", softHard: "poikkeus (pehmeä -и)", hintType: "Poikkeusfeminiini, vartalo pitenee (дочер-).", ending: "-и", plNom: "дочери" },
     { base: "жена", fi: "vaimo", gender: "f", tag: "person", softHard: "kova", hintType: "Kova -а loppuinen feminiini (liikkuva ё).", ending: "-ы", plNom: "жёны" },
     { base: "семья", fi: "perhe", gender: "f", tag: "person", softHard: "pehmeä", hintType: "Pehmeä -я loppuinen feminiini.", ending: "-и", plNom: "семьи" },
     { base: "деревня", fi: "kylä", gender: "f", tag: "place", softHard: "pehmeä", hintType: "Pehmeä -я loppuinen feminiini.", ending: "-и", plNom: "деревни" },
@@ -592,14 +626,14 @@ const NOUNS = [
     // NEUTRIT
     { base: "слово", fi: "sana", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "слова" },
     { base: "дело", fi: "asia", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "дела" },
-    { base: "время", fi: "aika", gender: "n", tag: "object", softHard: "poikkeus (-мя)", hintType: "Poikkeusneutri (-мя): vartalo pitenee (-ен-).", ending: "-ена", plNom: "времена" },
-    { base: "имя", fi: "nimi", gender: "n", tag: "object", softHard: "poikkeus (-мя)", hintType: "Poikkeusneutri (-мя): vartalo pitenee (-ен-).", ending: "-ена", plNom: "имена" },
+    { base: "время", fi: "aika", gender: "n", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: -мя-neutri saa -ена päätteen", softHard: "poikkeus (-мя)", hintType: "Poikkeusneutri (-мя): vartalo pitenee (-ен-).", ending: "-ена", plNom: "времена" },
+    { base: "имя", fi: "nimi", gender: "n", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: -мя-neutri saa -ена päätteen", softHard: "poikkeus (-мя)", hintType: "Poikkeusneutri (-мя): vartalo pitenee (-ен-).", ending: "-ена", plNom: "имена" },
     { base: "море", fi: "meri", gender: "n", tag: "place", softHard: "pehmeä", hintType: "Pehmeä -е loppuinen neutri.", ending: "-я", plNom: "моря" },
     { base: "озеро", fi: "järvi", gender: "n", tag: "place", softHard: "kova", hintType: "Kova -о loppuinen neutri (liikkuva ё).", ending: "-а", plNom: "озёра" },
     { base: "поле", fi: "pelto", gender: "n", tag: "place", softHard: "pehmeä", hintType: "Pehmeä -е loppuinen neutri.", ending: "-я", plNom: "поля" },
-    { base: "небо", fi: "taivas", gender: "n", tag: "object", softHard: "poikkeus (kova -еса)", hintType: "Poikkeusneutri: vartalo pitenee (-ес-).", ending: "-еса", plNom: "небеса" },
+    { base: "небо", fi: "taivas", gender: "n", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: vartalo pitenee (-еса pääte)", softHard: "poikkeus (kova -еса)", hintType: "Poikkeusneutri: vartalo pitenee (-ес-).", ending: "-еса", plNom: "небеса" },
     { base: "солнце", fi: "aurinko", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -це loppuinen neutri.", ending: "-а", plNom: "солнца" },
-    { base: "дерево", fi: "puu", gender: "n", tag: "place", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusneutri, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "деревья" },
+    { base: "дерево", fi: "puu", gender: "n", tag: "place", isException: true, exceptionLabel: "Poikkeava monikko: pehmeä -ья pääte (деревья)", softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusneutri, jonka monikossa on pehmeä -ья.", ending: "-ья", plNom: "деревья" },
     { base: "письмо", fi: "kirje", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "письма" },
     { base: "окно", fi: "ikkuna", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "окна" },
     { base: "здание", fi: "rakennus", gender: "n", tag: "place", softHard: "pehmeä", hintType: "Pehmeä -ие loppuinen neutri.", ending: "-я", plNom: "здания" },
@@ -607,7 +641,7 @@ const NOUNS = [
     { base: "платье", fi: "mekko", gender: "n", tag: "object", softHard: "pehmeä", hintType: "Pehmeä -ье loppuinen neutri.", ending: "-я", plNom: "платья" },
     { base: "зеркало", fi: "peili", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "зеркала" },
     { base: "кресло", fi: "nojatuoli", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "кресла" },
-    { base: "яблоко", fi: "omena", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "яблоки" },
+    { base: "яблоко", fi: "omena", gender: "n", tag: "object", isException: true, exceptionLabel: "Poikkeava monikko: neutri saa -и päätteen (яблоки)", softHard: "poikkeus (pehmeä -и)", hintType: "Poikkeusneutri: 7 kirjaimen säännön mukaan pääte on -и (яблоки).", ending: "-и", plNom: "яблоки" },
     { base: "яйцо", fi: "kananmuna", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "яйца" },
     { base: "кольцо", fi: "sormus", gender: "n", tag: "object", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "кольца" },
     { base: "место", fi: "paikka", gender: "n", tag: "place", softHard: "kova", hintType: "Kova -о loppuinen neutri.", ending: "-а", plNom: "места" }
@@ -646,6 +680,7 @@ const GENDER_NAMES_FI = { m: "Maskuliini", f: "Feminiini", n: "Neutri" };
 
 let currentTask = null;
 let colorCodingEnabled = true;
+let exceptionAlertEnabled = true;
 let hintLevel = 0;
 let correctCount = 0;
 let wrongCount = 0;
@@ -664,6 +699,19 @@ function toggleColors() {
         btn.classList.remove("active");
         btn.textContent = "⚪ Värikoodaus: POIS";
         legend.style.display = "none";
+    }
+    renderTask();
+}
+
+function toggleExceptionAlert() {
+    exceptionAlertEnabled = !exceptionAlertEnabled;
+    const btn = document.getElementById("exceptionToggleBtn");
+    if (exceptionAlertEnabled) {
+        btn.classList.add("active");
+        btn.textContent = "❗ Poikkeusilmoitus: PÄÄLLÄ";
+    } else {
+        btn.classList.remove("active");
+        btn.textContent = "⚪ Poikkeusilmoitus: POIS";
     }
     renderTask();
 }
@@ -687,7 +735,21 @@ function nextQuestion() {
     const useAdjective = (phraseChoice === "adj_noun") ? true : (phraseChoice === "noun_only" ? false : Math.random() < 0.5);
 
     const genderChoice = document.getElementById("genderSelect").value;
-    const candidateNouns = (genderChoice === "all") ? NOUNS : NOUNS.filter(n => n.gender === genderChoice);
+    const exceptionChoice = document.getElementById("exceptionSelect").value;
+
+    let candidateNouns = NOUNS;
+    if (genderChoice !== "all") {
+        candidateNouns = candidateNouns.filter(n => n.gender === genderChoice);
+    }
+    if (exceptionChoice === "exceptions_only") {
+        candidateNouns = candidateNouns.filter(n => Boolean(n.isException));
+    } else if (exceptionChoice === "regular_only") {
+        candidateNouns = candidateNouns.filter(n => !n.isException);
+    }
+
+    if (candidateNouns.length === 0) {
+        candidateNouns = NOUNS;
+    }
 
     const noun = candidateNouns[Math.floor(Math.random() * candidateNouns.length)];
 
@@ -733,6 +795,23 @@ function renderTask() {
     const typeBadge = currentTask.useAdjective ? `<span class="badge">Adjektiivi + Substantiivi</span>` : `<span class="badge">Substantiivi</span>`;
 
     badgesArea.innerHTML = `${genderBadge} ${typeBadge} <span class="badge">Monikko (Nom.)</span>`;
+
+    const exceptionBannerArea = document.getElementById("exceptionBannerArea");
+    const wordPromptBox = document.getElementById("wordPromptBox");
+
+    if (currentTask.noun.isException && exceptionAlertEnabled) {
+        const label = currentTask.noun.exceptionLabel || "Poikkeava monikkomuoto";
+        exceptionBannerArea.innerHTML = `
+            <div class="exception-banner" title="Tällä sanalla on poikkeava monikkomuoto">
+                <span class="exception-icon">!</span>
+                <span>${label}</span>
+            </div>
+        `;
+        wordPromptBox.classList.add("is-exception");
+    } else {
+        exceptionBannerArea.innerHTML = "";
+        wordPromptBox.classList.remove("is-exception");
+    }
 
     document.getElementById("singularPrompt").textContent = currentTask.singularPrompt;
     document.getElementById("wordTranslation").textContent = `(${currentTask.translationFi})`;
