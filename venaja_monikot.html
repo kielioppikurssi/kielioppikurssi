@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venäjän monikon nominatiivi</title>
+
+<style>
+    :root {
+        --bg-page: #f4f6f9;
+        --bg-card: #ffffff;
+        --primary: #003399;
+        --primary-hover: #0055cc;
+        
+        /* Värikoodit suvuille */
+        --masc-bg: #dbeafe;
+        --masc-border: #3b82f6;
+        --masc-text: #1e3a8a;
+
+        --fem-bg: #fee2e2;
+        --fem-border: #ef4444;
+        --fem-text: #7f1d1d;
+
+        --neut-bg: #fef9c3;
+        --neut-border: #eab308;
+        --neut-text: #713f12;
+
+        --neutral-bg: #f1f5f9;
+        --neutral-border: #cbd5e1;
+        --neutral-text: #1e293b;
+    }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--bg-page);
+        margin: 0;
+        padding: 20px;
+        color: #1e293b;
+        line-height: 1.5;
+    }
+
+    .home-button {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: 0.2s;
+        z-index: 1000;
+    }
+
+    .home-button:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+
+    .container {
+        max-width: 850px;
+        margin: 45px auto 20px auto;
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        color: #0f172a;
+        font-size: 1.85rem;
+        text-align: center;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #64748b;
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-size: 1rem;
+    }
+
+    /* Asetuspaneeli */
+    .controls-panel {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+    }
+
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .control-group label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+    }
+
+    select, .toggle-btn {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.95rem;
+        background: white;
+        cursor: pointer;
+        font-weight: 500;
+        transition: 0.15s;
+    }
+
+    .toggle-btn.active {
+        background: #e0e7ff;
+        border-color: #4f46e5;
+        color: #3730a3;
+        font-weight: 700;
+    }
+
+    /* Värikoodiselite */
+    .legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        font-size: 0.88rem;
+    }
+
+    .legend-item {
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        border: 1.5px solid transparent;
+    }
+    .leg-m { background: var(--masc-bg); border-color: var(--masc-border); color: var(--masc-text); }
+    .leg-f { background: var(--fem-bg); border-color: var(--fem-border); color: var(--fem-text); }
+    .leg-n { background: var(--neut-bg); border-color: var(--neut-border); color: var(--neut-text); }
+
+    /* Tehtäväkortti */
+    .task-card {
+        padding: 28px 20px;
+        border-radius: 14px;
+        border: 2.5px solid var(--neutral-border);
+        background: var(--neutral-bg);
+        text-align: center;
+        margin-bottom: 20px;
+        transition: all 0.25s ease;
+    }
+
+    .card-m { background: var(--masc-bg); border-color: var(--masc-border); color: var(--masc-text); }
+    .card-f { background: var(--fem-bg); border-color: var(--fem-border); color: var(--fem-text); }
+    .card-n { background: var(--neut-bg); border-color: var(--neut-border); color: var(--neut-text); }
+
+    .badges {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.88);
+        padding: 5px 13px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .word-prompt-box {
+        background: rgba(255, 255, 255, 0.85);
+        display: inline-block;
+        padding: 14px 28px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        margin-bottom: 10px;
+    }
+
+    .singular-word {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        color: #0f172a;
+    }
+
+    .word-translation {
+        font-size: 1.05rem;
+        color: #475569;
+        font-style: italic;
+        margin-top: 4px;
+    }
+
+    .task-instruction {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-top: 10px;
+        opacity: 0.9;
+    }
+
+    /* Syöttökenttä */
+    input#answer {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.3rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        transition: border-color 0.2s;
+    }
+
+    input#answer:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    /* Toimintopainikkeet */
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .action-btn {
+        padding: 11px 22px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .btn-check { background: #16a34a; color: white; }
+    .btn-check:hover { background: #15803d; }
+
+    .btn-hint { background: #f59e0b; color: white; }
+    .btn-hint:hover { background: #d97706; }
+
+    .btn-next { background: var(--primary); color: white; }
+    .btn-next:hover { background: var(--primary-hover); }
+
+    #hintBox {
+        margin-top: 16px;
+        padding: 14px 16px;
+        background: #fffbeb;
+        border-left: 5px solid #f59e0b;
+        border-radius: 8px;
+        color: #78350f;
+        font-size: 0.98rem;
+        display: none;
+        text-align: left;
+    }
+
+    .hint-step {
+        margin-bottom: 6px;
+    }
+    .hint-step:last-child {
+        margin-bottom: 0;
+    }
+
+    .ending-pill {
+        display: inline-block;
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        color: #92400e;
+        font-weight: 800;
+        padding: 1px 8px;
+        border-radius: 6px;
+        font-size: 1.05rem;
+    }
+
+    #result {
+        margin-top: 18px;
+        font-size: 1.15rem;
+        text-align: center;
+        min-height: 52px;
+    }
+
+    .correct { color: #16a34a; font-weight: bold; }
+    .wrong { color: #dc2626; font-weight: bold; }
+
+    .stats {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    /* ========================================================================
+       CHEATSHEET / TAIVUTUSTAULUKKO
+       ======================================================================== */
+    .cheatsheet-section {
+        max-width: 850px;
+        margin: 25px auto 40px auto;
+        background: var(--bg-card);
+        padding: 28px 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .cheatsheet-section h2 {
+        margin-top: 0;
+        color: #0f172a;
+        font-size: 1.45rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 10px;
+        margin-bottom: 18px;
+    }
+
+    .cheatsheet-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+
+    .cheatsheet-table th {
+        background: #1e293b;
+        color: white;
+        text-align: left;
+        padding: 12px 14px;
+        font-weight: 700;
+    }
+
+    .cheatsheet-table th:first-child { border-top-left-radius: 8px; }
+    .cheatsheet-table th:last-child { border-top-right-radius: 8px; }
+
+    .cheatsheet-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(0,0,0,0.08);
+        vertical-align: top;
+    }
+
+    /* Sukujen taustavärit taulukossa */
+    tr.row-m { background: var(--masc-bg); color: var(--masc-text); }
+    tr.row-f { background: var(--fem-bg); color: var(--fem-text); }
+    tr.row-n { background: var(--neut-bg); color: var(--neut-text); }
+
+    .end-tag {
+        display: inline-block;
+        background: rgba(255,255,255,0.85);
+        padding: 2px 7px;
+        border-radius: 5px;
+        font-weight: 800;
+        color: #0f172a;
+        border: 1px solid rgba(0,0,0,0.12);
+    }
+
+    .rules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .rule-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 15px;
+        font-size: 0.92rem;
+    }
+
+    .rule-card h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+        color: #0f172a;
+    }
+
+    .rule-card ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .rule-card li {
+        margin-bottom: 5px;
+    }
+
+    @media (max-width: 600px) {
+        .container, .cheatsheet-section {
+            padding: 20px 16px;
+            margin-top: 50px;
+        }
+        .singular-word {
+            font-size: 1.65rem;
+        }
+        .cheatsheet-table {
+            font-size: 0.86rem;
+        }
+        .cheatsheet-table th, .cheatsheet-table td {
+            padding: 9px 8px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-button">
+    ← Päävalikko
+</a>
+
+<div class="container">
+    <h1>Venäjän monikon nominatiivi</h1>
+    <p class="subtitle">Kirjoita annetun sanan (tai sanaparin) monikkomuoto perusmuodossa (nominatiivissa).</p>
+
+    <!-- ASETUSPANEELI -->
+    <div class="controls-panel">
+        <div class="control-group">
+            <label for="phraseSelect">1. Harjoitustyyppi</label>
+            <select id="phraseSelect" onchange="nextQuestion()">
+                <option value="noun_only">Vain substantiivi (esim. стол → столы)</option>
+                <option value="adj_noun">Adjektiivi + Substantiivi</option>
+                <option value="mixed">Sekaisin (molemmat)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="genderSelect">2. Suku</label>
+            <select id="genderSelect" onchange="nextQuestion()">
+                <option value="all">Kaikki suvut (M, F, N)</option>
+                <option value="m">Vain maskuliinit (sininen)</option>
+                <option value="f">Vain feminiinit (punainen)</option>
+                <option value="n">Vain neutrit (keltainen)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>3. Sukujen värikoodaus</label>
+            <button id="colorToggleBtn" class="toggle-btn active" onclick="toggleColors()">
+                🎨 Värikoodaus: PÄÄLLÄ
+            </button>
+        </div>
+    </div>
+
+    <!-- VÄRIKOODISELITE -->
+    <div class="legend" id="colorLegend">
+        <span class="legend-item leg-m">Sininen = Maskuliini</span>
+        <span class="legend-item leg-f">Punainen = Feminiini</span>
+        <span class="legend-item leg-n">Keltainen = Neutri</span>
+    </div>
+
+    <!-- TEHTÄVÄKORTTI -->
+    <div class="task-card" id="taskCard">
+        <div class="badges" id="badgesArea"></div>
+        <div class="word-prompt-box">
+            <div class="singular-word" id="singularPrompt"></div>
+            <div class="word-translation" id="wordTranslation"></div>
+        </div>
+        <div class="task-instruction">Kirjoita monikon nominatiivi:</div>
+    </div>
+
+    <!-- VASTAUSKENTTÄ -->
+    <input id="answer" autocomplete="off" placeholder="Kirjoita monikkomuoto tähän...">
+
+    <!-- PAINIKKEET -->
+    <div class="buttons">
+        <button class="action-btn btn-check" onclick="checkAnswer()">Tarkista (Enter)</button>
+        <button class="action-btn btn-hint" onclick="showHint()">💡 Vihje (<span id="hintCount">0</span>/2)</button>
+        <button class="action-btn btn-next" onclick="nextQuestion()">Seuraava sana →</button>
+    </div>
+
+    <div id="hintBox"></div>
+    <div id="result"></div>
+
+    <div class="stats">
+        <span>Oikein: <strong id="correctCount" style="color:#16a34a">0</strong></span>
+        <span>Putki: <strong id="streakCount" style="color:#003399">0</strong> 🔥</span>
+        <span>Väärin: <strong id="wrongCount" style="color:#dc2626">0</strong></span>
+    </div>
+</div>
+
+<!-- ========================================================================
+     TAIVUTUSTAULUKKO / CHEATSHEET
+     ======================================================================== -->
+<div class="cheatsheet-section">
+    <h2>📚 Muistilista: Monikon nominatiivi (Именительный падеж мн. ч.)</h2>
+    
+    <table class="cheatsheet-table">
+        <thead>
+            <tr>
+                <th>Suku</th>
+                <th>Kova vartalo (kova pääte)</th>
+                <th>Pehmeä vartalo / 7 kirjaimen sääntö (pehmeä pääte)</th>
+                <th>Yleisiä poikkeuksia</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-m">
+                <td><strong>Maskuliini</strong><br><small>(konsonantti, -й, -ь)</small></td>
+                <td>
+                    Pääte: <span class="end-tag">-ы</span><br>
+                    стол → стол<strong>ы</strong><br>
+                    отец → отц<strong>ы</strong> <em>(liikkuva е)</em>
+                </td>
+                <td>
+                    Pääte: <span class="end-tag">-и</span><br>
+                    • pehmeät (-ь, -й): преподаватель → преподавател<strong>и</strong><br>
+                    • 7 kirjaimen sääntö: мальчик → мальчик<strong>и</strong>, товарищ → товарищ<strong>и</strong>
+                </td>
+                <td>
+                    • Pääte <span class="end-tag">-а / -я</span>: город → город<strong>а</strong>, дом → дом<strong>а</strong>, учитель → учител<strong>я</strong>, директор → директор<strong>а</strong><br>
+                    • Pääte <span class="end-tag">-ья</span>: брат → брат<strong>ья</strong>, сын → сынов<strong>ья</strong>, муж → муж<strong>ья</strong><br>
+                    • Eri sana: человек → <strong>люди</strong>, ребёнок → <strong>дети</strong>
+                </td>
+            </tr>
+            <tr class="row-f">
+                <td><strong>Feminiini</strong><br><small>(-а, -я, -ь)</small></td>
+                <td>
+                    Pääte: <span class="end-tag">-ы</span><br>
+                    комната → комнат<strong>ы</strong><br>
+                    газета → газет<strong>ы</strong>
+                </td>
+                <td>
+                    Pääte: <span class="end-tag">-и</span><br>
+                    • pehmeät (-я, -ь): неделя → недел<strong>и</strong>, жизнь → жизн<strong>и</strong><br>
+                    • 7 kirjaimen sääntö: книга → книг<strong>и</strong>, ручка → ручк<strong>и</strong>, улица → улиц<strong>ы</strong> <em>(ц + ы!)</em>
+                </td>
+                <td>
+                    • Vartalon pidennys: мать → <strong>матери</strong>, дочь → <strong>дочери</strong><br>
+                    • Pääte <span class="end-tag">-ья</span>: статья → стат<strong>ьи</strong>
+                </td>
+            </tr>
+            <tr class="row-n">
+                <td><strong>Neutri</strong><br><small>(-о, -е, -мя)</small></td>
+                <td>
+                    Pääte: <span class="end-tag">-а</span><br>
+                    слово → слов<strong>а</strong><br>
+                    окно → окн<strong>а</strong>
+                </td>
+                <td>
+                    Pääte: <span class="end-tag">-я</span><br>
+                    море → мор<strong>я</strong><br>
+                    здание → здани<strong>я</strong><br>
+                    платье → плать<strong>я</strong>
+                </td>
+                <td>
+                    • -мя-sanat (<span class="end-tag">-ена</span>): время → врем<strong>ена</strong>, имя → им<strong>ена</strong><br>
+                    • Pääte <span class="end-tag">-ья</span>: дерево → дерев<strong>ья</strong><br>
+                    • Taipumattomat: <strong>пальто, метро, кафе</strong> (eivät muutu!)
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="rules-grid">
+        <div class="rule-card">
+            <h3>✍️ 7 kirjaimen oikeinkirjoitussääntö</h3>
+            <p style="margin-top:0; margin-bottom:6px;">Kirjainten <strong>г, к, х, ж, ч, ш, щ</strong> jälkeen ei koskaan kirjoiteta kirjainta <strong>ы</strong>, vaan aina <strong>и</strong>:</p>
+            <ul>
+                <li>девуш<strong>к</strong>а → девуш<strong>ки</strong></li>
+                <li>учени<strong>к</strong> → учени<strong>ки</strong></li>
+                <li>товари<strong>щ</strong> → товари<strong>щи</strong></li>
+            </ul>
+        </div>
+        <div class="rule-card">
+            <h3>🎨 Adjektiivit monikon nominatiivissa</h3>
+            <p style="margin-top:0; margin-bottom:6px;">Adjektiiveilla on monikossa kaikille suvuille vain kaksi mahdollista päätettä:</p>
+            <ul>
+                <li><strong>Kova vartalo → <span class="end-tag">-ые</span></strong>: нов<strong>ый</strong> стол → нов<strong>ые</strong> столы</li>
+                <li><strong>Pehmeä vartalo tai 7 kirjaimen sääntö → <span class="end-tag">-ие</span></strong>: хорош<strong>ий</strong> → хорош<strong>ие</strong>, маленьк<strong>ий</strong> → маленьк<strong>ие</strong>, син<strong>ий</strong> → син<strong>ие</strong></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ============================================================================
+   SANASTO JA TAIVUTUSMETATIEDOT
+   - softHard: "kova" tai "pehmeä" (vihjeen 1. vaihetta varten)
+   - hintType: tarkempi selitys vihjeen 1. vaiheeseen (esim. 7 kirjaimen sääntö, poikkeus)
+   - ending: monikon pääte kirjaimena (vihjeen 2. vaihetta varten)
+   ============================================================================ */
+const NOUNS = [
+    // --- MASKULIINIT ---
+    {
+        base: "стол", fi: "pöytä", gender: "m", tag: "object",
+        softHard: "kova", hintType: "Kova konsonanttiloppuinen maskuliini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "столы"
+    },
+    {
+        base: "город", fi: "kaupunki", gender: "m", tag: "place",
+        softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "города"
+    },
+    {
+        base: "дом", fi: "talo", gender: "m", tag: "place",
+        softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "дома"
+    },
+    {
+        base: "брат", fi: "veli", gender: "m", tag: "person",
+        softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "братья"
+    },
+    {
+        base: "отец", fi: "isä", gender: "m", tag: "person",
+        softHard: "kova", hintType: "Kova maskuliini (vartalosta putoaa liikkuva -е- pois: отц-).", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "отцы"
+    },
+    {
+        base: "сын", fi: "poika (lapsi)", gender: "m", tag: "person",
+        softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka vartaloon tulee -ов- ja pehmeä -ья.", ending: "-ья (сыновья)",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "сыновья"
+    },
+    {
+        base: "муж", fi: "aviomies", gender: "m", tag: "person",
+        softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -ья.", ending: "-ья",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "мужья"
+    },
+    {
+        base: "дедушка", fi: "isoisä", gender: "m", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "дедушки"
+    },
+    {
+        base: "дядя", fi: "eno / setä", gender: "m", tag: "person",
+        softHard: "pehmeä", hintType: "Pehmeä -я-loppuinen maskuliini.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "дяди"
+    },
+    {
+        base: "парень", fi: "poika / nuorimies", gender: "m", tag: "person",
+        softHard: "pehmeä", hintType: "Pehmeä -ь-loppuinen maskuliini (liikkuva -е- putoaa: парн-).", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "парни"
+    },
+    {
+        base: "мужчина", fi: "mies", gender: "m", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen maskuliini.", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "мужчины"
+    },
+    {
+        base: "человек", fi: "ihminen", gender: "m", tag: "person",
+        softHard: "poikkeus (täysin eri sana)", hintType: "Täysin epäsäännöllinen monikko (eri vartalo).", ending: "люди",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "люди"
+    },
+    {
+        base: "ребёнок", fi: "lapsi", gender: "m", tag: "person",
+        softHard: "poikkeus (täysin eri sana)", hintType: "Täysin epäsäännöllinen monikko (eri vartalo).", ending: "дети",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "дети"
+    },
+    {
+        base: "преподаватель", fi: "opettaja (yliopisto)", gender: "m", tag: "person",
+        softHard: "pehmeä", hintType: "Pehmeä -ь-loppuinen maskuliini.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "преподаватели"
+    },
+    {
+        base: "учитель", fi: "opettaja (koulu)", gender: "m", tag: "person",
+        softHard: "poikkeus (pehmeä -я)", hintType: "Poikkeusmaskuliini, jonka monikossa on pehmeä -я.", ending: "-я",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "учителя"
+    },
+    {
+        base: "ученик", fi: "oppilas", gender: "m", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "ученики"
+    },
+    {
+        base: "мальчик", fi: "pikkupoika", gender: "m", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "мальчики"
+    },
+    {
+        base: "товарищ", fi: "toveri / kaveri", gender: "m", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: щ-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "товарищи"
+    },
+    {
+        base: "коллега", fi: "kollega", gender: "m", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: г-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "коллеги"
+    },
+    {
+        base: "директор", fi: "johtaja", gender: "m", tag: "person",
+        softHard: "poikkeus (kova -а)", hintType: "Poikkeusmaskuliini, joka saa painollisen -а-päätteen.", ending: "-а",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "директора"
+    },
+    {
+        base: "писатель", fi: "kirjailija", gender: "m", tag: "person",
+        softHard: "pehmeä", hintType: "Pehmeä -ь-loppuinen maskuliini.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "писатели"
+    },
+    {
+        base: "художник", fi: "taiteilija", gender: "m", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "художники"
+    },
+    {
+        base: "сосед", fi: "naapuri", gender: "m", tag: "person",
+        softHard: "poikkeus (pehmeä -и)", hintType: "Poikkeusmaskuliini: kova konsonantti pehmenee monikossa.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "соседи"
+    },
+
+    // --- FEMINIINIT ---
+    {
+        base: "комната", fi: "huone", gender: "f", tag: "place",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "комнаты"
+    },
+    {
+        base: "улица", fi: "katu", gender: "f", tag: "place",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini (ц ei kuulu 7 kirjaimen sääntöön!).", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "улицы"
+    },
+    {
+        base: "квартира", fi: "asunto", gender: "f", tag: "place",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "квартиры"
+    },
+    {
+        base: "кухня", fi: "keittiö", gender: "f", tag: "place",
+        softHard: "pehmeä", hintType: "Pehmeä -я-loppuinen feminiini.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "кухни"
+    },
+    {
+        base: "больница", fi: "sairaala", gender: "f", tag: "place",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini (ц-kirjaimen jälkeen tulee -ы).", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "больницы"
+    },
+    {
+        base: "аптека", fi: "apteekki", gender: "f", tag: "place",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "аптеки"
+    },
+    {
+        base: "библиотека", fi: "kirjasto", gender: "f", tag: "place",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "библиотеки"
+    },
+    {
+        base: "страна", fi: "maa / valtio", gender: "f", tag: "place",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "страны"
+    },
+    {
+        base: "земля", fi: "maa / maaperä", gender: "f", tag: "place",
+        softHard: "pehmeä", hintType: "Pehmeä -я-loppuinen feminiini.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "земли"
+    },
+    {
+        base: "река", fi: "joki", gender: "f", tag: "place",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "реки"
+    },
+    {
+        base: "статья", fi: "artikkeli", gender: "f", tag: "object",
+        softHard: "pehmeä", hintType: "Pehmeä -ья-loppuinen feminiini.", ending: "-и (статьи)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "статьи"
+    },
+    {
+        base: "газета", fi: "sanomalehti", gender: "f", tag: "object",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "газеты"
+    },
+    {
+        base: "жизнь", fi: "elämä", gender: "f", tag: "object",
+        softHard: "pehmeä", hintType: "Pehmeä -ь-loppuinen feminiini.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "жизни"
+    },
+    {
+        base: "новость", fi: "uutinen", gender: "f", tag: "object",
+        softHard: "pehmeä", hintType: "Pehmeä -ь-loppuinen feminiini.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "новости"
+    },
+    {
+        base: "погода", fi: "sää", gender: "f", tag: "object",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "погоды"
+    },
+    {
+        base: "музыка", fi: "musiikki", gender: "f", tag: "object",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "музыки"
+    },
+    {
+        base: "песня", fi: "laulu", gender: "f", tag: "object",
+        softHard: "pehmeä", hintType: "Pehmeä -я-loppuinen feminiini.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "песни"
+    },
+    {
+        base: "сумка", fi: "laukku", gender: "f", tag: "object",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "сумки"
+    },
+    {
+        base: "ручка", fi: "kynä (kuulakynä)", gender: "f", tag: "object",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "ручки"
+    },
+    {
+        base: "неделя", fi: "viikko", gender: "f", tag: "object",
+        softHard: "pehmeä", hintType: "Pehmeä -я-loppuinen feminiini.", ending: "-и",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "недели"
+    },
+    {
+        base: "минута", fi: "minuutti", gender: "f", tag: "object",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "минуты"
+    },
+    {
+        base: "история", fi: "historia / tarina", gender: "f", tag: "object",
+        softHard: "pehmeä", hintType: "Pehmeä -ия-loppuinen feminiini.", ending: "-и (истории)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "истории"
+    },
+    {
+        base: "картина", fi: "maalaus / taulu", gender: "f", tag: "object",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "картины"
+    },
+    {
+        base: "стена", fi: "seinä", gender: "f", tag: "object",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "стены"
+    },
+    {
+        base: "мать", fi: "äiti", gender: "f", tag: "person",
+        softHard: "poikkeus (pehmeä -и + pidennys)", hintType: "Poikkeusfeminiini: vartalo pitenee (матер-) ja saa pehmeän päätteen.", ending: "-и (матери)",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "матери"
+    },
+    {
+        base: "мама", fi: "äiti (ark.)", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "мамы"
+    },
+    {
+        base: "дочь", fi: "tytär", gender: "f", tag: "person",
+        softHard: "poikkeus (pehmeä -и + pidennys)", hintType: "Poikkeusfeminiini: vartalo pitenee (дочер-) ja saa pehmeän päätteen.", ending: "-и (дочери)",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "дочери"
+    },
+    {
+        base: "жена", fi: "vaimo", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini (е muuttuu monikossa ё:ksi: жёны).", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "жёны"
+    },
+    {
+        base: "бабушка", fi: "isoäiti", gender: "f", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "бабушки"
+    },
+    {
+        base: "тётя", fi: "täti", gender: "f", tag: "person",
+        softHard: "pehmeä", hintType: "Pehmeä -я-loppuinen feminiini.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "тёти"
+    },
+    {
+        base: "женщина", fi: "nainen", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "женщины"
+    },
+    {
+        base: "девушка", fi: "nuori nainen / tyttö", gender: "f", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "девушки"
+    },
+    {
+        base: "девочка", fi: "pikkutyttö", gender: "f", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "девочки"
+    },
+    {
+        base: "студентка", fi: "naisopiskelija", gender: "f", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "студентки"
+    },
+    {
+        base: "учительница", fi: "naisopettaja (koulu)", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini (ц-kirjaimen jälkeen tulee -ы).", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "учительницы"
+    },
+    {
+        base: "ученица", fi: "naisoppilas", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini (ц-kirjaimen jälkeen tulee -ы).", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "ученицы"
+    },
+    {
+        base: "соседка", fi: "naisnaapuri", gender: "f", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "соседки"
+    },
+    {
+        base: "писательница", fi: "naiskirjailija", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini (ц-kirjaimen jälkeen tulee -ы).", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "писательницы"
+    },
+    {
+        base: "актриса", fi: "näyttelijätär", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini.", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "актрисы"
+    },
+    {
+        base: "певица", fi: "naislaulaja", gender: "f", tag: "person",
+        softHard: "kova", hintType: "Kova -а-loppuinen feminiini (ц-kirjaimen jälkeen tulee -ы).", ending: "-ы",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "певицы"
+    },
+    {
+        base: "журналистка", fi: "naistoimittaja", gender: "f", tag: "person",
+        softHard: "pehmeä (7 kirjaimen sääntö)", hintType: "7 kirjaimen sääntö: к-kirjaimen jälkeen tulee aina pehmeä pääte.", ending: "-и",
+        forbiddenAdjs: ["нов", "стар", "современн", "бел", "чёрн", "красн", "син", "зелён", "тёпл", "холодн", "светл", "тёмн"],
+        plNom: "журналистки"
+    },
+
+    // --- NEUTRIT ---
+    {
+        base: "слово", fi: "sana", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "слова"
+    },
+    {
+        base: "дело", fi: "asia / teko", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "дела"
+    },
+    {
+        base: "время", fi: "aika", gender: "n", tag: "object",
+        softHard: "poikkeus (-мя-neutri)", hintType: "Poikkeusneutri (-мя): vartalo pitenee (-ен-) ja saa päätteen -а.", ending: "-ена (времена)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "времена"
+    },
+    {
+        base: "имя", fi: "nimi", gender: "n", tag: "object",
+        softHard: "poikkeus (-мя-neutri)", hintType: "Poikkeusneutri (-мя): vartalo pitenee (-ен-) ja saa päätteen -а.", ending: "-ена (имена)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "имена"
+    },
+    {
+        base: "море", fi: "meri", gender: "n", tag: "place",
+        softHard: "pehmeä", hintType: "Pehmeä -е-loppuinen neutri.", ending: "-я",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "моря"
+    },
+    {
+        base: "озеро", fi: "järvi", gender: "n", tag: "place",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri (е muuttuu monikossa ё:ksi: озёра).", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "озёра"
+    },
+    {
+        base: "поле", fi: "pello", gender: "n", tag: "place",
+        softHard: "pehmeä", hintType: "Pehmeä -е-loppuinen neutri.", ending: "-я",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "поля"
+    },
+    {
+        base: "небо", fi: "taivas", gender: "n", tag: "object",
+        softHard: "poikkeus (kova -еса)", hintType: "Poikkeusneutri: vartalo pitenee (-ес-) ja saa päätteen -а.", ending: "-еса (небеса)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "небеса"
+    },
+    {
+        base: "солнце", fi: "aurinko", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -це-loppuinen neutri (ц-kirjaimen jälkeen tulee kova -а).", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "солнца"
+    },
+    {
+        base: "дерево", fi: "puu", gender: "n", tag: "place",
+        softHard: "poikkeus (pehmeä -ья)", hintType: "Poikkeusneutri, jonka monikossa on pehmeä -ья.", ending: "-ья",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "деревья"
+    },
+    {
+        base: "письмо", fi: "kirje", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "письма"
+    },
+    {
+        base: "окно", fi: "ikkuna", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "окна"
+    },
+    {
+        base: "здание", fi: "rakennus", gender: "n", tag: "place",
+        softHard: "pehmeä", hintType: "Pehmeä -ие-loppuinen neutri.", ending: "-я (здания)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "здания"
+    },
+    {
+        base: "утро", fi: "aamu", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "утра"
+    },
+    {
+        base: "путешествие", fi: "matka", gender: "n", tag: "place",
+        softHard: "pehmeä", hintType: "Pehmeä -ие-loppuinen neutri.", ending: "-я (путешествия)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "путешествия"
+    },
+    {
+        base: "платье", fi: "mekko", gender: "n", tag: "object",
+        softHard: "pehmeä", hintType: "Pehmeä -ье-loppuinen neutri.", ending: "-я (платья)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "платья"
+    },
+    {
+        base: "зеркало", fi: "peili", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "зеркала"
+    },
+    {
+        base: "кресло", fi: "nojatuoli", gender: "n", tag: "object",
+        softHard: "kova", hintType: "Kova -о-loppuinen neutri.", ending: "-а",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "кресла"
+    },
+    {
+        base: "собрание", fi: "kokous", gender: "n", tag: "place",
+        softHard: "pehmeä", hintType: "Pehmeä -ие-loppuinen neutri.", ending: "-я (собрания)",
+        forbiddenAdjs: ["молод", "добр", "умн"],
+        plNom: "собрания"
+    },
+// --- MASKULIINIT: Kovat & 7-kirjaimen sääntö (г, к, х, ж, ч, ш, щ) ---
+    { base: "стол", fi: "pöytä", gender: "m", animate: false, tag: "object", sg: { nom: "стол" }, pl: { nom: "столы" } },
+    { base: "стул", fi: "tuoli", gender: "m", animate: false, tag: "object", sg: { nom: "стул" }, pl: { nom: "стулья" } },
+    { base: "дом", fi: "talo", gender: "m", animate: false, tag: "place", sg: { nom: "дом" }, pl: { nom: "дома" } },
+    { base: "город", fi: "kaupunki", gender: "m", animate: false, tag: "place", sg: { nom: "город" }, pl: { nom: "города" } },
+    { base: "парк", fi: "puisto", gender: "m", animate: false, tag: "place", sg: { nom: "парк" }, pl: { nom: "парки" } },
+    { base: "банк", fi: "pankki", gender: "m", animate: false, tag: "place", sg: { nom: "банк" }, pl: { nom: "банки" } },
+    { base: "магазин", fi: "kauppa", gender: "m", animate: false, tag: "place", sg: { nom: "магазин" }, pl: { nom: "магазины" } },
+    { base: "университет", fi: "yliopisto", gender: "m", animate: false, tag: "place", sg: { nom: "университет" }, pl: { nom: "университеты" } },
+    { base: "театр", fi: "teatteri", gender: "m", animate: false, tag: "place", sg: { nom: "театр" }, pl: { nom: "театры" } },
+    { base: "автобус", fi: "bussi", gender: "m", animate: false, tag: "object", sg: { nom: "автобус" }, pl: { nom: "автобусы" } },
+    { base: "поезд", fi: "juna", gender: "m", animate: false, tag: "object", sg: { nom: "поезд" }, pl: { nom: "поезда" } },
+    { base: "самолёт", fi: "lentokone", gender: "m", animate: false, tag: "object", sg: { nom: "самолёт" }, pl: { nom: "самолёты" } },
+    { base: "телефон", fi: "puhelin", gender: "m", animate: false, tag: "object", sg: { nom: "телефон" }, pl: { nom: "телефоны" } },
+    { base: "компьютер", fi: "tietokone", gender: "m", animate: false, tag: "object", sg: { nom: "компьютер" }, pl: { nom: "компьютеры" } },
+    { base: "карандаш", fi: "lyijykynä", gender: "m", animate: false, tag: "object", sg: { nom: "карандаш" }, pl: { nom: "карандаши" } },
+    { base: "нож", fi: "veitsi", gender: "m", animate: false, tag: "object", sg: { nom: "нож" }, pl: { nom: "ножи" } },
+    { base: "ключ", fi: "avain", gender: "m", animate: false, tag: "object", sg: { nom: "ключ" }, pl: { nom: "ключи" } },
+    { base: "врач", fi: "lääkäri", gender: "m", animate: true, tag: "person", sg: { nom: "врач" }, pl: { nom: "врачи" } },
+    { base: "друг", fi: "ystävä", gender: "m", animate: true, tag: "person", sg: { nom: "друг" }, pl: { nom: "друзья" } },
+    { base: "студент", fi: "opiskelija", gender: "m", animate: true, tag: "person", sg: { nom: "студент" }, pl: { nom: "студенты" } },
+    { base: "турист", fi: "turisti", gender: "m", animate: true, tag: "person", sg: { nom: "турист" }, pl: { nom: "туристы" } },
+    { base: "билет", fi: "lippu (pääsy-/matka-)", gender: "m", animate: false, tag: "object", sg: { nom: "билет" }, pl: { nom: "билеты" } },
+    { base: "паспорт", fi: "passi", gender: "m", animate: false, tag: "object", sg: { nom: "паспорт" }, pl: { nom: "паспорта" } },
+    { base: "вопрос", fi: "kysymys", gender: "m", animate: false, tag: "object", sg: { nom: "вопрос" }, pl: { nom: "вопросы" } },
+    { base: "ответ", fi: "vastaus", gender: "m", animate: false, tag: "object", sg: { nom: "ответ" }, pl: { nom: "ответы" } },
+    { base: "урок", fi: "oppitunti", gender: "m", animate: false, tag: "object", sg: { nom: "урок" }, pl: { nom: "уроки" } },
+    { base: "язык", fi: "kieli", gender: "m", animate: false, tag: "object", sg: { nom: "язык" }, pl: { nom: "языки" } },
+    { base: "цвет", fi: "väri", gender: "m", animate: false, tag: "object", sg: { nom: "цвет" }, pl: { nom: "цвета" } },
+    { base: "цветок", fi: "kukka", gender: "m", animate: false, tag: "object", sg: { nom: "цветок" }, pl: { nom: "цветы" } },
+    { base: "глаз", fi: "silmä", gender: "m", animate: false, tag: "object", sg: { nom: "глаз" }, pl: { nom: "глаза" } },
+
+    // --- MASKULIINIT: Pehmeät (-ь, -й) ---
+    { base: "словарь", fi: "sanakirja", gender: "m", animate: false, tag: "object", sg: { nom: "словарь" }, pl: { nom: "словари" } },
+    { base: "день", fi: "päivä", gender: "m", animate: false, tag: "object", sg: { nom: "день" }, pl: { nom: "дни" } },
+    { base: "дождь", fi: "sade", gender: "m", animate: false, tag: "object", sg: { nom: "дождь" }, pl: { nom: "дожди" } },
+    { base: "музей", fi: "museo", gender: "m", animate: false, tag: "place", sg: { nom: "музей" }, pl: { nom: "музеи" } },
+    { base: "трамвай", fi: "raitiovaunu", gender: "m", animate: false, tag: "object", sg: { nom: "трамвай" }, pl: { nom: "трамваи" } },
+    { base: "герой", fi: "sankari", gender: "m", animate: true, tag: "person", sg: { nom: "герой" }, pl: { nom: "герои" } },
+    { base: "гость", fi: "vieras", gender: "m", animate: true, tag: "person", sg: { nom: "гость" }, pl: { nom: "гости" } },
+    { base: "рубль", fi: "rupla", gender: "m", animate: false, tag: "object", sg: { nom: "рубль" }, pl: { nom: "рубли" } },
+
+    // --- FEMINIINIT: Kovat & 7-kirjaimen sääntö (-а) ---
+    { base: "книга", fi: "kirja", gender: "f", animate: false, tag: "object", sg: { nom: "книга" }, pl: { nom: "книги" } },
+    { base: "школа", fi: "koulu", gender: "f", animate: false, tag: "place", sg: { nom: "школа" }, pl: { nom: "школы" } },
+    { base: "машина", fi: "auto", gender: "f", animate: false, tag: "object", sg: { nom: "машина" }, pl: { nom: "машины" } },
+    { base: "лампа", fi: "lamppu", gender: "f", animate: false, tag: "object", sg: { nom: "лампа" }, pl: { nom: "лампы" } },
+    { base: "чашка", fi: "kuppi", gender: "f", animate: false, tag: "object", sg: { nom: "чашка" }, pl: { nom: "чашки" } },
+    { base: "тарелка", fi: "lautanen", gender: "f", animate: false, tag: "object", sg: { nom: "тарелка" }, pl: { nom: "тарелки" } },
+    { base: "ложка", fi: "lusikka", gender: "f", animate: false, tag: "object", sg: { nom: "ложка" }, pl: { nom: "ложки" } },
+    { base: "вилка", fi: "haarukka", gender: "f", animate: false, tag: "object", sg: { nom: "вилка" }, pl: { nom: "вилки" } },
+    { base: "собака", fi: "koira", gender: "f", animate: true, tag: "person", sg: { nom: "собака" }, pl: { nom: "собаки" } },
+    { base: "кошка", fi: "kissa", gender: "f", animate: true, tag: "person", sg: { nom: "кошка" }, pl: { nom: "кошки" } },
+    { base: "подруга", fi: "naispuolinen ystävä", gender: "f", animate: true, tag: "person", sg: { nom: "подруга" }, pl: { nom: "подруги" } },
+    { base: "сестра", fi: "sisko", gender: "f", animate: true, tag: "person", sg: { nom: "сестра" }, pl: { nom: "сёстры" } },
+    { base: "рыба", fi: "kala", gender: "f", animate: true, tag: "object", sg: { nom: "рыба" }, pl: { nom: "рыбы" } },
+    { base: "птица", fi: "lintu", gender: "f", animate: true, tag: "object", sg: { nom: "птица" }, pl: { nom: "птицы" } },
+    { base: "шапка", fi: "pipo / lakki", gender: "f", animate: false, tag: "object", sg: { nom: "шапка" }, pl: { nom: "шапки" } },
+    { base: "рубашка", fi: "kauluspaita", gender: "f", animate: false, tag: "object", sg: { nom: "рубашка" }, pl: { nom: "рубашки" } },
+    { base: "юбка", fi: "hame", gender: "f", animate: false, tag: "object", sg: { nom: "юбка" }, pl: { nom: "юбки" } },
+    { base: "гора", fi: "vuori", gender: "f", animate: false, tag: "place", sg: { nom: "гора" }, pl: { nom: "горы" } },
+    { base: "звезда", fi: "tähti", gender: "f", animate: false, tag: "object", sg: { nom: "звезда" }, pl: { nom: "звёзды" } },
+
+    // --- FEMINIINIT: Pehmeät (-я, -ь) ---
+    { base: "семья", fi: "perhe", gender: "f", animate: false, tag: "person", sg: { nom: "семья" }, pl: { nom: "семьи" } },
+    { base: "деревня", fi: "kylä / maaseutu", gender: "f", animate: false, tag: "place", sg: { nom: "деревня" }, pl: { nom: "деревни" } },
+    { base: "станция", fi: "asema", gender: "f", animate: false, tag: "place", sg: { nom: "станция" }, pl: { nom: "станции" } },
+    { base: "лекция", fi: "luento", gender: "f", animate: false, tag: "object", sg: { nom: "лекция" }, pl: { nom: "лекции" } },
+    { base: "экскурсия", fi: "retki / kiertoajelu", gender: "f", animate: false, tag: "object", sg: { nom: "экскурсия" }, pl: { nom: "экскурсии" } },
+    { base: "тетрадь", fi: "vihko", gender: "f", animate: false, tag: "object", sg: { nom: "тетрадь" }, pl: { nom: "тетради" } },
+    { base: "дверь", fi: "ovi", gender: "f", animate: false, tag: "object", sg: { nom: "дверь" }, pl: { nom: "двери" } },
+    { base: "ночь", fi: "yö", gender: "f", animate: false, tag: "object", sg: { nom: "ночь" }, pl: { nom: "ночи" } },
+    { base: "вещь", fi: "tavara / asia", gender: "f", animate: false, tag: "object", sg: { nom: "вещь" }, pl: { nom: "вещи" } },
+    { base: "площадь", fi: "aukio / tori", gender: "f", animate: false, tag: "place", sg: { nom: "площадь" }, pl: { nom: "площади" } },
+    { base: "кровать", fi: "sänky", gender: "f", animate: false, tag: "object", sg: { nom: "кровать" }, pl: { nom: "кровати" } },
+
+    // --- NEUTRIT: Kovat (-о) ja Pehmeät (-е, -ие) ---
+    { base: "яблоко", fi: "omena", gender: "n", animate: false, tag: "object", sg: { nom: "яблоко" }, pl: { nom: "яблоки" } },
+    { base: "яйцо", fi: "kananmuna", gender: "n", animate: false, tag: "object", sg: { nom: "яйцо" }, pl: { nom: "яйца" } },
+    { base: "кольцо", fi: "sormus", gender: "n", animate: false, tag: "object", sg: { nom: "кольцо" }, pl: { nom: "кольца" } },
+    { base: "лицо", fi: "kasvot", gender: "n", animate: false, tag: "object", sg: { nom: "лицо" }, pl: { nom: "лица" } },
+    { base: "место", fi: "paikka", gender: "n", animate: false, tag: "place", sg: { nom: "место" }, pl: { nom: "места" } },
+    { base: "число", fi: "luku / päivämäärä", gender: "n", animate: false, tag: "object", sg: { nom: "число" }, pl: { nom: "числа" } },
+    { base: "правило", fi: "sääntö", gender: "n", animate: false, tag: "object", sg: { nom: "правило" }, pl: { nom: "правила" } },
+    { base: "упражнение", fi: "harjoitus", gender: "n", animate: false, tag: "object", sg: { nom: "упражнение" }, pl: { nom: "упражнения" } },
+    { base: "предложение", fi: "lause / ehdotus", gender: "n", animate: false, tag: "object", sg: { nom: "предложение" }, pl: { nom: "предложения" } },
+    { base: "задание", fi: "tehtävä", gender: "n", animate: false, tag: "object", sg: { nom: "задание" }, pl: { nom: "задания" } },
+    { base: "ухо", fi: "korva", gender: "n", animate: false, tag: "object", sg: { nom: "ухо" }, pl: { nom: "уши" } }
+];
+
+const ADJECTIVES = [
+    { stem: "нов", type: "hard", stressedEnd: false, fi: "uusi", allowedTags: ["place", "object"] },
+    { stem: "стар", type: "hard", stressedEnd: false, fi: "vanha", allowedTags: ["place", "object", "person"] },
+    { stem: "интересн", type: "hard", stressedEnd: false, fi: "mielenkiintoinen", allowedTags: ["place", "object", "person"] },
+    { stem: "красив", type: "hard", stressedEnd: false, fi: "kaunis", allowedTags: ["place", "object", "person"] },
+    { stem: "маленьк", type: "velar", stressedEnd: false, fi: "pieni", allowedTags: ["place", "object", "person"] },
+    { stem: "хорош", type: "soft", stressedEnd: false, fi: "hyvä", allowedTags: ["place", "object", "person"] },
+    { stem: "плох", type: "velar", stressedEnd: true, fi: "huono", allowedTags: ["place", "object", "person"] },
+    { stem: "важн", type: "hard", stressedEnd: false, fi: "tärkeä", allowedTags: ["object", "person"] },
+    { stem: "известн", type: "hard", stressedEnd: false, fi: "tunnettu / kuuluisa", allowedTags: ["place", "object", "person"] },
+    { stem: "современн", type: "hard", stressedEnd: false, fi: "nykyaikainen", allowedTags: ["place", "object"] },
+    { stem: "главн", type: "hard", stressedEnd: false, fi: "pää- / tärkein", allowedTags: ["place", "object"] },
+    { stem: "добр", type: "hard", stressedEnd: false, fi: "kiltti / hyväsydäminen", allowedTags: ["person"] },
+    { stem: "умн", type: "hard", stressedEnd: false, fi: "fiksu / älykäs", allowedTags: ["person"] },
+    { stem: "молод", type: "hard", stressedEnd: true, fi: "nuori", allowedTags: ["person"] },
+    { stem: "бел", type: "hard", stressedEnd: false, fi: "valkoinen", allowedTags: ["place", "object"] },
+    { stem: "чёрн", type: "hard", stressedEnd: false, fi: "musta", allowedTags: ["object"] },
+    { stem: "красн", type: "hard", stressedEnd: false, fi: "punainen", allowedTags: ["place", "object"] },
+    { stem: "син", type: "soft", stressedEnd: false, fi: "sininen", allowedTags: ["object"] },
+    { stem: "зелён", type: "hard", stressedEnd: false, fi: "vihreä", allowedTags: ["place", "object"] },
+    { stem: "дорог", type: "velar", stressedEnd: true, fi: "kallis / rakas", allowedTags: ["place", "object", "person"] },
+    { stem: "дешёв", type: "hard", stressedEnd: false, fi: "halpa", allowedTags: ["place", "object"] },
+    { stem: "высок", type: "velar", stressedEnd: false, fi: "korkea / pitkä", allowedTags: ["place", "person"] },
+    { stem: "тёпл", type: "hard", stressedEnd: false, fi: "lämmin", allowedTags: ["place", "object"] },
+    { stem: "холодн", type: "hard", stressedEnd: false, fi: "kylmä", allowedTags: ["place", "object"] },
+    { stem: "светл", type: "hard", stressedEnd: false, fi: "valoisa / vaalea", allowedTags: ["place", "object"] },
+    { stem: "тёмн", type: "hard", stressedEnd: false, fi: "pimeä / tumma", allowedTags: ["place", "object"] },
+    { stem: "финск", type: "velar", stressedEnd: false, fi: "suomalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "английск", type: "velar", stressedEnd: false, fi: "englantilainen", allowedTags: ["place", "object", "person"] },
+    { stem: "русск", type: "velar", stressedEnd: false, fi: "venäläinen", allowedTags: ["place", "object", "person"] },
+    { stem: "шведск", type: "velar", stressedEnd: false, fi: "ruotsalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "немецк", type: "velar", stressedEnd: false, fi: "saksalainen", allowedTags: ["place", "object", "person"] },
+    { stem: "французск", type: "velar", stressedEnd: false, fi: "ranskalainen", allowedTags: ["place", "object", "person"] }
+];
+
+function inflectAdjectiveNom(adj, gender, number) {
+    const s = adj.stem;
+    const isSoft = adj.type === "soft";
+    const isVelar = adj.type === "velar";
+
+    if (number === "sg") {
+        if (gender === "m") {
+            let nomEnd = adj.stressedEnd ? "ой" : (isSoft || isVelar ? "ий" : "ый");
+            return s + nomEnd;
+        }
+        if (gender === "f") {
+            return s + (isSoft ? "яя" : "ая");
+        }
+        if (gender === "n") {
+            return s + (isSoft ? "ее" : "ое");
+        }
+    }
+
+    if (number === "pl") {
+        return s + ((isSoft || isVelar) ? "ие" : "ые");
+    }
+    return s;
+}
+
+const GENDER_NAMES_FI = {
+    m: "Maskuliini",
+    f: "Feminiini",
+    n: "Neutri"
+};
+
+let currentTask = null;
+let colorCodingEnabled = true;
+let hintLevel = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let streakCount = 0;
+let answeredCurrent = false;
+
+function toggleColors() {
+    colorCodingEnabled = !colorCodingEnabled;
+    const btn = document.getElementById("colorToggleBtn");
+    const legend = document.getElementById("colorLegend");
+    if (colorCodingEnabled) {
+        btn.classList.add("active");
+        btn.textContent = "🎨 Värikoodaus: PÄÄLLÄ";
+        legend.style.display = "flex";
+    } else {
+        btn.classList.remove("active");
+        btn.textContent = "⚪ Värikoodaus: POIS (Testitila)";
+        legend.style.display = "none";
+    }
+    renderTask();
+}
+
+function applyCardColor() {
+    const card = document.getElementById("taskCard");
+    card.className = "task-card";
+    if (!colorCodingEnabled || !currentTask) return;
+    card.classList.add("card-" + currentTask.noun.gender);
+}
+
+function nextQuestion() {
+    hintLevel = 0;
+    answeredCurrent = false;
+    document.getElementById("hintCount").textContent = "0";
+    document.getElementById("hintBox").style.display = "none";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("answer").value = "";
+
+    const phraseChoice = document.getElementById("phraseSelect").value;
+    const useAdjective = (phraseChoice === "adj_noun")
+        ? true
+        : (phraseChoice === "noun_only" ? false : Math.random() < 0.5);
+
+    const genderChoice = document.getElementById("genderSelect").value;
+    const candidateNouns = (genderChoice === "all")
+        ? NOUNS
+        : NOUNS.filter(n => n.gender === genderChoice);
+
+    const noun = candidateNouns[Math.floor(Math.random() * candidateNouns.length)];
+
+    let singularPrompt = "";
+    let translationFi = "";
+    let expectedAnswer = "";
+    let chosenAdj = null;
+
+    if (useAdjective) {
+        const compatibleAdjs = ADJECTIVES.filter(a => 
+            a.allowedTags.includes(noun.tag) && 
+            (!noun.forbiddenAdjs || !noun.forbiddenAdjs.includes(a.stem))
+        );
+        chosenAdj = compatibleAdjs[Math.floor(Math.random() * compatibleAdjs.length)];
+
+        const sgAdj = inflectAdjectiveNom(chosenAdj, noun.gender, "sg");
+        singularPrompt = `${sgAdj} ${noun.base}`;
+        translationFi = `${chosenAdj.fi} ${noun.fi}`;
+
+        const plAdj = inflectAdjectiveNom(chosenAdj, noun.gender, "pl");
+        expectedAnswer = `${plAdj} ${noun.plNom}`;
+    } else {
+        singularPrompt = noun.base;
+        translationFi = noun.fi;
+        expectedAnswer = noun.plNom;
+    }
+
+    currentTask = {
+        useAdjective: useAdjective,
+        noun: noun,
+        adj: chosenAdj,
+        singularPrompt: singularPrompt,
+        translationFi: translationFi,
+        expected: expectedAnswer
+    };
+
+    renderTask();
+}
+
+function renderTask() {
+    if (!currentTask) return;
+    applyCardColor();
+
+    const badgesArea = document.getElementById("badgesArea");
+    const genderBadge = colorCodingEnabled
+        ? `<span class="badge">${GENDER_NAMES_FI[currentTask.noun.gender]}</span>`
+        : `<span class="badge">Suku piilotettu</span>`;
+
+    const typeBadge = currentTask.useAdjective
+        ? `<span class="badge">Adjektiivi + Substantiivi</span>`
+        : `<span class="badge">Substantiivi</span>`;
+
+    badgesArea.innerHTML = `
+        ${genderBadge}
+        ${typeBadge}
+        <span class="badge">Yksikkö → Monikko (Nom.)</span>
+    `;
+
+    document.getElementById("singularPrompt").textContent = currentTask.singularPrompt;
+    document.getElementById("wordTranslation").textContent = `(${currentTask.translationFi})`;
+
+    document.getElementById("answer").focus();
+}
+
+function showHint() {
+    if (!currentTask) return;
+    hintLevel = Math.min(hintLevel + 1, 2);
+    document.getElementById("hintCount").textContent = hintLevel;
+
+    const hintBox = document.getElementById("hintBox");
+    hintBox.style.display = "block";
+
+    const n = currentTask.noun;
+    const isSoftOrException = n.softHard.toLowerCase();
+
+    // Vaihe 1: Kova vai pehmeä pääte (ja mahdollinen sääntö/poikkeus)
+    let adjStep1 = "";
+    if (currentTask.useAdjective && currentTask.adj) {
+        const adjHardSoft = (currentTask.adj.type === "hard") ? "kova" : "pehmeä (tai 7 kirjaimen sääntö)";
+        adjStep1 = ` Adjektiivi saa <strong>${adjHardSoft}</strong> päätteen.`;
+    }
+
+    let html = `
+        <div class="hint-step">
+            <strong>1. Päätetyyppi:</strong> Substantiiviin tulee <strong>${isSoftOrException}</strong> pääte.
+            <span style="color:#92400e;">(${n.hintType})</span>${adjStep1}
+        </div>
+    `;
+
+    // Vaihe 2: Tarkka monikon pääte kirjaimena
+    if (hintLevel >= 2) {
+        let adjStep2 = "";
+        if (currentTask.useAdjective && currentTask.adj) {
+            const adjEnding = (currentTask.adj.type === "hard") ? "-ые" : "-ие";
+            adjStep2 = `Adjektiivin pääte: <span class="ending-pill">${adjEnding}</span> &nbsp;|&nbsp; `;
+        }
+
+        html += `
+            <div class="hint-step" style="margin-top:8px; padding-top:8px; border-top:1px dashed #f59e0b;">
+                <strong>2. Monikon pääte:</strong> ${adjStep2}Substantiivin pääte: <span class="ending-pill">${n.ending}</span>
+            </div>
+        `;
+    }
+
+    hintBox.innerHTML = html;
+}
+
+function checkAnswer() {
+    if (!currentTask) return;
+
+    const userRaw = document.getElementById("answer").value
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+
+    if (!userRaw) return;
+
+    const normalize = str => str.toLowerCase().replace(/ё/g, "е");
+    const isCorrect = normalize(userRaw) === normalize(currentTask.expected);
+    const resultDiv = document.getElementById("result");
+
+    if (isCorrect) {
+        if (!answeredCurrent) {
+            correctCount++;
+            streakCount++;
+            answeredCurrent = true;
+            document.getElementById("correctCount").textContent = correctCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        resultDiv.innerHTML = `
+            <span class="correct">✓ Oikein!</span><br>
+            <span style="color:#334155; font-size:1.1rem;">${currentTask.singularPrompt} → <strong>${currentTask.expected}</strong></span>
+        `;
+    } else {
+        if (!answeredCurrent) {
+            wrongCount++;
+            streakCount = 0;
+            answeredCurrent = true;
+            document.getElementById("wrongCount").textContent = wrongCount;
+            document.getElementById("streakCount").textContent = streakCount;
+        }
+        resultDiv.innerHTML = `
+            <span class="wrong">✗ Väärin</span><br>
+            Oikea monikkomuoto: <strong>${currentTask.expected}</strong>
+        `;
+    }
+}
+
+document.getElementById("answer").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        if (answeredCurrent) {
+            nextQuestion();
+        } else {
+            checkAnswer();
+        }
+    }
+});
+
+nextQuestion();
+</script>
+
+</body>
+</html>
