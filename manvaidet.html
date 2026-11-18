@@ -228,6 +228,109 @@
         text-align: center;
         display: none;
     }
+    /* Oikean reunan kelluva tekstilista */
+    .sidebar-nav {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 225px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        z-index: 999;
+    }
+
+    .sidebar-header {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .clear-mem-btn {
+        background: none;
+        border: none;
+        color: #64748b;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+    }
+    .clear-mem-btn:hover { color: #dc2626; }
+
+    .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .nav-item-btn {
+        width: 100%;
+        text-align: left;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 7px 10px;
+        font-size: 0.85rem;
+        color: #1e293b;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.15s;
+    }
+
+    .nav-item-btn:hover {
+        background: #eff6ff;
+        border-color: #93c5fd;
+    }
+
+    .nav-item-btn.active {
+        border: 2px solid var(--primary);
+        background: #eff6ff;
+        font-weight: 700;
+    }
+
+    .nav-score-badge {
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: #e2e8f0;
+        color: #475569;
+        white-space: nowrap;
+        margin-left: 6px;
+    }
+
+    .nav-score-badge.perfect { background: #dcfce7; color: #16a34a; }
+    .nav-score-badge.partial { background: #fee2e2; color: #dc2626; }
+
+    @media (max-width: 1320px) {
+        .sidebar-nav {
+            position: static;
+            width: auto;
+            max-width: 820px;
+            margin: 0 auto 20px auto;
+            max-height: none;
+        }
+        .nav-list {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        .nav-item-btn { width: auto; }
+    }
 </style>
 </head>
 <body>
@@ -235,6 +338,14 @@
 <a href="https://kielioppikurssi.github.io/kielioppikurssi" class="home-button">
     ← Päävalikkoon
 </a>
+
+    <aside class="sidebar-nav">
+    <div class="sidebar-header">
+        <span>📋 Tekstit</span>
+        <button class="clear-mem-btn" onclick="clearSavedProgress()" title="Nollaa tallennetut tulokset">Nollaa muisti</button>
+    </div>
+    <ul class="nav-list" id="sidebarList"></ul>
+</aside>
 
 <div class="container">
     <h1>🇸🇪 <em>Det</em> vai <em>man</em>? (B1)</h1>
@@ -472,6 +583,108 @@ const TEXTS = [
             { correct: "man", expl: "yleistävä tekijä (måste man tänka)" },
             { correct: "man", expl: "yleistävä tekijä (vad man köper)" }
         ]
+    },
+    {
+        id: 11,
+        title: "Teksti 11 – Matkailu ja luonto",
+        parts: [
+            "Att vandra i den svenska fjällvärlden är en fantastisk upplevelse för naturälskare. På hösten brukar ",
+            " packa ryggsäcken med varma kläder och choklad, eftersom ",
+            " kan bli mycket kallt uppe på kalfjället. Innan turen startar kontrollerar ",
+            " alltid väderleksrapporten, och om ",
+            " märker att stormen är på väg, avstår ",
+            " från att gå ut. Det är viktigt att komma ihåg att ",
+            " är naturen som bestämmer."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (brukar man packa)" },
+            { correct: "det", expl: "muodollinen subjekti (eftersom det kan bli)" },
+            { correct: "man", expl: "yleistävä tekijä (kontrollerar man)" },
+            { correct: "man", expl: "yleistävä tekijä (om man märker)" },
+            { correct: "man", expl: "yleistävä tekijä (avstår man)" },
+            { correct: "det", expl: "muodollinen subjekti (det är viktigt)" },
+            { correct: "det", expl: "korostus / korrelaatti (det är naturen som...)" }
+        ]
+    },
+    {
+        id: 12,
+        title: "Teksti 12 – Ruoanlaitto ja sesongit",
+        parts: [
+            "Att laga mat med färska råvaror är både roligt och hälsosamt. På hösten plockar ",
+            " svamp och bär i skogen. Många tycker att ",
+            " är roligt att laga mustiga grytor när ",
+            " regnar ute. I kokböckerna står ",
+            " ofta att hemligheten bakom en god smak är tålamod, och när ",
+            " följer receptet noga, lyckas ",
+            " nästan alltid."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (plockar man)" },
+            { correct: "det", expl: "muodollinen subjekti (det är roligt)" },
+            { correct: "det", expl: "sääilmiö (när det regnar)" },
+            { correct: "det", expl: "det står (lukee tekstissä)" },
+            { correct: "man", expl: "yleistävä tekijä (när man följer)" },
+            { correct: "man", expl: "yleistävä tekijä (lyckas man)" }
+        ]
+    },
+    {
+        id: 13,
+        title: "Teksti 13 – Konserttiillat kaupungissa",
+        parts: [
+            "Kulturlivet i staden erbjuder många intressanta evenemang under helgerna. På lördagarna samlas ",
+            " på torget för att lyssna på gatumusikanter. Under kalla kvällar händer ",
+            " ofta att folk drar sig inomhus till kaféerna. Om ",
+            " vill få en bra sittplats till kvällens konsert, upptäckande av biljetter visar att ",
+            " gäller att vara ute i god tid, eftersom ",
+            " snabbt blir fullt."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (samlas man)" },
+            { correct: "det", expl: "muodollinen subjekti (det händer ofta att...)" },
+            { correct: "man", expl: "yleistävä tekijä (om man vill)" },
+            { correct: "det", expl: "muodollinen subjekti (det gäller att...)" },
+            { correct: "det", expl: "nollasubjekti / tilanne (det blir fullt)" }
+        ]
+    },
+    {
+        id: 14,
+        title: "Teksti 14 – Opiskelu ja tentit",
+        parts: [
+            "Inför de stora tentamina i slutet av terminen sitter studenterna ofta uppe sent på nätterna. På biblioteket märker ",
+            " snabbt att ",
+            " är svårt att hitta en ledig studieplats. Lärarna brukar påminna om att ",
+            " måste planera sin tid väl. Om ",
+            " läser i sista sekund, upptäcker ",
+            " att ",
+            " blir svårt att hinna med allt."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (märker man)" },
+            { correct: "det", expl: "muodollinen subjekti (det är svårt)" },
+            { correct: "man", expl: "yleistävä tekijä (att man måste)" },
+            { correct: "man", expl: "yleistävä tekijä (om man läser)" },
+            { correct: "man", expl: "yleistävä tekijä (upptäcker man)" },
+            { correct: "det", expl: "muodollinen subjekti (det blir svårt)" }
+        ]
+    },
+    {
+        id: 15,
+        title: "Teksti 15 – Liikenne ja ruuhkat",
+        parts: [
+            "Trafiken i storstäderna kan vara ganska stressig under rusningstiden. På morgnarna hörs ",
+            " ofta på radion att ",
+            " har skett en olycka på motorvägen. Därför rekommenderar ",
+            " att ",
+            " som pendlar tar bussen i stället för bilen, eftersom ",
+            " sparar både tid och miljö på det sättet."
+        ],
+        gaps: [
+            { correct: "det", expl: "det hörs (kuullaan)" },
+            { correct: "det", expl: "det har skett (on tapahtunut)" },
+            { correct: "man", expl: "yleistävä tekijä (rekommenderar man)" },
+            { correct: "man", expl: "yleistävä tekijä (att man som pendlar...)" },
+            { correct: "man", expl: "yleistävä tekijä (sparar man)" }
+        ]
     }
 ];
 
@@ -500,45 +713,74 @@ let totalCorrectOverall = 0;
 let totalCheckedOverall = 0;
 let isCurrentChecked = false;
 
-function renderCurrentText() {
-    isCurrentChecked = false;
-    const item = TEXTS[currentIndex];
-    
-    document.getElementById("progressTitle").textContent = `Teksti ${currentIndex + 1} / ${TEXTS.length}`;
-    document.getElementById("scoreTracker").textContent = `Oikein tähän mennessä: ${totalCorrectOverall} / ${totalCheckedOverall}`;
+// Tallennetut tulokset selaimen muistista (esim. { "0": { correct: 6, total: 6 } })
+let savedScores = JSON.parse(localStorage.getItem("detManScores_v1") || "{}");
 
-    const container = document.getElementById("singleTextContainer");
-    
-    let html = `<div class="text-card">
-        <div class="text-header">${item.title}</div>
-        <div class="text-body">`;
+function renderSidebar() {
+    const list = document.getElementById("sidebarList");
+    if (!list) return;
+    list.innerHTML = "";
 
-    item.parts.forEach((part, idx) => {
-        html += part;
-        if (idx < item.gaps.length) {
-            html += `<select class="gap-select" id="gap-${idx}" aria-label="Aukko ${idx + 1}">
-                <option value="">– valitse –</option>
-                <option value="det">det</option>
-                <option value="man">man</option>
-            </select><span class="feedback-inline" id="fb-${idx}"></span>`;
+    TEXTS.forEach((t, idx) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.className = "nav-item-btn" + (idx === currentIndex ? " active" : "");
+        btn.onclick = () => jumpToText(idx);
+
+        const rec = savedScores[idx];
+        let badgeHtml = `<span class="nav-score-badge">–</span>`;
+        if (rec) {
+            const cls = rec.correct === rec.total ? "perfect" : "partial";
+            const icon = rec.correct === rec.total ? "✓" : "";
+            badgeHtml = `<span class="nav-score-badge ${cls}">${rec.correct}/${rec.total} ${icon}</span>`;
         }
+
+        // Lyhennetään otsikosta esim. "Teksti 1"
+        const shortTitle = t.title.split("–")[0].trim();
+        btn.innerHTML = `<span>${shortTitle}</span>${badgeHtml}`;
+        li.appendChild(btn);
+        list.appendChild(li);
     });
-
-    html += `</div>
-        <div class="explanation-list" id="explanationList">
-            <strong>Perustelut:</strong>
-            <ul id="explUl"></ul>
-        </div>
-    </div>`;
-
-    container.innerHTML = html;
-
-    document.getElementById("checkBtn").style.display = "inline-block";
-    document.getElementById("nextBtn").style.display = "none";
-    
-    const cardRes = document.getElementById("cardResult");
-    cardRes.style.display = "none";
 }
+
+function jumpToText(idx) {
+    currentIndex = idx;
+    document.getElementById("actionButtonsArea").style.display = "flex";
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.textContent = (currentIndex === TEXTS.length - 1) ? "Näytä loppuyhteenveto 🏁" : "Seuraava teksti →";
+    renderCurrentText();
+}
+
+function clearSavedProgress() {
+    savedScores = {};
+    localStorage.removeItem("detManScores_v1");
+    renderSidebar();
+}
+
+// Kytketään sivupalkin päivitys olemassa oleviin funktioihin
+const _origRenderCurrentText = renderCurrentText;
+renderCurrentText = function() {
+    _origRenderCurrentText();
+    renderSidebar();
+};
+
+const _origCheckCurrentText = checkCurrentText;
+checkCurrentText = function() {
+    const wasChecked = isCurrentChecked;
+    _origCheckCurrentText();
+    if (!wasChecked && isCurrentChecked) {
+        const item = TEXTS[currentIndex];
+        let ok = 0;
+        item.gaps.forEach((gap, idx) => {
+            if (document.getElementById(`gap-${idx}`).value === gap.correct) ok++;
+        });
+        savedScores[currentIndex] = { correct: ok, total: item.gaps.length };
+        localStorage.setItem("detManScores_v1", JSON.stringify(savedScores));
+        renderSidebar();
+    }
+};
+
+renderCurrentText();
 
 function checkCurrentText() {
     if (isCurrentChecked) return;
