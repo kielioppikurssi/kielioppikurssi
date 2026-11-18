@@ -228,6 +228,7 @@
         text-align: center;
         display: none;
     }
+
     /* Oikean reunan kelluva tekstilista */
     .sidebar-nav {
         position: fixed;
@@ -339,7 +340,7 @@
     ← Päävalikkoon
 </a>
 
-    <aside class="sidebar-nav">
+<aside class="sidebar-nav">
     <div class="sidebar-header">
         <span>📋 Tekstit</span>
         <button class="clear-mem-btn" onclick="clearSavedProgress()" title="Nollaa tallennetut tulokset">Nollaa muisti</button>
@@ -351,7 +352,7 @@
     <h1>🇸🇪 <em>Det</em> vai <em>man</em>? (B1)</h1>
 
     <div class="intro-box">
-        <strong>Ohje:</strong>Valitse oikea pronomini: <strong>Det</strong> tai <strong>man</strong>.
+        <strong>Ohje:</strong> Valitse oikea pronomini: <strong>det</strong> tai <strong>man</strong>.
         <ul>
             <li><strong>det</strong> = nollasubjekti / muodollinen subjekti (sää, <em>det finns</em>, <em>det är viktigt</em>, <em>det sägs</em>...)</li>
             <li><strong>man</strong> = yleistävä tekijä / passiivi ("ihmiset yleensä", esim. <em>man brukar</em>, <em>man kan</em>, <em>man måste</em>...)</li>
@@ -359,7 +360,7 @@
     </div>
 
     <div class="progress-bar-container">
-        <span id="progressTitle">Teksti 1 / 10</span>
+        <span id="progressTitle">Teksti 1 / 15</span>
         <span id="scoreTracker">Oikein tähän mennessä: 0 / 0</span>
     </div>
 
@@ -374,7 +375,6 @@
 </div>
 
 <script>
-// 10 tekstiä, jokaisessa täsmälleen 6 aukkoa (gaps-taulukko)
 const TEXTS = [
     {
         id: 1,
@@ -490,14 +490,16 @@ const TEXTS = [
             " är avkopplande att titta ut på landskapet när ",
             " reser genom landet. Dessutom sägs ",
             " att tågresor är mycket bättre för miljön, vilket gör att ",
-            " väljer tåget med gott samvete."
+            " väljer tåget om ",
+            " vill resa bekvämt."
         ],
         gaps: [
             { correct: "man", expl: "yleistävä tekijä (kan man boka)" },
             { correct: "det", expl: "muodollinen subjekti (det är avkopplande)" },
             { correct: "man", expl: "yleistävä tekijä (när man reser)" },
             { correct: "det", expl: "det sägs (kerrotaan / sanotaan)" },
-            { correct: "man", expl: "yleistävä tekijä (gör att man väljer)" }
+            { correct: "man", expl: "yleistävä tekijä (gör att man väljer)" },
+            { correct: "man", expl: "yleistävä tekijä (om man vill)" }
         ]
     },
     {
@@ -688,32 +690,12 @@ const TEXTS = [
     }
 ];
 
-// Teksti 6:ssa on korjattu tarkasti osat/aukot (6 kpl)
-TEXTS[5].gaps = [
-    { correct: "man", expl: "yleistävä tekijä (kan man boka)" },
-    { correct: "det", expl: "muodollinen subjekti (det är avkopplande)" },
-    { correct: "man", expl: "yleistävä tekijä (när man reser)" },
-    { correct: "det", expl: "det sägs (kerrotaan)" },
-    { correct: "man", expl: "yleistävä tekijä (gör att man väljer)" },
-    { correct: "man", expl: "yleistävä tekijä (lisäys: om man vill)" }
-];
-// Paikataan Text 6 parts, jotta niitä on 7 osaa ja 6 aukkoa:
-TEXTS[5].parts = [
-    "Resenärer väljer ofta tåget i stället för flyget. På nattågen kan ",
-    " boka en egen kupé och läsa en bok. Många tycker att ",
-    " är avkopplande att titta ut på landskapet när ",
-    " reser genom landet. Dessutom sägs ",
-    " att tågresor är mycket bättre för miljön, vilket gör att ",
-    " väljer tåget om ",
-    " vill resa bekvämt."
-];
-
 let currentIndex = 0;
 let totalCorrectOverall = 0;
 let totalCheckedOverall = 0;
 let isCurrentChecked = false;
 
-// Tallennetut tulokset selaimen muistista (esim. { "0": { correct: 6, total: 6 } })
+// Tallennetut tulokset selaimen muistista
 let savedScores = JSON.parse(localStorage.getItem("detManScores_v1") || "{}");
 
 function renderSidebar() {
@@ -735,7 +717,6 @@ function renderSidebar() {
             badgeHtml = `<span class="nav-score-badge ${cls}">${rec.correct}/${rec.total} ${icon}</span>`;
         }
 
-        // Lyhennetään otsikosta esim. "Teksti 1"
         const shortTitle = t.title.split("–")[0].trim();
         btn.innerHTML = `<span>${shortTitle}</span>${badgeHtml}`;
         li.appendChild(btn);
@@ -757,30 +738,47 @@ function clearSavedProgress() {
     renderSidebar();
 }
 
-// Kytketään sivupalkin päivitys olemassa oleviin funktioihin
-const _origRenderCurrentText = renderCurrentText;
-renderCurrentText = function() {
-    _origRenderCurrentText();
+function renderCurrentText() {
+    isCurrentChecked = false;
+    const item = TEXTS[currentIndex];
+    
+    document.getElementById("progressTitle").textContent = `Teksti ${currentIndex + 1} / ${TEXTS.length}`;
+    document.getElementById("scoreTracker").textContent = `Oikein tähän mennessä: ${totalCorrectOverall} / ${totalCheckedOverall}`;
+
+    const container = document.getElementById("singleTextContainer");
+    
+    let html = `<div class="text-card">
+        <div class="text-header">${item.title}</div>
+        <div class="text-body">`;
+
+    item.parts.forEach((part, idx) => {
+        html += part;
+        if (idx < item.gaps.length) {
+            html += `<select class="gap-select" id="gap-${idx}" aria-label="Aukko ${idx + 1}">
+                <option value="">– valitse –</option>
+                <option value="det">det</option>
+                <option value="man">man</option>
+            </select><span class="feedback-inline" id="fb-${idx}"></span>`;
+        }
+    });
+
+    html += `</div>
+        <div class="explanation-list" id="explanationList">
+            <strong>Perustelut:</strong>
+            <ul id="explUl"></ul>
+        </div>
+    </div>`;
+
+    container.innerHTML = html;
+
+    document.getElementById("checkBtn").style.display = "inline-block";
+    document.getElementById("nextBtn").style.display = "none";
+    
+    const cardRes = document.getElementById("cardResult");
+    cardRes.style.display = "none";
+
     renderSidebar();
-};
-
-const _origCheckCurrentText = checkCurrentText;
-checkCurrentText = function() {
-    const wasChecked = isCurrentChecked;
-    _origCheckCurrentText();
-    if (!wasChecked && isCurrentChecked) {
-        const item = TEXTS[currentIndex];
-        let ok = 0;
-        item.gaps.forEach((gap, idx) => {
-            if (document.getElementById(`gap-${idx}`).value === gap.correct) ok++;
-        });
-        savedScores[currentIndex] = { correct: ok, total: item.gaps.length };
-        localStorage.setItem("detManScores_v1", JSON.stringify(savedScores));
-        renderSidebar();
-    }
-};
-
-renderCurrentText();
+}
 
 function checkCurrentText() {
     if (isCurrentChecked) return;
@@ -834,6 +832,11 @@ function checkCurrentText() {
 
     document.getElementById("scoreTracker").textContent = `Oikein tähän mennessä: ${totalCorrectOverall} / ${totalCheckedOverall}`;
 
+    // Tallennetaan muistiin
+    savedScores[currentIndex] = { correct: textCorrectCount, total: item.gaps.length };
+    localStorage.setItem("detManScores_v1", JSON.stringify(savedScores));
+    renderSidebar();
+
     document.getElementById("explUl").innerHTML = explHtml;
     document.getElementById("explanationList").style.display = "block";
 
@@ -844,7 +847,7 @@ function checkCurrentText() {
         cardRes.style.background = "#dcfce7";
         cardRes.style.color = "#14532d";
         cardRes.style.border = "1px solid #16a34a";
-        cardRes.textContent = `🎉 Hienoa! Kaikki ${textCountMsg(textCorrectCount)} / ${item.gaps.length} oikein tässä tekstissä!`;
+        cardRes.textContent = `🎉 Hienoa! Kaikki ${textCorrectCount} / ${item.gaps.length} oikein tässä tekstissä!`;
     } else {
         cardRes.style.background = "#fee2e2";
         cardRes.style.color = "#7f1d1d";
@@ -861,10 +864,6 @@ function checkCurrentText() {
     }
 }
 
-function textCountMsg(n) {
-    return n;
-}
-
 function nextText() {
     currentIndex++;
     if (currentIndex < TEXTS.length) {
@@ -879,7 +878,7 @@ function showFinalSummary() {
     const container = document.getElementById("singleTextContainer");
     
     let gradeMsg = "";
-    const pct = (totalCorrectOverall / totalCheckedOverall) * 100;
+    const pct = totalCheckedOverall > 0 ? (totalCorrectOverall / totalCheckedOverall) * 100 : 0;
     if (pct === 100) gradeMsg = "Loistavaa! Virheetön suoritus!";
     else if (pct >= 80) gradeMsg = "Erinomaista työtä!";
     else if (pct >= 60) gradeMsg = "Hyvä suoritus, hallitset perusteet hyvin.";
