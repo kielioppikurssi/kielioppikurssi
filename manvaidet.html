@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Det vai man? – Ruotsin nollasubjekti ja man-passiivi (B1)</title>
+<style>
+    :root {
+        --bg-page: #f4f6f9;
+        --bg-card: #ffffff;
+        --primary: #004b87;
+        --primary-hover: #003666;
+        --border-color: #cbd5e1;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --correct-bg: #dcfce7;
+        --correct-border: #16a34a;
+        --correct-text: #14532d;
+        --wrong-bg: #fee2e2;
+        --wrong-border: #dc2626;
+        --wrong-text: #7f1d1d;
+    }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--bg-page);
+        color: var(--text-main);
+        margin: 0;
+        padding: 20px;
+        line-height: 1.65;
+    }
+
+    .home-button {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: 0.2s;
+        z-index: 1000;
+    }
+
+    .home-button:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+
+    .container {
+        max-width: 820px;
+        margin: 45px auto 30px auto;
+        background: var(--bg-card);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        margin-top: 0;
+        margin-bottom: 6px;
+        font-size: 1.9rem;
+        color: #0f172a;
+        text-align: center;
+    }
+
+    .progress-bar-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--primary);
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 12px;
+    }
+
+    .intro-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        font-size: 0.95rem;
+        color: #1e3a8a;
+    }
+
+    .intro-box ul {
+        margin: 6px 0 0 0;
+        padding-left: 20px;
+    }
+
+    .intro-box li {
+        margin-bottom: 3px;
+    }
+
+    .text-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .text-header {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--primary);
+        margin-bottom: 12px;
+    }
+
+    .text-body {
+        font-size: 1.08rem;
+        color: #1e293b;
+        line-height: 1.8;
+    }
+
+    select.gap-select {
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        margin: 0 3px;
+        border-radius: 6px;
+        border: 2px solid #94a3b8;
+        background: #ffffff;
+        color: #0f172a;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    select.gap-select:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    select.gap-select.is-correct {
+        background-color: var(--correct-bg);
+        border-color: var(--correct-border);
+        color: var(--correct-text);
+    }
+
+    select.gap-select.is-wrong {
+        background-color: var(--wrong-bg);
+        border-color: var(--wrong-border);
+        color: var(--wrong-text);
+    }
+
+    .feedback-inline {
+        display: inline-block;
+        margin-left: 4px;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .feedback-inline.correct { color: var(--correct-border); }
+    .feedback-inline.wrong { color: var(--wrong-border); }
+
+    .explanation-list {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px dashed #cbd5e1;
+        font-size: 0.9rem;
+        color: #475569;
+        display: none;
+    }
+
+    .explanation-list ul {
+        margin: 6px 0 0 0;
+        padding-left: 20px;
+    }
+
+    .actions-area {
+        margin-top: 25px;
+        text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .btn {
+        padding: 12px 26px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 2px 6px rgba(0,75,135,0.25);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    .btn-check {
+        background: #16a34a;
+        color: white;
+        box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn-check:hover {
+        background: #15803d;
+        transform: translateY(-1px);
+    }
+
+    #cardResult {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        text-align: center;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<a href="https://kielioppikurssi.github.io/kielioppikurssi" class="home-button">
+    ← Päävalikkoon
+</a>
+
+<div class="container">
+    <h1>🇸🇪 <em>Det</em> vai <em>man</em>? (B1)</h1>
+
+    <div class="intro-box">
+        <strong>Ohje:</strong> Edessäsi on 10 lyhyttä tekstiä (yksi kerrallaan). Jokaisessa tekstissä on <strong>6 aukkoa</strong>, joihin valitaan joko <strong>det</strong> tai <strong>man</strong>.
+        <ul>
+            <li><strong>det</strong> = nollasubjekti / muodollinen subjekti (sää, <em>det finns</em>, <em>det är viktigt</em>, <em>det sägs</em>...)</li>
+            <li><strong>man</strong> = yleistävä tekijä / passiivi ("ihmiset yleensä", esim. <em>man brukar</em>, <em>man kan</em>, <em>man måste</em>...)</li>
+        </ul>
+    </div>
+
+    <div class="progress-bar-container">
+        <span id="progressTitle">Teksti 1 / 10</span>
+        <span id="scoreTracker">Oikein tähän mennessä: 0 / 0</span>
+    </div>
+
+    <div id="singleTextContainer"></div>
+
+    <div class="actions-area" id="actionButtonsArea">
+        <button class="btn btn-check" id="checkBtn" onclick="checkCurrentText()">✓ Tarkista teksti</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextText()" style="display:none;">Seuraava teksti →</button>
+    </div>
+
+    <div id="cardResult"></div>
+</div>
+
+<script>
+// 10 tekstiä, jokaisessa täsmälleen 6 aukkoa (gaps-taulukko)
+const TEXTS = [
+    {
+        id: 1,
+        title: "Teksti 1 – Sää ja arki Pohjoismaissa",
+        parts: [
+            "Under hösten i Norden kan vädret växla väldigt snabbt. Ena dagen skiner solen från en klarblå himmel, men nästa morgon märker vi att ",
+            " blåser kallt och ",
+            " regnar hela förmiddagen. Trots det brukar ",
+            " klä på sig varma kläder innan ",
+            " går ut. På kvällarna är ",
+            " skönt att tända ljus när ",
+            " blir mörkt tidigt."
+        ],
+        gaps: [
+            { correct: "det", expl: "sääilmiö (det blåser)" },
+            { correct: "det", expl: "sääilmiö (det regnar)" },
+            { correct: "man", expl: "yleistävä tekijä (man brukar klä på sig)" },
+            { correct: "man", expl: "yleistävä tekijä (innan man går ut)" },
+            { correct: "det", expl: "muodollinen subjekti (det är skönt)" },
+            { correct: "det", expl: "ajanhetki / valoisuus (det blir mörkt)" }
+        ]
+    },
+    {
+        id: 2,
+        title: "Teksti 2 – Kahvikulttuuri Ruotsissa",
+        parts: [
+            "Fika är en viktig del av den svenska vardagen. På många arbetsplatser tar ",
+            " en kort paus på förmiddagen för att dricka kaffe. Ofta diskuterar ",
+            " både jobb och privata saker. Innan mötet börjar måste ",
+            " kontrollera att alla anmälda har kommit, eftersom ",
+            " är viktigt att börja i tid. Ibland märker ",
+            " att tiden inte räcker till, men ",
+            " brukar ändå ordna sig till slut."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (man tar en kort paus)" },
+            { correct: "man", expl: "yleistävä tekijä (diskuterar man)" },
+            { correct: "man", expl: "yleistävä tekijä (måste man kontrollera)" },
+            { correct: "det", expl: "muodollinen subjekti (det är viktigt)" },
+            { correct: "man", expl: "yleistävä tekijä (märker man)" },
+            { correct: "det", expl: "lauseen nollasubjekti (det brukar ordna sig)" }
+        ]
+    },
+    {
+        id: 3,
+        title: "Teksti 3 – Kaupungin uudet pyörätiet",
+        parts: [
+            "Kommunen har satsat mycket på trafiksäkerheten. Numera konstaterar många att ",
+            " finns betydligt fler breda cykelbanor i centrum. När ",
+            " cyklar till skolan eller jobbet märker ",
+            " att trafiken flyter smidigare. Många hävdar att ",
+            " är mycket enklare att ta sig fram nu. Om ",
+            " vill undvika bilköerna rekommenderar ",
+            " att man väljer två hjul."
+        ],
+        gaps: [
+            { correct: "det", expl: "det finns (on olemassa)" },
+            { correct: "man", expl: "yleistävä tekijä (när man cyklar)" },
+            { correct: "man", expl: "yleistävä tekijä (märker man)" },
+            { correct: "det", expl: "muodollinen subjekti (det är mycket enklare)" },
+            { correct: "man", expl: "yleistävä tekijä (om man vill)" },
+            { correct: "man", expl: "yleistävä tekijä (rekommenderar man)" }
+        ]
+    },
+    {
+        id: 4,
+        title: "Teksti 4 – Kielten opiskelu",
+        parts: [
+            "Att lära sig ett nytt språk kräver tålamod. Lärarna brukar påminna om att ",
+            " måste våga prata från början. Även om ",
+            " gör misstag ibland, är ",
+            " helt normalt under inlärningsprocessen. Om ",
+            " övar regelbundet upptäcker ",
+            " snabbt att ",
+            " blir roligare att kommunicera."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (man måste våga)" },
+            { correct: "man", expl: "yleistävä tekijä (om man gör misstag)" },
+            { correct: "det", expl: "viittaus aiempaan (det är helt normalt)" },
+            { correct: "man", expl: "yleistävä tekijä (om man övar)" },
+            { correct: "man", expl: "yleistävä tekijä (upptäcker man)" },
+            { correct: "det", expl: "muodollinen subjekti (det blir roligare)" }
+        ]
+    },
+    {
+        id: 5,
+        title: "Teksti 5 – Etätyön vaikutukset",
+        parts: [
+            "Allt fler företag erbjuder sina anställda att arbeta hemifrån. Forskare menar att ",
+            " är viktigt att ha tydliga rutiner. När ",
+            " jobbar hemma är ",
+            " lätt att glömma bort pauser om ",
+            " inte sätter upp en fast tidsplan. Efter arbetsdagens slut kan ",
+            " känna sig trött i huvudet, trots att ",
+            " har suttit stilla hela dagen."
+        ],
+        gaps: [
+            { correct: "det", expl: "muodollinen subjekti (det är viktigt)" },
+            { correct: "man", expl: "yleistävä tekijä (när man jobbar)" },
+            { correct: "det", expl: "muodollinen subjekti (det är lätt)" },
+            { correct: "man", expl: "yleistävä tekijä (om man inte sätter upp)" },
+            { correct: "man", expl: "yleistävä tekijä (kan man känna sig)" },
+            { correct: "man", expl: "yleistävä tekijä (trots att man har suttit)" }
+        ]
+    },
+    {
+        id: 6,
+        title: "Teksti 6 – Matkustaminen junalla",
+        parts: [
+            "Resenärer väljer ofta tåget i stället för flyget. På nattågen kan ",
+            " boka en egen kupé och läsa en bok. Många tycker att ",
+            " är avkopplande att titta ut på landskapet när ",
+            " reser genom landet. Dessutom sägs ",
+            " att tågresor är mycket bättre för miljön, vilket gör att ",
+            " väljer tåget med gott samvete."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (kan man boka)" },
+            { correct: "det", expl: "muodollinen subjekti (det är avkopplande)" },
+            { correct: "man", expl: "yleistävä tekijä (när man reser)" },
+            { correct: "det", expl: "det sägs (kerrotaan / sanotaan)" },
+            { correct: "man", expl: "yleistävä tekijä (gör att man väljer)" }
+        ]
+    },
+    {
+        id: 7,
+        title: "Teksti 7 – Vanha kirjasto",
+        parts: [
+            "Stadsbiblioteket ligger i en vacker historisk byggnad. Bland lokalbefolkningen berättas ",
+            " ofta att en känd författare brukade sitta där och skriva. Om ",
+            " besöker läsesalen märker ",
+            " direkt den tysta och rofyllda atmosfären. Ibland sägs ",
+            " att gamla byggnader har en egen själ, och ",
+            " kan verkligen känna historiens vingslag när ",
+            " går in genom dörrarna."
+        ],
+        gaps: [
+            { correct: "det", expl: "det berättas (kerrotaan)" },
+            { correct: "man", expl: "yleistävä tekijä (om man besöker)" },
+            { correct: "man", expl: "yleistävä tekijä (märker man)" },
+            { correct: "det", expl: "det sägs (sanotaan)" },
+            { correct: "man", expl: "yleistävä tekijä (man kan verkligen känna)" },
+            { correct: "man", expl: "yleistävä tekijä (när man går in)" }
+        ]
+    },
+    {
+        id: 8,
+        title: "Teksti 8 – Luonnossa liikkuminen",
+        parts: [
+            "Allemansrätten ger alla i Sverige en unik möjlighet att uppleva skog och mark. Samtidigt får ",
+            " inte glömma att friheten innebär ett stort ansvar. Före turen är ",
+            " klokt att kontrollera väderprognosen så att ",
+            " inte överraskas av oväder. Om ",
+            " skräpar ner i naturen bryter ",
+            " mot lagen, och ",
+            " kan få böter."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (får man inte glömma)" },
+            { correct: "det", expl: "muodollinen subjekti (det är klokt)" },
+            { correct: "man", expl: "yleistävä tekijä (så att man inte överraskas)" },
+            { correct: "man", expl: "yleistävä tekijä (om man skräpar ner)" },
+            { correct: "man", expl: "yleistävä tekijä (bryter man mot lagen)" },
+            { correct: "man", expl: "yleistävä tekijä (man kan få böter)" }
+        ]
+    },
+    {
+        id: 9,
+        title: "Teksti 9 – Päätöksenteko",
+        parts: [
+            "Efter flera timmars diskussion stod ",
+            " klart att frågan behövde utredas vidare. Styrelsen insåg att ",
+            " behövde samla in mer information innan ",
+            " kunde fatta ett slutgiltigt beslut. Under mötet noterade ",
+            " att vissa detaljer var oklara, och ",
+            " bestämde att ",
+            " skulle hålla ett extra möte nästa vecka."
+        ],
+        gaps: [
+            { correct: "det", expl: "det stod klart (on selvää / kävi selväksi)" },
+            { correct: "man", expl: "yleistävä tekijä (att man behövde / styrelsen)" },
+            { correct: "man", expl: "yleistävä tekijä (innan man kunde)" },
+            { correct: "man", expl: "yleistävä tekijä (noterade man)" },
+            { correct: "man", expl: "yleistävä tekijä (man bestämde)" },
+            { correct: "det", expl: "muodollinen subjekti / viittaus (det skulle hållas... tai man)" }
+        ]
+    },
+    {
+        id: 10,
+        title: "Teksti 10 – Kierrätys arjessa",
+        parts: [
+            "Intresset för hållbar konsumtion har ökat kraftigt. I nästan varje bostadsområde sorterar ",
+            " numera avfall i separata kärl. Det märks att ",
+            " har blivit mer miljömedvetna. Forskarna påpekar att ",
+            " är nödvändigt att fortsätta på den inslagna vägen. Om ",
+            " vill minska sitt klimatavtryck måste ",
+            " tänka på vad ",
+            " köper i affären."
+        ],
+        gaps: [
+            { correct: "man", expl: "yleistävä tekijä (sorterar man)" },
+            { correct: "det", expl: "det märks (huomataan)" },
+            { correct: "det", expl: "muodollinen subjekti (det är nödvändigt)" },
+            { correct: "man", expl: "yleistävä tekijä (om man vill)" },
+            { correct: "man", expl: "yleistävä tekijä (måste man tänka)" },
+            { correct: "man", expl: "yleistävä tekijä (vad man köper)" }
+        ]
+    }
+];
+
+// Teksti 6:ssa on korjattu tarkasti osat/aukot (6 kpl)
+TEXTS[5].gaps = [
+    { correct: "man", expl: "yleistävä tekijä (kan man boka)" },
+    { correct: "det", expl: "muodollinen subjekti (det är avkopplande)" },
+    { correct: "man", expl: "yleistävä tekijä (när man reser)" },
+    { correct: "det", expl: "det sägs (kerrotaan)" },
+    { correct: "man", expl: "yleistävä tekijä (gör att man väljer)" },
+    { correct: "man", expl: "yleistävä tekijä (lisäys: om man vill)" }
+];
+// Paikataan Text 6 parts, jotta niitä on 7 osaa ja 6 aukkoa:
+TEXTS[5].parts = [
+    "Resenärer väljer ofta tåget i stället för flyget. På nattågen kan ",
+    " boka en egen kupé och läsa en bok. Många tycker att ",
+    " är avkopplande att titta ut på landskapet när ",
+    " reser genom landet. Dessutom sägs ",
+    " att tågresor är mycket bättre för miljön, vilket gör att ",
+    " väljer tåget om ",
+    " vill resa bekvämt."
+];
+
+let currentIndex = 0;
+let totalCorrectOverall = 0;
+let totalCheckedOverall = 0;
+let isCurrentChecked = false;
+
+function renderCurrentText() {
+    isCurrentChecked = false;
+    const item = TEXTS[currentIndex];
+    
+    document.getElementById("progressTitle").textContent = `Teksti ${currentIndex + 1} / ${TEXTS.length}`;
+    document.getElementById("scoreTracker").textContent = `Oikein tähän mennessä: ${totalCorrectOverall} / ${totalCheckedOverall}`;
+
+    const container = document.getElementById("singleTextContainer");
+    
+    let html = `<div class="text-card">
+        <div class="text-header">${item.title}</div>
+        <div class="text-body">`;
+
+    item.parts.forEach((part, idx) => {
+        html += part;
+        if (idx < item.gaps.length) {
+            html += `<select class="gap-select" id="gap-${idx}" aria-label="Aukko ${idx + 1}">
+                <option value="">– valitse –</option>
+                <option value="det">det</option>
+                <option value="man">man</option>
+            </select><span class="feedback-inline" id="fb-${idx}"></span>`;
+        }
+    });
+
+    html += `</div>
+        <div class="explanation-list" id="explanationList">
+            <strong>Perustelut:</strong>
+            <ul id="explUl"></ul>
+        </div>
+    </div>`;
+
+    container.innerHTML = html;
+
+    document.getElementById("checkBtn").style.display = "inline-block";
+    document.getElementById("nextBtn").style.display = "none";
+    
+    const cardRes = document.getElementById("cardResult");
+    cardRes.style.display = "none";
+}
+
+function checkCurrentText() {
+    if (isCurrentChecked) return;
+
+    const item = TEXTS[currentIndex];
+    let textCorrectCount = 0;
+    let unanswered = false;
+    let explHtml = "";
+
+    item.gaps.forEach((gap, idx) => {
+        const selectEl = document.getElementById(`gap-${idx}`);
+        const fbEl = document.getElementById(`fb-${idx}`);
+        const val = selectEl.value;
+
+        selectEl.classList.remove("is-correct", "is-wrong");
+        fbEl.classList.remove("correct", "wrong");
+
+        if (!val) {
+            unanswered = true;
+            selectEl.classList.add("is-wrong");
+            fbEl.textContent = "✗";
+            fbEl.classList.add("wrong");
+            explHtml += `<li>Aukko ${idx + 1}: Tyhjä (oikea oli <strong>${gap.correct}</strong> – ${gap.expl})</li>`;
+        } else if (val === gap.correct) {
+            textCorrectCount++;
+            selectEl.classList.add("is-correct");
+            fbEl.textContent = "✓";
+            fbEl.classList.add("correct");
+            explHtml += `<li>Aukko ${idx + 1}: <strong>${gap.correct}</strong> Oikein (${gap.expl})</li>`;
+        } else {
+            selectEl.classList.add("is-wrong");
+            fbEl.textContent = "✗";
+            fbEl.classList.add("wrong");
+            explHtml += `<li>Aukko ${idx + 1}: Väärin. Oikea oli <strong>${gap.correct}</strong> (${gap.expl})</li>`;
+        }
+    });
+
+    if (unanswered) {
+        const cardRes = document.getElementById("cardResult");
+        cardRes.style.display = "block";
+        cardRes.style.background = "#fef3c7";
+        cardRes.style.color = "#92400e";
+        cardRes.style.border = "1px solid #f59e0b";
+        cardRes.textContent = "⚠️ Täytä kaikki aukot ennen tarkistusta!";
+        return;
+    }
+
+    isCurrentChecked = true;
+    totalCorrectOverall += textCorrectCount;
+    totalCheckedOverall += item.gaps.length;
+
+    document.getElementById("scoreTracker").textContent = `Oikein tähän mennessä: ${totalCorrectOverall} / ${totalCheckedOverall}`;
+
+    document.getElementById("explUl").innerHTML = explHtml;
+    document.getElementById("explanationList").style.display = "block";
+
+    const cardRes = document.getElementById("cardResult");
+    cardRes.style.display = "block";
+
+    if (textCorrectCount === item.gaps.length) {
+        cardRes.style.background = "#dcfce7";
+        cardRes.style.color = "#14532d";
+        cardRes.style.border = "1px solid #16a34a";
+        cardRes.textContent = `🎉 Hienoa! Kaikki ${textCountMsg(textCorrectCount)} / ${item.gaps.length} oikein tässä tekstissä!`;
+    } else {
+        cardRes.style.background = "#fee2e2";
+        cardRes.style.color = "#7f1d1d";
+        cardRes.style.border = "1px solid #dc2626";
+        cardRes.textContent = `Sait ${textCorrectCount} / ${item.gaps.length} oikein. Katso perustelut alta ja siirry seuraavaan.`;
+    }
+
+    document.getElementById("checkBtn").style.display = "none";
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.style.display = "inline-block";
+    
+    if (currentIndex === TEXTS.length - 1) {
+        nextBtn.textContent = "Näytä loppuyhteenveto 🏁";
+    }
+}
+
+function textCountMsg(n) {
+    return n;
+}
+
+function nextText() {
+    currentIndex++;
+    if (currentIndex < TEXTS.length) {
+        renderCurrentText();
+    } else {
+        showFinalSummary();
+    }
+}
+
+function showFinalSummary() {
+    document.getElementById("progressTitle").textContent = "Harjoitus suoritettu!";
+    const container = document.getElementById("singleTextContainer");
+    
+    let gradeMsg = "";
+    const pct = (totalCorrectOverall / totalCheckedOverall) * 100;
+    if (pct === 100) gradeMsg = "Loistavaa! Virheetön suoritus!";
+    else if (pct >= 80) gradeMsg = "Erinomaista työtä!";
+    else if (pct >= 60) gradeMsg = "Hyvä suoritus, hallitset perusteet hyvin.";
+    else gradeMsg = "Kannattaa kerrata vielä det- ja man-rakenteiden sääntöjä.";
+
+    container.innerHTML = `
+        <div class="text-card" style="text-align:center; padding: 40px 20px;">
+            <h2 style="color:var(--primary); margin-top:0;">🏆 Valmista!</h2>
+            <p style="font-size: 1.2rem; margin: 15px 0;">Kokononaistuloksesi: <strong>${totalCorrectOverall} / ${totalCheckedOverall}</strong> oikein (${Math.round(pct)}%)</p>
+            <p style="font-size: 1.05rem; color: #475569; margin-bottom: 25px;">${gradeMsg}</p>
+            <button class="btn btn-primary" onclick="restartAll()">Aloita harjoitus alusta ↺</button>
+        </div>
+    `;
+
+    document.getElementById("actionButtonsArea").style.display = "none";
+    document.getElementById("cardResult").style.display = "none";
+}
+
+function restartAll() {
+    currentIndex = 0;
+    totalCorrectOverall = 0;
+    totalCheckedOverall = 0;
+    document.getElementById("actionButtonsArea").style.display = "flex";
+    document.getElementById("nextBtn").textContent = "Seuraava teksti →";
+    renderCurrentText();
+}
+
+renderCurrentText();
+</script>
+
+</body>
+</html>
