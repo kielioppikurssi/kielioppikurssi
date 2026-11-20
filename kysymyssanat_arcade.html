@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kysymyssanat — Arcade | Ruotsin kielioppipeli</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-grad-1: #070d1f;
+    --bg-grad-2: #11255a;
+    --bg-grad-3: #0369a1;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at 50% 20%, var(--bg-grad-3) 0%, var(--bg-grad-2) 48%, var(--bg-grad-1) 100%);
+    color: #ffffff;
+    user-select: none;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  h1, h2, .font-display {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* Lasimorfismi */
+  .glass {
+    background: rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .glass-strong {
+    background: rgba(9, 15, 34, 0.84);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Energiakuplat / Meteoriitit */
+  .energy-orb {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 9999px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 22px;
+    min-width: 128px;
+    min-height: 76px;
+    background: radial-gradient(circle at 30% 25%, rgba(56, 189, 248, 0.42), rgba(30, 58, 138, 0.78) 70%, rgba(15, 23, 42, 0.92));
+    border: 2px solid rgba(125, 211, 252, 0.65);
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.35), inset 0 2px 10px rgba(255, 255, 255, 0.35);
+    transition: transform 0.14s ease, border-color 0.2s, box-shadow 0.2s;
+    z-index: 20;
+    touch-action: manipulation;
+  }
+
+  .energy-orb:hover {
+    transform: translate(-50%, -50%) scale(1.08);
+    border-color: #fde047;
+    box-shadow: 0 0 32px rgba(253, 224, 71, 0.65), inset 0 2px 12px rgba(255, 255, 255, 0.5);
+    z-index: 25;
+  }
+
+  .energy-orb:active {
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+
+  .energy-orb.orb-danger {
+    border-color: #f87171;
+    box-shadow: 0 0 26px rgba(239, 68, 68, 0.6), inset 0 2px 10px rgba(248, 113, 113, 0.4);
+  }
+
+  .energy-orb.orb-wrong {
+    animation: orbShake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    background: radial-gradient(circle at 30% 25%, rgba(239, 68, 68, 0.7), rgba(127, 29, 29, 0.9));
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.85) !important;
+  }
+
+  .energy-orb.orb-correct-highlight {
+    background: radial-gradient(circle at 30% 25%, rgba(250, 204, 21, 0.85), rgba(202, 138, 4, 0.92));
+    border-color: #fef08a !important;
+    box-shadow: 0 0 40px rgba(250, 204, 21, 0.95) !important;
+    transform: translate(-50%, -50%) scale(1.16) !important;
+    z-index: 30;
+  }
+
+  @keyframes orbShake {
+    10%, 90% { transform: translate(calc(-50% - 5px), -50%); }
+    20%, 80% { transform: translate(calc(-50% + 8px), -50%); }
+    30%, 50%, 70% { transform: translate(calc(-50% - 10px), -50%); }
+    40%, 60% { transform: translate(calc(-50% + 10px), -50%); }
+  }
+
+  /* Kelluvat pistetekstit */
+  .floating-score {
+    position: fixed;
+    pointer-events: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    z-index: 50;
+    animation: floatUp 1.15s ease-out forwards;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translate(-50%, 0) scale(0.85); }
+    25% { transform: translate(-50%, -18px) scale(1.12); }
+    100% { opacity: 0; transform: translate(-50%, -70px) scale(1); }
+  }
+
+  /* Sydänanimaatio */
+  .heart-lost {
+    animation: heartBreak 0.45s ease-out forwards;
+  }
+
+  @keyframes heartBreak {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35) rotate(-12deg); color: #ef4444; }
+    100% { transform: scale(0.85); opacity: 0.3; filter: grayscale(100%); }
+  }
+
+  /* Vaaravyöhyke */
+  .danger-line {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(239, 68, 68, 0.22),
+      rgba(239, 68, 68, 0.22) 12px,
+      rgba(239, 68, 68, 0.07) 12px,
+      rgba(239, 68, 68, 0.07) 24px
+    );
+    border-top: 2px dashed rgba(248, 113, 113, 0.65);
+  }
+
+  /* Aukko kysymyslauseessa */
+  .blank-slot {
+    display: inline-block;
+    min-width: 72px;
+    padding: 0 10px;
+    margin: 0 3px;
+    border-bottom: 3px solid #38bdf8;
+    background: rgba(56, 189, 248, 0.18);
+    border-radius: 8px 8px 2px 2px;
+    color: #7dd3fc;
+    font-weight: 800;
+  }
+
+  /* Liukusäädin */
+  input[type=range] {
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.22);
+    height: 6px;
+    border-radius: 999px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #38bdf8;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.9);
+  }
+
+  /* Tähtialuksen tykkitorni */
+  #turretBarrel {
+    transform-origin: 50% 78%;
+    transition: transform 0.06s linear;
+  }
+</style>
+</head>
+<body class="relative flex flex-col items-center justify-center">
+
+  <!-- Tähtitaivas & Laser / Partikkeli -canvas -->
+  <canvas id="bgStarCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+  <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
+
+  <!-- Paluulinkki päävalikkoon -->
+  <a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-btn fixed top-4 left-4 z-50 glass hover:bg-white/20 text-white font-semibold text-sm sm:text-base px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg">
+    ← Päävalikko
+  </a>
+
+  <!-- ALOITUSNÄKYMÄ -->
+  <div id="modeSelect" class="relative z-10 w-full max-w-4xl px-4 pt-16 sm:pt-6 pb-6 flex flex-col items-center text-center overflow-y-auto max-h-screen">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass text-sky-200 text-xs sm:text-sm font-semibold mb-2.5 tracking-wide uppercase">
+      <span>🚀 Ruotsin kielioppipeli • Arcade</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-sky-200 to-amber-200">
+      Kysymyssanat — Arcade
+    </h1>
+    <p class="text-sky-100/90 text-sm sm:text-base max-w-xl mb-4">
+      Tähtää ja ammu oikea ruotsin kysymyssana-energiapallo ennen kuin kuplat laskeutuvat vaaravyöhykkeelle! Voit klikata kuplaa tai painaa numeronäppäimiä <strong class="text-amber-300">1–5</strong>.
+    </p>
+
+    <!-- Ennätys & Nopeuden säätö ennen peliä -->
+    <div class="flex flex-wrap items-center justify-center gap-3 mb-5">
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-2 text-sm">
+        <span class="text-amber-300 text-lg">🏆</span>
+        <span class="text-sky-200">Ennätys:</span>
+        <span id="menuHighScore" class="font-bold text-white text-base">0</span>
+      </div>
+
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-3 text-sm">
+        <span class="text-sky-200 font-medium">Pelin nopeus:</span>
+        <input type="range" id="menuSpeedSlider" min="0.3" max="2.5" step="0.1" value="0.7" class="w-24 sm:w-28">
+        <span id="menuSpeedValue" class="font-bold text-amber-300 w-9 text-left">0.7x</span>
+      </div>
+    </div>
+
+    <!-- 3 Pelimuotoa -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-5">
+      <button onclick="startGame('basic')" class="group glass hover:bg-sky-500/30 border-sky-300/30 hover:border-sky-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🛸</span>
+        <span class="font-display font-bold text-lg text-white">Perustaso</span>
+        <span class="text-xs text-sky-200 mt-1">vad, vem, var, när, hur, varför</span>
+      </button>
+
+      <button onclick="startGame('advanced')" class="group glass hover:bg-indigo-500/30 border-indigo-300/30 hover:border-indigo-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">⚡</span>
+        <span class="font-display font-bold text-lg text-white">Haastetaso</span>
+        <span class="text-xs text-indigo-200 mt-1">vart, varifrån, vems, vilken/vilket/vilka, hur-yhdistelmät</span>
+      </button>
+
+      <button onclick="startGame('all')" class="group glass hover:bg-emerald-500/30 border-emerald-300/30 hover:border-emerald-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg relative overflow-hidden">
+        <span class="absolute top-2 right-2 bg-emerald-400/20 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300/30">70+ LAUSETTA</span>
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🌌</span>
+        <span class="font-display font-bold text-lg text-white">Kaikki yhdessä</span>
+        <span class="text-xs text-emerald-200 mt-1">Koko kysymyssanavalikoima</span>
+      </button>
+    </div>
+
+    <!-- Kieliopin pikaopaskortit -->
+    <div class="glass-strong rounded-2xl p-4 sm:p-5 text-left w-full border border-sky-300/20">
+      <div class="flex items-center gap-2 text-amber-300 font-bold text-sm sm:text-base mb-2.5">
+        <span>💡</span>
+        <span>Kysymyssanojen muistilista</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10 space-y-1">
+          <div class="font-bold text-sky-300 text-sm mb-1">Perussanat</div>
+          <div><strong class="text-white">vad</strong> = mikä / mitä</div>
+          <div><strong class="text-white">vem</strong> = kuka / ketä</div>
+          <div><strong class="text-white">var</strong> = missä (paikka)</div>
+          <div><strong class="text-white">när</strong> = milloin</div>
+          <div><strong class="text-white">hur</strong> = miten / kuinka</div>
+          <div><strong class="text-white">varför</strong> = miksi</div>
+        </div>
+
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10 space-y-1">
+          <div class="font-bold text-indigo-300 text-sm mb-1">Suunta & Omistus</div>
+          <div><strong class="text-white">vart</strong> = minne (suunta)</div>
+          <div><strong class="text-white">varifrån</strong> = mistä (alkuperä)</div>
+          <div><strong class="text-white">vems</strong> = kenen</div>
+          <div><strong class="text-white">vilka</strong> = ketkä / mitkä (monikko)</div>
+        </div>
+
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10 space-y-1">
+          <div class="font-bold text-emerald-300 text-sm mb-1">Suku & Määrä</div>
+          <div><strong class="text-white">vilken / vilket / vilka</strong> = mikä / kumpi (en / ett / mon.)</div>
+          <div><strong class="text-white">hur många</strong> = kuinka monta (laskettavat)</div>
+          <div><strong class="text-white">hur mycket</strong> = kuinka paljon (ainekset/hinta)</div>
+          <div><strong class="text-white">hur länge / hur ofta</strong> = kuinka kauan / usein</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PELINÄKYMÄ -->
+  <div id="game" class="hidden fixed inset-0 z-10 flex flex-col justify-between">
+    
+    <!-- Yläpalkki (HUD) -->
+    <header class="w-full pt-16 sm:pt-4 px-4 sm:px-6 flex flex-wrap items-center justify-between gap-2 z-30">
+      <!-- Pelimuodon vaihto -->
+      <div class="flex items-center gap-1 sm:ml-36 bg-slate-900/50 p-1 rounded-xl border border-white/15 backdrop-blur-md">
+        <button id="btn-basic" onclick="changeMode('basic')" class="mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Perus</button>
+        <button id="btn-advanced" onclick="changeMode('advanced')" class="mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Haaste</button>
+        <button id="btn-all" onclick="changeMode('all')" class="mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Kaikki</button>
+      </div>
+
+      <!-- Keskellä: Elämät, Combo ja Ääninappi -->
+      <div class="flex items-center gap-2 sm:gap-3.5">
+        <div id="heartsContainer" class="glass px-3 py-1.5 rounded-xl flex items-center gap-1 text-base sm:text-lg" title="Elämät">
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+        </div>
+
+        <div id="comboBadge" class="glass px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all duration-300 opacity-60">
+          <span class="text-sm sm:text-base">🔥</span>
+          <span class="text-xs sm:text-sm font-bold text-amber-300">Combo <span id="comboCount">0</span></span>
+        </div>
+
+        <button id="soundToggleBtn" onclick="toggleSound()" class="glass hover:bg-white/20 px-3 py-1.5 rounded-xl text-sm font-bold text-sky-100 transition" title="Äänet päälle / pois">
+          🔊
+        </button>
+      </div>
+
+      <!-- Oikealla: Pisteet, Taso ja Nopeus -->
+      <div class="flex items-center gap-2.5 ml-auto sm:ml-0">
+        <div class="glass px-3.5 py-1.5 rounded-xl flex items-center gap-3">
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Taso</div>
+            <div id="levelDisplay" class="font-display font-bold text-sm sm:text-base text-white">1</div>
+          </div>
+          <div class="h-6 w-px bg-white/20"></div>
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Pisteet</div>
+            <div id="score" class="font-display font-extrabold text-base sm:text-xl text-amber-300">0</div>
+          </div>
+        </div>
+
+        <!-- Nopeudensäätö pelin aikana -->
+        <div class="hidden md:flex glass px-3 py-1.5 rounded-xl flex-col justify-center">
+          <div class="flex justify-between text-[11px] text-sky-200 font-medium mb-1">
+            <span>Nopeus</span>
+            <span id="speedValue" class="font-bold text-white">0.7x</span>
+          </div>
+          <input type="range" id="speedSlider" min="0.3" max="2.5" step="0.1" value="0.7" class="w-24">
+        </div>
+      </div>
+    </header>
+
+    <!-- Pelialue (energiapallot leijailevat täällä) -->
+    <main id="playfield" class="relative flex-1 w-full overflow-hidden">
+      <div id="orbContainer" class="w-full h-full relative"></div>
+
+      <!-- Kielioppivihjeen ponnahduspalkki virheen yhteydessä -->
+      <div id="grammarToast" class="hidden fixed top-28 sm:top-20 left-1/2 -translate-x-1/2 z-40 glass-strong border-amber-400/60 px-4 py-2.5 rounded-2xl max-w-md w-[92vw] text-center shadow-2xl transition-all">
+        <div class="text-xs font-extrabold uppercase tracking-wider text-amber-300 mb-0.5">💡 Kielioppivinkki</div>
+        <div id="grammarToastText" class="text-xs sm:text-sm text-white font-medium"></div>
+      </div>
+
+      <!-- Vaara-alue -->
+      <div id="dangerZone" class="danger-line absolute bottom-0 left-0 right-0 h-44 pointer-events-none flex items-start justify-center pt-1.5">
+        <span class="text-[11px] uppercase tracking-widest text-red-300/75 font-bold">Vaara-alue</span>
+      </div>
+    </main>
+
+    <!-- Alareunan Tähtialus + Kysymyskortti -->
+    <footer class="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 w-full max-w-xl px-3 flex flex-col items-center pointer-events-none">
+      
+      <!-- Futuristinen Lasertykkitorni / Tähtialus -->
+      <div id="turretWrapper" class="relative w-24 h-16 -mb-3 z-20 flex items-center justify-center">
+        <svg viewBox="0 0 100 70" class="w-full h-full overflow-visible drop-shadow-[0_0_14px_rgba(56,189,248,0.65)]">
+          <!-- Tykkitornin pyörivä piippu -->
+          <g id="turretBarrel">
+            <rect x="44" y="6" width="12" height="36" rx="4" fill="url(#barrelGrad)" stroke="#bae6fd" stroke-width="1.5"/>
+            <circle cx="50" cy="8" r="4.5" fill="#fde047"/>
+          </g>
+          <!-- Aluksen runko -->
+          <path d="M18 62 L32 38 L68 38 L82 62 Z" fill="url(#hullGrad)" stroke="#7dd3fc" stroke-width="2"/>
+          <circle cx="50" cy="50" r="10" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+          <circle cx="50" cy="50" r="4" fill="#38bdf8"/>
+          <defs>
+            <linearGradient id="barrelGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#1d4ed8"/>
+            </linearGradient>
+            <linearGradient id="hullGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1e3a8a"/>
+              <stop offset="100%" stop-color="#0f172a"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- Kysymyskortti -->
+      <div class="glass-strong w-full rounded-2xl px-4 py-3 sm:px-6 sm:py-3.5 text-center border border-sky-300/30 shadow-2xl pointer-events-auto">
+        <div class="flex items-center justify-center gap-2 mb-1">
+          <span id="questionLevelTag" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30">
+            Kysymyslause
+          </span>
+          <span class="text-[11px] text-slate-300 hidden sm:inline">Klikkaa oikeaa palloa tai paina 1–5</span>
+        </div>
+        <div id="questionSentence" class="font-display text-xl sm:text-2xl font-extrabold text-white leading-snug">
+          <span class="blank-slot">___</span> kommer du ifrån?
+        </div>
+        <div id="questionTranslation" class="text-xs sm:text-sm text-sky-200/90 font-medium mt-1">
+          "Mistä sinä olet kotoisin?"
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- GAME OVER -MODAALI -->
+  <div id="gameOverModal" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-strong max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-white/20 transform transition-all">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+        🏁
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-1">Peli päättyi!</h2>
+      <p id="newRecordBanner" class="hidden text-amber-300 font-bold text-sm mb-3 animate-pulse">
+        🎉 Uusi ennätys! 🎉
+      </p>
+
+      <div class="grid grid-cols-2 gap-3 my-5">
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-sky-200 uppercase font-semibold">Pisteet</div>
+          <div id="finalScore" class="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-amber-200 uppercase font-semibold">Ennätys</div>
+          <div id="finalHighScore" class="text-2xl sm:text-3xl font-extrabold text-amber-300 mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Oikeat osumat</div>
+          <div id="finalCorrect" class="text-lg font-bold text-emerald-400">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Paras Combo</div>
+          <div id="finalMaxCombo" class="text-lg font-bold text-orange-400">0x</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="restartCurrentMode()" class="flex-1 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-extrabold py-3.5 px-5 rounded-xl transition shadow-lg">
+          Pelaa uudelleen
+        </button>
+        <button onclick="returnToMenu()" class="flex-1 glass hover:bg-white/20 text-white font-bold py-3.5 px-5 rounded-xl transition">
+          Vaihda pelimuotoa
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/**
+ * Kysymyssanapankki (72 luonnollista arkipäivän kysymystä)
+ * level: 'basic' | 'advanced'
+ */
+const questionBank = [
+  // ================= PERUSTASO: vad, vem, var, när, hur, varför =================
+  { sentence: "___ heter du?", answer: "Vad", options: ["Vad", "Vem", "Var", "Hur"], level: "basic", fi: "Mikä sinun nimesi on?", tip: "Nimeä kysytään ruotsiksi sanalla Vad (Vad heter du? = Mitä sinua kutsutaan?)." },
+  { sentence: "___ bor du?", answer: "Var", options: ["Var", "Vart", "Vad", "När"], level: "basic", fi: "Missä sinä asut?", tip: "Var = missä (paikallaan olo). Vart = minne (liike)." },
+  { sentence: "___ kommer du till skolan?", answer: "När", options: ["När", "Var", "Hur", "Varför"], level: "basic", fi: "Milloin tulet kouluun?", tip: "När = milloin (kysyy ajankohtaa)." },
+  { sentence: "___ mår du idag?", answer: "Hur", options: ["Hur", "Vad", "Var", "Vem"], level: "basic", fi: "Miten voit tänään?", tip: "Hur = miten / kuinka (Hur mår du? = Miten voit?)." },
+  { sentence: "___ är din bästa kompis?", answer: "Vem", options: ["Vem", "Vad", "Var", "Vems"], level: "basic", fi: "Kuka on paras kaverisi?", tip: "Vem = kuka (kysyy yksittäistä henkilöä)." },
+  { sentence: "___ är du trött idag?", answer: "Varför", options: ["Varför", "När", "Hur", "Vad"], level: "basic", fi: "Miksi olet väsynyt tänään?", tip: "Varför = miksi (kysyy syytä)." },
+  { sentence: "___ gör du på fritiden?", answer: "Vad", options: ["Vad", "Var", "Hur", "Vem"], level: "basic", fi: "Mitä teet vapaa-ajalla?", tip: "Vad = mitä / mikä." },
+  { sentence: "___ ligger biblioteket?", answer: "Var", options: ["Var", "Vart", "Vad", "När"], level: "basic", fi: "Missä kirjasto sijaitsee?", tip: "Var = missä (sijainti)." },
+  { sentence: "___ börjar filmen?", answer: "När", options: ["När", "Hur", "Varför", "Var"], level: "basic", fi: "Milloin elokuva alkaa?", tip: "När = milloin." },
+  { sentence: "___ gammal är din bror?", answer: "Hur", options: ["Hur", "Vad", "När", "Vem"], level: "basic", fi: "Kuinka vanha veljesi on?", tip: "Hur gammal = kuinka vanha (Hur = kuinka/miten)." },
+  { sentence: "___ sitter där borta?", answer: "Vem", options: ["Vem", "Vad", "Var", "Vilka"], level: "basic", fi: "Kuka istuu tuolla kauempana?", tip: "Vem = kuka (yksikkö)." },
+  { sentence: "___ skrattar ni så mycket?", answer: "Varför", options: ["Varför", "Vad", "Hur", "När"], level: "basic", fi: "Miksi nauratte niin paljon?", tip: "Varför = miksi." },
+  { sentence: "___ är klockan nu?", answer: "Vad", options: ["Vad", "Hur", "När", "Var"], level: "basic", fi: "Paljonko kello on nyt?", tip: "Kellonaikaa kysytään muodolla: Vad är klockan?" },
+  { sentence: "___ är min mobiltelefon?", answer: "Var", options: ["Var", "Vart", "Vad", "Vem"], level: "basic", fi: "Missä minun matkapuhelimeni on?", tip: "Var = missä." },
+  { sentence: "___ fyller du år?", answer: "När", options: ["När", "Vad", "Hur", "Varför"], level: "basic", fi: "Milloin sinulla on syntymäpäivä?", tip: "När = milloin." },
+  { sentence: "___ kommer man till stationen?", answer: "Hur", options: ["Hur", "Var", "Vart", "Vad"], level: "basic", fi: "Miten pääsee asemalle?", tip: "Hur = miten (tapa tai reitti)." },
+  { sentence: "___ ringde nyss?", answer: "Vem", options: ["Vem", "Vad", "Vems", "Var"], level: "basic", fi: "Kuka soitti äsken?", tip: "Vem = kuka." },
+  { sentence: "___ lär du dig svenska?", answer: "Varför", options: ["Varför", "Vad", "Hur", "När"], level: "basic", fi: "Miksi opiskelet ruotsia?", tip: "Varför = miksi." },
+  { sentence: "___ vill du äta till middag?", answer: "Vad", options: ["Vad", "Var", "Hur", "När"], level: "basic", fi: "Mitä haluat syödä päivälliseksi?", tip: "Vad = mitä." },
+  { sentence: "___ arbetar din mamma?", answer: "Var", options: ["Var", "Vart", "Vem", "Vad"], level: "basic", fi: "Missä äitisi työskentelee?", tip: "Var = missä." },
+  { sentence: "___ åker ni på semester?", answer: "När", options: ["När", "Vart", "Var", "Varför"], level: "basic", fi: "Milloin lähdette lomalle?", tip: "När = milloin (huomaa suomennos)." },
+  { sentence: "___ stavar man det ordet?", answer: "Hur", options: ["Hur", "Vad", "Var", "Varför"], level: "basic", fi: "Miten tuo sana kirjoitetaan (tavataan)?", tip: "Hur = miten." },
+  { sentence: "___ har tagit min penna?", answer: "Vem", options: ["Vem", "Vems", "Vad", "Var"], level: "basic", fi: "Kuka on ottanut kynäni?", tip: "Vem = kuka." },
+  { sentence: "___ stannade bussen?", answer: "Varför", options: ["Varför", "Var", "När", "Hur"], level: "basic", fi: "Miksi bussi pysähtyi?", tip: "Varför = miksi." },
+  { sentence: "___ betyder det här ordet?", answer: "Vad", options: ["Vad", "Hur", "Varför", "Vem"], level: "basic", fi: "Mitä tämä sana tarkoittaa?", tip: "Vad = mitä." },
+  { sentence: "___ har du lagt nycklarna?", answer: "Var", options: ["Var", "Vart", "Vad", "När"], level: "basic", fi: "Minne/mihin olet laittanut avaimet?", tip: "Lägga-verbin kanssa ruotsissa käytetään sijaintia: Var har du lagt...?" },
+  { sentence: "___ slutar lektionen?", answer: "När", options: ["När", "Hur", "Vad", "Var"], level: "basic", fi: "Milloin oppitunti päättyy?", tip: "När = milloin." },
+  { sentence: "___ var provet idag?", answer: "Hur", options: ["Hur", "Vad", "Var", "Varför"], level: "basic", fi: "Millainen koe oli tänään?", tip: "Hur var... = millainen ... oli?" },
+  { sentence: "___ ska vi bjuda på festen?", answer: "Vem", options: ["Vem", "Vad", "Vems", "Var"], level: "basic", fi: "Kenet kutsumme juhliin?", tip: "Vem = kuka / kenet." },
+  { sentence: "___ köpte du den där jackan?", answer: "Var", options: ["Var", "Vart", "Vad", "Vem"], level: "basic", fi: "Mistä ostit tuon takin?", tip: "Köpa-verbin kanssa käytetään sijaintia: Var köpte du...?" },
+
+  // ================= HAASTETASO: vart, varifrån, vems, vilken/vilket/vilka, hur-yhdistelmät =================
+  { sentence: "___ ska du åka i sommar?", answer: "Vart", options: ["Vart", "Var", "Varifrån", "När"], level: "advanced", fi: "Minne aiot matkustaa kesällä?", tip: "Vart = minne (ilmaisee liikettä kohti paikkaa). Var = missä." },
+  { sentence: "___ kommer du ifrån?", answer: "Varifrån", options: ["Varifrån", "Vart", "Var", "Vem"], level: "advanced", fi: "Mistä sinä olet kotoisin?", tip: "Varifrån = mistä (alkuperä tai lähtöpaikka)." },
+  { sentence: "___ väska är det här?", answer: "Vems", options: ["Vems", "Vem", "Vilken", "Vad"], level: "advanced", fi: "Kenen laukku tämä on?", tip: "Vems = kenen (omistusta kysyvä muoto)." },
+  { sentence: "___ buss går till centrum?", answer: "Vilken", options: ["Vilken", "Vilket", "Vilka", "Vad"], level: "advanced", fi: "Mikä bussi menee keskustaan?", tip: "en buss (en-suku) → Vilken buss?" },
+  { sentence: "___ hus bor de i?", answer: "Vilket", options: ["Vilket", "Vilken", "Vilka", "Var"], level: "advanced", fi: "Missä (millaisessa) talossa he asuvat?", tip: "ett hus (ett-suku) → Vilket hus?" },
+  { sentence: "___ skor ska jag ta på mig?", answer: "Vilka", options: ["Vilka", "Vilken", "Vilket", "Vad"], level: "advanced", fi: "Mitkä kengät minun pitäisi laittaa jalkaan?", tip: "skor on monikko → Vilka skor?" },
+  { sentence: "___ syskon har du?", answer: "Hur många", options: ["Hur många", "Hur mycket", "Hur länge", "Hur ofta"], level: "advanced", fi: "Kuinka monta sisarusta sinulla on?", tip: "Hur många = kuinka monta (laskettavat asiat, kuten syskon)." },
+  { sentence: "___ kostar biljetten?", answer: "Hur mycket", options: ["Hur mycket", "Hur många", "Hur ofta", "Vad"], level: "advanced", fi: "Kuinka paljon lippu maksaa?", tip: "Hur mycket = kuinka paljon (hinta, määrä)." },
+  { sentence: "___ har du bott i Finland?", answer: "Hur länge", options: ["Hur länge", "Hur ofta", "Hur många", "När"], level: "advanced", fi: "Kuinka kauan olet asunut Suomessa?", tip: "Hur länge = kuinka kauan (kesto)." },
+  { sentence: "___ tränar du på gym?", answer: "Hur ofta", options: ["Hur ofta", "Hur länge", "Hur mycket", "När"], level: "advanced", fi: "Kuinka usein treenaat salilla?", tip: "Hur ofta = kuinka usein (toistuvuus)." },
+  { sentence: "___ går det här tåget?", answer: "Vart", options: ["Vart", "Var", "Varifrån", "Hur"], level: "advanced", fi: "Minne tämä juna menee?", tip: "Vart = minne (suunta)." },
+  { sentence: "___ har du fått den fina presenten?", answer: "Varifrån", options: ["Varifrån", "Vart", "Var", "Vems"], level: "advanced", fi: "Mistä olet saanut tuon hienon lahjan?", tip: "Varifrån = mistä." },
+  { sentence: "___ cykel står utanför dörren?", answer: "Vems", options: ["Vems", "Vem", "Vilken", "Vilket"], level: "advanced", fi: "Kenen pyörä seisoo oven ulkopuolella?", tip: "Vems = kenen." },
+  { sentence: "___ dag är det idag?", answer: "Vilken", options: ["Vilken", "Vilket", "Vilka", "Vad"], level: "advanced", fi: "Mikä päivä tänään on?", tip: "en dag (en-suku) → Vilken dag?" },
+  { sentence: "___ språk talar man i Schweiz?", answer: "Vilka", options: ["Vilka", "Vilken", "Vilket", "Vad"], level: "advanced", fi: "Mitä kieliä Sveitsissä puhutaan?", tip: "Tässä tarkoitetaan useita kieliä (monikko) → Vilka språk?" },
+  { sentence: "___ rum är ditt?", answer: "Vilket", options: ["Vilket", "Vilken", "Vilka", "Var"], level: "advanced", fi: "Kumpi / mikä huone on sinun?", tip: "ett rum (ett-suku) → Vilket rum?" },
+  { sentence: "___ elever finns det i klassen?", answer: "Hur många", options: ["Hur många", "Hur mycket", "Hur länge", "Vilka"], level: "advanced", fi: "Kuinka monta oppilasta luokassa on?", tip: "Elever on laskettava monikko → Hur många." },
+  { sentence: "___ mjölk vill du ha i kaffet?", answer: "Hur mycket", options: ["Hur mycket", "Hur många", "Hur ofta", "Vilken"], level: "advanced", fi: "Kuinka paljon maitoa haluat kahviin?", tip: "Mjölk on ainesana (ei laskettava) → Hur mycket." },
+  { sentence: "___ tar resan med tåg?", answer: "Hur länge", options: ["Hur länge", "Hur ofta", "Hur mycket", "När"], level: "advanced", fi: "Kuinka kauan junamatka kestää?", tip: "Hur länge = kuinka kauan." },
+  { sentence: "___ åker ni till stugan?", answer: "Hur ofta", options: ["Hur ofta", "Hur länge", "Vart", "Varifrån"], level: "advanced", fi: "Kuinka usein käytte mökillä?", tip: "Hur ofta = kuinka usein." },
+  { sentence: "___ sprang hunden?", answer: "Vart", options: ["Vart", "Var", "Varifrån", "Vem"], level: "advanced", fi: "Minne koira juoksi?", tip: "Springa ilmaisee liikettä → Vart (minne)." },
+  { sentence: "___ kommer tåget?", answer: "Varifrån", options: ["Varifrån", "Vart", "Var", "När"], level: "advanced", fi: "Mistä juna tulee?", tip: "Varifrån = mistä." },
+  { sentence: "___ tur är det nu?", answer: "Vems", options: ["Vems", "Vem", "Vilken", "Vad"], level: "advanced", fi: "Kenen vuoro nyt on?", tip: "Vems = kenen." },
+  { sentence: "___ färg tycker du bäst om?", answer: "Vilken", options: ["Vilken", "Vilket", "Vilka", "Vad"], level: "advanced", fi: "Mistä väristä pidät eniten?", tip: "en färg (en-suku) → Vilken färg?" },
+  { sentence: "___ bord ska vi sitta vid?", answer: "Vilket", options: ["Vilket", "Vilken", "Vilka", "Var"], level: "advanced", fi: "Missä pöydässä meidän pitäisi istua?", tip: "ett bord (ett-suku) → Vilket bord?" },
+  { sentence: "___ länder har du besökt?", answer: "Vilka", options: ["Vilka", "Vilken", "Vilket", "Var"], level: "advanced", fi: "Missä maissa olet käynyt?", tip: "länder on monikko → Vilka länder?" },
+  { sentence: "___ böcker har du läst i år?", answer: "Hur många", options: ["Hur många", "Hur mycket", "Hur ofta", "Vilka"], level: "advanced", fi: "Kuinka monta kirjaa olet lukenut tänä vuonna?", tip: "Böcker on laskettava monikko → Hur många." },
+  { sentence: "___ tid har vi kvar?", answer: "Hur mycket", options: ["Hur mycket", "Hur många", "Hur länge", "När"], level: "advanced", fi: "Kuinka paljon aikaa meillä on jäljellä?", tip: "Tid (aika) ei ole yksittäin laskettava → Hur mycket tid?" },
+  { sentence: "___ har du väntat på mig?", answer: "Hur länge", options: ["Hur länge", "Hur ofta", "När", "Varför"], level: "advanced", fi: "Kuinka kauan olet odottanut minua?", tip: "Hur länge = kuinka kauan." },
+  { sentence: "___ städar du ditt rum?", answer: "Hur ofta", options: ["Hur ofta", "Hur länge", "När", "Hur"], level: "advanced", fi: "Kuinka usein siivoat huoneesi?", tip: "Hur ofta = kuinka usein." },
+  { sentence: "___ ska vi gå efter maten?", answer: "Vart", options: ["Vart", "Var", "Varifrån", "När"], level: "advanced", fi: "Minne menemme ruoan jälkeen?", tip: "Vart = minne (liike)." },
+  { sentence: "___ mobil ligger på soffan?", answer: "Vems", options: ["Vems", "Vem", "Vilken", "Vad"], level: "advanced", fi: "Kenen kännykkä on sohvalla?", tip: "Vems = kenen." },
+  { sentence: "___ film vill ni se ikväll?", answer: "Vilken", options: ["Vilken", "Vilket", "Vilka", "Vad"], level: "advanced", fi: "Minkä elokuvan haluatte katsoa tänä iltana?", tip: "en film (en-suku) → Vilken film?" },
+  { sentence: "___ äpple är sötast?", answer: "Vilket", options: ["Vilket", "Vilken", "Vilka", "Vad"], level: "advanced", fi: "Mikä / kumpi omena on makein?", tip: "ett äpple (ett-suku) → Vilket äpple?" },
+  { sentence: "___ kompisar kommer till festen?", answer: "Vilka", options: ["Vilka", "Vem", "Vilken", "Vems"], level: "advanced", fi: "Ketkä kaverit tulevat juhliin?", tip: "kompisar on monikko → Vilka (ketkä)." },
+  { sentence: "___ pengar behöver du?", answer: "Hur mycket", options: ["Hur mycket", "Hur många", "Vad", "Vilka"], level: "advanced", fi: "Kuinka paljon rahaa tarvitset?", tip: "Pengar-sanan kanssa käytetään ruotsissa muotoa Hur mycket pengar!" },
+  { sentence: "___ koppar kaffe dricker du per dag?", answer: "Hur många", options: ["Hur många", "Hur mycket", "Hur ofta", "Hur länge"], level: "advanced", fi: "Kuinka monta kuppia kahvia juot päivässä?", tip: "Koppar (kupit) on laskettava monikko → Hur många." },
+  { sentence: "___ är det till Stockholm?", answer: "Hur långt", options: ["Hur långt", "Hur länge", "Var", "Vart"], level: "advanced", fi: "Kuinka pitkä matka on Tukholmaan?", tip: "Hur långt = kuinka pitkä matka (etäisyys)." }
+];
+
+const praises = ["Bra!", "Snyggt!", "Fantastiskt!", "Strålande!", "Perfekt!", "Utmärkt!", "Fullträff!"];
+
+// Pelin tilamuuttujat
+let mode = 'basic'; // 'basic' | 'advanced' | 'all'
+let score = 0;
+let highScore = parseInt(localStorage.getItem('swe_frageord_arcade_highscore') || '0', 10);
+let lives = 3;
+let combo = 0;
+let maxCombo = 0;
+let correctCount = 0;
+let level = 1;
+let soundEnabled = true;
+
+let baseSpeed = 0.7;
+let isGameRunning = false;
+let isTransitioning = false;
+let animationFrameId = null;
+let lastTimestamp = 0;
+let usedQuestions = new Set();
+
+let currentQuestion = null;
+let activeOrbs = []; // { el, text, x, y, vx, wobblePhase, isCorrect, hit }
+let turretAngle = 0; // radiaaneina
+
+// DOM-elementit
+const modeSelectEl = document.getElementById('modeSelect');
+const gameEl = document.getElementById('game');
+const gameOverModalEl = document.getElementById('gameOverModal');
+const orbContainerEl = document.getElementById('orbContainer');
+const scoreEl = document.getElementById('score');
+const levelDisplayEl = document.getElementById('levelDisplay');
+const comboBadgeEl = document.getElementById('comboBadge');
+const comboCountEl = document.getElementById('comboCount');
+const heartsContainerEl = document.getElementById('heartsContainer');
+const turretBarrelEl = document.getElementById('turretBarrel');
+const grammarToastEl = document.getElementById('grammarToast');
+const grammarToastTextEl = document.getElementById('grammarToastText');
+
+// Ennätys aloitusruutuun
+document.getElementById('menuHighScore').textContent = highScore;
+
+/**
+ * Web Audio API -ääniefektit (ei ulkoisia äänitiedostoja)
+ */
+let audioCtx = null;
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'laser') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.14);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } else if (type === 'hit') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.setValueAtTime(659.25, now + 0.06); // E5
+      osc.frequency.setValueAtTime(783.99, now + 0.12); // G5
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.start(now);
+      osc.stop(now + 0.29);
+    } else if (type === 'wrong') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(175, now);
+      osc.frequency.linearRampToValueAtTime(125, now + 0.22);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    }
+  } catch (e) {
+    // Ohitetaan ääni jos selain estää
+  }
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundToggleBtn').textContent = soundEnabled ? '🔊' : '🔇';
+}
+
+/**
+ * Palauttaa aktiivisen pelimuodon kysymysjoukon
+ */
+function getActivePool() {
+  if (mode === 'all') return questionBank;
+  return questionBank.filter(q => q.level === mode);
+}
+
+/**
+ * Käynnistää pelin
+ */
+function startGame(selectedMode) {
+  mode = selectedMode;
+  score = 0;
+  lives = 3;
+  combo = 0;
+  maxCombo = 0;
+  correctCount = 0;
+  level = 1;
+  usedQuestions.clear();
+  isGameRunning = true;
+  isTransitioning = false;
+
+  modeSelectEl.classList.add('hidden');
+  gameOverModalEl.classList.add('hidden');
+  grammarToastEl.classList.add('hidden');
+  gameEl.classList.remove('hidden');
+
+  updateModeTabs();
+  updateHUD();
+  renderHearts();
+
+  spawnWave();
+  lastTimestamp = performance.now();
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Vaihtaa pelimuotoa kesken pelin
+ */
+function changeMode(newMode) {
+  if (!isGameRunning) return;
+  mode = newMode;
+  usedQuestions.clear();
+  updateModeTabs();
+  spawnWave();
+}
+
+function updateModeTabs() {
+  ['basic', 'advanced', 'all'].forEach(m => {
+    const btn = document.getElementById('btn-' + m);
+    if (m === mode) {
+      btn.className = 'mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-sky-500 text-slate-950 shadow transition';
+    } else {
+      btn.className = 'mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-sky-100 hover:bg-white/10 transition';
+    }
+  });
+}
+
+function updateHUD() {
+  scoreEl.textContent = score;
+  levelDisplayEl.textContent = level;
+  comboCountEl.textContent = combo;
+
+  if (combo >= 2) {
+    comboBadgeEl.classList.remove('opacity-60');
+    comboBadgeEl.classList.add('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  } else {
+    comboBadgeEl.classList.add('opacity-60');
+    comboBadgeEl.classList.remove('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  }
+}
+
+function renderHearts() {
+  const hearts = heartsContainerEl.querySelectorAll('.heart');
+  hearts.forEach((h, idx) => {
+    if (idx < lives) {
+      h.classList.remove('heart-lost');
+      h.style.opacity = '1';
+      h.style.filter = 'none';
+    } else {
+      h.classList.add('heart-lost');
+    }
+  });
+}
+
+/**
+ * Luo uuden kysymyksen ja 4–5 leijailevaa energiapalloa
+ */
+function spawnWave() {
+  isTransitioning = false;
+  orbContainerEl.innerHTML = '';
+  activeOrbs = [];
+
+  const pool = getActivePool();
+  if (usedQuestions.size >= pool.length - 2) {
+    usedQuestions.clear();
+  }
+
+  let candidate;
+  do {
+    candidate = pool[Math.floor(Math.random() * pool.length)];
+  } while (usedQuestions.has(candidate.sentence));
+  usedQuestions.add(candidate.sentence);
+
+  currentQuestion = candidate;
+
+  // Päivitetään kysymyskortti
+  const tagEl = document.getElementById('questionLevelTag');
+  tagEl.textContent = candidate.level === 'basic' ? 'Perustaso' : 'Haastetaso';
+  tagEl.className = candidate.level === 'basic'
+    ? 'px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30'
+    : 'px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-400/20 text-indigo-200 border border-indigo-300/30';
+
+  document.getElementById('questionSentence').innerHTML = candidate.sentence.replace(
+    '___',
+    '<span class="blank-slot">___</span>'
+  );
+  document.getElementById('questionTranslation').textContent = `"${candidate.fi}"`;
+
+  // Sekoitetaan vaihtoehdot (4–5 palloa)
+  const shuffledOptions = [...candidate.options].sort(() => Math.random() - 0.5);
+  const count = shuffledOptions.length;
+  const playWidth = document.getElementById('playfield').clientWidth;
+
+  // Lasketaan tasaiset vaakasuuntaiset aloituspaikat marginaaleilla
+  const marginX = Math.min(85, playWidth * 0.14);
+  const usableWidth = Math.max(200, playWidth - marginX * 2);
+
+  shuffledOptions.forEach((word, index) => {
+    const ratio = count === 1 ? 0.5 : index / (count - 1);
+    const startX = marginX + ratio * usableWidth;
+    // Hieman porrastettu aloituskorkeus, jotta näyttää elävältä aallolta
+    const startY = 48 + (index % 2 === 0 ? 0 : 28);
+
+    const orbEl = document.createElement('button');
+    orbEl.type = 'button';
+    orbEl.className = 'energy-orb';
+    orbEl.style.left = startX + 'px';
+    orbEl.style.top = startY + 'px';
+
+    orbEl.innerHTML = `
+      <span class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-slate-900/90 border border-sky-300/50 text-[11px] font-bold text-sky-200 flex items-center justify-center shadow">
+        ${index + 1}
+      </span>
+      <span class="font-display text-lg sm:text-xl font-extrabold text-white tracking-wide drop-shadow">
+        ${word}
+      </span>
+    `;
+
+    const orbObj = {
+      el: orbEl,
+      text: word,
+      x: startX,
+      y: startY,
+      baseX: startX,
+      wobblePhase: Math.random() * Math.PI * 2,
+      wobbleAmp: 12 + Math.random() * 12,
+      isCorrect: word === candidate.answer,
+      wrongClicked: false
+    };
+
+    orbEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      shootAtOrb(orbObj);
+    });
+
+    orbContainerEl.appendChild(orbEl);
+    activeOrbs.push(orbObj);
+  });
+}
+
+/**
+ * Tähtää tykkitornin kohti hiirtä
+ */
+window.addEventListener('mousemove', (e) => {
+  if (!isGameRunning) return;
+  aimTurretAt(e.clientX, e.clientY);
+});
+
+function aimTurretAt(targetX, targetY) {
+  const turretRect = document.getElementById('turretWrapper').getBoundingClientRect();
+  const originX = turretRect.left + turretRect.width / 2;
+  const originY = turretRect.top + turretRect.height * 0.7;
+  const angleRad = Math.atan2(targetX - originX, originY - targetY);
+  const clampedDeg = Math.max(-72, Math.min(72, (angleRad * 180) / Math.PI));
+  turretBarrelEl.style.transform = `rotate(${clampedDeg}deg)`;
+}
+
+/**
+ * Ampuu laserin valittuun energiapalloon
+ */
+function shootAtOrb(orbObj) {
+  if (!isGameRunning || isTransitioning || orbObj.wrongClicked) return;
+
+  const orbRect = orbObj.el.getBoundingClientRect();
+  const targetX = orbRect.left + orbRect.width / 2;
+  const targetY = orbRect.top + orbRect.height / 2;
+
+  aimTurretAt(targetX, targetY);
+  playSound('laser');
+
+  const turretRect = document.getElementById('turretWrapper').getBoundingClientRect();
+  const startX = turretRect.left + turretRect.width / 2;
+  const startY = turretRect.top + 14;
+
+  if (orbObj.isCorrect) {
+    spawnLaserBeam(startX, startY, targetX, targetY, '#38bdf8');
+    handleCorrectHit(orbObj, targetX, targetY);
+  } else {
+    spawnLaserBeam(startX, startY, targetX, targetY, '#ef4444');
+    handleWrongHit(orbObj, targetX, targetY);
+  }
+}
+
+/**
+ * Käsittelee osuman oikeaan palloon
+ */
+function handleCorrectHit(orbObj, x, y) {
+  isTransitioning = true;
+  combo++;
+  correctCount++;
+  if (combo > maxCombo) maxCombo = combo;
+
+  const newLevel = Math.floor(correctCount / 6) + 1;
+  const leveledUp = newLevel > level;
+  level = newLevel;
+
+  const comboBonus = Math.min(combo - 1, 5) * 5;
+  const earnedPoints = 10 + comboBonus;
+  score += earnedPoints;
+
+  updateHUD();
+  playSound('hit');
+
+  // Täydennetään lause korttiin
+  document.getElementById('questionSentence').innerHTML = currentQuestion.sentence.replace(
+    '___',
+    `<span class="text-emerald-300 underline decoration-2">${currentQuestion.answer}</span>`
+  );
+
+  // Räjäytetään oikea pallo ja häivytetään muut
+  orbObj.el.style.transform = 'translate(-50%, -50%) scale(1.35)';
+  orbObj.el.style.opacity = '0';
+  activeOrbs.forEach(o => {
+    if (o !== orbObj) {
+      o.el.style.opacity = '0.25';
+      o.el.style.transform = 'translate(-50%, -50%) scale(0.85)';
+    }
+  });
+
+  burstParticles(x, y, combo >= 3 ? 34 : 20, '#38bdf8');
+  const praise = praises[Math.floor(Math.random() * praises.length)];
+  spawnFloatingText(x, y - 16, `${praise} +${earnedPoints}${combo > 1 ? ` (x${combo})` : ''}`, '#fde047');
+
+  if (leveledUp) {
+    setTimeout(() => {
+      spawnFloatingText(window.innerWidth / 2, window.innerHeight * 0.35, `TASO ${level}! 🚀`, '#38bdf8');
+    }, 240);
+  }
+
+  setTimeout(() => {
+    if (isGameRunning) spawnWave();
+  }, 680);
+}
+
+/**
+ * Käsittelee osuman väärään palloon
+ */
+function handleWrongHit(orbObj, x, y) {
+  orbObj.wrongClicked = true;
+  orbObj.el.classList.add('orb-wrong');
+  combo = 0;
+  lives--;
+  updateHUD();
+  renderHearts();
+  playSound('wrong');
+
+  burstParticles(x, y, 12, '#ef4444');
+  spawnFloatingText(x, y - 18, `Väärin! -1 ❤️`, '#fca5a5');
+  showGrammarTip(currentQuestion.tip);
+
+  if (lives <= 0) {
+    isTransitioning = true;
+    // Paljastetaan oikea vastaus ennen Game Overia
+    const correctOrb = activeOrbs.find(o => o.isCorrect);
+    if (correctOrb) correctOrb.el.classList.add('orb-correct-highlight');
+    setTimeout(triggerGameOver, 1700);
+  }
+}
+
+/**
+ * Käsittelee tilanteen, jossa pallot ehtivät vaaravyöhykkeelle
+ */
+function handleWaveMissed() {
+  if (isTransitioning) return;
+  isTransitioning = true;
+  combo = 0;
+  lives--;
+  updateHUD();
+  renderHearts();
+  playSound('wrong');
+
+  const correctOrb = activeOrbs.find(o => o.isCorrect);
+  if (correctOrb) {
+    correctOrb.el.classList.add('orb-correct-highlight');
+  }
+
+  document.getElementById('questionSentence').innerHTML = currentQuestion.sentence.replace(
+    '___',
+    `<span class="text-amber-300 underline decoration-2">${currentQuestion.answer}</span>`
+  );
+  showGrammarTip(`Aika loppui! Oikea muoto: ${currentQuestion.answer}. ${currentQuestion.tip}`);
+
+  if (lives <= 0) {
+    setTimeout(triggerGameOver, 2000);
+  } else {
+    setTimeout(() => {
+      if (isGameRunning) spawnWave();
+    }, 2200);
+  }
+}
+
+let toastTimeout = null;
+function showGrammarTip(text) {
+  grammarToastTextEl.textContent = text;
+  grammarToastEl.classList.remove('hidden');
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    grammarToastEl.classList.add('hidden');
+  }, 4200);
+}
+
+/**
+ * Pääpelisilmukka: liikuttaa palloja pehmeästi alaspäin ja aaltoilevasti sivusuunnassa
+ */
+function gameLoop(timestamp) {
+  if (!isGameRunning) return;
+
+  const deltaTime = (timestamp - lastTimestamp) / 16.67;
+  lastTimestamp = timestamp;
+
+  if (!isTransitioning && activeOrbs.length > 0) {
+    const playfield = document.getElementById('playfield');
+    const playHeight = playfield.clientHeight;
+    const playWidth = playfield.clientWidth;
+    const dangerThreshold = playHeight - 172;
+
+    // Erittäin maltillinen kiihtyminen tason noustessa
+    const levelMultiplier = 1 + (level - 1) * 0.08;
+    const verticalStep = baseSpeed * 0.55 * levelMultiplier * deltaTime;
+
+    let reachedBottom = false;
+
+    activeOrbs.forEach((orb) => {
+      orb.y += verticalStep;
+      orb.wobblePhase += 0.025 * deltaTime;
+      const offsetX = Math.sin(orb.wobblePhase) * orb.wobbleAmp;
+      const clampedX = Math.max(70, Math.min(playWidth - 70, orb.baseX + offsetX));
+
+      orb.el.style.left = clampedX + 'px';
+      orb.el.style.top = orb.y + 'px';
+
+      if (orb.y > dangerThreshold - 55) {
+        orb.el.classList.add('orb-danger');
+      }
+      if (orb.y >= dangerThreshold) {
+        reachedBottom = true;
+      }
+    });
+
+    if (reachedBottom) {
+      handleWaveMissed();
+    }
+  }
+
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Päättää pelin ja näyttää tulokset
+ */
+function triggerGameOver() {
+  isGameRunning = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+  let isNewRecord = false;
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('swe_frageord_arcade_highscore', String(highScore));
+    isNewRecord = true;
+  }
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalHighScore').textContent = highScore;
+  document.getElementById('menuHighScore').textContent = highScore;
+  document.getElementById('finalCorrect').textContent = correctCount;
+  document.getElementById('finalMaxCombo').textContent = maxCombo + 'x';
+
+  const recordBanner = document.getElementById('newRecordBanner');
+  if (isNewRecord && score > 0) {
+    recordBanner.classList.remove('hidden');
+    burstParticles(window.innerWidth / 2, window.innerHeight / 3, 55, '#fde047');
+  } else {
+    recordBanner.classList.add('hidden');
+  }
+
+  gameOverModalEl.classList.remove('hidden');
+}
+
+function restartCurrentMode() {
+  startGame(mode);
+}
+
+function returnToMenu() {
+  isGameRunning = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  gameOverModalEl.classList.add('hidden');
+  grammarToastEl.classList.add('hidden');
+  gameEl.classList.add('hidden');
+  modeSelectEl.classList.remove('hidden');
+}
+
+/**
+ * Kelluva pisteteksti
+ */
+function spawnFloatingText(x, y, text, color) {
+  const el = document.createElement('div');
+  el.className = 'floating-score text-lg sm:text-xl';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.color = color;
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1150);
+}
+
+/**
+ * Canvas-efektit: lasersäde, räjähdyspartikkelit ja taustan tähtitaivas
+ */
+const fxCanvas = document.getElementById('fxCanvas');
+const fxCtx = fxCanvas.getContext('2d');
+const starCanvas = document.getElementById('bgStarCanvas');
+const starCtx = starCanvas.getContext('2d');
+
+let particles = [];
+let lasers = [];
+let stars = [];
+
+function resizeCanvases() {
+  fxCanvas.width = window.innerWidth;
+  fxCanvas.height = window.innerHeight;
+  starCanvas.width = window.innerWidth;
+  starCanvas.height = window.innerHeight;
+  initStars();
+}
+
+function initStars() {
+  stars = [];
+  const starCount = Math.floor((window.innerWidth * window.innerHeight) / 14000);
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      x: Math.random() * starCanvas.width,
+      y: Math.random() * starCanvas.height,
+      r: 0.6 + Math.random() * 1.6,
+      alpha: 0.25 + Math.random() * 0.65,
+      twinkleSpeed: 0.01 + Math.random() * 0.025,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+window.addEventListener('resize', resizeCanvases);
+resizeCanvases();
+
+function spawnLaserBeam(x1, y1, x2, y2, color) {
+  lasers.push({ x1, y1, x2, y2, color, alpha: 1 });
+}
+
+function burstParticles(x, y, count, primaryColor) {
+  const palette = [primaryColor, '#fde047', '#ffffff', '#4ade80', '#f472b6'];
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2.5 + Math.random() * 6.5;
+    particles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1.5,
+      size: 3.5 + Math.random() * 5,
+      color: palette[Math.floor(Math.random() * palette.length)],
+      alpha: 1
+    });
+  }
+}
+
+function renderVisualEffects() {
+  // Taustatähdet
+  starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+  for (let i = 0; i < stars.length; i++) {
+    const s = stars[i];
+    s.phase += s.twinkleSpeed;
+    const a = s.alpha * (0.65 + 0.35 * Math.sin(s.phase));
+    starCtx.fillStyle = `rgba(224, 242, 254, ${a})`;
+    starCtx.beginPath();
+    starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    starCtx.fill();
+  }
+
+  // Laserit & räjähdykset
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+  for (let i = lasers.length - 1; i >= 0; i--) {
+    const l = lasers[i];
+    fxCtx.save();
+    fxCtx.globalAlpha = l.alpha;
+    fxCtx.strokeStyle = l.color;
+    fxCtx.lineWidth = 6;
+    fxCtx.lineCap = 'round';
+    fxCtx.shadowColor = l.color;
+    fxCtx.shadowBlur = 18;
+    fxCtx.beginPath();
+    fxCtx.moveTo(l.x1, l.y1);
+    fxCtx.lineTo(l.x2, l.y2);
+    fxCtx.stroke();
+
+    // Kirkas ydin
+    fxCtx.strokeStyle = '#ffffff';
+    fxCtx.lineWidth = 2;
+    fxCtx.stroke();
+    fxCtx.restore();
+
+    l.alpha -= 0.08;
+    if (l.alpha <= 0) lasers.splice(i, 1);
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.14;
+    p.alpha -= 0.025;
+
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+
+    fxCtx.save();
+    fxCtx.globalAlpha = p.alpha;
+    fxCtx.fillStyle = p.color;
+    fxCtx.beginPath();
+    fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    fxCtx.fill();
+    fxCtx.restore();
+  }
+
+  requestAnimationFrame(renderVisualEffects);
+}
+renderVisualEffects();
+
+// Näppäimistöohjaus (1–5 tai A–E ampuvat suoraan vastaavaan palloon)
+window.addEventListener('keydown', (e) => {
+  if (!isGameRunning || isTransitioning) return;
+  const keyMap = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4 };
+  const idx = keyMap[e.key.toLowerCase()];
+  if (idx !== undefined && activeOrbs[idx]) {
+    e.preventDefault();
+    shootAtOrb(activeOrbs[idx]);
+  }
+});
+
+// Nopeusliukusäätimien synkronointi (aloitusruutu + pelinäkymä)
+const menuSpeedSlider = document.getElementById('menuSpeedSlider');
+const gameSpeedSlider = document.getElementById('speedSlider');
+
+function syncSpeed(val) {
+  baseSpeed = parseFloat(val);
+  menuSpeedSlider.value = baseSpeed;
+  gameSpeedSlider.value = baseSpeed;
+  document.getElementById('menuSpeedValue').textContent = baseSpeed.toFixed(1) + 'x';
+  document.getElementById('speedValue').textContent = baseSpeed.toFixed(1) + 'x';
+}
+
+menuSpeedSlider.addEventListener('input', (e) => syncSpeed(e.target.value));
+gameSpeedSlider.addEventListener('input', (e) => syncSpeed(e.target.value));
+</script>
+</body>
+</html>
