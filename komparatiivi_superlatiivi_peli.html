@@ -1,147 +1,980 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="fi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Komparatiivi & Superlatiivi</title>
+<title>Komparatiivi & Superlatiivi – Ruotsin kielioppipeli</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-body{margin:0;overflow:hidden;font-family:Palatino,"Palatino Linotype",serif;background:linear-gradient(135deg,#0d47a1,#1565c0,#42a5f5);color:white}
-#header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;font-size:1.2rem;font-weight:bold}
-#header > div:first-child{
-    margin-left:140px;
-}
-#modeSelect h1{margin-top:120px}
-button{padding:12px 25px;margin:10px;font-size:1.1rem;cursor:pointer;border:none;border-radius:10px}
-#game{display:none}#inputArea{position:fixed;bottom:25px;left:50%;transform:translateX(-50%)}
-#answer{font-size:2rem;text-align:center;width:260px;padding:10px;border-radius:10px;border:none}
-.word{position:absolute;left:50%;transform:translateX(-50%);font-size:2.4rem;background:rgba(255,255,255,.15);padding:10px 20px;border-radius:12px;backdrop-filter:blur(4px)}
-.shake{animation:shake .35s;background:#d50000!important}
-@keyframes shake{0%{transform:translateX(-50%)}20%{transform:translateX(-60%)}40%{transform:translateX(-40%)}60%{transform:translateX(-60%)}80%{transform:translateX(-40%)}100%{transform:translateX(-50%)}}
-.popup{position:fixed;top:80px;right:20px;background:#43a047;color:white;padding:15px 25px;border-radius:12px;font-size:1.4rem;opacity:1;animation:fadeout 2s forwards}
-@keyframes fadeout{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
-.correctAnswer{color:#ffeb3b;font-weight:bold}
-.home-btn{position:fixed;top:15px;left:15px;z-index:9999;background:white;color:#0d47a1;text-decoration:none;font-size:1rem;font-weight:bold;padding:10px 16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
-</style></head><body>
-<a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-btn">← Päävalikko</a>
-<div id="modeSelect"><h1>Valitse peli</h1><button onclick="startGame('comp')">Komparatiivi</button><button onclick="startGame('sup')">Superlatiivi</button></div>
-<div id="game"><div id="header"><div><button onclick="changeMode('comp')">Komparatiivi</button><button onclick="changeMode('sup')">Superlatiivi</button></div><div>
-    <div>
-        Pisteet: <span id="score">0</span>
+  :root {
+    --bg-grad-1: #0f172a;
+    --bg-grad-2: #1e3a8a;
+    --bg-grad-3: #0284c7;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 55%, var(--bg-grad-3) 100%);
+    color: #ffffff;
+    user-select: none;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  h1, h2, .font-display {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* Lasimorfismi */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  }
+
+  .glass-strong {
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Putoava sanakortti */
+  .word-card {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    padding: 14px 28px;
+    text-align: center;
+    min-width: 240px;
+    transition: border-color 0.2s, background 0.2s;
+    z-index: 20;
+  }
+
+  .word-card.danger-zone {
+    border-color: #f87171;
+    background: linear-gradient(145deg, rgba(239, 68, 68, 0.35), rgba(185, 28, 28, 0.25));
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+  }
+
+  .word-card.correct-reveal {
+    border-color: #4ade80;
+    background: linear-gradient(145deg, rgba(22, 163, 74, 0.85), rgba(21, 128, 61, 0.85));
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  .word-card.missed-reveal {
+    border-color: #f87171;
+    background: linear-gradient(145deg, rgba(220, 38, 38, 0.9), rgba(153, 27, 27, 0.9));
+  }
+
+  /* Ravistusanimaatio väärästä vastauksesta */
+  .shake {
+    animation: shake 0.38s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #ef4444 !important;
+    background: rgba(220, 38, 38, 0.45) !important;
+  }
+
+  @keyframes shake {
+    10%, 90% { transform: translateX(calc(-50% - 4px)); }
+    20%, 80% { transform: translateX(calc(-50% + 7px)); }
+    30%, 50%, 70% { transform: translateX(calc(-50% - 9px)); }
+    40%, 60% { transform: translateX(calc(-50% + 9px)); }
+  }
+
+  /* Kelluvat pistetekstit */
+  .floating-score {
+    position: fixed;
+    pointer-events: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    z-index: 50;
+    animation: floatUp 1.1s ease-out forwards;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  @keyframes floatUp {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(0.85);
+    }
+    25% {
+      transform: translate(-50%, -15px) scale(1.1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -65px) scale(1);
+    }
+  }
+
+  /* Sydänanimaatio */
+  .heart-lost {
+    animation: heartBreak 0.45s ease-out forwards;
+  }
+
+  @keyframes heartBreak {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35) rotate(-12deg); color: #ef4444; }
+    100% { transform: scale(0.85); opacity: 0.3; filter: grayscale(100%); }
+  }
+
+  /* Vaara-alue alareunassa */
+  .danger-line {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(239, 68, 68, 0.25),
+      rgba(239, 68, 68, 0.25) 12px,
+      rgba(239, 68, 68, 0.1) 12px,
+      rgba(239, 68, 68, 0.1) 24px
+    );
+    border-top: 2px dashed rgba(248, 113, 113, 0.65);
+  }
+
+  /* Mukautettu liukusäädin */
+  input[type=range] {
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.2);
+    height: 6px;
+    border-radius: 999px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #38bdf8;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+  }
+
+  /* Taustan koristeelliset valopallot */
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.45;
+  }
+</style>
+</head>
+<body class="relative flex flex-col items-center justify-center">
+
+  <!-- Taustan koristeelliset hehkut -->
+  <div class="bg-orb w-96 h-96 bg-blue-400 top-[-10%] left-[-5%]"></div>
+  <div class="bg-orb w-96 h-96 bg-indigo-500 bottom-[-10%] right-[-5%]"></div>
+  <div class="bg-orb w-72 h-72 bg-cyan-300 top-[40%] left-[60%] opacity-20"></div>
+
+  <!-- Konfetti-canvas -->
+  <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
+
+  <!-- Paluulinkki päävalikkoon (säilytetty tarkalleen vaaditussa muodossa) -->
+  <a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-btn fixed top-4 left-4 z-50 glass hover:bg-white/20 text-white font-semibold text-sm sm:text-base px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg">
+    ← Päävalikko
+  </a>
+
+  <!-- ALOITUSNÄKYMÄ -->
+  <div id="modeSelect" class="relative z-10 w-full max-w-2xl px-4 py-6 flex flex-col items-center text-center overflow-y-auto max-h-screen">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass text-sky-200 text-xs sm:text-sm font-semibold mb-3 tracking-wide uppercase">
+      <span>🇸🇪 Ruotsin kielioppipeli</span>
     </div>
 
-    <div style="margin-top:8px;">
-        Nopeus
-        <input type="range"
-               id="speedSlider"
-               min="0.5"
-               max="5"
-               step="0.1"
-               value="1.4">
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-sky-100 to-sky-300">
+      Komparatiivi & Superlatiivi
+    </h1>
+    <p class="text-sky-100/90 text-sm sm:text-base max-w-lg mb-6">
+      Taivuta putoavat ruotsin adjektiivit oikeaan vertailumuotoon ennen kuin ne osuvat alareunan vaaravyöhykkeeseen!
+    </p>
 
-        <span id="speedValue">1.4</span>
+    <!-- Ennätyspalkki -->
+    <div class="flex items-center gap-4 mb-6">
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-2 text-sm">
+        <span class="text-amber-300 text-lg">🏆</span>
+        <span class="text-sky-200">Ennätys:</span>
+        <span id="menuHighScore" class="font-bold text-white text-base">0</span>
+      </div>
     </div>
-</div></div><div id="wordContainer"></div><div id="inputArea"><input id="answer" autocomplete="off"></div></div>
+
+    <!-- Pelimuodon valintapainikkeet -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-6">
+      <button onclick="startGame('comp')" class="group glass hover:bg-sky-500/30 border-sky-300/30 hover:border-sky-300 p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">⚡</span>
+        <span class="font-display font-bold text-lg text-white">Komparatiivi</span>
+        <span class="text-xs text-sky-200 mt-1">snabbare, mer spännande</span>
+      </button>
+
+      <button onclick="startGame('sup')" class="group glass hover:bg-indigo-500/30 border-indigo-300/30 hover:border-indigo-300 p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">👑</span>
+        <span class="font-display font-bold text-lg text-white">Superlatiivi</span>
+        <span class="text-xs text-indigo-200 mt-1">snabbast, mest spännande</span>
+      </button>
+
+      <button onclick="startGame('mix')" class="group glass hover:bg-emerald-500/30 border-emerald-300/30 hover:border-emerald-300 p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg relative overflow-hidden">
+        <span class="absolute top-2 right-2 bg-emerald-400/20 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300/30">HAASTE</span>
+        <span class="text-2xl mb-1.5 group-hover:scale-110 transition-transform">🎲</span>
+        <span class="font-display font-bold text-lg text-white">Sekoitus</span>
+        <span class="text-xs text-emerald-200 mt-1">Molemmat vaihtelevat</span>
+      </button>
+    </div>
+
+    <!-- Kielioppivinkki / Ohjelaatikko -->
+    <div class="glass-strong rounded-2xl p-4 sm:p-5 text-left w-full border border-sky-300/20">
+      <div class="flex items-center gap-2 text-amber-300 font-bold text-sm sm:text-base mb-2">
+        <span>💡</span>
+        <span>Muista mer / mest -taivutus!</span>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-200 leading-relaxed mb-2.5">
+        Osa ruotsin adjektiiveista taipuu sanojen <strong class="text-sky-300">mer</strong> (komparatiivi) ja <strong class="text-indigo-300">mest</strong> (superlatiivi) avulla päätteiden <em>-are/-ast</em> sijaan:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+        <div class="bg-white/5 rounded-xl p-2.5 border border-white/10">
+          <div class="font-bold text-sky-300 mb-0.5">-ad -päätteiset</div>
+          <div class="text-slate-300">stressad → <span class="text-white font-medium">mer stressad</span></div>
+        </div>
+        <div class="bg-white/5 rounded-xl p-2.5 border border-white/10">
+          <div class="font-bold text-indigo-300 mb-0.5">-ande / -ende</div>
+          <div class="text-slate-300">spännande → <span class="text-white font-medium">mest spännande</span></div>
+        </div>
+        <div class="bg-white/5 rounded-xl p-2.5 border border-white/10">
+          <div class="font-bold text-emerald-300 mb-0.5">-isk -päätteiset</div>
+          <div class="text-slate-300">typisk → <span class="text-white font-medium">mer typisk</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PELINÄKYMÄ -->
+  <div id="game" class="hidden fixed inset-0 z-10 flex flex-col justify-between">
+    
+    <!-- Yläpalkki (HUD) -->
+    <header class="w-full pt-16 sm:pt-4 px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 z-30">
+      <!-- Vasen tyhjä tila päävalikko-napille isolla näytöllä + pelimuodon vaihto -->
+      <div class="flex items-center gap-1.5 sm:ml-36 bg-slate-900/40 p-1 rounded-xl border border-white/15 backdrop-blur-md">
+        <button id="btn-comp" onclick="changeMode('comp')" class="mode-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Komparatiivi</button>
+        <button id="btn-sup" onclick="changeMode('sup')" class="mode-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Superlatiivi</button>
+        <button id="btn-mix" onclick="changeMode('mix')" class="mode-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Sekoitus</button>
+      </div>
+
+      <!-- Keskellä: Elämät ja Combo -->
+      <div class="flex items-center gap-3 sm:gap-5">
+        <!-- Elämät (3 sydäntä) -->
+        <div id="heartsContainer" class="glass px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-lg sm:text-xl" title="Elämät">
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+        </div>
+
+        <!-- Combo / Streak -->
+        <div id="comboBadge" class="glass px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all duration-300 opacity-60">
+          <span id="comboIcon" class="text-base sm:text-lg">🔥</span>
+          <span class="text-xs sm:text-sm font-bold text-amber-300">Combo <span id="comboCount">0</span></span>
+        </div>
+      </div>
+
+      <!-- Oikealla: Pisteet, Taso ja Nopeus -->
+      <div class="flex items-center gap-3 ml-auto sm:ml-0">
+        <div class="glass px-3.5 py-1.5 rounded-xl flex items-center gap-3">
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Taso</div>
+            <div id="levelDisplay" class="font-display font-bold text-sm sm:text-base text-white">1</div>
+          </div>
+          <div class="h-6 w-px bg-white/20"></div>
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Pisteet</div>
+            <div id="score" class="font-display font-extrabold text-base sm:text-xl text-amber-300">0</div>
+          </div>
+        </div>
+
+        <!-- Nopeudensäätö -->
+        <div class="hidden md:flex glass px-3 py-1.5 rounded-xl flex-col justify-center">
+          <div class="flex justify-between text-[11px] text-sky-200 font-medium mb-1">
+            <span>Nopeus</span>
+            <span id="speedValue" class="font-bold text-white">1.2x</span>
+          </div>
+          <input type="range" id="speedSlider" min="0.5" max="3.5" step="0.1" value="1.2" class="w-24">
+        </div>
+      </div>
+    </header>
+
+    <!-- Pelialue, jossa sanat putoavat -->
+    <main id="playfield" class="relative flex-1 w-full overflow-hidden">
+      <div id="wordContainer" class="w-full h-full relative"></div>
+
+      <!-- Vaara-alue alareunassa -->
+      <div id="dangerZone" class="danger-line absolute bottom-0 left-0 right-0 h-36 pointer-events-none flex items-start justify-center pt-1.5">
+        <span class="text-[11px] uppercase tracking-widest text-red-300/70 font-bold">Vaara-alue</span>
+      </div>
+    </main>
+
+    <!-- Syöttökenttä alareunassa -->
+    <footer id="inputArea" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-md px-4">
+      <div class="glass-strong p-2 rounded-2xl flex items-center gap-2 border border-white/25 shadow-2xl">
+        <input 
+          id="answer" 
+          type="text" 
+          autocomplete="off" 
+          autocorrect="off" 
+          autocapitalize="off" 
+          spellcheck="false"
+          placeholder="Kirjoita vastaus + Enter..." 
+          class="w-full bg-white/10 text-white placeholder-sky-200/50 text-center text-xl sm:text-2xl font-bold py-2.5 px-4 rounded-xl border border-white/10 focus:outline-none focus:border-sky-400 focus:bg-white/15 transition"
+        >
+        <button onclick="checkAnswer()" class="bg-sky-500 hover:bg-sky-400 active:scale-95 text-slate-950 font-extrabold px-4 py-3 rounded-xl transition shadow-lg shrink-0" title="Tarkista vastaus">
+          ↵
+        </button>
+      </div>
+      <div id="hintBar" class="text-center text-xs text-sky-200/90 mt-1.5 font-medium h-4"></div>
+    </footer>
+  </div>
+
+  <!-- GAME OVER -MODAALI -->
+  <div id="gameOverModal" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-strong max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-white/20 transform transition-all">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+        🏁
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-1">Peli päättyi!</h2>
+      <p id="newRecordBanner" class="hidden text-amber-300 font-bold text-sm mb-3 animate-pulse">
+        🎉 Uusi ennätys! 🎉
+      </p>
+
+      <div class="grid grid-cols-2 gap-3 my-5">
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-sky-200 uppercase font-semibold">Pisteet</div>
+          <div id="finalScore" class="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-amber-200 uppercase font-semibold">Ennätys</div>
+          <div id="finalHighScore" class="text-2xl sm:text-3xl font-extrabold text-amber-300 mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Oikeat vastaukset</div>
+          <div id="finalCorrect" class="text-lg font-bold text-emerald-400">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Paras Combo</div>
+          <div id="finalMaxCombo" class="text-lg font-bold text-orange-400">0x</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="restartCurrentMode()" class="flex-1 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-extrabold py-3.5 px-5 rounded-xl transition shadow-lg">
+          Pelaa uudelleen
+        </button>
+        <button onclick="returnToMenu()" class="flex-1 glass hover:bg-white/20 text-white font-bold py-3.5 px-5 rounded-xl transition">
+          Vaihda pelimuotoa
+        </button>
+      </div>
+    </div>
+  </div>
+
 <script>
+/**
+ * Adjektiivisanasto:
+ * Rakenne: [perusmuoto, komparatiivi, superlatiivi, suomennos, onkoMerMest]
+ */
 const adjectives = [
-["stor","större","störst"],
-["liten","mindre","minst"],
-["gammal","äldre","äldst"],
-["ung","yngre","yngst"],
-["bra","bättre","bäst"],
-["dålig","sämre","sämst"],
-["många","fler","flest"],
-["tung", "tyngre", "tyngst"],
-// yleiset säännölliset
-["snabb","snabbare","snabbast"],
-["lång","längre","längst"],
-["kort","kortare","kortast"],
-["dyr","dyrare","dyrast"],
-["billig","billigare","billigast"],
-["stark","starkare","starkast"],
-["svag","svagare","svagast"],
-["hög","högre","högst"],
-["låg","lägre","lägst"],
-["varm","varmare","varmast"],
-["kall","kallare","kallast"],
-["glad","gladare","gladast"],
-["ledsen","ledsnare","ledsnast"],
-["vacker","vackrare","vackrast"],
-["ful","fulare","fulast"],
-["rik","rikare","rikast"],
-["fattig","fattigare","fattigast"],
-["intressant","intressantare","intressantast"],
-["viktig","viktigare","viktigast"],
-["rolig","roligare","roligast"],
-["tråkig","tråkigare","tråkigast"],
-["enkel","enklare","enklast"],
-["svår","svårare","svårast"],
-["lätt","lättare","lättast"],
-["mörk","mörkare","mörkast"],
-["ljus","ljusare","ljusast"],
-["ren","renare","renast"],
-["smutsig","smutsigare","smutsigast"],
-["frisk","friskare","friskast"],
-["sjuk","sjukare","sjukast"],
-["snygg","snyggare","snyggast"],
-["stilig","stiligare","stiligast"],
-["trevlig","trevligare","trevligast"],
-["vänlig","vänligare","vänligast"],
-["arg","argare","argast"],
-["lugn","lugnare","lugnast"],
-["tyst","tystare","tystast"],
-["högljudd","högljuddare","högljuddast"],
-["modern","modernare","modernast"],
-["hård","hårdare","hårdast"],
-["mjuk","mjukare","mjukast"],
-["bred","bredare","bredast"],
-["smal","smalare","smalast"],
-["tjock","tjockare","tjockast"],
-["tunn","tunnare","tunnast"],
-["snäll","snällare","snällast"],
-["elak","elakare","elakast"],
-["säker","säkrare","säkrast"],
-["farlig","farligare","farligast"],
-["vacker","vackrare","vackrast"],
-["stökig","stökigare","stökigast"],
-["ordentlig","ordentligare","ordentligast"],
-["snål","snålare","snålast"],
-["generös","generösare","generösast"],
-["tom","tommare","tommast"],
-["full","fullare","fullast"],
-["fri","friare","friast"],
-["upptagen","upptagnare","upptagnast"],
+  // Epäsäännölliset ja erittäin yleiset perusadjektiivit
+  ["stor", "större", "störst", "iso / suuri", false],
+  ["liten", "mindre", "minst", "pieni", false],
+  ["gammal", "äldre", "äldst", "vanha", false],
+  ["ung", "yngre", "yngst", "nuori", false],
+  ["bra", "bättre", "bäst", "hyvä", false],
+  ["dålig", "sämre", "sämst", "huono", false],
+  ["många", "fler", "flest", "monet / useat", false],
+  ["tung", "tyngre", "tyngst", "raskas / painava", false],
+  ["lång", "längre", "längst", "pitkä", false],
+  ["hög", "högre", "högst", "korkea", false],
+  ["låg", "lägre", "lägst", "matala", false],
+  ["vacker", "vackrare", "vackrast", "kaunis", false],
+  ["enkel", "enklare", "enklast", "helppo / yksinkertainen", false],
+  ["säker", "säkrare", "säkrast", "varma / turvallinen", false],
 
-// värit
-["röd","rödare","rödast"],
-["blå","blåare","blåast"],
-["grön","grönare","grönast"],
-["gul","gulare","gulast"],
-["svart","svartare","svartast"],
-["vit","vitare","vitast"],
-["grå","gråare","gråast"],
-["brun","brunare","brunast"],
+  // Arkipäiväiset säännölliset adjektiivit
+  ["glad", "gladare", "gladast", "iloinen", false],
+  ["ledsen", "ledsnare", "ledsnast", "surullinen", false],
+  ["trött", "tröttare", "tröttast", "väsynyt", false],
+  ["hungrig", "hungrigare", "hungrigast", "nälkäinen", false],
+  ["törstig", "törstigare", "törstigast", "janoinen", false],
+  ["pigg", "piggare", "piggast", "pirteä", false],
+  ["snabb", "snabbare", "snabbast", "nopea", false],
+  ["långsam", "långsammare", "långsammast", "hidas", false],
+  ["varm", "varmare", "varmast", "lämmin", false],
+  ["kall", "kallare", "kallast", "kylmä", false],
+  ["ny", "nyare", "nyast", "uusi", false],
+  ["billig", "billigare", "billigast", "halpa", false],
+  ["dyr", "dyrare", "dyrast", "kallis", false],
+  ["svår", "svårare", "svårast", "vaikea", false],
+  ["lätt", "lättare", "lättast", "kevyt / helppo", false],
+  ["stark", "starkare", "starkast", "vahva", false],
+  ["svag", "svagare", "svagast", "heikko", false],
+  ["rik", "rikare", "rikast", "rikas", false],
+  ["fattig", "fattigare", "fattigast", "köyhä", false],
+  ["snäll", "snällare", "snällast", "kiltti", false],
+  ["rolig", "roligare", "roligast", "hauska", false],
+  ["tråkig", "tråkigare", "tråkigast", "tylsä", false],
+  ["ful", "fulare", "fulast", "ruma", false],
+  ["ren", "renare", "renast", "puhdas", false],
+  ["smutsig", "smutsigare", "smutsigast", "likainen", false],
+  ["mörk", "mörkare", "mörkast", "tumma / pimeä", false],
+  ["ljus", "ljusare", "ljusast", "vaalea / valoisa", false],
+  ["kort", "kortare", "kortast", "lyhyt", false],
+  ["bred", "bredare", "bredast", "leveä", false],
+  ["smal", "smalare", "smalast", "kapea / hoikka", false],
+  ["tjock", "tjockare", "tjockast", "paksu", false],
+  ["tunn", "tunnare", "tunnast", "ohut", false],
+  ["hård", "hårdare", "hårdast", "kova", false],
+  ["mjuk", "mjukare", "mjukast", "pehmeä", false],
+  ["frisk", "friskare", "friskast", "terve", false],
+  ["sjuk", "sjukare", "sjukast", "sairas", false],
+  ["tidig", "tidigare", "tidigast", "aikainen", false],
+  ["sen", "senare", "senast", "myöhäinen", false],
+  ["farlig", "farligare", "farligast", "vaarallinen", false],
+  ["viktig", "viktigare", "viktigast", "tärkeä", false],
+  ["vanlig", "vanligare", "vanligast", "tavallinen", false],
+  ["trevlig", "trevligare", "trevligast", "mukava", false],
+  ["vänlig", "vänligare", "vänligast", "ystävällinen", false],
+  ["lugn", "lugnare", "lugnast", "rauhallinen", false],
+  ["tyst", "tystare", "tystast", "hiljainen", false],
+  ["snygg", "snyggare", "snyggast", "komea / tyylikäs", false],
+  ["modern", "modernare", "modernast", "nykyaikainen", false],
+  ["populär", "populärare", "populärast", "suosittu", false],
+  ["intressant", "intressantare", "intressantast", "mielenkiintoinen", false],
 
-// taajuudeltaan yleisiä
-["vanlig","vanligare","vanligast"],
-["ovanlig","ovanligare","ovanligast"],
-["populär","populärare","populärast"],
-["praktisk","praktiskare","praktiskast"],
-["teoretisk","teoretiskare","teoretiskast"],
-["positiv","positivare","positivast"],
-["negativ","negativare","negativast"],
-["aktiv","aktivare","aktivast"],
-["passiv","passivare","passivast"],
-["effektiv","effektivare","effektivast"]
+  // Aidot ja luonnolliset mer / mest -adjektiivit (-ad, -ande/-ende, -isk)
+  ["stressad", "mer stressad", "mest stressad", "stressaantunut", true],
+  ["intresserad", "mer intresserad", "mest intresserad", "kiinnostunut", true],
+  ["förvånad", "mer förvånad", "mest förvånad", "hämmästynyt / yllättynyt", true],
+  ["irriterad", "mer irriterad", "mest irriterad", "ärsyyntynyt", true],
+  ["avslappnad", "mer avslappnad", "mest avslappnad", "rentoutunut", true],
+  ["motiverad", "mer motiverad", "mest motiverad", "motivoitunut", true],
+  ["fokuserad", "mer fokuserad", "mest fokuserad", "keskittynyt", true],
+  ["organiserad", "mer organiserad", "mest organiserad", "järjestelmällinen", true],
+  ["komplicerad", "mer komplicerad", "mest komplicerad", "monimutkainen", true],
+  ["avancerad", "mer avancerad", "mest avancerad", "edistynyt / kehittynyt", true],
+  ["detaljerad", "mer detaljerad", "mest detaljerad", "yksityiskohtainen", true],
+  ["chockad", "mer chockad", "mest chockad", "järkyttynyt", true],
+  ["förtjust", "mer förtjust", "mest förtjust", "ihastunut", true],
+  ["berömd", "mer berömd", "mest berömd", "kuuluisa", true],
+  ["spännande", "mer spännande", "mest spännande", "jännittävä", true],
+  ["krävande", "mer krävande", "mest krävande", "vaativa", true],
+  ["imponerande", "mer imponerande", "mest imponerande", "vaikuttava", true],
+  ["förvirrande", "mer förvirrande", "mest förvirrande", "hämmentävä", true],
+  ["typisk", "mer typisk", "mest typisk", "tyypillinen", true],
+  ["praktisk", "mer praktisk", "mest praktisk", "käytännöllinen", true],
+  ["ekologisk", "mer ekologisk", "mest ekologisk", "ekologinen", true],
+  ["automatisk", "mer automatisk", "mest automatisk", "automaattinen", true],
+  ["kritisk", "mer kritisk", "mest kritisk", "kriittinen", true],
+  ["fantastisk", "mer fantastisk", "mest fantastisk", "mahtava / fantastinen", true],
+  ["energisk", "mer energisk", "mest energisk", "energinen", true],
+  ["sympatisk", "mer sympatisk", "mest sympatisk", "sympaattinen", true],
+  ["romantisk", "mer romantisk", "mest romantisk", "romanttinen", true],
+  ["dramatisk", "mer dramatisk", "mest dramatisk", "dramaattinen", true]
 ];
-const praises=["Bra!","Snyggt!","Fantastiskt!","Strålande!","Perfekt!","Utmärkt!"];
-let mode='',score=0,currentWord=null,currentData=null,pos=0,speed=1.4,moveInterval=null;
-function startGame(type){mode=type;document.getElementById('modeSelect').style.display='none';document.getElementById('game').style.display='block';document.getElementById('answer').value='';document.getElementById('answer').focus();spawnWord();}
-function spawnWord(){clearInterval(moveInterval);currentData=adjectives[Math.floor(Math.random()*adjectives.length)];currentWord=document.createElement('div');currentWord.className='word';currentWord.textContent=currentData[0];currentWord.style.top='60px';document.getElementById('wordContainer').innerHTML='';document.getElementById('wordContainer').appendChild(currentWord);pos=60;moveInterval=setInterval(()=>{pos+=speed;currentWord.style.top=pos+'px';if(pos>window.innerHeight-180){clearInterval(moveInterval);currentWord.classList.add('correctAnswer');currentWord.textContent=currentData[0]+' → '+(mode==='comp'?currentData[1]:currentData[2]);setTimeout(spawnWord,2400);}},20)}
-document.getElementById('answer').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const value=e.target.value.trim().toLowerCase();const correct=mode==='comp'?currentData[1]:currentData[2];if(value===correct.toLowerCase()){score++;document.getElementById('score').textContent=score;const pop=document.createElement('div');pop.className='popup';pop.textContent=praises[Math.floor(Math.random()*praises.length)]+' +1';document.body.appendChild(pop);setTimeout(()=>pop.remove(),2000);e.target.value='';spawnWord();}else{currentWord.classList.add('shake');setTimeout(()=>currentWord.classList.remove('shake'),350);}});
-function changeMode(newMode){mode=newMode;document.getElementById('answer').value='';document.getElementById('answer').focus();spawnWord();}
 
-document.getElementById("speedSlider").addEventListener("input", function() {
-    speed = parseFloat(this.value);
-    document.getElementById("speedValue").textContent = this.value;
+const praises = ["Bra!", "Snyggt!", "Fantastiskt!", "Strålande!", "Perfekt!", "Utmärkt!", "Kanon!"];
+
+// Pelin tilamuuttujat
+let mode = 'comp';           // 'comp' | 'sup' | 'mix'
+let currentTargetForm = 'comp'; // 'comp' | 'sup' (käytetään erityisesti sekoitus-tilassa)
+let score = 0;
+let highScore = parseInt(localStorage.getItem('swe_comp_sup_highscore') || '0', 10);
+let lives = 3;
+let combo = 0;
+let maxCombo = 0;
+let correctCount = 0;
+let level = 1;
+let wrongAttemptsOnCurrent = 0;
+
+let currentWordEl = null;
+let currentData = null;
+let pos = 0;
+let baseSpeed = 1.2;
+let isGameRunning = false;
+let isTransitioning = false;
+let animationFrameId = null;
+let lastTimestamp = 0;
+let usedIndices = new Set();
+
+// DOM-elementit
+const modeSelectEl = document.getElementById('modeSelect');
+const gameEl = document.getElementById('game');
+const gameOverModalEl = document.getElementById('gameOverModal');
+const wordContainerEl = document.getElementById('wordContainer');
+const answerInputEl = document.getElementById('answer');
+const scoreEl = document.getElementById('score');
+const levelDisplayEl = document.getElementById('levelDisplay');
+const comboBadgeEl = document.getElementById('comboBadge');
+const comboCountEl = document.getElementById('comboCount');
+const hintBarEl = document.getElementById('hintBar');
+const heartsContainerEl = document.getElementById('heartsContainer');
+
+// Alustetaan aloitusruudun ennätys
+document.getElementById('menuHighScore').textContent = highScore;
+
+/**
+ * Käynnistää pelin valitulla pelimuodolla
+ */
+function startGame(selectedMode) {
+  mode = selectedMode;
+  score = 0;
+  lives = 3;
+  combo = 0;
+  maxCombo = 0;
+  correctCount = 0;
+  level = 1;
+  usedIndices.clear();
+  isGameRunning = true;
+  isTransitioning = false;
+
+  modeSelectEl.classList.add('hidden');
+  gameOverModalEl.classList.add('hidden');
+  gameEl.classList.remove('hidden');
+
+  updateModeTabs();
+  updateHUD();
+  renderHearts();
+
+  answerInputEl.value = '';
+  answerInputEl.focus();
+
+  spawnWord();
+  lastTimestamp = performance.now();
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Vaihtaa pelimuotoa kesken pelin
+ */
+function changeMode(newMode) {
+  if (!isGameRunning) return;
+  mode = newMode;
+  updateModeTabs();
+  answerInputEl.value = '';
+  answerInputEl.focus();
+  spawnWord();
+}
+
+/**
+ * Päivittää yläpalkin pelimuotopainikkeiden aktiivisen tilan
+ */
+function updateModeTabs() {
+  ['comp', 'sup', 'mix'].forEach(m => {
+    const btn = document.getElementById('btn-' + m);
+    if (m === mode) {
+      btn.className = 'mode-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-sky-500 text-slate-950 shadow transition';
+    } else {
+      btn.className = 'mode-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-sky-100 hover:bg-white/10 transition';
+    }
+  });
+}
+
+/**
+ * Päivittää pisteet, tason ja combon
+ */
+function updateHUD() {
+  scoreEl.textContent = score;
+  levelDisplayEl.textContent = level;
+  comboCountEl.textContent = combo;
+
+  if (combo >= 2) {
+    comboBadgeEl.classList.remove('opacity-60');
+    comboBadgeEl.classList.add('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  } else {
+    comboBadgeEl.classList.add('opacity-60');
+    comboBadgeEl.classList.remove('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  }
+}
+
+/**
+ * Piirtää elämät (sydämet)
+ */
+function renderHearts() {
+  const hearts = heartsContainerEl.querySelectorAll('.heart');
+  hearts.forEach((h, idx) => {
+    if (idx < lives) {
+      h.classList.remove('heart-lost');
+      h.style.opacity = '1';
+      h.style.filter = 'none';
+    } else {
+      h.classList.add('heart-lost');
+    }
+  });
+}
+
+/**
+ * Valitsee seuraavan sanan ja luo sanakortin
+ */
+function spawnWord() {
+  isTransitioning = false;
+  wrongAttemptsOnCurrent = 0;
+
+  // Varmistetaan ettei sama sana tule heti uudelleen
+  if (usedIndices.size >= adjectives.length - 5) {
+    usedIndices.clear();
+  }
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * adjectives.length);
+  } while (usedIndices.has(idx));
+  usedIndices.add(idx);
+
+  currentData = adjectives[idx];
+  const [baseWord, compWord, supWord, finnishMeaning, isMerMest] = currentData;
+
+  // Päätetään kysyttävä muoto
+  if (mode === 'mix') {
+    currentTargetForm = Math.random() < 0.5 ? 'comp' : 'sup';
+  } else {
+    currentTargetForm = mode;
+  }
+
+  // Luodaan visuaalinen kortti
+  wordContainerEl.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'word-card';
+
+  const badgeColor = currentTargetForm === 'comp'
+    ? 'bg-sky-400/25 text-sky-200 border-sky-300/40'
+    : 'bg-indigo-400/25 text-indigo-200 border-indigo-300/40';
+  const badgeText = currentTargetForm === 'comp' ? 'KOMPARATIIVI' : 'SUPERLATIIVI';
+
+  const merMestTag = isMerMest
+    ? `<span class="inline-block ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/25 text-amber-200 border border-amber-300/40">mer / mest</span>`
+    : '';
+
+  card.innerHTML = `
+    <div class="flex items-center justify-center mb-1">
+      <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold tracking-wider border ${badgeColor}">
+        ${badgeText}
+      </span>
+      ${merMestTag}
+    </div>
+    <div class="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+      ${baseWord}
+    </div>
+    <div class="text-xs sm:text-sm text-sky-100/80 font-medium mt-0.5">
+      (${finnishMeaning})
+    </div>
+  `;
+
+  pos = 12;
+  card.style.top = pos + 'px';
+  wordContainerEl.appendChild(card);
+  currentWordEl = card;
+
+  // Päivitetään syöttökentän alle pieni apuvihje
+  if (isMerMest) {
+    const prefix = currentTargetForm === 'comp' ? 'mer' : 'mest';
+    hintBarEl.innerHTML = `Vihje: Taipuu <span class="text-amber-300 font-bold">${prefix} + perusmuoto</span>`;
+  } else {
+    hintBarEl.textContent = '';
+  }
+}
+
+/**
+ * Pääpelisilmukka (60fps sulava liike)
+ */
+function gameLoop(timestamp) {
+  if (!isGameRunning) return;
+
+  const deltaTime = (timestamp - lastTimestamp) / 16.67; // Normalisoidaan 60fps vauhtiin
+  lastTimestamp = timestamp;
+
+  if (!isTransitioning && currentWordEl) {
+    // Nopeus kasvaa hienovaraisesti tason noustessa
+    const levelMultiplier = 1 + (level - 1) * 0.12;
+    const step = baseSpeed * levelMultiplier * deltaTime;
+    pos += step;
+    currentWordEl.style.top = pos + 'px';
+
+    const playfieldHeight = document.getElementById('playfield').clientHeight;
+    const cardBottom = pos + currentWordEl.offsetHeight;
+    const dangerThreshold = playfieldHeight - 135;
+
+    // Vaara-alueen korostus kun sana lähestyy pohjaa
+    if (cardBottom > dangerThreshold - 60) {
+      currentWordEl.classList.add('danger-zone');
+    }
+
+    // Sana osui vaara-alueen pohjaan -> menetetään elämä
+    if (cardBottom >= dangerThreshold) {
+      handleMissedWord('Sana putosi pohjaan!');
+    }
+  }
+
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Tarkistaa pelaajan syöttämän vastauksen
+ */
+function checkAnswer() {
+  if (!isGameRunning || isTransitioning || !currentData) return;
+
+  const rawValue = answerInputEl.value.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!rawValue) return;
+
+  const correctAnswer = (currentTargetForm === 'comp' ? currentData[1] : currentData[2]).toLowerCase();
+
+  if (rawValue === correctAnswer) {
+    handleCorrectAnswer();
+  } else {
+    handleWrongAnswer();
+  }
+}
+
+/**
+ * Käsittelee oikean vastauksen
+ */
+function handleCorrectAnswer() {
+  isTransitioning = true;
+  combo++;
+  correctCount++;
+  if (combo > maxCombo) maxCombo = combo;
+
+  // Tasonnousu joka 6. oikeasta vastauksesta
+  const newLevel = Math.floor(correctCount / 6) + 1;
+  const leveledUp = newLevel > level;
+  level = newLevel;
+
+  // Pisteiden laskenta (peruspisteet + combo-bonus)
+  const comboBonus = Math.min(combo - 1, 5) * 5;
+  const earnedPoints = 10 + comboBonus;
+  score += earnedPoints;
+
+  updateHUD();
+
+  // Kortin visuaalinen vahvistus
+  const rect = currentWordEl.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  currentWordEl.classList.remove('danger-zone');
+  currentWordEl.classList.add('correct-reveal');
+  currentWordEl.innerHTML = `
+    <div class="text-xs font-bold uppercase tracking-wider text-emerald-200 mb-0.5">
+      ${praises[Math.floor(Math.random() * praises.length)]}
+    </div>
+    <div class="font-display text-2xl sm:text-3xl font-extrabold text-white">
+      ${currentData[0]} → ${currentTargetForm === 'comp' ? currentData[1] : currentData[2]}
+    </div>
+  `;
+
+  // Kelluva pisteteksti ja partikkelit
+  spawnFloatingText(centerX, centerY - 10, `+${earnedPoints}${combo > 1 ? ` (Combo x${combo}!)` : ''}`, '#fde047');
+  if (leveledUp) {
+    setTimeout(() => {
+      spawnFloatingText(centerX, centerY - 45, `TASO ${level}! 🚀`, '#38bdf8');
+    }, 250);
+  }
+  burstConfetti(centerX, centerY, combo >= 3 ? 28 : 14);
+
+  answerInputEl.value = '';
+  setTimeout(() => {
+    if (isGameRunning) spawnWord();
+  }, 650);
+}
+
+/**
+ * Käsittelee väärän vastauksen (ravistus, 3 virheestä menettää sydämen)
+ */
+function handleWrongAnswer() {
+  wrongAttemptsOnCurrent++;
+  combo = 0;
+  updateHUD();
+
+  currentWordEl.classList.remove('shake');
+  void currentWordEl.offsetWidth; // Pakottaa animaation uudelleenkäynnistyksen
+  currentWordEl.classList.add('shake');
+
+  const rect = currentWordEl.getBoundingClientRect();
+  spawnFloatingText(rect.left + rect.width / 2, rect.top, `Väärin! (${wrongAttemptsOnCurrent}/3)`, '#fca5a5');
+
+  if (wrongAttemptsOnCurrent >= 3) {
+    handleMissedWord('Liian monta virhettä!');
+  } else {
+    // Valitaan teksti valmiiksi helppoa korjausta varten
+    answerInputEl.select();
+  }
+}
+
+/**
+ * Käsittelee tilanteen, jossa sana menee ohi (putoaa pohjaan tai 3 virhettä)
+ */
+function handleMissedWord(reason) {
+  isTransitioning = true;
+  combo = 0;
+  lives--;
+  updateHUD();
+  renderHearts();
+
+  const correctAnswer = currentTargetForm === 'comp' ? currentData[1] : currentData[2];
+
+  currentWordEl.classList.remove('danger-zone', 'shake');
+  currentWordEl.classList.add('missed-reveal');
+  currentWordEl.innerHTML = `
+    <div class="text-xs font-bold uppercase tracking-wider text-red-200 mb-0.5">${reason}</div>
+    <div class="font-display text-2xl sm:text-3xl font-extrabold text-white">
+      ${currentData[0]} → <span class="text-amber-300 underline decoration-2">${correctAnswer}</span>
+    </div>
+  `;
+
+  answerInputEl.value = '';
+
+  if (lives <= 0) {
+    setTimeout(triggerGameOver, 1600);
+  } else {
+    setTimeout(() => {
+      if (isGameRunning) spawnWord();
+    }, 1900);
+  }
+}
+
+/**
+ * Päättää pelin ja näyttää tulokset
+ */
+function triggerGameOver() {
+  isGameRunning = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+  let isNewRecord = false;
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('swe_comp_sup_highscore', String(highScore));
+    isNewRecord = true;
+  }
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalHighScore').textContent = highScore;
+  document.getElementById('menuHighScore').textContent = highScore;
+  document.getElementById('finalCorrect').textContent = correctCount;
+  document.getElementById('finalMaxCombo').textContent = maxCombo + 'x';
+
+  const recordBanner = document.getElementById('newRecordBanner');
+  if (isNewRecord && score > 0) {
+    recordBanner.classList.remove('hidden');
+    burstConfetti(window.innerWidth / 2, window.innerHeight / 3, 50);
+  } else {
+    recordBanner.classList.add('hidden');
+  }
+
+  gameOverModalEl.classList.remove('hidden');
+}
+
+function restartCurrentMode() {
+  startGame(mode);
+}
+
+function returnToMenu() {
+  isGameRunning = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  gameOverModalEl.classList.add('hidden');
+  gameEl.classList.add('hidden');
+  modeSelectEl.classList.remove('hidden');
+}
+
+/**
+ * Luo kelluvan pistetekstin ruudulle
+ */
+function spawnFloatingText(x, y, text, color) {
+  const el = document.createElement('div');
+  el.className = 'floating-score text-lg sm:text-xl';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.color = color;
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+/**
+ * Kevyt konfetti- ja partikkeliefekti oikeasta vastauksesta
+ */
+const fxCanvas = document.getElementById('fxCanvas');
+const fxCtx = fxCanvas.getContext('2d');
+let particles = [];
+
+function resizeFxCanvas() {
+  fxCanvas.width = window.innerWidth;
+  fxCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeFxCanvas);
+resizeFxCanvas();
+
+function burstConfetti(x, y, count) {
+  const colors = ['#38bdf8', '#fde047', '#4ade80', '#f472b6', '#a78bfa', '#fb923c'];
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2.5 + Math.random() * 6;
+    particles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      size: 4 + Math.random() * 5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      rotation: Math.random() * 360,
+      vRot: (Math.random() - 0.5) * 12
+    });
+  }
+}
+
+function updateParticles() {
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.18; // Painovoima
+    p.alpha -= 0.022;
+    p.rotation += p.vRot;
+
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+
+    fxCtx.save();
+    fxCtx.globalAlpha = p.alpha;
+    fxCtx.translate(p.x, p.y);
+    fxCtx.rotate((p.rotation * Math.PI) / 180);
+    fxCtx.fillStyle = p.color;
+    fxCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+    fxCtx.restore();
+  }
+  requestAnimationFrame(updateParticles);
+}
+updateParticles();
+
+// Näppäimistö- ja liukusäädinkuuntelijat
+answerInputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    checkAnswer();
+  }
 });
-</script></body></html>
+
+document.getElementById('speedSlider').addEventListener('input', function () {
+  baseSpeed = parseFloat(this.value);
+  document.getElementById('speedValue').textContent = baseSpeed.toFixed(1) + 'x';
+  answerInputEl.focus();
+});
+</script>
+</body>
+</html>
