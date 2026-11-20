@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indefiniittipronominit – Ruotsin kielioppipeli</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-grad-1: #0f172a;
+    --bg-grad-2: #1e3a8a;
+    --bg-grad-3: #0284c7;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 55%, var(--bg-grad-3) 100%);
+    color: #ffffff;
+    user-select: none;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  h1, h2, .font-display {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* Lasimorfismi */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  }
+
+  .glass-strong {
+    background: rgba(15, 23, 42, 0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Putoava lausekortti */
+  .word-card {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-radius: 22px;
+    padding: 16px 26px;
+    text-align: center;
+    width: min(92vw, 520px);
+    transition: border-color 0.2s, background 0.2s;
+    z-index: 20;
+  }
+
+  .word-card.danger-zone {
+    border-color: #f87171;
+    background: linear-gradient(145deg, rgba(239, 68, 68, 0.38), rgba(185, 28, 28, 0.28));
+    box-shadow: 0 0 28px rgba(239, 68, 68, 0.55);
+  }
+
+  .word-card.correct-reveal {
+    border-color: #4ade80;
+    background: linear-gradient(145deg, rgba(22, 163, 74, 0.88), rgba(21, 128, 61, 0.88));
+    transform: translateX(-50%) scale(1.03);
+  }
+
+  .word-card.missed-reveal {
+    border-color: #f87171;
+    background: linear-gradient(145deg, rgba(220, 38, 38, 0.92), rgba(153, 27, 27, 0.92));
+  }
+
+  /* Ravistusanimaatio väärästä vastauksesta */
+  .shake {
+    animation: shake 0.38s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #ef4444 !important;
+    background: rgba(220, 38, 38, 0.45) !important;
+  }
+
+  @keyframes shake {
+    10%, 90% { transform: translateX(calc(-50% - 4px)); }
+    20%, 80% { transform: translateX(calc(-50% + 7px)); }
+    30%, 50%, 70% { transform: translateX(calc(-50% - 9px)); }
+    40%, 60% { transform: translateX(calc(-50% + 9px)); }
+  }
+
+  /* Kelluvat pistetekstit */
+  .floating-score {
+    position: fixed;
+    pointer-events: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    z-index: 50;
+    animation: floatUp 1.1s ease-out forwards;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  }
+
+  @keyframes floatUp {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(0.85);
+    }
+    25% {
+      transform: translate(-50%, -15px) scale(1.1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -65px) scale(1);
+    }
+  }
+
+  /* Sydänanimaatio */
+  .heart-lost {
+    animation: heartBreak 0.45s ease-out forwards;
+  }
+
+  @keyframes heartBreak {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35) rotate(-12deg); color: #ef4444; }
+    100% { transform: scale(0.85); opacity: 0.3; filter: grayscale(100%); }
+  }
+
+  /* Vaara-alue alareunassa */
+  .danger-line {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(239, 68, 68, 0.25),
+      rgba(239, 68, 68, 0.25) 12px,
+      rgba(239, 68, 68, 0.1) 12px,
+      rgba(239, 68, 68, 0.1) 24px
+    );
+    border-top: 2px dashed rgba(248, 113, 113, 0.65);
+  }
+
+  /* Mukautettu liukusäädin */
+  input[type=range] {
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.2);
+    height: 6px;
+    border-radius: 999px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #38bdf8;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+  }
+
+  /* Taustan koristeelliset valopallot */
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
+  /* Aukon korostus lauseessa */
+  .blank-slot {
+    display: inline-block;
+    min-width: 78px;
+    padding: 0 10px;
+    margin: 0 3px;
+    border-bottom: 3px solid #38bdf8;
+    background: rgba(56, 189, 248, 0.18);
+    border-radius: 8px 8px 2px 2px;
+    color: #7dd3fc;
+    font-weight: 800;
+  }
+</style>
+</head>
+<body class="relative flex flex-col items-center justify-center">
+
+  <!-- Taustan koristeelliset hehkut -->
+  <div class="bg-orb w-96 h-96 bg-blue-400 top-[-10%] left-[-5%]"></div>
+  <div class="bg-orb w-96 h-96 bg-indigo-500 bottom-[-10%] right-[-5%]"></div>
+  <div class="bg-orb w-72 h-72 bg-cyan-300 top-[40%] left-[60%] opacity-20"></div>
+
+  <!-- Konfetti-canvas -->
+  <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
+
+  <!-- Paluulinkki päävalikkoon -->
+  <a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-btn fixed top-4 left-4 z-50 glass hover:bg-white/20 text-white font-semibold text-sm sm:text-base px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg">
+    ← Päävalikko
+  </a>
+
+  <!-- ALOITUSNÄKYMÄ -->
+  <div id="modeSelect" class="relative z-10 w-full max-w-3xl px-4 pt-16 sm:pt-6 pb-6 flex flex-col items-center text-center overflow-y-auto max-h-screen">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass text-sky-200 text-xs sm:text-sm font-semibold mb-2.5 tracking-wide uppercase">
+      <span>🇸🇪 Ruotsin kielioppipeli</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-sky-100 to-sky-300">
+      Indefiniittipronominit
+    </h1>
+    <p class="text-sky-100/90 text-sm sm:text-base max-w-xl mb-4">
+      Täydennä putoaviin ruotsin lauseisiin oikea muoto (<strong class="text-sky-300">någon, något, några</strong> tai <strong class="text-indigo-300">ingen, inget, inga</strong>) ennen kuin lause osuu vaara-alueelle!
+    </p>
+
+    <!-- Ennätyspalkki & Vaikeusasetus -->
+    <div class="flex flex-wrap items-center justify-center gap-3 mb-5">
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-2 text-sm">
+        <span class="text-amber-300 text-lg">🏆</span>
+        <span class="text-sky-200">Ennätys:</span>
+        <span id="menuHighScore" class="font-bold text-white text-base">0</span>
+      </div>
+
+      <label class="glass px-4 py-2 rounded-xl flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white/15 transition select-none">
+        <input type="checkbox" id="hardModeToggle" class="w-4 h-4 accent-amber-400 rounded cursor-pointer">
+        <span class="text-sky-100 font-medium">Vaikea tila (piilota sukuvihjeet)</span>
+      </label>
+    </div>
+
+    <!-- Pelimuodon valintapainikkeet -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-5">
+      <button onclick="startGame('nagon')" class="group glass hover:bg-sky-500/30 border-sky-300/30 hover:border-sky-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">✨</span>
+        <span class="font-display font-bold text-lg text-white">Någon / Något / Några</span>
+        <span class="text-xs text-sky-200 mt-1">joku, jokin, jotkut / yhtään</span>
+      </button>
+
+      <button onclick="startGame('ingen')" class="group glass hover:bg-indigo-500/30 border-indigo-300/30 hover:border-indigo-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🚫</span>
+        <span class="font-display font-bold text-lg text-white">Ingen / Inget / Inga</span>
+        <span class="text-xs text-indigo-200 mt-1">ei kukaan, ei mikään, ei ketkään</span>
+      </button>
+
+      <button onclick="startGame('mix')" class="group glass hover:bg-emerald-500/30 border-emerald-300/30 hover:border-emerald-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg relative overflow-hidden">
+        <span class="absolute top-2 right-2 bg-emerald-400/20 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300/30">HAASTE</span>
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🎲</span>
+        <span class="font-display font-bold text-lg text-white">Sekoitus</span>
+        <span class="text-xs text-emerald-200 mt-1">Kaikki 6 muotoa yhdessä</span>
+      </button>
+    </div>
+
+    <!-- Kielioppikertauskortti -->
+    <div class="glass-strong rounded-2xl p-4 sm:p-5 text-left w-full border border-sky-300/20">
+      <div class="flex items-center gap-2 text-amber-300 font-bold text-sm sm:text-base mb-2.5">
+        <span>💡</span>
+        <span>Pikaopas: Valitse muoto suvun, luvun ja lauseen mukaan</span>
+      </div>
+
+      <!-- Taivutuskortit suvun ja luvun mukaan -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs mb-3">
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+          <div class="font-bold text-sky-300 text-sm mb-1">en-suku (yksikkö)</div>
+          <div class="text-white font-semibold mb-0.5">någon / ingen</div>
+          <div class="text-slate-300">esim. <em>en bil, en kompis</em></div>
+        </div>
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+          <div class="font-bold text-indigo-300 text-sm mb-1">ett-suku (yksikkö)</div>
+          <div class="text-white font-semibold mb-0.5">något / inget</div>
+          <div class="text-slate-300">esim. <em>ett äpple, ett svar</em></div>
+        </div>
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+          <div class="font-bold text-emerald-300 text-sm mb-1">Monikko (kaikki)</div>
+          <div class="text-white font-semibold mb-0.5">några / inga</div>
+          <div class="text-slate-300">esim. <em>böcker, pengar</em></div>
+        </div>
+      </div>
+
+      <!-- Käyttöero: någon vs ingen -->
+      <div class="bg-sky-950/50 rounded-xl p-3 border border-sky-400/20 text-xs text-slate-200 space-y-1">
+        <div>
+          <strong class="text-sky-300">någon / något / några:</strong> Myönteisissä lauseissa, kysymyksissä (<em>Har du någon penna?</em>), sivulauseissa sekä kieltosanan <em>inte</em> ja verbin jälkeen (<em>Jag känner inte någon här.</em>).
+        </div>
+        <div>
+          <strong class="text-indigo-300">ingen / inget / inga:</strong> Kielteisissä päälauseissa <strong>ilman</strong> <em>inte</em>-sanaa (<em>Jag har inga pengar.</em> / <em>Ingen vet svaret.</em>).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PELINÄKYMÄ -->
+  <div id="game" class="hidden fixed inset-0 z-10 flex flex-col justify-between">
+    
+    <!-- Yläpalkki (HUD) -->
+    <header class="w-full pt-16 sm:pt-4 px-4 sm:px-6 flex flex-wrap items-center justify-between gap-2.5 z-30">
+      <!-- Pelimuodon vaihto -->
+      <div class="flex items-center gap-1 sm:ml-36 bg-slate-900/45 p-1 rounded-xl border border-white/15 backdrop-blur-md">
+        <button id="btn-nagon" onclick="changeMode('nagon')" class="mode-tab px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Någon-muodot</button>
+        <button id="btn-ingen" onclick="changeMode('ingen')" class="mode-tab px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Ingen-muodot</button>
+        <button id="btn-mix" onclick="changeMode('mix')" class="mode-tab px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Sekoitus</button>
+      </div>
+
+      <!-- Keskellä: Elämät, Combo ja Vihjenappi -->
+      <div class="flex items-center gap-2.5 sm:gap-4">
+        <!-- Elämät (3 sydäntä) -->
+        <div id="heartsContainer" class="glass px-3 py-1.5 rounded-xl flex items-center gap-1 text-base sm:text-lg" title="Elämät">
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+        </div>
+
+        <!-- Combo / Streak -->
+        <div id="comboBadge" class="glass px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all duration-300 opacity-60">
+          <span class="text-sm sm:text-base">🔥</span>
+          <span class="text-xs sm:text-sm font-bold text-amber-300">Combo <span id="comboCount">0</span></span>
+        </div>
+
+        <!-- Vihjeiden näyttö/piilotus -->
+        <button id="toggleHintBtn" onclick="toggleHintVisibility()" class="glass hover:bg-white/20 px-3 py-1.5 rounded-xl text-xs font-semibold text-sky-200 flex items-center gap-1 transition" title="Näytä tai piilota sukuvihjeet">
+          <span>💡</span>
+          <span id="hintBtnLabel" class="hidden sm:inline">Vihjeet: Päällä</span>
+        </button>
+      </div>
+
+      <!-- Oikealla: Pisteet, Taso ja Nopeus -->
+      <div class="flex items-center gap-2.5 ml-auto sm:ml-0">
+        <div class="glass px-3.5 py-1.5 rounded-xl flex items-center gap-3">
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Taso</div>
+            <div id="levelDisplay" class="font-display font-bold text-sm sm:text-base text-white">1</div>
+          </div>
+          <div class="h-6 w-px bg-white/20"></div>
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Pisteet</div>
+            <div id="score" class="font-display font-extrabold text-base sm:text-xl text-amber-300">0</div>
+          </div>
+        </div>
+
+        <!-- Nopeudensäätö -->
+        <div class="hidden lg:flex glass px-3 py-1.5 rounded-xl flex-col justify-center">
+          <div class="flex justify-between text-[11px] text-sky-200 font-medium mb-1">
+            <span>Nopeus</span>
+            <span id="speedValue" class="font-bold text-white">1.0x</span>
+          </div>
+          <input type="range" id="speedSlider" min="0.5" max="5.0" step="0.1" value="1.0" class="w-24">
+        </div>
+      </div>
+    </header>
+
+    <!-- Pelialue, jossa lausekortit putoavat -->
+    <main id="playfield" class="relative flex-1 w-full overflow-hidden">
+      <div id="wordContainer" class="w-full h-full relative"></div>
+
+      <!-- Vaara-alue alareunassa -->
+      <div id="dangerZone" class="danger-line absolute bottom-0 left-0 right-0 h-44 pointer-events-none flex items-start justify-center pt-1.5">
+        <span class="text-[11px] uppercase tracking-widest text-red-300/70 font-bold">Vaara-alue</span>
+      </div>
+    </main>
+
+    <!-- Syöttökenttä ja pikavalintapainikkeet alareunassa -->
+    <footer id="inputArea" class="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 w-full max-w-lg px-4">
+      <!-- Pikapainikkeet mobiili- ja hiiripelaamiseen -->
+      <div id="quickButtons" class="flex flex-wrap justify-center gap-1.5 mb-2">
+        <button type="button" onclick="fillAndSubmit('någon')" class="quick-btn glass hover:bg-sky-500/35 active:scale-95 text-sky-100 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-sky-300/30 transition">någon</button>
+        <button type="button" onclick="fillAndSubmit('något')" class="quick-btn glass hover:bg-sky-500/35 active:scale-95 text-sky-100 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-sky-300/30 transition">något</button>
+        <button type="button" onclick="fillAndSubmit('några')" class="quick-btn glass hover:bg-sky-500/35 active:scale-95 text-sky-100 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-sky-300/30 transition">några</button>
+        <button type="button" onclick="fillAndSubmit('ingen')" class="quick-btn glass hover:bg-indigo-500/35 active:scale-95 text-indigo-100 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-indigo-300/30 transition">ingen</button>
+        <button type="button" onclick="fillAndSubmit('inget')" class="quick-btn glass hover:bg-indigo-500/35 active:scale-95 text-indigo-100 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-indigo-300/30 transition">inget</button>
+        <button type="button" onclick="fillAndSubmit('inga')" class="quick-btn glass hover:bg-indigo-500/35 active:scale-95 text-indigo-100 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-indigo-300/30 transition">inga</button>
+      </div>
+
+      <div class="glass-strong p-2 rounded-2xl flex items-center gap-2 border border-white/25 shadow-2xl">
+        <input 
+          id="answer" 
+          type="text" 
+          autocomplete="off" 
+          autocorrect="off" 
+          autocapitalize="off" 
+          spellcheck="false"
+          placeholder="Kirjoita vastaus + Enter..." 
+          class="w-full bg-white/10 text-white placeholder-sky-200/50 text-center text-xl sm:text-2xl font-bold py-2 px-4 rounded-xl border border-white/10 focus:outline-none focus:border-sky-400 focus:bg-white/15 transition"
+        >
+        <button onclick="checkAnswer()" class="bg-sky-500 hover:bg-sky-400 active:scale-95 text-slate-950 font-extrabold px-4 py-2.5 rounded-xl transition shadow-lg shrink-0" title="Tarkista vastaus">
+          ↵
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- GAME OVER -MODAALI -->
+  <div id="gameOverModal" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-strong max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-white/20 transform transition-all">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+        🏁
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-1">Peli päättyi!</h2>
+      <p id="newRecordBanner" class="hidden text-amber-300 font-bold text-sm mb-3 animate-pulse">
+        🎉 Uusi ennätys! 🎉
+      </p>
+
+      <div class="grid grid-cols-2 gap-3 my-5">
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-sky-200 uppercase font-semibold">Pisteet</div>
+          <div id="finalScore" class="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-amber-200 uppercase font-semibold">Ennätys</div>
+          <div id="finalHighScore" class="text-2xl sm:text-3xl font-extrabold text-amber-300 mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Oikeat vastaukset</div>
+          <div id="finalCorrect" class="text-lg font-bold text-emerald-400">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Paras Combo</div>
+          <div id="finalMaxCombo" class="text-lg font-bold text-orange-400">0x</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="restartCurrentMode()" class="flex-1 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-extrabold py-3.5 px-5 rounded-xl transition shadow-lg">
+          Pelaa uudelleen
+        </button>
+        <button onclick="returnToMenu()" class="flex-1 glass hover:bg-white/20 text-white font-bold py-3.5 px-5 rounded-xl transition">
+          Vaihda pelimuotoa
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/**
+ * Lausepankki indefiniittipronomineille (72 luonnollista arkipäivän lausetta)
+ * Jokainen objekti sisältää:
+ * - sentence: lause, jossa ___ on aukko
+ * - answer: oikea muoto (någon, något, några, ingen, inget, inga)
+ * - type: 'nagon' | 'ingen'
+ * - hint: substantiivin suku / luku
+ * - fi: suomennos lauseesta
+ */
+const sentenceBank = [
+  // ================= NÅGON (en-suku, yksikkö) =================
+  { sentence: "Har du ___ penna?", answer: "någon", type: "nagon", hint: "en penna (yksikkö, en-suku)", fi: "Onko sinulla yhtään kynää?" },
+  { sentence: "Det sitter ___ i soffan.", answer: "någon", type: "nagon", hint: "henkilö (yksikkö, en-suku)", fi: "Joku istuu sohvalla." },
+  { sentence: "Jag känner inte ___ här.", answer: "någon", type: "nagon", hint: "henkilö (kielto inte + verbi)", fi: "En tunne ketään täällä." },
+  { sentence: "Har du ___ syster?", answer: "någon", type: "nagon", hint: "en syster (yksikkö, en-suku)", fi: "Onko sinulla siskoa?" },
+  { sentence: "Finns det ___ bra film på bio?", answer: "någon", type: "nagon", hint: "en film (yksikkö, en-suku)", fi: "Meneekö elokuvissa mitään hyvää elokuvaa?" },
+  { sentence: "Har ni ___ hund?", answer: "någon", type: "nagon", hint: "en hund (yksikkö, en-suku)", fi: "Onko teillä koiraa?" },
+  { sentence: "Jag har inte ___ bil.", answer: "någon", type: "nagon", hint: "en bil (kielto inte + verbi)", fi: "Minulla ei ole autoa." },
+  { sentence: "Har du ___ bra idé?", answer: "någon", type: "nagon", hint: "en idé (yksikkö, en-suku)", fi: "Onko sinulla mitään hyvää ideaa?" },
+  { sentence: "Det ringde ___ på dörren.", answer: "någon", type: "nagon", hint: "henkilö (yksikkö, en-suku)", fi: "Joku soitti ovikelloa." },
+  { sentence: "Har du ___ fråga?", answer: "någon", type: "nagon", hint: "en fråga (yksikkö, en-suku)", fi: "Onko sinulla mitään kysyttävää?" },
+  { sentence: "Vi såg inte ___ lärare i korridoren.", answer: "någon", type: "nagon", hint: "en lärare (kielto inte + verbi)", fi: "Emme nähneet yhtään opettajaa käytävällä." },
+  { sentence: "Behöver du ___ hjälp?", answer: "någon", type: "nagon", hint: "en hjälp (yksikkö, en-suku)", fi: "Tarvitsetko yhtään apua?" },
+
+  // ================= NÅGOT (ett-suku, yksikkö) =================
+  { sentence: "Har du ___ äpple i väskan?", answer: "något", type: "nagon", hint: "ett äpple (yksikkö, ett-suku)", fi: "Onko sinulla yhtään omenaa laukussa?" },
+  { sentence: "Jag vill köpa ___ nytt.", answer: "något", type: "nagon", hint: "itsenäinen (ett-muoto)", fi: "Haluan ostaa jotain uutta." },
+  { sentence: "Finns det ___ problem?", answer: "något", type: "nagon", hint: "ett problem (yksikkö, ett-suku)", fi: "Onko olemassa jotain ongelmaa?" },
+  { sentence: "Hörde du ___ ljud?", answer: "något", type: "nagon", hint: "ett ljud (yksikkö, ett-suku)", fi: "Kuulitko jonkin äänen?" },
+  { sentence: "Vi fick inte ___ svar.", answer: "något", type: "nagon", hint: "ett svar (kielto inte + verbi)", fi: "Emme saaneet mitään vastausta." },
+  { sentence: "Har han ___ jobb nu?", answer: "något", type: "nagon", hint: "ett jobb (yksikkö, ett-suku)", fi: "Onko hänellä nyt mitään työtä?" },
+  { sentence: "Finns det ___ ledigt rum?", answer: "något", type: "nagon", hint: "ett rum (yksikkö, ett-suku)", fi: "Onko vapaana yhtään huonetta?" },
+  { sentence: "Vill du äta ___ gott?", answer: "något", type: "nagon", hint: "itsenäinen (ett-muoto)", fi: "Haluatko syödä jotain hyvää?" },
+  { sentence: "Har du ___ förslag?", answer: "något", type: "nagon", hint: "ett förslag (yksikkö, ett-suku)", fi: "Onko sinulla mitään ehdotusta?" },
+  { sentence: "Jag har inte ___ paraply med mig.", answer: "något", type: "nagon", hint: "ett paraply (kielto inte + verbi)", fi: "Minulla ei ole sateenvarjoa mukanani." },
+  { sentence: "Har ni ___ husdjur?", answer: "något", type: "nagon", hint: "ett husdjur (yksikkö, ett-suku)", fi: "Onko teillä lemmikkiä?" },
+  { sentence: "Sade hon ___ viktigt?", answer: "något", type: "nagon", hint: "itsenäinen (ett-muoto)", fi: "Sanoiko hän jotain tärkeää?" },
+
+  // ================= NÅGRA (monikko) =================
+  { sentence: "Jag har ___ bra vänner i Sverige.", answer: "några", type: "nagon", hint: "vänner (monikko)", fi: "Minulla on joitakin hyviä ystäviä Ruotsissa." },
+  { sentence: "Har du ___ syskon?", answer: "några", type: "nagon", hint: "syskon (monikko)", fi: "Onko sinulla sisaruksia?" },
+  { sentence: "Vi köpte ___ böcker i bokhandeln.", answer: "några", type: "nagon", hint: "böcker (monikko)", fi: "Ostimme muutamia kirjoja kirjakaupasta." },
+  { sentence: "Det finns inte ___ biljetter kvar.", answer: "några", type: "nagon", hint: "biljetter (monikko, kielto inte)", fi: "Lippuja ei ole enää yhtään jäljellä." },
+  { sentence: "Har du ___ planer för helgen?", answer: "några", type: "nagon", hint: "planer (monikko)", fi: "Onko sinulla mitään suunnitelmia viikonlopuksi?" },
+  { sentence: "Jag behöver köpa ___ nya skor.", answer: "några", type: "nagon", hint: "skor (monikko)", fi: "Minun täytyy ostaa muutamat uudet kengät." },
+  { sentence: "Vi har inte ___ läxor idag.", answer: "några", type: "nagon", hint: "läxor (monikko, kielto inte)", fi: "Meillä ei ole tänään yhtään läksyjä." },
+  { sentence: "Finns det ___ äpplen i kylen?", answer: "några", type: "nagon", hint: "äpplen (monikko)", fi: "Onko jääkaapissa yhtään omenia?" },
+  { sentence: "Han tog ___ bilder på resan.", answer: "några", type: "nagon", hint: "bilder (monikko)", fi: "Hän otti muutamia kuvia matkalla." },
+  { sentence: "Jag har inte ___ kontanter på mig.", answer: "några", type: "nagon", hint: "kontanter (monikko, kielto inte)", fi: "Minulla ei ole yhtään käteistä mukanani." },
+  { sentence: "Hon ställde ___ smarta frågor.", answer: "några", type: "nagon", hint: "frågor (monikko)", fi: "Hän esitti muutamia fiksuja kysymyksiä." },
+  { sentence: "Har ni ___ husdjur hemma?", answer: "några", type: "nagon", hint: "husdjur (monikko)", fi: "Onko teillä kotona lemmikkejä?" },
+
+  // ================= INGEN (en-suku, yksikkö) =================
+  { sentence: "Jag har ___ bil.", answer: "ingen", type: "ingen", hint: "en bil (yksikkö, en-suku)", fi: "Minulla ei ole autoa." },
+  { sentence: "Det finns ___ mjölk kvar.", answer: "ingen", type: "ingen", hint: "en mjölk (yksikkö, en-suku)", fi: "Maitoa ei ole enää jäljellä." },
+  { sentence: "___ vet svaret på frågan.", answer: "ingen", type: "ingen", hint: "henkilö (yksikkö, en-suku)", fi: "Kukaan ei tiedä vastausta kysymykseen." },
+  { sentence: "Han har ___ tid idag.", answer: "ingen", type: "ingen", hint: "en tid (yksikkö, en-suku)", fi: "Hänellä ei ole tänään aikaa." },
+  { sentence: "Det är ___ fara!", answer: "ingen", type: "ingen", hint: "en fara (yksikkö, en-suku)", fi: "Ei hätää! (Ei mitään vaaraa!)" },
+  { sentence: "Jag såg ___ hund i parken.", answer: "ingen", type: "ingen", hint: "en hund (yksikkö, en-suku)", fi: "En nähnyt yhtään koiraa puistossa." },
+  { sentence: "Hon har ___ bror.", answer: "ingen", type: "ingen", hint: "en bror (yksikkö, en-suku)", fi: "Hänellä ei ole veljeä." },
+  { sentence: "Det kom ___ buss i morse.", answer: "ingen", type: "ingen", hint: "en buss (yksikkö, en-suku)", fi: "Tänä aamuna ei tullut yhtään bussia." },
+  { sentence: "Jag har ___ aning.", answer: "ingen", type: "ingen", hint: "en aning (yksikkö, en-suku)", fi: "Minulla ei ole aavistustakaan." },
+  { sentence: "Vi har ___ TV i sovrummet.", answer: "ingen", type: "ingen", hint: "en TV (yksikkö, en-suku)", fi: "Meillä ei ole televisiota makuuhuoneessa." },
+  { sentence: "___ förstod vad han menade.", answer: "ingen", type: "ingen", hint: "henkilö (yksikkö, en-suku)", fi: "Kukaan ei ymmärtänyt mitä hän tarkoitti." },
+  { sentence: "Det finns ___ ost i kylskåpet.", answer: "ingen", type: "ingen", hint: "en ost (yksikkö, en-suku)", fi: "Jääkaapissa ei ole juustoa." },
+
+  // ================= INGET (ett-suku, yksikkö) =================
+  { sentence: "Vi har ___ husdjur.", answer: "inget", type: "ingen", hint: "ett husdjur (yksikkö, ett-suku)", fi: "Meillä ei ole lemmikkiä." },
+  { sentence: "Det gör ___.", answer: "inget", type: "ingen", hint: "itsenäinen (ett-muoto)", fi: "Ei se mitään." },
+  { sentence: "Jag har ___ val.", answer: "inget", type: "ingen", hint: "ett val (yksikkö, ett-suku)", fi: "Minulla ei ole vaihtoehtoa." },
+  { sentence: "Hon fick ___ svar på mejlet.", answer: "inget", type: "ingen", hint: "ett svar (yksikkö, ett-suku)", fi: "Hän ei saanut vastausta sähköpostiin." },
+  { sentence: "Det finns ___ kaffe kvar.", answer: "inget", type: "ingen", hint: "ett kaffe (yksikkö, ett-suku)", fi: "Kahvia ei ole enää jäljellä." },
+  { sentence: "Han har ___ körkort.", answer: "inget", type: "ingen", hint: "ett körkort (yksikkö, ett-suku)", fi: "Hänellä ei ole ajokorttia." },
+  { sentence: "Vi har ___ vatten i flaskan.", answer: "inget", type: "ingen", hint: "ett vatten (yksikkö, ett-suku)", fi: "Meillä ei ole vettä pullossa." },
+  { sentence: "Det hände ___ speciellt igår.", answer: "inget", type: "ingen", hint: "itsenäinen (ett-muoto)", fi: "Eilen ei tapahtunut mitään erityistä." },
+  { sentence: "Jag har ___ paraply.", answer: "inget", type: "ingen", hint: "ett paraply (yksikkö, ett-suku)", fi: "Minulla ei ole sateenvarjoa." },
+  { sentence: "Det finns ___ salt på bordet.", answer: "inget", type: "ingen", hint: "ett salt (yksikkö, ett-suku)", fi: "Pöydällä ei ole suolaa." },
+  { sentence: "Barnet sa ___ ord.", answer: "inget", type: "ingen", hint: "ett ord (yksikkö, ett-suku)", fi: "Lapsi ei sanonut sanaakaan." },
+  { sentence: "Vi har ___ internet idag.", answer: "inget", type: "ingen", hint: "ett internet (yksikkö, ett-suku)", fi: "Meillä ei ole internetiä tänään." },
+
+  // ================= INGA (monikko) =================
+  { sentence: "Jag har ___ pengar.", answer: "inga", type: "ingen", hint: "pengar (monikko)", fi: "Minulla ei ole rahaa." },
+  { sentence: "Det finns ___ problem.", answer: "inga", type: "ingen", hint: "problem (monikko)", fi: "Ei ole mitään ongelmia." },
+  { sentence: "Vi har ___ läxor idag.", answer: "inga", type: "ingen", hint: "läxor (monikko)", fi: "Meillä ei ole läksyjä tänään." },
+  { sentence: "Hon har ___ skor på sig.", answer: "inga", type: "ingen", hint: "skor (monikko)", fi: "Hänellä ei ole kenkiä jalassa." },
+  { sentence: "Det kom ___ gäster till festen.", answer: "inga", type: "ingen", hint: "gäster (monikko)", fi: "Juhliin ei tullut yhtään vieraita." },
+  { sentence: "Jag har ___ syskon.", answer: "inga", type: "ingen", hint: "syskon (monikko)", fi: "Minulla ei ole sisaruksia." },
+  { sentence: "Det finns ___ lediga platser.", answer: "inga", type: "ingen", hint: "platser (monikko)", fi: "Vapaita paikkoja ei ole." },
+  { sentence: "Han har ___ vänner i den nya staden.", answer: "inga", type: "ingen", hint: "vänner (monikko)", fi: "Hänellä ei ole ystäviä uudessa kaupungissa." },
+  { sentence: "Vi köpte ___ kläder idag.", answer: "inga", type: "ingen", hint: "kläder (monikko)", fi: "Emme ostaneet tänään vaatteita." },
+  { sentence: "Det finns ___ moln på himlen.", answer: "inga", type: "ingen", hint: "moln (monikko)", fi: "Taivaalla ei ole yhtään pilviä." },
+  { sentence: "Jag har ___ nycklar med mig.", answer: "inga", type: "ingen", hint: "nycklar (monikko)", fi: "Minulla ei ole avaimia mukanani." },
+  { sentence: "De har ___ barn.", answer: "inga", type: "ingen", hint: "barn (monikko)", fi: "Heillä ei ole lapsia." }
+];
+
+const praises = ["Bra!", "Snyggt!", "Fantastiskt!", "Strålande!", "Perfekt!", "Utmärkt!", "Kanon!"];
+
+// Pelin tilamuuttujat
+let mode = 'nagon'; // 'nagon' | 'ingen' | 'mix'
+let score = 0;
+let highScore = parseInt(localStorage.getItem('swe_indef_pron_highscore') || '0', 10);
+let lives = 3;
+let combo = 0;
+let maxCombo = 0;
+let correctCount = 0;
+let level = 1;
+let wrongAttemptsOnCurrent = 0;
+let showHints = true;
+
+let currentWordEl = null;
+let currentItem = null;
+let pos = 0;
+let baseSpeed = 0.3;
+let isGameRunning = false;
+let isTransitioning = false;
+let animationFrameId = null;
+let lastTimestamp = 0;
+let usedSentences = new Set();
+
+// DOM-elementit
+const modeSelectEl = document.getElementById('modeSelect');
+const gameEl = document.getElementById('game');
+const gameOverModalEl = document.getElementById('gameOverModal');
+const wordContainerEl = document.getElementById('wordContainer');
+const answerInputEl = document.getElementById('answer');
+const scoreEl = document.getElementById('score');
+const levelDisplayEl = document.getElementById('levelDisplay');
+const comboBadgeEl = document.getElementById('comboBadge');
+const comboCountEl = document.getElementById('comboCount');
+const heartsContainerEl = document.getElementById('heartsContainer');
+const hardModeToggleEl = document.getElementById('hardModeToggle');
+
+// Alustetaan ennätys aloitusruutuun
+document.getElementById('menuHighScore').textContent = highScore;
+
+/**
+ * Palauttaa aktiiviseen pelimuotoon sopivan lausetaulukon
+ */
+function getActivePool() {
+  if (mode === 'mix') return sentenceBank;
+  return sentenceBank.filter(item => item.type === mode);
+}
+
+/**
+ * Käynnistää pelin valitulla pelimuodolla
+ */
+function startGame(selectedMode) {
+  mode = selectedMode;
+  showHints = !hardModeToggleEl.checked;
+  score = 0;
+  lives = 3;
+  combo = 0;
+  maxCombo = 0;
+  correctCount = 0;
+  level = 1;
+  usedSentences.clear();
+  isGameRunning = true;
+  isTransitioning = false;
+
+  modeSelectEl.classList.add('hidden');
+  gameOverModalEl.classList.add('hidden');
+  gameEl.classList.remove('hidden');
+
+  updateModeTabs();
+  updateQuickButtons();
+  updateHintButtonUI();
+  updateHUD();
+  renderHearts();
+
+  answerInputEl.value = '';
+  answerInputEl.focus();
+
+  spawnWord();
+  lastTimestamp = performance.now();
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Vaihtaa pelimuotoa kesken pelin
+ */
+function changeMode(newMode) {
+  if (!isGameRunning) return;
+  mode = newMode;
+  usedSentences.clear();
+  updateModeTabs();
+  updateQuickButtons();
+  answerInputEl.value = '';
+  answerInputEl.focus();
+  spawnWord();
+}
+
+/**
+ * Päivittää yläpalkin pelimuotopainikkeiden tyylit
+ */
+function updateModeTabs() {
+  ['nagon', 'ingen', 'mix'].forEach(m => {
+    const btn = document.getElementById('btn-' + m);
+    if (m === mode) {
+      btn.className = 'mode-tab px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-sky-500 text-slate-950 shadow transition';
+    } else {
+      btn.className = 'mode-tab px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-sky-100 hover:bg-white/10 transition';
+    }
+  });
+}
+
+/**
+ * Korostaa tai suodattaa pikapainikkeet pelimuodon mukaan
+ */
+function updateQuickButtons() {
+  const buttons = document.querySelectorAll('#quickButtons .quick-btn');
+  buttons.forEach(btn => {
+    const val = btn.textContent.trim();
+    const isNagonGroup = val.startsWith('någ');
+    if (mode === 'nagon' && !isNagonGroup) {
+      btn.classList.add('opacity-35');
+    } else if (mode === 'ingen' && isNagonGroup) {
+      btn.classList.add('opacity-35');
+    } else {
+      btn.classList.remove('opacity-35');
+    }
+  });
+}
+
+/**
+ * Vaihtaa vihjeiden näkyvyyden kesken pelin
+ */
+function toggleHintVisibility() {
+  showHints = !showHints;
+  hardModeToggleEl.checked = !showHints;
+  updateHintButtonUI();
+  const hintEl = document.getElementById('cardHintTag');
+  if (hintEl) {
+    hintEl.style.display = showHints ? 'inline-block' : 'none';
+  }
+  answerInputEl.focus();
+}
+
+function updateHintButtonUI() {
+  const label = document.getElementById('hintBtnLabel');
+  const btn = document.getElementById('toggleHintBtn');
+  if (showHints) {
+    label.textContent = 'Vihjeet: Päällä';
+    btn.classList.remove('opacity-60');
+  } else {
+    label.textContent = 'Vihjeet: Piilossa';
+    btn.classList.add('opacity-60');
+  }
+}
+
+/**
+ * Päivittää pisteet, tason ja combon
+ */
+function updateHUD() {
+  scoreEl.textContent = score;
+  levelDisplayEl.textContent = level;
+  comboCountEl.textContent = combo;
+
+  if (combo >= 2) {
+    comboBadgeEl.classList.remove('opacity-60');
+    comboBadgeEl.classList.add('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  } else {
+    comboBadgeEl.classList.add('opacity-60');
+    comboBadgeEl.classList.remove('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  }
+}
+
+/**
+ * Piirtää elämät (sydämet)
+ */
+function renderHearts() {
+  const hearts = heartsContainerEl.querySelectorAll('.heart');
+  hearts.forEach((h, idx) => {
+    if (idx < lives) {
+      h.classList.remove('heart-lost');
+      h.style.opacity = '1';
+      h.style.filter = 'none';
+    } else {
+      h.classList.add('heart-lost');
+    }
+  });
+}
+
+/**
+ * Muotoilee lauseen niin, että ___ korvautuu visuaalisella aukolla
+ */
+function formatSentenceHTML(sentence) {
+  return sentence.replace('___', '<span class="blank-slot">___</span>');
+}
+
+/**
+ * Luo uuden putoavan lausekortin
+ */
+function spawnWord() {
+  isTransitioning = false;
+  wrongAttemptsOnCurrent = 0;
+
+  const pool = getActivePool();
+  if (usedSentences.size >= pool.length - 2) {
+    usedSentences.clear();
+  }
+
+  let candidate;
+  do {
+    candidate = pool[Math.floor(Math.random() * pool.length)];
+  } while (usedSentences.has(candidate.sentence));
+  usedSentences.add(candidate.sentence);
+
+  currentItem = candidate;
+
+  wordContainerEl.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'word-card';
+
+  const typeBadge = mode === 'mix'
+    ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">någon / ingen ?</span>`
+    : (currentItem.type === 'nagon'
+      ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-sky-400/20 text-sky-200 border border-sky-300/30">någon / något / några</span>`
+      : `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-indigo-400/20 text-indigo-200 border border-indigo-300/30">ingen / inget / inga</span>`);
+
+  const hintDisplay = showHints ? 'inline-block' : 'none';
+
+  card.innerHTML = `
+    <div class="flex flex-wrap items-center justify-center gap-1.5 mb-2">
+      ${typeBadge}
+      <span id="cardHintTag" style="display:${hintDisplay}" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/20 text-amber-200 border border-amber-300/35">
+        ${currentItem.hint}
+      </span>
+    </div>
+    <div class="font-display text-xl sm:text-3xl font-extrabold text-white leading-snug tracking-tight">
+      ${formatSentenceHTML(currentItem.sentence)}
+    </div>
+    <div class="text-xs sm:text-sm text-sky-100/85 font-medium mt-1.5">
+      "${currentItem.fi}"
+    </div>
+  `;
+
+  pos = 12;
+  card.style.top = pos + 'px';
+  wordContainerEl.appendChild(card);
+  currentWordEl = card;
+}
+
+/**
+ * Pääpelisilmukka (60fps)
+ */
+function gameLoop(timestamp) {
+  if (!isGameRunning) return;
+
+  const deltaTime = (timestamp - lastTimestamp) / 16.67;
+  lastTimestamp = timestamp;
+
+  if (!isTransitioning && currentWordEl) {
+    // Hienovarainen nopeuden kasvu tason noustessa
+    const levelMultiplier = 1 + (level - 1) * 0.1;
+    const step = baseSpeed * 0.85 * levelMultiplier * deltaTime;
+    pos += step;
+    currentWordEl.style.top = pos + 'px';
+
+    const playfieldHeight = document.getElementById('playfield').clientHeight;
+    const cardBottom = pos + currentWordEl.offsetHeight;
+    const dangerThreshold = playfieldHeight - 170;
+
+    if (cardBottom > dangerThreshold - 65) {
+      currentWordEl.classList.add('danger-zone');
+    }
+
+    if (cardBottom >= dangerThreshold) {
+      handleMissedWord('Aika loppui!');
+    }
+  }
+
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Pikapainikkeen painallus täyttää vastauksen ja tarkistaa sen heti
+ */
+function fillAndSubmit(word) {
+  if (!isGameRunning || isTransitioning) return;
+  answerInputEl.value = word;
+  checkAnswer();
+  answerInputEl.focus();
+}
+
+/**
+ * Tarkistaa pelaajan syöttämän vastauksen
+ */
+function checkAnswer() {
+  if (!isGameRunning || isTransitioning || !currentItem) return;
+
+  const rawValue = answerInputEl.value.trim().toLowerCase();
+  if (!rawValue) return;
+
+  if (rawValue === currentItem.answer.toLowerCase()) {
+    handleCorrectAnswer();
+  } else {
+    handleWrongAnswer();
+  }
+}
+
+/**
+ * Käsittelee oikean vastauksen
+ */
+function handleCorrectAnswer() {
+  isTransitioning = true;
+  combo++;
+  correctCount++;
+  if (combo > maxCombo) maxCombo = combo;
+
+  const newLevel = Math.floor(correctCount / 6) + 1;
+  const leveledUp = newLevel > level;
+  level = newLevel;
+
+  // Lisäpisteet vaikeasta tilasta (kun vihjeet piilotettu) ja combosta
+  const hardBonus = !showHints ? 5 : 0;
+  const comboBonus = Math.min(combo - 1, 5) * 5;
+  const earnedPoints = 10 + comboBonus + hardBonus;
+  score += earnedPoints;
+
+  updateHUD();
+
+  const rect = currentWordEl.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  // Muodostetaan valmis lause (huomioidaan iso alkukirjain jos aukko on lauseen alussa)
+  const isAtStart = currentItem.sentence.startsWith('___');
+  const displayAnswer = isAtStart
+    ? currentItem.answer.charAt(0).toUpperCase() + currentItem.answer.slice(1)
+    : currentItem.answer;
+  const completedSentence = currentItem.sentence.replace(
+    '___',
+    `<span class="text-amber-300 underline decoration-2">${displayAnswer}</span>`
+  );
+
+  currentWordEl.classList.remove('danger-zone');
+  currentWordEl.classList.add('correct-reveal');
+  currentWordEl.innerHTML = `
+    <div class="text-xs font-bold uppercase tracking-wider text-emerald-200 mb-1">
+      ${praises[Math.floor(Math.random() * praises.length)]}
+    </div>
+    <div class="font-display text-xl sm:text-2xl font-extrabold text-white">
+      ${completedSentence}
+    </div>
+  `;
+
+  spawnFloatingText(centerX, centerY - 12, `+${earnedPoints}${combo > 1 ? ` (Combo x${combo}!)` : ''}`, '#fde047');
+  if (leveledUp) {
+    setTimeout(() => {
+      spawnFloatingText(centerX, centerY - 48, `TASO ${level}! 🚀`, '#38bdf8');
+    }, 250);
+  }
+  burstConfetti(centerX, centerY, combo >= 3 ? 28 : 14);
+
+  answerInputEl.value = '';
+  setTimeout(() => {
+    if (isGameRunning) spawnWord();
+  }, 750);
+}
+
+/**
+ * Käsittelee väärän vastauksen
+ */
+function handleWrongAnswer() {
+  wrongAttemptsOnCurrent++;
+  combo = 0;
+  updateHUD();
+
+  currentWordEl.classList.remove('shake');
+  void currentWordEl.offsetWidth;
+  currentWordEl.classList.add('shake');
+
+  const rect = currentWordEl.getBoundingClientRect();
+  spawnFloatingText(rect.left + rect.width / 2, rect.top, `Väärin! (${wrongAttemptsOnCurrent}/3)`, '#fca5a5');
+
+  if (wrongAttemptsOnCurrent >= 3) {
+    handleMissedWord('Liian monta virhettä!');
+  } else {
+    answerInputEl.select();
+  }
+}
+
+/**
+ * Käsittelee ohimennyttä lausetta (elämän menetys + oikean vastauksen näyttö)
+ */
+function handleMissedWord(reason) {
+  isTransitioning = true;
+  combo = 0;
+  lives--;
+  updateHUD();
+  renderHearts();
+
+  const isAtStart = currentItem.sentence.startsWith('___');
+  const displayAnswer = isAtStart
+    ? currentItem.answer.charAt(0).toUpperCase() + currentItem.answer.slice(1)
+    : currentItem.answer;
+  const completedSentence = currentItem.sentence.replace(
+    '___',
+    `<span class="text-amber-300 underline decoration-2">${displayAnswer}</span>`
+  );
+
+  currentWordEl.classList.remove('danger-zone', 'shake');
+  currentWordEl.classList.add('missed-reveal');
+  currentWordEl.innerHTML = `
+    <div class="text-xs font-bold uppercase tracking-wider text-red-200 mb-1">${reason} (${currentItem.hint})</div>
+    <div class="font-display text-xl sm:text-2xl font-extrabold text-white">
+      ${completedSentence}
+    </div>
+  `;
+
+  answerInputEl.value = '';
+
+  if (lives <= 0) {
+    setTimeout(triggerGameOver, 1800);
+  } else {
+    setTimeout(() => {
+      if (isGameRunning) spawnWord();
+    }, 2200);
+  }
+}
+
+/**
+ * Päättää pelin ja avaa yhteenvetoikkunan
+ */
+function triggerGameOver() {
+  isGameRunning = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+  let isNewRecord = false;
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('swe_indef_pron_highscore', String(highScore));
+    isNewRecord = true;
+  }
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalHighScore').textContent = highScore;
+  document.getElementById('menuHighScore').textContent = highScore;
+  document.getElementById('finalCorrect').textContent = correctCount;
+  document.getElementById('finalMaxCombo').textContent = maxCombo + 'x';
+
+  const recordBanner = document.getElementById('newRecordBanner');
+  if (isNewRecord && score > 0) {
+    recordBanner.classList.remove('hidden');
+    burstConfetti(window.innerWidth / 2, window.innerHeight / 3, 50);
+  } else {
+    recordBanner.classList.add('hidden');
+  }
+
+  gameOverModalEl.classList.remove('hidden');
+}
+
+function restartCurrentMode() {
+  startGame(mode);
+}
+
+function returnToMenu() {
+  isGameRunning = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  gameOverModalEl.classList.add('hidden');
+  gameEl.classList.add('hidden');
+  modeSelectEl.classList.remove('hidden');
+}
+
+/**
+ * Luo kelluvan pistetekstin ruudulle
+ */
+function spawnFloatingText(x, y, text, color) {
+  const el = document.createElement('div');
+  el.className = 'floating-score text-lg sm:text-xl';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.color = color;
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+/**
+ * Konfetti- ja partikkeliefekti oikeasta vastauksesta
+ */
+const fxCanvas = document.getElementById('fxCanvas');
+const fxCtx = fxCanvas.getContext('2d');
+let particles = [];
+
+function resizeFxCanvas() {
+  fxCanvas.width = window.innerWidth;
+  fxCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeFxCanvas);
+resizeFxCanvas();
+
+function burstConfetti(x, y, count) {
+  const colors = ['#38bdf8', '#fde047', '#4ade80', '#f472b6', '#a78bfa', '#fb923c'];
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2.5 + Math.random() * 6;
+    particles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      size: 4 + Math.random() * 5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      rotation: Math.random() * 360,
+      vRot: (Math.random() - 0.5) * 12
+    });
+  }
+}
+
+function updateParticles() {
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.18;
+    p.alpha -= 0.022;
+    p.rotation += p.vRot;
+
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+
+    fxCtx.save();
+    fxCtx.globalAlpha = p.alpha;
+    fxCtx.translate(p.x, p.y);
+    fxCtx.rotate((p.rotation * Math.PI) / 180);
+    fxCtx.fillStyle = p.color;
+    fxCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+    fxCtx.restore();
+  }
+  requestAnimationFrame(updateParticles);
+}
+updateParticles();
+
+// Näppäimistö- ja liukusäädinkuuntelijat
+answerInputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    checkAnswer();
+  }
+});
+
+document.getElementById('speedSlider').addEventListener('input', function () {
+  baseSpeed = parseFloat(this.value);
+  document.getElementById('speedValue').textContent = baseSpeed.toFixed(1) + 'x';
+  answerInputEl.focus();
+});
+</script>
+</body>
+</html>
