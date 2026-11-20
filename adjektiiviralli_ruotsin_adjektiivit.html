@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Adjektiiviralli — Ruotsin adjektiivien taivutus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-sky-top: #070d1f;
+    --bg-sky-mid: #102454;
+    --bg-sky-bot: #0c4a6e;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(180deg, var(--bg-sky-top) 0%, var(--bg-sky-mid) 50%, var(--bg-sky-bot) 100%);
+    color: #ffffff;
+    user-select: none;
+    height: 100vh;
+    width: 100vw;
+    touch-action: manipulation;
+  }
+
+  h1, h2, .font-display {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* Lasimorfismi */
+  .glass {
+    background: rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .glass-strong {
+    background: rgba(9, 15, 34, 0.86);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Aukko esimerkkilauseessa */
+  .blank-slot {
+    display: inline-block;
+    min-width: 76px;
+    padding: 0 10px;
+    margin: 0 3px;
+    border-bottom: 3px solid #38bdf8;
+    background: rgba(56, 189, 248, 0.18);
+    border-radius: 8px 8px 2px 2px;
+    color: #7dd3fc;
+    font-weight: 800;
+  }
+
+  /* Kelluvat pistetekstit */
+  .floating-score {
+    position: fixed;
+    pointer-events: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    z-index: 50;
+    animation: floatUp 1.1s ease-out forwards;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translate(-50%, 0) scale(0.85); }
+    25% { transform: translate(-50%, -18px) scale(1.12); }
+    100% { opacity: 0; transform: translate(-50%, -70px) scale(1); }
+  }
+
+  /* Sydänanimaatio */
+  .heart-lost {
+    animation: heartBreak 0.45s ease-out forwards;
+  }
+
+  @keyframes heartBreak {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35) rotate(-12deg); color: #ef4444; }
+    100% { transform: scale(0.85); opacity: 0.3; filter: grayscale(100%); }
+  }
+
+  /* Liukusäädin */
+  input[type=range] {
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.22);
+    height: 6px;
+    border-radius: 999px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #38bdf8;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.9);
+  }
+
+  /* Koko ruudun pelicanvas */
+  #roadCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+</style>
+</head>
+<body class="relative flex flex-col items-center justify-center">
+
+  <!-- Paluulinkki päävalikkoon -->
+  <a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-btn fixed top-4 left-4 z-50 glass hover:bg-white/20 text-white font-semibold text-sm sm:text-base px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg">
+    ← Päävalikko
+  </a>
+
+  <!-- ALOITUSVALIKKO -->
+  <div id="modeSelect" class="relative z-20 w-full max-w-4xl px-4 pt-16 sm:pt-6 pb-6 flex flex-col items-center text-center overflow-y-auto max-h-screen">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass text-sky-200 text-xs sm:text-sm font-semibold mb-2.5 tracking-wide uppercase">
+      <span>🏎️ Ruotsin kielioppipeli • 3-kaistainen autopeli</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-sky-200 to-amber-200">
+      Adjektiiviralli
+    </h1>
+    <p class="text-sky-100/90 text-sm sm:text-base max-w-xl mb-4">
+      Ohjaa auto oikealle kaistalle ja aja lauseeseen sopivan adjektiivimuodon portista läpi! Ohjaus toimii <strong class="text-amber-300">nuolinäppäimillä (← / →)</strong> tai <strong class="text-sky-300">painamalla kaistaa</strong>.
+    </p>
+
+    <!-- Ennätys & Nopeusasetus -->
+    <div class="flex flex-wrap items-center justify-center gap-3 mb-5">
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-2 text-sm">
+        <span class="text-amber-300 text-lg">🏆</span>
+        <span class="text-sky-200">Ennätys:</span>
+        <span id="menuHighScore" class="font-bold text-white text-base">0</span>
+      </div>
+
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-3 text-sm">
+        <span class="text-sky-200 font-medium">Ajonopeus:</span>
+        <input type="range" id="menuSpeedSlider" min="0.3" max="2.5" step="0.1" value="0.7" class="w-24 sm:w-28">
+        <span id="menuSpeedValue" class="font-bold text-amber-300 w-9 text-left">0.7x</span>
+      </div>
+    </div>
+
+    <!-- 3 Pelimuotoa -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-5">
+      <button onclick="startGame('basic')" class="group glass hover:bg-sky-500/30 border-sky-300/30 hover:border-sky-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🛣️</span>
+        <span class="font-display font-bold text-lg text-white">Perustaso</span>
+        <span class="text-xs text-sky-200 mt-1">Epämääräiset en / ett / monikko & peruspredikatiivit</span>
+      </button>
+
+      <button onclick="startGame('advanced')" class="group glass hover:bg-indigo-500/30 border-indigo-300/30 hover:border-indigo-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg">
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">⚡</span>
+        <span class="font-display font-bold text-lg text-white">Haastetaso</span>
+        <span class="text-xs text-indigo-200 mt-1">Määräinen muoto, omistuspronominit & erikoistaivutukset</span>
+      </button>
+
+      <button onclick="startGame('all')" class="group glass hover:bg-emerald-500/30 border-emerald-300/30 hover:border-emerald-300 p-4 sm:p-5 rounded-2xl transition-all duration-200 transform hover:-translate-y-1 flex flex-col items-center text-center shadow-lg relative overflow-hidden">
+        <span class="absolute top-2 right-2 bg-emerald-400/20 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300/30">80 LAUSETTA</span>
+        <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🏁</span>
+        <span class="font-display font-bold text-lg text-white">Kaikki yhdessä</span>
+        <span class="text-xs text-emerald-200 mt-1">Kaikki adjektiivitapaukset sekaisin</span>
+      </button>
+    </div>
+
+    <!-- Liikennesäännöt / Kieliopin pikaopas -->
+    <div class="glass-strong rounded-2xl p-4 sm:p-5 text-left w-full border border-sky-300/20">
+      <div class="flex items-center gap-2 text-amber-300 font-bold text-sm sm:text-base mb-2.5">
+        <span>🚦</span>
+        <span>Adjektiivirallin liikennesäännöt</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10 space-y-1">
+          <div class="font-bold text-sky-300 text-sm mb-1">1. Epämääräinen muoto</div>
+          <div><strong class="text-white">en-suku:</strong> en <span class="text-sky-300 font-semibold">rolig</span> film</div>
+          <div><strong class="text-white">ett-suku:</strong> ett <span class="text-sky-300 font-semibold">roligt</span> spel (-t)</div>
+          <div><strong class="text-white">monikko:</strong> många <span class="text-sky-300 font-semibold">roliga</span> böcker (-a)</div>
+        </div>
+
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10 space-y-1">
+          <div class="font-bold text-amber-300 text-sm mb-1">2. Määräinen & omistus → aina -a!</div>
+          <div><strong class="text-white">den / det / de:</strong> den <span class="text-amber-300 font-semibold">nya</span> bilen, det <span class="text-amber-300 font-semibold">nya</span> huset</div>
+          <div><strong class="text-white">omistus / genetiivi:</strong> min <span class="text-amber-300 font-semibold">nya</span> mobil, mitt <span class="text-amber-300 font-semibold">stora</span> rum, Saras <span class="text-amber-300 font-semibold">gula</span> bil</div>
+        </div>
+
+        <div class="bg-white/5 rounded-xl p-3 border border-white/10 space-y-1">
+          <div class="font-bold text-emerald-300 text-sm mb-1">3. Erikoistaivutuksia</div>
+          <div><strong class="text-white">vit – vitt – vita</strong> / <strong class="text-white">glad – glatt – glada</strong></div>
+          <div><strong class="text-white">öppen – öppet – öppna</strong> / <strong class="text-white">vacker – vackert – vackra</strong></div>
+          <div><strong class="text-white">ny – nytt – nya</strong> / <strong class="text-white">gammal – gammalt – gamla</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PELINÄKYMÄ -->
+  <div id="game" class="hidden fixed inset-0 z-10 flex flex-col">
+    
+    <!-- Koko ruudun 3-kaistainen tie-canvas -->
+    <canvas id="roadCanvas" class="fixed inset-0 z-0"></canvas>
+
+    <!-- Yläpalkki (HUD) -->
+    <header class="relative w-full pt-16 sm:pt-4 px-3 sm:px-6 flex flex-wrap items-center justify-between gap-2 z-30 pointer-events-auto">
+      <!-- Pelimuodon vaihto -->
+      <div class="flex items-center gap-1 sm:ml-36 bg-slate-950/60 p-1 rounded-xl border border-white/15 backdrop-blur-md">
+        <button id="btn-basic" onclick="changeMode('basic')" class="mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Perus</button>
+        <button id="btn-advanced" onclick="changeMode('advanced')" class="mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Haaste</button>
+        <button id="btn-all" onclick="changeMode('all')" class="mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">Kaikki</button>
+      </div>
+
+      <!-- Keskellä: Elämät, Combo ja Ääninappi -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div id="heartsContainer" class="glass px-3 py-1.5 rounded-xl flex items-center gap-1 text-base sm:text-lg" title="Elämät">
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+          <span class="heart transition-all">❤️</span>
+        </div>
+
+        <div id="comboBadge" class="glass px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all duration-300 opacity-60">
+          <span class="text-sm sm:text-base">🔥</span>
+          <span class="text-xs sm:text-sm font-bold text-amber-300">Combo <span id="comboCount">0</span></span>
+        </div>
+
+        <button id="soundToggleBtn" onclick="toggleSound()" class="glass hover:bg-white/20 px-3 py-1.5 rounded-xl text-sm font-bold text-sky-100 transition" title="Äänet päälle / pois">
+          🔊
+        </button>
+      </div>
+
+      <!-- Oikealla: Pisteet, Taso ja Nopeus -->
+      <div class="flex items-center gap-2 ml-auto sm:ml-0">
+        <div class="glass px-3.5 py-1.5 rounded-xl flex items-center gap-3">
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Taso</div>
+            <div id="levelDisplay" class="font-display font-bold text-sm sm:text-base text-white">1</div>
+          </div>
+          <div class="h-6 w-px bg-white/20"></div>
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">Pisteet</div>
+            <div id="score" class="font-display font-extrabold text-base sm:text-xl text-amber-300">0</div>
+          </div>
+        </div>
+
+        <div class="hidden md:flex glass px-3 py-1.5 rounded-xl flex-col justify-center">
+          <div class="flex justify-between text-[11px] text-sky-200 font-medium mb-1">
+            <span>Nopeus</span>
+            <span id="speedValue" class="font-bold text-white">0.7x</span>
+          </div>
+          <input type="range" id="speedSlider" min="0.3" max="2.5" step="0.1" value="0.7" class="w-24">
+        </div>
+      </div>
+    </header>
+
+    <!-- Ylhäällä keskellä oleva Esimerkkilausekortti -->
+    <div class="relative z-20 w-full max-w-2xl mx-auto px-3 mt-2 sm:mt-3 pointer-events-none">
+      <div id="sentenceCard" class="glass-strong rounded-2xl px-4 py-3 sm:px-6 sm:py-3.5 text-center border border-sky-300/35 shadow-2xl transition-colors duration-200">
+        <div class="flex items-center justify-center gap-2 mb-1">
+          <span id="caseBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30">
+            Epämääräinen muoto
+          </span>
+          <span class="text-[11px] text-slate-300 hidden sm:inline">← / → kaistanvaihto • Välilyönti = Kaasu</span>
+        </div>
+        <div id="questionSentence" class="font-display text-xl sm:text-3xl font-extrabold text-white leading-snug">
+          Vi har en <span class="blank-slot">___</span> bil.
+        </div>
+        <div id="questionTranslation" class="text-xs sm:text-sm text-sky-200/90 font-medium mt-1">
+          "Meillä on hauska auto."
+        </div>
+      </div>
+
+      <!-- Kielioppivinkki-toast (nousee esiin erityisesti virheen yhteydessä) -->
+      <div id="grammarToast" class="hidden mt-2 glass-strong border-amber-400/70 px-4 py-2.5 rounded-2xl text-center shadow-2xl">
+        <div id="grammarToastTitle" class="text-xs font-extrabold uppercase tracking-wider text-amber-300 mb-0.5">💡 Kielioppiselitys</div>
+        <div id="grammarToastText" class="text-xs sm:text-sm text-white font-medium"></div>
+      </div>
+    </div>
+
+    <!-- Alareunan ohjauspalkki (Kaasu / Boost + mobiilikaistapainikkeet) -->
+    <footer class="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 w-full max-w-lg px-3 flex items-center justify-center gap-2.5 pointer-events-auto">
+      <button type="button" onclick="moveLane(-1)" class="glass hover:bg-white/20 active:scale-95 text-white font-extrabold px-4 py-2.5 rounded-xl border border-white/20 shadow-lg text-sm sm:text-base" title="Vasen kaista (←)">
+        ◀ Vasen
+      </button>
+
+      <button type="button" id="boostBtn"
+        onmousedown="setBoost(true)" onmouseup="setBoost(false)" onmouseleave="setBoost(false)"
+        ontouchstart="setBoost(true); event.preventDefault();" ontouchend="setBoost(false)"
+        class="flex-1 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 active:scale-95 text-slate-950 font-display font-black py-2.5 px-4 rounded-xl shadow-lg text-sm sm:text-base tracking-wide uppercase transition">
+        ⚡ Kaasu (Boost)
+      </button>
+
+      <button type="button" onclick="moveLane(1)" class="glass hover:bg-white/20 active:scale-95 text-white font-extrabold px-4 py-2.5 rounded-xl border border-white/20 shadow-lg text-sm sm:text-base" title="Oikea kaista (→)">
+        Oikea ▶
+      </button>
+    </footer>
+  </div>
+
+  <!-- GAME OVER -MODAALI -->
+  <div id="gameOverModal" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-strong max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-white/20 transform transition-all">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+        🏁
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-1">Maali saavutettu!</h2>
+      <p id="newRecordBanner" class="hidden text-amber-300 font-bold text-sm mb-3 animate-pulse">
+        🎉 Uusi rataennätys! 🎉
+      </p>
+
+      <div class="grid grid-cols-2 gap-3 my-5">
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-sky-200 uppercase font-semibold">Pisteet</div>
+          <div id="finalScore" class="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+          <div class="text-xs text-amber-200 uppercase font-semibold">Ennätys</div>
+          <div id="finalHighScore" class="text-2xl sm:text-3xl font-extrabold text-amber-300 mt-0.5">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Oikeat portit</div>
+          <div id="finalCorrect" class="text-lg font-bold text-emerald-400">0</div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div class="text-xs text-slate-300">Paras Combo</div>
+          <div id="finalMaxCombo" class="text-lg font-bold text-orange-400">0x</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="restartCurrentMode()" class="flex-1 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-extrabold py-3.5 px-5 rounded-xl transition shadow-lg">
+          Aja uudelleen
+        </button>
+        <button onclick="returnToMenu()" class="flex-1 glass hover:bg-white/20 text-white font-bold py-3.5 px-5 rounded-xl transition">
+          Vaihda pelimuotoa
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/**
+ * 80 esimerkkilauseen pankki ruotsin adjektiiveista (en-muoto, ett-muoto, -a-muoto)
+ * forms: [en-muoto, ett-muoto, -a-muoto (monikko / määräinen)]
+ * level: 'basic' | 'advanced'
+ */
+const adjectiveCases = [
+  // ================= PERUSTASO: Epämääräinen en / ett / monikko & peruspredikatiivit =================
+  { sentence: "Det är en ___ film.", forms: ["rolig", "roligt", "roliga"], answer: "rolig", level: "basic", tag: "Epämääräinen en-suku", fi: "Se on hauska elokuva.", tip: "en film on en-sukuinen yksikkö → adjektiivi perusmuodossa (rolig)." },
+  { sentence: "Vi spelade ett ___ spel igår.", forms: ["rolig", "roligt", "roliga"], answer: "roligt", level: "basic", tag: "Epämääräinen ett-suku", fi: "Pelasimme eilen hauskaa peliä.", tip: "ett spel on ett-sukuinen yksikkö → adjektiiviin tulee -t (roligt)." },
+  { sentence: "Hon berättade många ___ historier.", forms: ["rolig", "roligt", "roliga"], answer: "roliga", level: "basic", tag: "Monikko", fi: "Hän kertoi monia hauskoja tarinoita.", tip: "historier on monikko → adjektiiviin tulee -a (roliga)." },
+  { sentence: "Jag har köpt en ___ telefon.", forms: ["ny", "nytt", "nya"], answer: "ny", level: "basic", tag: "Epämääräinen en-suku", fi: "Olen ostanut uuden puhelimen.", tip: "en telefon (en-suku, yksikkö) → ny." },
+  { sentence: "De bor i ett ___ hus.", forms: ["ny", "nytt", "nya"], answer: "nytt", level: "basic", tag: "Epämääräinen ett-suku", fi: "He asuvat uudessa talossa.", tip: "ett hus (ett-suku, yksikkö) → nytt (vokaaliloppuinen saa -tt)." },
+  { sentence: "Vi behöver köpa ___ skor.", forms: ["ny", "nytt", "nya"], answer: "nya", level: "basic", tag: "Monikko", fi: "Meidän täytyy ostaa uudet kengät.", tip: "skor on monikko → nya." },
+  { sentence: "De har en mycket ___ hund.", forms: ["stor", "stort", "stora"], answer: "stor", level: "basic", tag: "Epämääräinen en-suku", fi: "Heillä on todella iso koira.", tip: "en hund (en-suku, yksikkö) → stor." },
+  { sentence: "Skolan har ett ___ bibliotek.", forms: ["stor", "stort", "stora"], answer: "stort", level: "basic", tag: "Epämääräinen ett-suku", fi: "Koululla on iso kirjasto.", tip: "ett bibliotek (ett-suku, yksikkö) → stort." },
+  { sentence: "Det finns många ___ städer i Europa.", forms: ["stor", "stort", "stora"], answer: "stora", level: "basic", tag: "Monikko", fi: "Euroopassa on monia suuria kaupunkeja.", tip: "städer on monikko → stora." },
+  { sentence: "Det var en ___ fråga.", forms: ["svår", "svårt", "svåra"], answer: "svår", level: "basic", tag: "Epämääräinen en-suku", fi: "Se oli vaikea kysymys.", tip: "en fråga (en-suku, yksikkö) → svår." },
+  { sentence: "Vi hade ett ___ prov i matte.", forms: ["svår", "svårt", "svåra"], answer: "svårt", level: "basic", tag: "Epämääräinen ett-suku", fi: "Meillä oli vaikea matematiikan koe.", tip: "ett prov (ett-suku, yksikkö) → svårt." },
+  { sentence: "De här övningarna är ganska ___.", forms: ["svår", "svårt", "svåra"], answer: "svåra", level: "basic", tag: "Predikatiivi (monikko)", fi: "Nämä harjoitukset ovat melko vaikeita.", tip: "Subjekti övningarna on monikossa → svåra." },
+  { sentence: "Jag vill dricka en ___ kopp te.", forms: ["varm", "varmt", "varma"], answer: "varm", level: "basic", tag: "Epämääräinen en-suku", fi: "Haluan juoda lämpimän kupin teetä.", tip: "en kopp (en-suku, yksikkö) → varm." },
+  { sentence: "Det är väldigt ___ i rummet.", forms: ["varm", "varmt", "varma"], answer: "varmt", level: "basic", tag: "Predikatiivi (det är)", fi: "Huoneessa on todella lämmintä.", tip: "Muodollisen subjektin 'Det' kanssa käytetään ett-muotoa → varmt." },
+  { sentence: "På sommaren är kvällarna ___.", forms: ["varm", "varmt", "varma"], answer: "varma", level: "basic", tag: "Predikatiivi (monikko)", fi: "Kesällä illat ovat lämpimiä.", tip: "kvällarna on monikko → varma." },
+  { sentence: "Han kör en ___ sportbil.", forms: ["snabb", "snabbt", "snabba"], answer: "snabb", level: "basic", tag: "Epämääräinen en-suku", fi: "Hän ajaa nopeaa urheiluautoa.", tip: "en sportbil (en-suku, yksikkö) → snabb." },
+  { sentence: "Det här tåget är mycket ___.", forms: ["snabb", "snabbt", "snabba"], answer: "snabbt", level: "basic", tag: "Predikatiivi (ett-suku)", fi: "Tämä juna on todella nopea.", tip: "tåget (ett tåg) on ett-sukuinen → snabbt." },
+  { sentence: "De är ___ löpare.", forms: ["snabb", "snabbt", "snabba"], answer: "snabba", level: "basic", tag: "Predikatiivi (monikko)", fi: "He ovat nopeita juoksijoita.", tip: "Subjekti 'De' on monikko → snabba." },
+  { sentence: "Det kostar en ___ slant, men är värt det.", forms: ["dyr", "dyrt", "dyra"], answer: "dyr", level: "basic", tag: "Epämääräinen en-suku", fi: "Se maksaa sievoisen summan, mutta on sen arvoista.", tip: "en slant (en-suku, yksikkö) → dyr." },
+  { sentence: "Ett hotellrum i centrum är ofta ___.", forms: ["dyr", "dyrt", "dyra"], answer: "dyrt", level: "basic", tag: "Predikatiivi (ett-suku)", fi: "Hotellihuone keskustassa on usein kallis.", tip: "ett hotellrum (ett-suku) → dyrt." },
+  { sentence: "Kläder i den där butiken är ___.", forms: ["dyr", "dyrt", "dyra"], answer: "dyra", level: "basic", tag: "Predikatiivi (monikko)", fi: "Vaatteet tuossa kaupassa ovat kalliita.", tip: "kläder on monikko → dyra." },
+  { sentence: "Det var en ___ dag på stranden.", forms: ["fin", "fint", "fina"], answer: "fin", level: "basic", tag: "Epämääräinen en-suku", fi: "Oli hieno päivä rannalla.", tip: "en dag (en-suku, yksikkö) → fin." },
+  { sentence: "Vädret är riktigt ___ idag!", forms: ["fin", "fint", "fina"], answer: "fint", level: "basic", tag: "Predikatiivi (ett-suku)", fi: "Sää on todella hieno tänään!", tip: "vädret (ett väder) on ett-sukuinen → fint." },
+  { sentence: "Du har tagit många ___ bilder.", forms: ["fin", "fint", "fina"], answer: "fina", level: "basic", tag: "Monikko", fi: "Olet ottanut monia hienoja kuvia.", tip: "bilder on monikko → fina." },
+  { sentence: "Vi såg en ___ björn i skogen.", forms: ["brun", "brunt", "bruna"], answer: "brun", level: "basic", tag: "Epämääräinen en-suku", fi: "Näimme ruskean karhun metsässä.", tip: "en björn (en-suku, yksikkö) → brun." },
+  { sentence: "Bordet i köket är ___.", forms: ["brun", "brunt", "bruna"], answer: "brunt", level: "basic", tag: "Predikatiivi (ett-suku)", fi: "Keittiön pöytä on ruskea.", tip: "bordet (ett bord) on ett-sukuinen → brunt." },
+  { sentence: "Hon har vackra ___ ögon.", forms: ["brun", "brunt", "bruna"], answer: "bruna", level: "basic", tag: "Monikko", fi: "Hänellä on kauniit ruskeat silmät.", tip: "ögon on monikko → bruna." },
+  { sentence: "Det är en ___ idé!", forms: ["smart", "smart", "smarta"], answer: "smart", level: "basic", tag: "Epämääräinen en-suku", fi: "Se on fiksu idea!", tip: "en idé (en-suku) → smart. (Huom. smart ei muutu ett-suvussa!)" },
+  { sentence: "Jag behöver en ___ paus nu.", forms: ["kort", "kort", "korta"], answer: "kort", level: "basic", tag: "Epämääräinen en-suku", fi: "Tarvitsen lyhyen tauon nyt.", tip: "en paus (en-suku) → kort." },
+  { sentence: "Dagarna är ___ på vintern.", forms: ["kort", "kort", "korta"], answer: "korta", level: "basic", tag: "Predikatiivi (monikko)", fi: "Päivät ovat lyhyitä talvella.", tip: "dagarna on monikko → korta." },
+  { sentence: "Han dricker en ___ smoothie.", forms: ["kall", "kallt", "kalla"], answer: "kall", level: "basic", tag: "Epämääräinen en-suku", fi: "Hän juo kylmän smoothien.", tip: "en smoothie (en-suku, yksikkö) → kall." },
+  { sentence: "Vattnet i sjön är ganska ___.", forms: ["kall", "kallt", "kalla"], answer: "kallt", level: "basic", tag: "Predikatiivi (ett-suku)", fi: "Vesi järvessä on melko kylmää.", tip: "vattnet (ett vatten) on ett-sukuinen → kallt." },
+  { sentence: "Mina händer är alldeles ___.", forms: ["kall", "kallt", "kalla"], answer: "kalla", level: "basic", tag: "Predikatiivi (monikko)", fi: "Käteni ovat aivan kylmät.", tip: "händer on monikko → kalla." },
+  { sentence: "Det är en ___ väg till jobbet.", forms: ["lång", "långt", "långa"], answer: "lång", level: "basic", tag: "Epämääräinen en-suku", fi: "Työmatka on pitkä.", tip: "en väg (en-suku, yksikkö) → lång." },
+  { sentence: "Vi har ett ___ sommarlov.", forms: ["lång", "långt", "långa"], answer: "långt", level: "basic", tag: "Epämääräinen ett-suku", fi: "Meillä on pitkä kesäloma.", tip: "ett sommarlov (ett-suku, yksikkö) → långt." },
+  { sentence: "De har ___ semester i juli.", forms: ["lång", "långt", "långa"], answer: "lång", level: "basic", tag: "Epämääräinen en-suku", fi: "Heillä on pitkä loma heinäkuussa.", tip: "en semester (en-suku) → lång." },
+  { sentence: "Han är en ___ och snäll kille.", forms: ["lugn", "lugnt", "lugna"], answer: "lugn", level: "basic", tag: "Epämääräinen en-suku", fi: "Hän on rauhallinen ja kiltti kaveri.", tip: "en kille (en-suku, yksikkö) → lugn." },
+  { sentence: "Det är så ___ och skönt här ute.", forms: ["lugn", "lugnt", "lugna"], answer: "lugnt", level: "basic", tag: "Predikatiivi (det är)", fi: "Täällä ulkona on niin rauhallista ja mukavaa.", tip: "'Det är' -rakenteessa käytetään ett-muotoa → lugnt." },
+  { sentence: "Barnen är väldigt ___ idag.", forms: ["lugn", "lugnt", "lugna"], answer: "lugna", level: "basic", tag: "Predikatiivi (monikko)", fi: "Lapset ovat todella rauhallisia tänään.", tip: "barnen on monikko → lugna." },
+  { sentence: "Hon bär en ___ klänning.", forms: ["gul", "gult", "gula"], answer: "gul", level: "basic", tag: "Epämääräinen en-suku", fi: "Hänellä on yllään keltainen mekko.", tip: "en klänning (en-suku, yksikkö) → gul." },
+
+  // ================= HAASTETASO: Määräinen muoto, omistuspronominit & erikoistaivutukset =================
+  // Määräinen muoto (den / det / de + -a)
+  { sentence: "Jag gillar den ___ tröjan.", forms: ["ny", "nytt", "nya"], answer: "nya", level: "advanced", tag: "Määräinen muoto (den)", fi: "Pidän tuosta uudesta paidasta.", tip: "Määräisen artikkelin (den) jälkeen adjektiivi saa AINA -a-päätteen, myös yksikössä → den nya tröjan!" },
+  { sentence: "Har du sett det ___ köket?", forms: ["stor", "stort", "stora"], answer: "stora", level: "advanced", tag: "Määräinen muoto (det)", fi: "Oletko nähnyt sen ison keittiön?", tip: "Vaikka köket on ett-sukuinen, määräisen artikkelin (det) jälkeen tulee -a → det stora köket!" },
+  { sentence: "De ___ eleverna sitter längst bak.", forms: ["lång", "långt", "långa"], answer: "långa", level: "advanced", tag: "Määräinen muoto (de)", fi: "Pitkät oppilaat istuvat takimmaisena.", tip: "Määräisen monikon (de) jälkeen adjektiivissa on -a → de långa eleverna." },
+  { sentence: "Den där ___ filmen var fantastisk.", forms: ["rolig", "roligt", "roliga"], answer: "roliga", level: "advanced", tag: "Määräinen muoto (den där)", fi: "Tuo hauska elokuva oli mahtava.", tip: "Demonstratiivipronominin (den där / det där / de där) jälkeen adjektiivissa on aina -a → den där roliga filmen." },
+  { sentence: "Det här ___ bordet passar perfekt.", forms: ["rund", "runt", "runda"], answer: "runda", level: "advanced", tag: "Määräinen muoto (det här)", fi: "Tämä pyöreä pöytä sopii täydellisesti.", tip: "'Det här' vaatii määräisen -a-muodon (vaikka substantiivi on ilman päätettä) → det här runda bordet." },
+
+  // Omistuspronominit ja genetiivi (min/mitt/mina, hans/hennes, Saras -> aina -a!)
+  { sentence: "Var är min ___ jacka?", forms: ["röd", "rött", "röda"], answer: "röda", level: "advanced", tag: "Omistuspronomini (min)", fi: "Missä on minun punainen takkini?", tip: "Omistuspronominin (min, din, hans, vår...) jälkeen adjektiivi saa AINA -a-päätteen → min röda jacka!" },
+  { sentence: "Vi ska måla mitt ___ rum.", forms: ["gammal", "gammalt", "gamla"], answer: "gamla", level: "advanced", tag: "Omistuspronomini (mitt)", fi: "Aiomme maalata minun vanhan huoneeni.", tip: "Omistuspronominin (mitt) jälkeen tulee aina -a (ja gammal-sanasta katoaa a) → mitt gamla rum!" },
+  { sentence: "Hennes ___ skor står i hallen.", forms: ["vit", "vitt", "vita"], answer: "vita", level: "advanced", tag: "Omistuspronomini (hennes)", fi: "Hänen valkoiset kenkänsä ovat eteisessä.", tip: "Omistuspronominin (hennes) ja monikon vuoksi → hennes vita skor." },
+  { sentence: "Har du träffat Saras ___ kompis?", forms: ["trevlig", "trevligt", "trevliga"], answer: "trevliga", level: "advanced", tag: "Genetiivi (Saras)", fi: "Oletko tavannut Saran mukavan kaverin?", tip: "Genetiivin (Saras, pappas, skolans) jälkeen adjektiivissa on aina -a → Saras trevliga kompis!" },
+  { sentence: "Deras ___ hus ligger vid havet.", forms: ["vacker", "vackert", "vackra"], answer: "vackra", level: "advanced", tag: "Omistuspronomini (deras)", fi: "Heidän kaunis talonsa sijaitsee meren rannalla.", tip: "Omistuspronominin (deras) jälkeen tulee -a (vacker → vackra) → deras vackra hus." },
+
+  // Erikoistaivutukset: vit - vitt - vita / röd - rött - röda / glad - glatt - glada / god - gott - goda / söt - sött - söta
+  { sentence: "Snön på marken är alldeles ___.", forms: ["vit", "vitt", "vita"], answer: "vit", level: "advanced", tag: "Erikoistaivutus (vit)", fi: "Lumi maassa on aivan valkoista.", tip: "snön (en snö) on en-sukuinen → vit. (ett-muodossa: vitt, monikossa: vita)." },
+  { sentence: "Jag köpte ett ___ papper.", forms: ["vit", "vitt", "vita"], answer: "vitt", level: "advanced", tag: "Erikoistaivutus (vit → vitt)", fi: "Ostin valkoisen paperin.", tip: "ett papper (ett-suku) → loppukonsonantti t kahdentuu: vitt!" },
+  { sentence: "De bor i ett ___ hus.", forms: ["röd", "rött", "röda"], answer: "rött", level: "advanced", tag: "Erikoistaivutus (röd → rött)", fi: "He asuvat punaisessa talossa.", tip: "ett hus (ett-suku) → röd-sanan d muuttuu muotoon -tt: rött!" },
+  { sentence: "Jag köpte en ___ ros till mamma.", forms: ["röd", "rött", "röda"], answer: "röd", level: "advanced", tag: "Erikoistaivutus (röd)", fi: "Ostin punaisen ruusun äidille.", tip: "en ros (en-suku) → röd." },
+  { sentence: "Det var ett ___ besked att höra!", forms: ["glad", "glatt", "glada"], answer: "glatt", level: "advanced", tag: "Erikoistaivutus (glad → glatt)", fi: "Se oli iloinen uutinen kuulla!", tip: "ett besked (ett-suku) → glad-sanan d muuttuu muotoon -tt: glatt!" },
+  { sentence: "Alla barnen är mycket ___ idag.", forms: ["glad", "glatt", "glada"], answer: "glada", level: "advanced", tag: "Erikoistaivutus (glada)", fi: "Kaikki lapset ovat todella iloisia tänään.", tip: "barnen on monikko → glada." },
+  { sentence: "Det här kaffet är riktigt ___.", forms: ["god", "gott", "goda"], answer: "gott", level: "advanced", tag: "Erikoistaivutus (god → gott)", fi: "Tämä kahvi on todella hyvää.", tip: "kaffet (ett kaffe) on ett-sukuinen → god muuttuu muotoon gott!" },
+  { sentence: "Vi åt ___ bullar till fikat.", forms: ["god", "gott", "goda"], answer: "goda", level: "advanced", tag: "Erikoistaivutus (goda)", fi: "Söimme hyviä pullia kahvitauolla.", tip: "bullar on monikko → goda." },
+  { sentence: "De har ett ___ litet barn.", forms: ["söt", "sött", "söta"], answer: "sött", level: "advanced", tag: "Erikoistaivutus (söt → sött)", fi: "Heillä on suloinen pieni lapsi.", tip: "ett barn (ett-suku) → söt saa tupla-t:n: sött!" },
+  { sentence: "Vilka ___ kattungar!", forms: ["söt", "sött", "söta"], answer: "söta", level: "advanced", tag: "Erikoistaivutus (söta)", fi: "Miten suloisia kissanpentuja!", tip: "kattungar on monikko → söta." },
+
+  // Erikoistaivutukset: -en, -el, -er, -al (öppen, ledsen, enkel, vacker, gammal)
+  { sentence: "Fönstret står ___ hela natten.", forms: ["öppen", "öppet", "öppna"], answer: "öppet", level: "advanced", tag: "-en-loppuinen (öppen)", fi: "Ikkuna on auki koko yön.", tip: "fönstret (ett fönster) on ett-sukuinen → öppen menettää n:n: öppet!" },
+  { sentence: "Är affärerna ___ på söndagar?", forms: ["öppen", "öppet", "öppna"], answer: "öppna", level: "advanced", tag: "-en-loppuinen (öppen)", fi: "Ovatko kaupat auki sunnuntaisin?", tip: "affärerna on monikko → e katoaa keskeltä: öppna!" },
+  { sentence: "Barnet såg lite ___ ut.", forms: ["ledsen", "ledset", "ledsna"], answer: "ledset", level: "advanced", tag: "-en-loppuinen (ledsen)", fi: "Lapsi näytti hieman surulliselta.", tip: "barnet (ett barn) on ett-sukuinen → ledsen → ledset!" },
+  { sentence: "Varför är ni så ___?", forms: ["ledsen", "ledset", "ledsna"], answer: "ledsna", level: "advanced", tag: "-en-loppuinen (ledsen)", fi: "Miksi te olette niin surullisia?", tip: "Subjekti 'ni' tarkoittaa tässä useampaa (monikko) → ledsna." },
+  { sentence: "Det var ett ___ val för mig.", forms: ["enkel", "enkelt", "enkla"], answer: "enkelt", level: "advanced", tag: "-el-loppuinen (enkel)", fi: "Se oli helppo valinta minulle.", tip: "ett val (ett-suku) → enkelt." },
+  { sentence: "Uppgifterna i boken är ganska ___.", forms: ["enkel", "enkelt", "enkla"], answer: "enkla", level: "advanced", tag: "-el-loppuinen (enkel)", fi: "Kirjan tehtävät ovat melko helppoja.", tip: "uppgifterna on monikko → e katoaa -el-päätteestä: enkla!" },
+  { sentence: "Vi besökte ett ___ slott i Sverige.", forms: ["vacker", "vackert", "vackra"], answer: "vackert", level: "advanced", tag: "-er-loppuinen (vacker)", fi: "Vierailimme kauniissa linnassa Ruotsissa.", tip: "ett slott (ett-suku) → vackert." },
+  { sentence: "Blommorna i trädgården är ___.", forms: ["vacker", "vackert", "vackra"], answer: "vackra", level: "advanced", tag: "-er-loppuinen (vacker)", fi: "Kukat puutarhassa ovat kauniita.", tip: "blommorna on monikko → e katoaa -er-päätteestä: vackra!" },
+  { sentence: "De renoverar ett ___ torp.", forms: ["gammal", "gammalt", "gamla"], answer: "gammalt", level: "advanced", tag: "Erikoistaivutus (gammal)", fi: "He remontoivat vanhaa torppaa.", tip: "ett torp (ett-suku) → gammalt." },
+  { sentence: "Mina morföräldrar är ganska ___.", forms: ["gammal", "gammalt", "gamla"], answer: "gamla", level: "advanced", tag: "Erikoistaivutus (gamla)", fi: "Isovanhempani ovat melko vanhoja.", tip: "morföräldrar on monikko → gammal-sanasta katoaa toinen m ja a: gamla!" },
+
+  // Lisää monipuolisia tapauksia (trött, fri, blå, mörk, ljus, hungrig, viktig, intressant, färsk, billig)
+  { sentence: "Jag känner mig väldigt ___ idag.", forms: ["trött", "trött", "trötta"], answer: "trött", level: "advanced", tag: "-tt-loppuinen (trött)", fi: "Tunnen oloni todella väsyneeksi tänään.", tip: "Subjekti 'jag' (yksikkö) → trött." },
+  { sentence: "Efter matchen var spelarna ___.", forms: ["trött", "trött", "trötta"], answer: "trötta", level: "advanced", tag: "-tt-loppuinen (trötta)", fi: "Ottelun jälkeen pelaajat olivat väsyneitä.", tip: "spelarna on monikko → trötta." },
+  { sentence: "Äntligen har vi ett ___ veckoslut!", forms: ["fri", "fritt", "fria"], answer: "fritt", level: "advanced", tag: "Vokaaliloppuinen (fri)", fi: "Vihdoinkin meillä on vapaa viikonloppu!", tip: "ett veckoslut (ett-suku) → vokaaliloppuinen fri saa -tt: fritt!" },
+  { sentence: "Himlen är klar och ___ idag.", forms: ["blå", "blått", "blåa"], answer: "blå", level: "advanced", tag: "Vokaaliloppuinen (blå)", fi: "Taivas on kirkas ja sininen tänään.", tip: "himlen (en himmel, en-suku) → blå." },
+  { sentence: "Hon köpte ett ___ paraply.", forms: ["blå", "blått", "blåa"], answer: "blått", level: "advanced", tag: "Vokaaliloppuinen (blått)", fi: "Hän osti sinisen sateenvarjon.", tip: "ett paraply (ett-suku) → blå saa -tt: blått!" },
+  { sentence: "Det är ett väldigt ___ problem.", forms: ["viktig", "viktigt", "viktiga"], answer: "viktigt", level: "advanced", tag: "Epämääräinen ett-suku", fi: "Se on todella tärkeä ongelma.", tip: "ett problem (ett-suku) → viktigt." },
+  { sentence: "Den ___ boken ligger på bordet.", forms: ["tjock", "tjockt", "tjocka"], answer: "tjocka", level: "advanced", tag: "Määräinen muoto (den)", fi: "Paksu kirja on pöydällä.", tip: "Määräinen artikkeli 'den' → adjektiiviin aina -a: den tjocka boken!" },
+  { sentence: "Vi åt ___ bröd till frukost.", forms: ["färsk", "färskt", "färska"], answer: "färskt", level: "advanced", tag: "Ainesana (ett-suku)", fi: "Söimme tuoretta leipää aamiaiseksi.", tip: "bröd on ett-sukuinen ainesana (ett bröd) → färskt." },
+  { sentence: "Hans ___ cykel blev stulen.", forms: ["dyr", "dyrt", "dyra"], answer: "dyra", level: "advanced", tag: "Omistuspronomini (hans)", fi: "Hänen kallis pyöränsä varastettiin.", tip: "Omistuspronominin (hans) jälkeen adjektiivi saa aina -a-päätteen → hans dyra cykel!" },
+  { sentence: "Det här är mitt ___ favoritställe.", forms: ["egen", "eget", "egna"], answer: "egna", level: "advanced", tag: "Omistuspronomini + egen", fi: "Tämä on minun oma lempipaikkani.", tip: "Omistuspronominin (mitt) jälkeen egen taipuu muotoon egna → mitt egna favoritställe!" }
+];
+
+const praises = ["Bra!", "Snyggt!", "Fantastiskt!", "Strålande!", "Perfekt!", "Utmärkt!", "Full fart!"];
+
+// Pelin tilamuuttujat
+let mode = 'basic'; // 'basic' | 'advanced' | 'all'
+let score = 0;
+let highScore = parseInt(localStorage.getItem('swe_adj_ralli_highscore') || '0', 10);
+let lives = 3;
+let combo = 0;
+let maxCombo = 0;
+let correctCount = 0;
+let level = 1;
+let soundEnabled = true;
+
+let baseSpeed = 0.7;
+let isBoosting = false;
+let isGameRunning = false;
+let isWaveResolving = false;
+let animationFrameId = null;
+let lastTimestamp = 0;
+let usedIndices = new Set();
+
+// Auton ja kaistojen tilamuuttujat
+let currentLane = 1; // 0 = vasen, 1 = keski, 2 = oikea
+let visualCarX = 0.5; // 0..1 suhteellinen leveys tiellä
+let roadScrollOffset = 0;
+let carShakeTimer = 0;
+let screenFlashColor = null;
+let screenFlashAlpha = 0;
+
+// Lähestyvä porttiaalto
+let currentCase = null;
+let gateProgress = 0; // 0 (horisontti / yläreuna) -> 1 (auton kohdalla)
+let gateOptions = []; // 3 merkkijonoa kaistoille 0, 1, 2
+let gateResolved = false;
+
+// Partikkelit
+let particles = [];
+
+// DOM-elementit
+const modeSelectEl = document.getElementById('modeSelect');
+const gameEl = document.getElementById('game');
+const gameOverModalEl = document.getElementById('gameOverModal');
+const roadCanvas = document.getElementById('roadCanvas');
+const ctx = roadCanvas.getContext('2d');
+
+const scoreEl = document.getElementById('score');
+const levelDisplayEl = document.getElementById('levelDisplay');
+const comboBadgeEl = document.getElementById('comboBadge');
+const comboCountEl = document.getElementById('comboCount');
+const heartsContainerEl = document.getElementById('heartsContainer');
+const grammarToastEl = document.getElementById('grammarToast');
+const grammarToastTitleEl = document.getElementById('grammarToastTitle');
+const grammarToastTextEl = document.getElementById('grammarToastText');
+const sentenceCardEl = document.getElementById('sentenceCard');
+
+document.getElementById('menuHighScore').textContent = highScore;
+
+/**
+ * Web Audio API -ääniefektit
+ */
+let audioCtx = null;
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'lane') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(240, now);
+      osc.frequency.exponentialRampToValueAtTime(360, now + 0.08);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.start(now);
+      osc.stop(now + 0.09);
+    } else if (type === 'correct') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.06);
+      osc.frequency.setValueAtTime(783.99, now + 0.12);
+      gain.gain.setValueAtTime(0.16, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.start(now);
+      osc.stop(now + 0.29);
+    } else if (type === 'crash') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(55, now + 0.28);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.31);
+    }
+  } catch (e) {
+    // Ohitetaan jos selain estää
+  }
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundToggleBtn').textContent = soundEnabled ? '🔊' : '🔇';
+}
+
+/**
+ * Canvasin koon päivitys
+ */
+function resizeRoadCanvas() {
+  roadCanvas.width = window.innerWidth;
+  roadCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeRoadCanvas);
+resizeRoadCanvas();
+
+/**
+ * Palauttaa aktiivisen pelimuodon kysymykset
+ */
+function getActivePool() {
+  if (mode === 'all') return adjectiveCases;
+  return adjectiveCases.filter(item => item.level === mode);
+}
+
+/**
+ * Käynnistää pelin
+ */
+function startGame(selectedMode) {
+  mode = selectedMode;
+  score = 0;
+  lives = 3;
+  combo = 0;
+  maxCombo = 0;
+  correctCount = 0;
+  level = 1;
+  currentLane = 1;
+  visualCarX = 0.5;
+  isBoosting = false;
+  usedIndices.clear();
+  particles = [];
+  isGameRunning = true;
+
+  modeSelectEl.classList.add('hidden');
+  gameOverModalEl.classList.add('hidden');
+  grammarToastEl.classList.add('hidden');
+  gameEl.classList.remove('hidden');
+
+  updateModeTabs();
+  updateHUD();
+  renderHearts();
+  spawnNextGateWave();
+
+  lastTimestamp = performance.now();
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+function changeMode(newMode) {
+  if (!isGameRunning) return;
+  mode = newMode;
+  usedIndices.clear();
+  updateModeTabs();
+  spawnNextGateWave();
+}
+
+function updateModeTabs() {
+  ['basic', 'advanced', 'all'].forEach(m => {
+    const btn = document.getElementById('btn-' + m);
+    if (m === mode) {
+      btn.className = 'mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-sky-500 text-slate-950 shadow transition';
+    } else {
+      btn.className = 'mode-tab px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-sky-100 hover:bg-white/10 transition';
+    }
+  });
+}
+
+function updateHUD() {
+  scoreEl.textContent = score;
+  levelDisplayEl.textContent = level;
+  comboCountEl.textContent = combo;
+
+  if (combo >= 2) {
+    comboBadgeEl.classList.remove('opacity-60');
+    comboBadgeEl.classList.add('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  } else {
+    comboBadgeEl.classList.add('opacity-60');
+    comboBadgeEl.classList.remove('border-amber-400', 'bg-amber-500/20', 'scale-105');
+  }
+}
+
+function renderHearts() {
+  const hearts = heartsContainerEl.querySelectorAll('.heart');
+  hearts.forEach((h, idx) => {
+    if (idx < lives) {
+      h.classList.remove('heart-lost');
+      h.style.opacity = '1';
+      h.style.filter = 'none';
+    } else {
+      h.classList.add('heart-lost');
+    }
+  });
+}
+
+/**
+ * Arpoo uuden lauseen ja sijoittaa sen 3 muotoa satunnaisesti kolmelle kaistalle
+ */
+function spawnNextGateWave() {
+  gateResolved = false;
+  isWaveResolving = false;
+  gateProgress = 0;
+
+  const pool = getActivePool();
+  if (usedIndices.size >= pool.length - 2) {
+    usedIndices.clear();
+  }
+
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * pool.length);
+  } while (usedIndices.has(idx));
+  usedIndices.add(idx);
+
+  currentCase = pool[idx];
+
+  // Varmistetaan että kolmella kaistalla on 3 eri vaihtoehtoa (jos esim. 'smart' tai 'kort' on sama en/ett-muodossa, lisätään tarkenne tai kolmas muoto)
+  let opts = [...currentCase.forms];
+  if (opts[0] === opts[1]) {
+    // Esim. smart / smart / smarta -> lisätään vaihtoehtoiseksi harhautukseksi vaikka 'smartare'
+    opts = [opts[0], opts[2], opts[0] + "are"];
+  }
+
+  // Sekoitetaan vaihtoehdot satunnaisesti kaistoille 0, 1, 2
+  gateOptions = opts.sort(() => Math.random() - 0.5);
+
+  // Päivitetään lausekortti ylhäällä
+  const badge = document.getElementById('caseBadge');
+  badge.textContent = currentCase.tag;
+  badge.className = currentCase.level === 'basic'
+    ? 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30'
+    : 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-400/20 text-amber-200 border border-amber-300/30';
+
+  document.getElementById('questionSentence').innerHTML = currentCase.sentence.replace(
+    '___',
+    '<span class="blank-slot">___</span>'
+  );
+  document.getElementById('questionTranslation').textContent = `"${currentCase.fi}"`;
+}
+
+/**
+ * Kaistanvaihto (-1 vasemmalle, +1 oikealle)
+ */
+function moveLane(delta) {
+  if (!isGameRunning) return;
+  const target = Math.max(0, Math.min(2, currentLane + delta));
+  if (target !== currentLane) {
+    currentLane = target;
+    playSound('lane');
+  }
+}
+
+function setLaneDirect(laneIndex) {
+  if (!isGameRunning) return;
+  const clamped = Math.max(0, Math.min(2, laneIndex));
+  if (clamped !== currentLane) {
+    currentLane = clamped;
+    playSound('lane');
+  }
+}
+
+function setBoost(active) {
+  isBoosting = active;
+  const btn = document.getElementById('boostBtn');
+  if (active) {
+    btn.classList.add('ring-4', 'ring-amber-300/60', 'scale-95');
+  } else {
+    btn.classList.remove('ring-4', 'ring-amber-300/60', 'scale-95');
+  }
+}
+
+/**
+ * Tarkistaa osuman kun portit saavuttavat auton kohdan
+ */
+function evaluateGatePass() {
+  if (gateResolved || !currentCase) return;
+  gateResolved = true;
+  isWaveResolving = true;
+
+  const chosenWord = gateOptions[currentLane];
+  const isCorrect = chosenWord === currentCase.answer;
+
+  const carScreenX = getLaneScreenX(currentLane, getCarY());
+  const carScreenY = getCarY();
+
+  // Täydennetään oikea sana lausekorttiin
+  document.getElementById('questionSentence').innerHTML = currentCase.sentence.replace(
+    '___',
+    `<span class="${isCorrect ? 'text-emerald-300' : 'text-amber-300'} underline decoration-2">${currentCase.answer}</span>`
+  );
+
+  if (isCorrect) {
+    combo++;
+    correctCount++;
+    if (combo > maxCombo) maxCombo = combo;
+
+    const newLevel = Math.floor(correctCount / 6) + 1;
+    const leveledUp = newLevel > level;
+    level = newLevel;
+
+    const boostBonus = isBoosting ? 5 : 0;
+    const comboBonus = Math.min(combo - 1, 5) * 5;
+    const earned = 10 + comboBonus + boostBonus;
+    score += earned;
+
+    updateHUD();
+    playSound('correct');
+
+    screenFlashColor = 'rgba(34, 197, 94, 0.25)';
+    screenFlashAlpha = 1;
+    spawnSparks(carScreenX, carScreenY - 20, combo >= 3 ? 34 : 20, '#4ade80');
+
+    const praise = praises[Math.floor(Math.random() * praises.length)];
+    spawnFloatingText(carScreenX, carScreenY - 45, `${praise} +${earned}${combo > 1 ? ` (x${combo})` : ''}`, '#fde047');
+
+    if (leveledUp) {
+      setTimeout(() => {
+        spawnFloatingText(window.innerWidth / 2, window.innerHeight * 0.42, `TASO ${level}! 🏎️💨`, '#38bdf8');
+      }, 220);
+    }
+
+    setTimeout(() => {
+      if (isGameRunning) spawnNextGateWave();
+    }, 520);
+  } else {
+    combo = 0;
+    lives--;
+    carShakeTimer = 24;
+    updateHUD();
+    renderHearts();
+    playSound('crash');
+
+    screenFlashColor = 'rgba(239, 68, 68, 0.35)';
+    screenFlashAlpha = 1;
+    spawnSparks(carScreenX, carScreenY - 10, 26, '#ef4444');
+    spawnFloatingText(carScreenX, carScreenY - 45, `Väärä kaista! -1 ❤️`, '#fca5a5');
+
+    showGrammarToast(
+      `Oikea muoto: ${currentCase.answer}`,
+      currentCase.tip
+    );
+
+    if (lives <= 0) {
+      setTimeout(triggerGameOver, 1900);
+    } else {
+      setTimeout(() => {
+        if (isGameRunning) spawnNextGateWave();
+      }, 2100);
+    }
+  }
+}
+
+let toastTimeout = null;
+function showGrammarToast(title, text) {
+  grammarToastTitleEl.textContent = `💡 ${title}`;
+  grammarToastTextEl.textContent = text;
+  grammarToastEl.classList.remove('hidden');
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    grammarToastEl.classList.add('hidden');
+  }, 4600);
+}
+
+/**
+ * Pääpelisilmukka: päivittää tien, porttien etenemisen, auton ja efektit
+ */
+function gameLoop(timestamp) {
+  if (!isGameRunning) return;
+
+  const deltaTime = Math.min((timestamp - lastTimestamp) / 16.67, 3);
+  lastTimestamp = timestamp;
+
+  // Lasketaan nopeus
+  const levelMultiplier = 1 + (level - 1) * 0.08;
+  const boostMultiplier = isBoosting ? 2.35 : 1.0;
+  const effectiveSpeed = baseSpeed * levelMultiplier * boostMultiplier;
+
+  // Tien viivojen rullaus
+  roadScrollOffset = (roadScrollOffset + effectiveSpeed * 9.5 * deltaTime) % 1000;
+
+  // Pelaajan auton sulava siirtymä kohti valittua kaistaa (0 -> 1/6, 1 -> 3/6, 2 -> 5/6)
+  const targetNormX = (currentLane + 0.5) / 3;
+  visualCarX += (targetNormX - visualCarX) * Math.min(1, 0.22 * deltaTime);
+
+  // Porttien eteneminen alaspäin
+  if (!gateResolved) {
+    gateProgress += effectiveSpeed * 0.0048 * deltaTime;
+    if (gateProgress >= 0.86) {
+      gateProgress = 0.86;
+      evaluateGatePass();
+    }
+  }
+
+  // Auton pakokaasu- / vauhtipartikkelit
+  if (Math.random() < (isBoosting ? 0.85 : 0.35)) {
+    const cx = getLaneScreenX(visualCarX * 3 - 0.5, getCarY());
+    const cy = getCarY() + 34;
+    particles.push({
+      x: cx + (Math.random() - 0.5) * 14,
+      y: cy,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: 2.5 + effectiveSpeed * 2,
+      size: isBoosting ? 5 : 3.5,
+      color: isBoosting ? '#38bdf8' : 'rgba(203, 213, 225, 0.45)',
+      alpha: 0.75,
+      decay: 0.045
+    });
+  }
+
+  renderRoadScene(deltaTime);
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Geometria-apuohjelmat: 3-kaistainen perspektiivitien laskenta
+ */
+function getRoadMetrics() {
+  const w = roadCanvas.width;
+  const h = roadCanvas.height;
+  const horizonY = Math.max(175, h * 0.25);
+  const bottomY = h;
+  const bottomRoadWidth = Math.min(w * 0.92, 680);
+  const topRoadWidth = bottomRoadWidth * 0.44;
+  return { w, h, horizonY, bottomY, bottomRoadWidth, topRoadWidth };
+}
+
+function getCarY() {
+  return roadCanvas.height - 122;
+}
+
+/**
+ * Palauttaa kaistan keskikohdan X-koordinaatin tietyllä Y-korkeudella
+ * laneNorm: 0..2 (tai liukuva arvo)
+ */
+function getLaneScreenX(laneIndex, y) {
+  const { w, horizonY, bottomY, bottomRoadWidth, topRoadWidth } = getRoadMetrics();
+  const t = Math.max(0, Math.min(1.2, (y - horizonY) / (bottomY - horizonY)));
+  const roadWidthAtY = topRoadWidth + (bottomRoadWidth - topRoadWidth) * t;
+  const roadLeftAtY = (w - roadWidthAtY) / 2;
+  const laneWidthAtY = roadWidthAtY / 3;
+  return roadLeftAtY + laneWidthAtY * (laneIndex + 0.5);
+}
+
+/**
+ * Piirtää koko 3-kaistaisen moottoritien, lähestyvät portit ja pelaajan auton
+ */
+function renderRoadScene(deltaTime) {
+  const { w, h, horizonY, bottomY, bottomRoadWidth, topRoadWidth } = getRoadMetrics();
+  ctx.clearRect(0, 0, w, h);
+
+  // 1. Taivas ja horisontin hehku
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, horizonY + 30);
+  skyGrad.addColorStop(0, '#050914');
+  skyGrad.addColorStop(0.6, '#0f214d');
+  skyGrad.addColorStop(1, '#0284c7');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, w, horizonY + 30);
+
+  // Horisontin valoviiva
+  ctx.save();
+  ctx.shadowColor = '#38bdf8';
+  ctx.shadowBlur = 24;
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+  ctx.fillRect(0, horizonY - 2, w, 4);
+  ctx.restore();
+
+  // 2. Tien ulkopuolinen maisema (yöllinen sinivihreä maasto)
+  const groundGrad = ctx.createLinearGradient(0, horizonY, 0, h);
+  groundGrad.addColorStop(0, '#09152b');
+  groundGrad.addColorStop(1, '#040a17');
+  ctx.fillStyle = groundGrad;
+  ctx.fillRect(0, horizonY, w, h - horizonY);
+
+  // 3. Asfalttitie (trapetsi)
+  const topLeft = (w - topRoadWidth) / 2;
+  const topRight = topLeft + topRoadWidth;
+  const botLeft = (w - bottomRoadWidth) / 2;
+  const botRight = botLeft + bottomRoadWidth;
+
+  const roadGrad = ctx.createLinearGradient(0, horizonY, 0, h);
+  roadGrad.addColorStop(0, '#1e293b');
+  roadGrad.addColorStop(1, '#0f172a');
+  ctx.fillStyle = roadGrad;
+  ctx.beginPath();
+  ctx.moveTo(topLeft, horizonY);
+  ctx.lineTo(topRight, horizonY);
+  ctx.lineTo(botRight, bottomY);
+  ctx.lineTo(botLeft, bottomY);
+  ctx.closePath();
+  ctx.fill();
+
+  // 4. Tien reunakaiteet (puna-valkoinen / syaani hehku)
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = '#38bdf8';
+  ctx.beginPath();
+  ctx.moveTo(topLeft, horizonY);
+  ctx.lineTo(botLeft, bottomY);
+  ctx.moveTo(topRight, horizonY);
+  ctx.lineTo(botRight, bottomY);
+  ctx.stroke();
+
+  // 5. Liikkuvat kaistaviivat (erottavat kaistat 0 | 1 | 2)
+  const dashCount = 12;
+  for (let laneDiv = 1; laneDiv <= 2; laneDiv++) {
+    const ratio = laneDiv / 3;
+    for (let i = 0; i < dashCount; i++) {
+      const rawT = ((i + (roadScrollOffset % 100) / 100) / dashCount);
+      const t1 = Math.pow(rawT, 1.45);
+      const t2 = Math.pow(Math.min(1, rawT + 0.045), 1.45);
+      if (t2 <= t1) continue;
+
+      const y1 = horizonY + (bottomY - horizonY) * t1;
+      const y2 = horizonY + (bottomY - horizonY) * t2;
+
+      const w1 = topRoadWidth + (bottomRoadWidth - topRoadWidth) * t1;
+      const w2 = topRoadWidth + (bottomRoadWidth - topRoadWidth) * t2;
+
+      const x1 = (w - w1) / 2 + w1 * ratio;
+      const x2 = (w - w2) / 2 + w2 * ratio;
+
+      ctx.strokeStyle = `rgba(226, 232, 240, ${0.25 + t1 * 0.55})`;
+      ctx.lineWidth = 2 + t1 * 3.5;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+  }
+
+  // 6. Lähestyvät 3 vaihtoehtoporttia / opastetaulua
+  if (gateOptions.length === 3) {
+    // Epälineaarinen perspektiivi tekee lähestymisestä luonnollisen
+    const perspT = Math.pow(gateProgress, 1.28);
+    const gateY = horizonY + (getCarY() - horizonY) * (perspT / 0.83);
+    const roadW = topRoadWidth + (bottomRoadWidth - topRoadWidth) * Math.max(0, (gateY - horizonY) / (bottomY - horizonY));
+    const laneW = roadW / 3;
+    const scale = 0.52 + 0.52 * perspT;
+
+    // Vaakasuuntainen portaalipalkki kaistojen yli
+    const leftEdge = (w - roadW) / 2;
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+    ctx.lineWidth = Math.max(2, 4 * scale);
+    ctx.beginPath();
+    ctx.moveTo(leftEdge, gateY);
+    ctx.lineTo(leftEdge + roadW, gateY);
+    ctx.stroke();
+
+    for (let lane = 0; lane < 3; lane++) {
+      const centerX = leftEdge + laneW * (lane + 0.5);
+      const boxW = laneW * 0.86;
+      const boxH = Math.max(34, 58 * scale);
+      const boxX = centerX - boxW / 2;
+      const boxY = gateY - boxH / 2;
+
+      const isCarInThisLane = currentLane === lane;
+
+      // Taulun tausta
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 12 * scale);
+
+      if (gateResolved) {
+        const isCorrectGate = gateOptions[lane] === currentCase.answer;
+        ctx.fillStyle = isCorrectGate ? 'rgba(22, 163, 74, 0.92)' : 'rgba(30, 41, 59, 0.82)';
+        ctx.strokeStyle = isCorrectGate ? '#4ade80' : 'rgba(148, 163, 184, 0.4)';
+      } else if (isCarInThisLane) {
+        ctx.fillStyle = 'rgba(14, 116, 144, 0.92)';
+        ctx.strokeStyle = '#fde047';
+        ctx.shadowColor = 'rgba(253, 224, 71, 0.65)';
+        ctx.shadowBlur = 16;
+      } else {
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+      }
+
+      ctx.lineWidth = isCarInThisLane ? 3 : 2;
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      // Adjektiiviteksti taulussa
+      const fontSize = Math.max(14, Math.round(24 * scale));
+      ctx.font = `800 ${fontSize}px Outfit, sans-serif`;
+      ctx.fillStyle = isCarInThisLane && !gateResolved ? '#fef08a' : '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(gateOptions[lane], centerX, gateY + 1);
+    }
+  }
+
+  // 7. Partikkelit
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * deltaTime;
+    p.y += p.vy * deltaTime;
+    p.alpha -= (p.decay || 0.025) * deltaTime;
+
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // 8. Pelaajan sporttinen auto alhaalla
+  const carY = getCarY();
+  const roadWAtCar = topRoadWidth + (bottomRoadWidth - topRoadWidth) * ((carY - horizonY) / (bottomY - horizonY));
+  const roadLeftAtCar = (w - roadWAtCar) / 2;
+  let carX = roadLeftAtCar + roadWAtCar * visualCarX;
+
+  if (carShakeTimer > 0) {
+    carX += (Math.random() - 0.5) * 14;
+    carShakeTimer -= deltaTime;
+  }
+
+  drawPlayerCar(carX, carY);
+
+  // 9. Osuma- tai törmäysvälähdys
+  if (screenFlashAlpha > 0 && screenFlashColor) {
+    ctx.save();
+    ctx.globalAlpha = screenFlashAlpha;
+    ctx.fillStyle = screenFlashColor;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+    screenFlashAlpha -= 0.055 * deltaTime;
+  }
+}
+
+/**
+ * Piirtää tyylikkään ylhäältä kuvatun urheiluauton ajovaloilla
+ */
+function drawPlayerCar(x, y) {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Ajovalokeilat eteenpäin
+  const beamGrad = ctx.createLinearGradient(0, -25, 0, -145);
+  beamGrad.addColorStop(0, 'rgba(254, 249, 195, 0.36)');
+  beamGrad.addColorStop(1, 'rgba(254, 249, 195, 0)');
+  ctx.fillStyle = beamGrad;
+  ctx.beginPath();
+  ctx.moveTo(-16, -28);
+  ctx.lineTo(-44, -145);
+  ctx.lineTo(44, -145);
+  ctx.lineTo(16, -28);
+  ctx.closePath();
+  ctx.fill();
+
+  // Auton varjo
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+  ctx.beginPath();
+  ctx.roundRect(-24, -34, 48, 76, 14);
+  ctx.fill();
+
+  // Renkaat
+  ctx.fillStyle = '#090d16';
+  ctx.fillRect(-25, -24, 6, 16);
+  ctx.fillRect(19, -24, 6, 16);
+  ctx.fillRect(-25, 12, 6, 16);
+  ctx.fillRect(19, 12, 6, 16);
+
+  // Kori (sporttinen syaani-sininen liukuväri)
+  const bodyGrad = ctx.createLinearGradient(0, -38, 0, 38);
+  bodyGrad.addColorStop(0, '#38bdf8');
+  bodyGrad.addColorStop(0.5, '#0284c7');
+  bodyGrad.addColorStop(1, '#1e3a8a');
+  ctx.fillStyle = bodyGrad;
+  ctx.strokeStyle = '#bae6fd';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(-21, -38, 42, 74, 13);
+  ctx.fill();
+  ctx.stroke();
+
+  // Tuulilasi & kattoikkuna
+  ctx.fillStyle = '#0f172a';
+  ctx.beginPath();
+  ctx.roundRect(-15, -18, 30, 34, 8);
+  ctx.fill();
+
+  // Tuulilasin heijastus
+  ctx.fillStyle = 'rgba(186, 230, 253, 0.35)';
+  ctx.beginPath();
+  ctx.moveTo(-12, -15);
+  ctx.lineTo(12, -15);
+  ctx.lineTo(9, -6);
+  ctx.lineTo(-9, -6);
+  ctx.closePath();
+  ctx.fill();
+
+  // Etuvalot
+  ctx.fillStyle = '#fef08a';
+  ctx.fillRect(-16, -37, 8, 4);
+  ctx.fillRect(8, -37, 8, 4);
+
+  // Takavalot
+  ctx.fillStyle = '#ef4444';
+  ctx.fillRect(-16, 33, 9, 4);
+  ctx.fillRect(7, 33, 9, 4);
+
+  ctx.restore();
+}
+
+/**
+ * Kipinäpartikkelit
+ */
+function spawnSparks(x, y, count, mainColor) {
+  const palette = [mainColor, '#fde047', '#ffffff', '#38bdf8'];
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2.5 + Math.random() * 6;
+    particles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1.5,
+      size: 3 + Math.random() * 4.5,
+      color: palette[Math.floor(Math.random() * palette.length)],
+      alpha: 1,
+      decay: 0.028
+    });
+  }
+}
+
+/**
+ * Kelluva pisteteksti
+ */
+function spawnFloatingText(x, y, text, color) {
+  const el = document.createElement('div');
+  el.className = 'floating-score text-lg sm:text-xl';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.color = color;
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+/**
+ * Game Over & Valikkoon paluu
+ */
+function triggerGameOver() {
+  isGameRunning = false;
+  isBoosting = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+  let isNewRecord = false;
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('swe_adj_ralli_highscore', String(highScore));
+    isNewRecord = true;
+  }
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalHighScore').textContent = highScore;
+  document.getElementById('menuHighScore').textContent = highScore;
+  document.getElementById('finalCorrect').textContent = correctCount;
+  document.getElementById('finalMaxCombo').textContent = maxCombo + 'x';
+
+  const recordBanner = document.getElementById('newRecordBanner');
+  if (isNewRecord && score > 0) {
+    recordBanner.classList.remove('hidden');
+  } else {
+    recordBanner.classList.add('hidden');
+  }
+
+  gameOverModalEl.classList.remove('hidden');
+}
+
+function restartCurrentMode() {
+  startGame(mode);
+}
+
+function returnToMenu() {
+  isGameRunning = false;
+  isBoosting = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  gameOverModalEl.classList.add('hidden');
+  grammarToastEl.classList.add('hidden');
+  gameEl.classList.add('hidden');
+  modeSelectEl.classList.remove('hidden');
+}
+
+// Näppäimistöohjaus (Nuolinäppäimet, A/D, 1/2/3 sekä Välilyönti/Nuoli ylös kaasulle)
+window.addEventListener('keydown', (e) => {
+  if (!isGameRunning) return;
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+    e.preventDefault();
+    moveLane(-1);
+  } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+    e.preventDefault();
+    moveLane(1);
+  } else if (e.key === '1') {
+    setLaneDirect(0);
+  } else if (e.key === '2') {
+    setLaneDirect(1);
+  } else if (e.key === '3') {
+    setLaneDirect(2);
+  } else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+    e.preventDefault();
+    setBoost(true);
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+    setBoost(false);
+  }
+});
+
+// Suora kaistan klikkaus / kosketus tien päällä (toimii välittömästi puhelimella ja hiirellä)
+function handleRoadPointer(clientX) {
+  if (!isGameRunning) return;
+  const w = window.innerWidth;
+  if (clientX < w / 3) {
+    setLaneDirect(0);
+  } else if (clientX < (w * 2) / 3) {
+    setLaneDirect(1);
+  } else {
+    setLaneDirect(2);
+  }
+}
+
+roadCanvas.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  handleRoadPointer(e.clientX);
+});
+
+// Nopeusliukusäätimien synkronointi
+const menuSpeedSlider = document.getElementById('menuSpeedSlider');
+const gameSpeedSlider = document.getElementById('speedSlider');
+
+function syncSpeed(val) {
+  baseSpeed = parseFloat(val);
+  menuSpeedSlider.value = baseSpeed;
+  gameSpeedSlider.value = baseSpeed;
+  document.getElementById('menuSpeedValue').textContent = baseSpeed.toFixed(1) + 'x';
+  document.getElementById('speedValue').textContent = baseSpeed.toFixed(1) + 'x';
+}
+
+menuSpeedSlider.addEventListener('input', (e) => syncSpeed(e.target.value));
+gameSpeedSlider.addEventListener('input', (e) => syncSpeed(e.target.value));
+</script>
+</body>
+</html>
