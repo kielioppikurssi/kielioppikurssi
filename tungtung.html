@@ -21,35 +21,26 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
-/* Päävalikko-nappi */
-.btn-menu {
-    width: 100%;
-    padding: 11px 18px;
-    margin-top: 10px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, #e7bc8a 0%, #a97142 100%);
-    color: #2f1a0a;
-    font-size: 1rem;
+.back-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
     font-weight: 900;
-    letter-spacing: 0.03em;
-    border: 3px solid #3f230e;
-    box-shadow: 0 4px 0 #2b1607, inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    color: #fef3c7;
+    text-decoration: none;
     cursor: pointer;
-    transition: transform 0.08s ease, filter 0.15s ease, opacity 0.2s ease;
+    white-space: nowrap;
+    transition: transform 0.08s ease, filter 0.15s ease;
 }
 
-.btn-menu:hover:not(:disabled) {
-    filter: brightness(1.06);
+.back-menu-btn:hover {
+    filter: brightness(1.08);
 }
 
-.btn-menu:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}
-
-.btn-menu:not(:disabled):active {
-    transform: translateY(3px);
-    box-shadow: 0 1px 0 #2b1607, inset 0 2px 0 rgba(255, 255, 255, 0.2);
+.back-menu-btn:active {
+    transform: translateY(2px);
 }
         body {
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -764,10 +755,27 @@
     </style>
 </head>
 <body>
-      <!-- Paluulinkki päävalikkoon -->
-  <a href="https://kielioppikurssi.github.io/kielioppikurssi/" class="home-btn fixed top-4 left-4 z-50 glass hover:bg-white/20 text-white font-semibold text-sm sm:text-base px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg">
-    ← Päävalikko
-  </a>
+<div class="hud-row">
+    <div style="display:flex; gap:8px; align-items:center;">
+        <a href="index.html" id="backToMenuLink" class="wood-panel back-menu-btn">← Päävalikko</a>
+        <div class="wood-panel hud-box">
+            <span class="hud-label">Pisteet</span>
+            <span id="scoreDisplay" class="hud-val">0</span>
+        </div>
+    </div>
+
+    <div class="wood-panel hud-box" id="livesDisplay" aria-label="Elämät">
+        <span>❤️</span><span>❤️</span><span>❤️</span>
+    </div>
+
+    <div style="display:flex; gap:6px; align-items:center;">
+        <div class="wood-panel hud-box">
+            <span>⏳</span>
+            <span id="timerDisplay" class="hud-val" style="color:#fff;">60</span>
+        </div>
+        <button id="soundToggleBtn" type="button" class="wood-panel sound-btn" title="Äänet ja puhe päälle/pois">🔊</button>
+    </div>
+</div>
     <div class="stars"></div>
 
     <!-- Kustomoitu kursorihahmo -->
