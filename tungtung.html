@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tung Tyngre Tyngst Sahuren – Ruotsin Adjektiivipeli</title>
+    <title>Tung - tyngre - tyngst & Den tyngsta Sahuren – Ruotsin adjektiivipeli</title>
     <style>
         /* =========================================================================
            PERUSTYYLIT JA TEEMA (Ei ulkoisia riippuvuuksia)
@@ -840,7 +840,7 @@
     </main>
 
     <footer>
-        Tung Tyngre Tyngst Sahuren • Ruotsin adjektiivien komparatiivi &amp; superlatiivi
+        Tung - tyngre - tyngst - den tyngsta Sahuren • Ruotsin adjektiivien komparatiivi &amp; superlatiivi
     </footer>
 
     <!-- ALOITUS- JA LOPETUSIKKUNA -->
@@ -871,9 +871,9 @@
                 </svg>
             </div>
 
-            <h1 id="modalTitle" class="modal-title">TUNG TYNGRE TYNGST SAHUREN!</h1>
+            <h1 id="modalTitle" class="modal-title">TUNG TYNGRE TYNGST & DEN TYNGSTA SAHUREN!</h1>
             <p id="modalDesc" class="modal-desc">
-                Kopauta kepilläsi oikeaa ruotsin adjektiivin <b>komparatiivi-</b> tai <b>superlatiivimuotoa</b>! Jokainen peräkkäinen osuma kasvattaa Sahuren-kursoriasi – kerää 4 osumaa saavuttaaksesi tilan <b>DEN TYNGSTA SAHUREN!</b>
+                Kopauta kepilläsi oikeaa ruotsin adjektiivin <b>komparatiivi-</b> tai <b>superlatiivimuotoa</b>! Jokainen peräkkäinen osuma kasvattaa Sahuria painavammaksi – kerää 4 osumaa saavuttaaksesi absoluuttisen painavan <b>DEN TYNGSTA SAHURENIN!</b>
             </p>
 
             <div id="finalStatsBox" class="stats-box hidden">
@@ -894,52 +894,52 @@
          */
         const ADJECTIVES = [
             // Epäsäännölliset ja vokaalinmuutokselliset
-            { base: "tung",   fi: "painava / raskas", comp: "tyngre",    sup: "tyngst",    fakes: ["tungare", "tyngsta", "mera tung"] },
-            { base: "stor",   fi: "iso",              comp: "större",    sup: "störst",    fakes: ["storare", "största", "storast"] },
-            { base: "liten",  fi: "pieni",            comp: "mindre",    sup: "minst",     fakes: ["litenare", "minsta", "mindrast"] },
-            { base: "bra",    fi: "hyvä",             comp: "bättre",    sup: "bäst",      fakes: ["braare", "bästa", "braast"] },
-            { base: "dålig",  fi: "huono",            comp: "sämre",     sup: "sämst",     fakes: ["dåligare", "sämsta", "dåligast"] },
-            { base: "gammal", fi: "vanha",            comp: "äldre",     sup: "äldst",     fakes: ["gammalare", "äldsta", "gammalast"] },
-            { base: "ung",    fi: "nuori",            comp: "yngre",     sup: "yngst",     fakes: ["ungare", "yngsta", "ungast"] },
-            { base: "lång",   fi: "pitkä",            comp: "längre",    sup: "längst",    fakes: ["långare", "längsta", "långast"] },
-            { base: "hög",    fi: "korkea",           comp: "högre",     sup: "högst",     fakes: ["högare", "högsta", "högast"] },
-            { base: "låg",    fi: "matala",           comp: "lägre",     sup: "lägst",     fakes: ["lågare", "lägsta", "lågast"] },
-            { base: "trång",  fi: "ahdas",            comp: "trängre",   sup: "trängst",   fakes: ["trångare", "trängsta", "trångast"] },
-            { base: "grov",   fi: "karkea / paksu",   comp: "grövre",    sup: "grövst",    fakes: ["grovare", "grövsta", "grovast"] },
-            { base: "få",     fi: "harvat",           comp: "färre",     sup: "färst",     fakes: ["fåare", "färsta", "fåast"] },
+            { base: "tung",   fi: "painava / raskas", comp: "tyngre",    sup: "tyngst",    fakes: ["tungare", "tungst", "mera tung"] },
+            { base: "stor",   fi: "iso",              comp: "större",    sup: "störst",    fakes: ["storare", "störstä", "storast"] },
+            { base: "liten",  fi: "pieni",            comp: "mindre",    sup: "minst",     fakes: ["litenare", "minstä", "mindrast"] },
+            { base: "bra",    fi: "hyvä",             comp: "bättre",    sup: "bäst",      fakes: ["braare", "båst", "braast"] },
+            { base: "dålig",  fi: "huono",            comp: "sämre",     sup: "sämst",     fakes: ["dåligare", "dålig", "dåligast"] },
+            { base: "gammal", fi: "vanha",            comp: "äldre",     sup: "äldst",     fakes: ["gammalare", "älst" "gammalast"] },
+            { base: "ung",    fi: "nuori",            comp: "yngre",     sup: "yngst",     fakes: ["ungare", "yngstä", "ungast"] },
+            { base: "lång",   fi: "pitkä",            comp: "längre",    sup: "längst",    fakes: ["långare", "långsta", "långast"] },
+            { base: "hög",    fi: "korkea",           comp: "högre",     sup: "högst",     fakes: ["högare", "hogsta", "högast"] },
+            { base: "låg",    fi: "matala",           comp: "lägre",     sup: "lägst",     fakes: ["lågare", "läst", "lågast"] },
+            { base: "trång",  fi: "ahdas",            comp: "trängre",   sup: "trängst",   fakes: ["trångare", "tränsta", "trångast"] },
+            { base: "grov",   fi: "karkea / paksu",   comp: "grövre",    sup: "grövst",    fakes: ["grovare", "grovsta", "grovast"] },
+            { base: "ond",     fi: "paha",           comp: "värre",     sup: "värst",     fakes: ["ondare", "ondst", "wärst"] },
 
             // -er / -el / -en -loppuiset
-            { base: "vacker",  fi: "kaunis",          comp: "vackrare",  sup: "vackrast",  fakes: ["vackerare", "vackraste", "vackre"] },
-            { base: "enkel",   fi: "yksinkertainen",  comp: "enklare",   sup: "enklast",   fakes: ["enkelare", "enklaste", "enkle"] },
-            { base: "nyfiken", fi: "utelias",         comp: "nyfiknare", sup: "nyfiknast", fakes: ["nyfikenare", "nyfiknaste", "mera nyfiken"] },
+            { base: "vacker",  fi: "kaunis",          comp: "vackrare",  sup: "vackrast",  fakes: ["vackerare", "vackräst", "vackre"] },
+            { base: "enkel",   fi: "yksinkertainen",  comp: "enklare",   sup: "enklast",   fakes: ["enkelare", "enklas", "enkle"] },
+            { base: "nyfiken", fi: "utelias",         comp: "nyfiknare", sup: "nyfiknast", fakes: ["nyfikenare", "nyfikaste", "mera nyfiken"] },
 
             // Säännölliset (-are / -ast)
-            { base: "snabb",  fi: "nopea",            comp: "snabbare",  sup: "snabbast",  fakes: ["snäbbre", "snabbaste", "snabbre"] },
-            { base: "rolig",  fi: "hauska",           comp: "roligare",  sup: "roligast",  fakes: ["roligre", "roligaste", "mera rolig"] },
-            { base: "glad",   fi: "iloinen",          comp: "gladare",   sup: "gladast",   fakes: ["glädre", "gladaste", "glädst"] },
-            { base: "kall",   fi: "kylmä",            comp: "kallare",   sup: "kallast",   fakes: ["källre", "kallaste", "källst"] },
-            { base: "varm",   fi: "lämmin",           comp: "varmare",   sup: "varmast",   fakes: ["värmre", "varmaste", "värmst"] },
-            { base: "dyr",    fi: "kallis",           comp: "dyrare",    sup: "dyrast",    fakes: ["dyrre", "dyraste", "dyrst"] },
-            { base: "billig", fi: "halpa",            comp: "billigare", sup: "billigast", fakes: ["billigre", "billigaste", "mera billig"] },
-            { base: "ny",     fi: "uusi",             comp: "nyare",     sup: "nyast",     fakes: ["nyre", "nyaste", "nyst"] },
-            { base: "rik",    fi: "rikas",            comp: "rikare",    sup: "rikast",    fakes: ["rikre", "rikaste", "rikst"] },
-            { base: "fattig", fi: "köyhä",            comp: "fattigare", sup: "fattigast", fakes: ["fattigre", "fattigaste", "mera fattig"] },
-            { base: "snäll",  fi: "kiltti",           comp: "snällare",  sup: "snällast",  fakes: ["snällre", "snällaste", "snällst"] },
-            { base: "dum",    fi: "tyhmä",            comp: "dummare",   sup: "dummast",   fakes: ["dumare", "dummaste", "dümre"] },
-            { base: "trött",  fi: "väsynyt",          comp: "tröttare",  sup: "tröttast",  fakes: ["tröttre", "tröttaste", "tröttst"] },
-            { base: "pigg",   fi: "pirteä",           comp: "piggare",   sup: "piggast",   fakes: ["piggre", "piggaste", "piggst"] },
-            { base: "svår",   fi: "vaikea",           comp: "svårare",   sup: "svårast",   fakes: ["svärre", "svåraste", "svärst"] },
-            { base: "lätt",   fi: "helppo / kevyt",   comp: "lättare",   sup: "lättast",   fakes: ["lättre", "lättaste", "lättst"] },
-            { base: "ljus",   fi: "vaalea / valoisa", comp: "ljusare",   sup: "ljusast",   fakes: ["ljusre", "ljusaste", "ljusst"] },
-            { base: "mörk",   fi: "tumma / pimeä",    comp: "mörkare",   sup: "mörkast",   fakes: ["mörkre", "mörkaste", "mörkst"] },
-            { base: "stark",  fi: "vahva",            comp: "starkare",  sup: "starkast",  fakes: ["stärkre", "starkaste", "stärkst"] },
-            { base: "svag",   fi: "heikko",           comp: "svagare",   sup: "svagast",   fakes: ["svägre", "svagaste", "svägst"] },
-            { base: "fin",    fi: "hieno",            comp: "finare",    sup: "finast",    fakes: ["finre", "finaste", "finst"] },
-            { base: "ful",    fi: "ruma",             comp: "fulare",    sup: "fulast",    fakes: ["fulre", "fulaste", "fulst"] },
-            { base: "tidig",  fi: "aikainen",         comp: "tidigare",  sup: "tidigast",  fakes: ["tidigre", "tidigaste", "mera tidig"] },
-            { base: "sen",    fi: "myöhäinen",        comp: "senare",    sup: "senast",    fakes: ["senre", "senaste", "senst"] },
-            { base: "sjuk",   fi: "sairas",           comp: "sjukare",   sup: "sjukast",   fakes: ["sjukre", "sjukaste", "sjukst"] },
-            { base: "frisk",  fi: "terve",            comp: "friskare",  sup: "friskast",  fakes: ["friskre", "friskaste", "friskst"] }
+            { base: "snabb",  fi: "nopea",            comp: "snabbare",  sup: "snabbast",  fakes: ["snäbbre", "snäbbaste", "snabbre"] },
+            { base: "rolig",  fi: "hauska",           comp: "roligare",  sup: "roligast",  fakes: ["roligre", "roligst", "mera rolig"] },
+            { base: "glad",   fi: "iloinen",          comp: "gladare",   sup: "gladast",   fakes: ["glädre", "gläädare", "glädst"] },
+            { base: "kall",   fi: "kylmä",            comp: "kallare",   sup: "kallast",   fakes: ["källre", "kallt", "källst"] },
+            { base: "varm",   fi: "lämmin",           comp: "varmare",   sup: "varmast",   fakes: ["värmre", "varmat", "värmst"] },
+            { base: "dyr",    fi: "kallis",           comp: "dyrare",    sup: "dyrast",    fakes: ["dyrre", "dyrt", "dyrst"] },
+            { base: "billig", fi: "halpa",            comp: "billigare", sup: "billigast", fakes: ["billigre", "billigr", "mera billig"] },
+            { base: "ny",     fi: "uusi",             comp: "nyare",     sup: "nyast",     fakes: ["nyre", "nytt", "nyst"] },
+            { base: "rik",    fi: "rikas",            comp: "rikare",    sup: "rikast",    fakes: ["rikre", "rikt", "rikst"] },
+            { base: "fattig", fi: "köyhä",            comp: "fattigare", sup: "fattigast", fakes: ["fattigre", "fatta", "mera fattig"] },
+            { base: "snäll",  fi: "kiltti",           comp: "snällare",  sup: "snällast",  fakes: ["snällre", "snallast", "snällst"] },
+            { base: "dum",    fi: "tyhmä",            comp: "dummare",   sup: "dummast",   fakes: ["dumare", "dumaste", "dümre"] },
+            { base: "trött",  fi: "väsynyt",          comp: "tröttare",  sup: "tröttast",  fakes: ["tröttre", "trötaste", "tröttst"] },
+            { base: "pigg",   fi: "pirteä",           comp: "piggare",   sup: "piggast",   fakes: ["piggre", "piggste", "piggst"] },
+            { base: "svår",   fi: "vaikea",           comp: "svårare",   sup: "svårast",   fakes: ["svärre", "svartast", "svärst"] },
+            { base: "lätt",   fi: "helppo / kevyt",   comp: "lättare",   sup: "lättast",   fakes: ["lättre", "lattast", "lättst"] },
+            { base: "ljus",   fi: "vaalea / valoisa", comp: "ljusare",   sup: "ljusast",   fakes: ["ljusre", "ljysast", "ljusst"] },
+            { base: "mörk",   fi: "tumma / pimeä",    comp: "mörkare",   sup: "mörkast",   fakes: ["mörkre", "morkaste", "mörkst"] },
+            { base: "stark",  fi: "vahva",            comp: "starkare",  sup: "starkast",  fakes: ["stärkre", "stärkaste", "stärkst"] },
+            { base: "svag",   fi: "heikko",           comp: "svagare",   sup: "svagast",   fakes: ["svägre", "svagåste", "svägst"] },
+            { base: "fin",    fi: "hieno",            comp: "finare",    sup: "finast",    fakes: ["finre", "fina", "finst"] },
+            { base: "ful",    fi: "ruma",             comp: "fulare",    sup: "fulast",    fakes: ["fulre", "fullast", "fulst"] },
+            { base: "tidig",  fi: "aikainen",         comp: "tidigare",  sup: "tidigast",  fakes: ["tidigre", "tidningen", "mera tidig"] },
+            { base: "sen",    fi: "myöhäinen",        comp: "senare",    sup: "senast",    fakes: ["senre", "senarare", "senst"] },
+            { base: "sjuk",   fi: "sairas",           comp: "sjukare",   sup: "sjukast",   fakes: ["sjukre", "sjykare", "sjukst"] },
+            { base: "frisk",  fi: "terve",            comp: "friskare",  sup: "friskast",  fakes: ["friskre", "frikare", "friskst"] }
         ];
 
         /**
