@@ -6,7 +6,7 @@
     <title>Tung - tyngre - tyngst & Den tyngsta Sahuren – Ruotsin adjektiivipeli</title>
     <style>
         /* =========================================================================
-           PERUSTYYLIT JA TEEMA (Ei ulkoisia riippuvuuksia)
+           PERUSTYYLIT JA TEEMA
            ========================================================================= */
         :root {
             --wood-light: #d4a373;
@@ -37,13 +37,11 @@
             position: relative;
         }
 
-        /* Piilotetaan järjestelmän kursori pelin ollessa käynnissä työpöydällä */
         body.playing-desktop,
         body.playing-desktop * {
             cursor: none !important;
         }
 
-        /* Tähtitaivas taustalla */
         .stars {
             position: fixed;
             inset: 0;
@@ -59,7 +57,6 @@
             z-index: 0;
         }
 
-        /* Puupaneelit */
         .wood-panel {
             background: linear-gradient(180deg, #b07d4f 0%, #86532b 100%);
             border: 3px solid #3f230e;
@@ -125,7 +122,6 @@
             cursor: pointer;
         }
 
-        /* 4-portainen Combo-mittari */
         .combo-meter-panel {
             padding: 8px 12px;
             display: flex;
@@ -174,7 +170,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Asteittain voimistuvat combo-palkit */
         .combo-step.active-1 {
             background: linear-gradient(180deg, #fde047, #eab308);
             color: #422006;
@@ -298,7 +293,7 @@
         }
 
         /* =========================================================================
-           3x3 PELIRUUDUKKO (WHACK-A-MOLE)
+           3x3 PELIRUUDUKKO
            ========================================================================= */
         .game-board {
             position: relative;
@@ -432,7 +427,7 @@
         }
 
         /* =========================================================================
-           KUSTOMOITU KURSORI (KASVAA COMBO-TASON MUKAAN!)
+           KUSTOMOITU KURSORI
            ========================================================================= */
         .custom-sahur-cursor {
             --cursor-scale: 0.72;
@@ -453,7 +448,6 @@
             filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.55));
         }
 
-        /* Kultainen hehku ja aura kursorille kun saavutetaan 4+ combo (DEN TYNGSTA SAHUREN) */
         .custom-sahur-cursor.cursor-max-aura {
             filter:
                 drop-shadow(0 0 10px rgba(250, 204, 21, 0.95))
@@ -461,7 +455,6 @@
                 drop-shadow(0 6px 10px rgba(0, 0, 0, 0.65));
         }
 
-        /* Lyöntianimaatio kursorihahmolle – säilyttää dynaamisen --cursor-scale arvon */
         .custom-sahur-cursor.whacking {
             animation: cursorBodyWhack 0.24s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
@@ -489,7 +482,6 @@
             100% { transform: rotate(25deg); }
         }
 
-        /* Kosketusnäytöillä vilahtava lyövä kursorihahmo (skaalautuu myös combo-tason mukaan) */
         .touch-sahur-whack {
             --cursor-scale: 0.72;
             position: fixed;
@@ -522,7 +514,7 @@
         }
 
         /* =========================================================================
-           GRADUAALISET COMBO-ANIMAATIOT (TUNG -> TYNGRE -> TYNGST -> DEN TYNGSTA SAHUREN)
+           COMBO-ANIMAATIOT
            ========================================================================= */
         .combo-callout {
             position: fixed;
@@ -535,7 +527,6 @@
             letter-spacing: 0.03em;
         }
 
-        /* Taso 1: TUNG */
         .callout-lvl-1 {
             font-size: clamp(1.4rem, 4.5vw, 1.9rem);
             color: #fde047;
@@ -549,7 +540,6 @@
             100% { opacity: 0; transform: translate(-50%, -115%) scale(0.95); }
         }
 
-        /* Taso 2: TYNGRE! */
         .callout-lvl-2 {
             font-size: clamp(2rem, 6.5vw, 2.8rem);
             color: #fb923c;
@@ -564,7 +554,6 @@
             100% { opacity: 0; transform: translate(-50%, -145%) scale(1); }
         }
 
-        /* Taso 3: TYNGST!! */
         .callout-lvl-3 {
             font-size: clamp(2.6rem, 8.5vw, 3.8rem);
             background: linear-gradient(180deg, #fef08a 0%, #f97316 55%, #ef4444 100%);
@@ -582,7 +571,6 @@
             100% { opacity: 0; transform: translate(-50%, -155%) scale(1.05); }
         }
 
-        /* Taso 4+: DEN TYNGSTA SAHUREN!!! (Valtava koko ruudun huima efekti) */
         .callout-lvl-4 {
             left: 50% !important;
             top: 46% !important;
@@ -607,7 +595,6 @@
             100% { opacity: 0; transform: translate(-50%, -68%) scale(1.35); }
         }
 
-        /* Kultainen välähdys taustalle 4. combosta */
         .mega-flash-overlay {
             position: fixed;
             inset: 0;
@@ -622,7 +609,6 @@
             100% { opacity: 0; }
         }
 
-        /* Lentävät partikkelit (puulastut & tähdet) */
         .particle {
             position: fixed;
             pointer-events: none;
@@ -636,7 +622,6 @@
             100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.2) rotate(var(--rot)); }
         }
 
-        /* Ruudun tärähdys */
         .screen-shake {
             animation: screenShake 0.28s cubic-bezier(.36,.07,.19,.97) both;
         }
@@ -726,10 +711,15 @@
             border: 3px solid #064e3b;
             box-shadow: 0 5px 0 #064e3b;
             cursor: pointer;
-            transition: transform 0.08s ease;
+            transition: transform 0.08s ease, opacity 0.2s ease;
         }
 
-        .btn-start:active {
+        .btn-start:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .btn-start:not(:disabled):active {
             transform: translateY(4px);
             box-shadow: 0 1px 0 #064e3b;
         }
@@ -747,34 +737,24 @@
 <body>
     <div class="stars"></div>
 
-    <!-- Kustomoitu kursorihahmo (toinen, tummempi kentungan-puupölkkyhahmo kepin kanssa, kasvaa combon mukaan) -->
+    <!-- Kustomoitu kursorihahmo -->
     <div id="customCursor" class="custom-sahur-cursor" style="opacity: 0;" aria-hidden="true">
         <svg viewBox="0 0 130 140" width="100%" height="100%" style="overflow: visible;">
-            <!-- Tikkujalat -->
             <path d="M54 114 L50 131 L42 133" fill="none" stroke="#291507" stroke-width="4.5" stroke-linecap="round"/>
             <path d="M70 114 L74 131 L82 133" fill="none" stroke="#291507" stroke-width="4.5" stroke-linecap="round"/>
-            <!-- Oikea tikkukäsi lantiolla -->
             <path d="M78 72 Q92 82 86 96" fill="none" stroke="#291507" stroke-width="4.5" stroke-linecap="round"/>
-            <!-- Tummempi, kulmikkaampi Sahur-puupölkkyvartalo -->
             <rect x="44" y="16" width="36" height="100" rx="11" fill="#8c5830" stroke="#291507" stroke-width="4"/>
-            <!-- Yläpään puukiekko -->
             <ellipse cx="62" cy="20" rx="16" ry="5.5" fill="#b87e4e" stroke="#291507" stroke-width="2.5"/>
-            <!-- Puunsyyt & halkeamat -->
             <path d="M51 34 L51 106 M73 30 L73 102" stroke="#593317" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-            <!-- Päättäväiset tuijottavat silmät -->
             <circle cx="54" cy="42" r="8.5" fill="#fef08a" stroke="#1c0d04" stroke-width="2.5"/>
             <circle cx="70" cy="42" r="8.5" fill="#fef08a" stroke="#1c0d04" stroke-width="2.5"/>
             <circle cx="52.5" cy="42" r="3.8" fill="#090502"/>
             <circle cx="68.5" cy="42" r="3.8" fill="#090502"/>
-            <!-- V-muotoiset keskittyneet kulmakarvat -->
             <path d="M45 30 L60 35" stroke="#1c0d04" stroke-width="3" stroke-linecap="round"/>
             <path d="M79 30 L64 35" stroke="#1c0d04" stroke-width="3" stroke-linecap="round"/>
-            <!-- Tiukka viivamainen suu -->
             <path d="M51 60 Q62 56 73 60" fill="none" stroke="#1c0d04" stroke-width="3" stroke-linecap="round"/>
-            <!-- Vasen käsi + Pitkä lyöntikeppi/pesäpallomaila (animoitu ryhmä) -->
             <g class="cursor-bat-group">
                 <path d="M46 68 L28 62" fill="none" stroke="#291507" stroke-width="4.5" stroke-linecap="round"/>
-                <!-- Pitkä kentungan-nuija/maila -->
                 <rect x="22" y="-12" width="9" height="82" rx="4" transform="rotate(-28 28 62)" fill="#e5b887" stroke="#291507" stroke-width="3"/>
                 <ellipse cx="-8" cy="-2" rx="6" ry="3.2" transform="rotate(-28 -8 -2)" fill="#fde68a" stroke="#291507" stroke-width="2"/>
                 <rect x="21" y="64" width="11" height="5" rx="2" transform="rotate(-28 28 62)" fill="#4a2c15"/>
@@ -782,7 +762,7 @@
         </svg>
     </div>
 
-    <!-- YLÄPALKKI: Tilastot & 4-portainen Combo-mittari -->
+    <!-- YLÄPALKKI -->
     <header class="top-bar">
         <div class="hud-row">
             <div class="wood-panel hud-box">
@@ -799,11 +779,10 @@
                     <span>⏳</span>
                     <span id="timerDisplay" class="hud-val" style="color:#fff;">60</span>
                 </div>
-                <button id="soundToggleBtn" type="button" class="wood-panel sound-btn" title="Äänet päälle/pois">🔊</button>
+                <button id="soundToggleBtn" type="button" class="wood-panel sound-btn" title="Äänet ja puhe päälle/pois">🔊</button>
             </div>
         </div>
 
-        <!-- 4-portainen Combo-mittari -->
         <div id="comboMeterPanel" class="wood-panel combo-meter-panel">
             <div class="combo-header">
                 <span style="color:#fde68a;">🔥 Sahuren Combo-mittari</span>
@@ -889,7 +868,7 @@
     <script>
         /**
          * =========================================================================
-         * 1. SANALISTA (42 ruotsin adjektiivia – 'mången'/'många' poistettu)
+         * 1. SANALISTA (42 ruotsin adjektiivia)
          * =========================================================================
          */
         const ADJECTIVES = [
@@ -899,14 +878,14 @@
             { base: "liten",  fi: "pieni",            comp: "mindre",    sup: "minst",     fakes: ["litenare", "minstä", "mindrast"] },
             { base: "bra",    fi: "hyvä",             comp: "bättre",    sup: "bäst",      fakes: ["braare", "båst", "braast"] },
             { base: "dålig",  fi: "huono",            comp: "sämre",     sup: "sämst",     fakes: ["dåligare", "dålig", "dåligast"] },
-            { base: "gammal", fi: "vanha",            comp: "äldre",     sup: "äldst",     fakes: ["gammalare", "älst" "gammalast"] },
+            { base: "gammal", fi: "vanha",            comp: "äldre",     sup: "äldst",     fakes: ["gammalare", "älst", "gammalast"] },
             { base: "ung",    fi: "nuori",            comp: "yngre",     sup: "yngst",     fakes: ["ungare", "yngstä", "ungast"] },
             { base: "lång",   fi: "pitkä",            comp: "längre",    sup: "längst",    fakes: ["långare", "långsta", "långast"] },
             { base: "hög",    fi: "korkea",           comp: "högre",     sup: "högst",     fakes: ["högare", "hogsta", "högast"] },
             { base: "låg",    fi: "matala",           comp: "lägre",     sup: "lägst",     fakes: ["lågare", "läst", "lågast"] },
             { base: "trång",  fi: "ahdas",            comp: "trängre",   sup: "trängst",   fakes: ["trångare", "tränsta", "trångast"] },
             { base: "grov",   fi: "karkea / paksu",   comp: "grövre",    sup: "grövst",    fakes: ["grovare", "grovsta", "grovast"] },
-            { base: "ond",     fi: "paha",           comp: "värre",     sup: "värst",     fakes: ["ondare", "ondst", "wärst"] },
+            { base: "ond",    fi: "paha",             comp: "värre",     sup: "värst",     fakes: ["ondare", "ondst", "wärst"] },
 
             // -er / -el / -en -loppuiset
             { base: "vacker",  fi: "kaunis",          comp: "vackrare",  sup: "vackrast",  fakes: ["vackerare", "vackräst", "vackre"] },
@@ -944,13 +923,26 @@
 
         /**
          * =========================================================================
-         * 2. ÄÄNIEFEKTIT (Web Audio API – Graduaalisesti nousevat TUNG-kopahdukset)
+         * 2. ÄÄNIEFEKTIT JA RUOTSINKIELINEN PUHESYNTEESI
          * =========================================================================
          */
         class SoundEngine {
             constructor() {
                 this.ctx = null;
                 this.enabled = true;
+                this.swedishVoice = null;
+
+                if ('speechSynthesis' in window) {
+                    const loadVoices = () => {
+                        const voices = window.speechSynthesis.getVoices();
+                        this.swedishVoice =
+                            voices.find(v => v.lang.toLowerCase().startsWith('sv-se')) ||
+                            voices.find(v => v.lang.toLowerCase().startsWith('sv')) ||
+                            null;
+                    };
+                    loadVoices();
+                    window.speechSynthesis.onvoiceschanged = loadVoices;
+                }
             }
 
             init() {
@@ -965,10 +957,55 @@
 
             toggle() {
                 this.enabled = !this.enabled;
+                if (!this.enabled && 'speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
                 return this.enabled;
             }
 
-            // Kevyt puun kopahdus kun lyö ohi tyhjään
+            speakSwedishCombo(combo) {
+                if (!this.enabled || !('speechSynthesis' in window)) return;
+
+                try {
+                    window.speechSynthesis.cancel();
+
+                    let phrase = 'tung';
+                    let pitch = 1.0;
+                    let rate = 1.08;
+
+                    if (combo === 1) {
+                        phrase = 'tung';
+                        pitch = 1.02;
+                        rate = 1.1;
+                    } else if (combo === 2) {
+                        phrase = 'tyngre!';
+                        pitch = 1.12;
+                        rate = 1.12;
+                    } else if (combo === 3) {
+                        phrase = 'tyngst!';
+                        pitch = 1.24;
+                        rate = 1.15;
+                    } else {
+                        phrase = 'den tyngsta sahuren!';
+                        pitch = 0.85;
+                        rate = 0.96;
+                    }
+
+                    const utterance = new SpeechSynthesisUtterance(phrase);
+                    utterance.lang = 'sv-SE';
+                    if (this.swedishVoice) {
+                        utterance.voice = this.swedishVoice;
+                    }
+                    utterance.pitch = pitch;
+                    utterance.rate = rate;
+                    utterance.volume = 1.0;
+
+                    window.speechSynthesis.speak(utterance);
+                } catch (err) {
+                    // Ohitetaan jos selain estää puhesynteesin
+                }
+            }
+
             playWoodTap() {
                 if (!this.enabled) return;
                 this.init();
@@ -988,17 +1025,18 @@
                 osc.stop(now + 0.09);
             }
 
-            // Oikean osuman ääni skaalautuu combo-tason (1..4+) mukaan!
             playComboHit(combo) {
                 if (!this.enabled) return;
                 this.init();
-                if (!this.ctx) return;
 
+                // Puhutaan kombotaso ruotsiksi
+                this.speakSwedishCombo(combo);
+
+                if (!this.ctx) return;
                 const now = this.ctx.currentTime;
 
                 if (combo >= 4) {
-                    // TASO 4+: Mahtipontinen TUNG-TUNG-TUNG! -sointu
-                    const freqs = [293.66, 369.99, 440.00, 587.33]; // D-duuri-sointu
+                    const freqs = [293.66, 369.99, 440.00, 587.33];
                     freqs.forEach((f, idx) => {
                         const start = now + idx * 0.055;
                         const osc = this.ctx.createOscillator();
@@ -1007,7 +1045,7 @@
                         osc.frequency.setValueAtTime(f * 1.15, start);
                         osc.frequency.exponentialRampToValueAtTime(f, start + 0.14);
 
-                        gain.gain.setValueAtTime(0.38, start);
+                        gain.gain.setValueAtTime(0.26, start);
                         gain.gain.exponentialRampToValueAtTime(0.01, start + 0.36);
 
                         osc.connect(gain);
@@ -1016,7 +1054,6 @@
                         osc.stop(start + 0.38);
                     });
                 } else {
-                    // TASOT 1-3: Nouseva ontto puukopahdus
                     const baseFreq = 310 + (combo - 1) * 75;
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
@@ -1024,26 +1061,13 @@
                     osc.frequency.setValueAtTime(baseFreq, now);
                     osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.52, now + 0.15);
 
-                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.setValueAtTime(0.32, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
 
                     osc.connect(gain);
                     gain.connect(this.ctx.destination);
                     osc.start(now);
                     osc.stop(now + 0.19);
-
-                    // Toinen kaksoiskopahdus
-                    const osc2 = this.ctx.createOscillator();
-                    const gain2 = this.ctx.createGain();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(baseFreq * 1.45, now + 0.05);
-                    osc2.frequency.exponentialRampToValueAtTime(baseFreq * 0.75, now + 0.18);
-                    gain2.gain.setValueAtTime(0.32, now + 0.05);
-                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                    osc2.connect(gain2);
-                    gain2.connect(this.ctx.destination);
-                    osc2.start(now + 0.05);
-                    osc2.stop(now + 0.21);
                 }
             }
 
@@ -1058,7 +1082,7 @@
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(155, now);
                 osc.frequency.exponentialRampToValueAtTime(60, now + 0.28);
-                gain.gain.setValueAtTime(0.38, now);
+                gain.gain.setValueAtTime(0.35, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
@@ -1098,12 +1122,11 @@
         const GAME_DURATION = 60;
         const INITIAL_LIVES = 3;
         const TOTAL_HOLES = 9;
-
-        // Kursorin skaalausportaat combo-tason (0, 1, 2, 3, 4+) mukaan
         const CURSOR_COMBO_SCALES = [0.72, 0.90, 1.12, 1.38, 1.75];
 
         const state = {
             running: false,
+            roundId: 0,
             score: 0,
             lives: INITIAL_LIVES,
             timeLeft: GAME_DURATION,
@@ -1112,6 +1135,7 @@
             currentQuestion: null,
             holes: [],
             spawnTimer: null,
+            nextQuestionTimer: null,
             clockTimer: null,
             lastUsedAdjIndex: -1,
             isTouchDevice: false
@@ -1135,7 +1159,6 @@
         const soundToggleBtn = document.getElementById('soundToggleBtn');
         const customCursor = document.getElementById('customCursor');
 
-        // Combo-mittarin elementit
         const comboMeterPanel = document.getElementById('comboMeterPanel');
         const comboStatusLabel = document.getElementById('comboStatusLabel');
         const comboStepEls = [
@@ -1147,7 +1170,7 @@
 
         /**
          * =========================================================================
-         * 4. KUSTOMOITU KURSORI (KASVAA COMBO-TASON MUKAAN) & LYÖNTIANIMAATIO
+         * 4. KUSTOMOITU KURSORI
          * =========================================================================
          */
         function getCursorScaleForCombo(combo) {
@@ -1185,10 +1208,8 @@
                 }
             });
 
-            // Globaali klikkaus/napautus laukaisee kursorihahmon kepin heilautuksen
             window.addEventListener('pointerdown', (e) => {
                 if (!state.running) return;
-                // Älä laukaise jos klikattiin ääninappia
                 if (e.target.closest('#soundToggleBtn')) return;
 
                 if (e.pointerType === 'touch') {
@@ -1200,7 +1221,6 @@
                     triggerDesktopCursorWhack();
                 }
 
-                // Jos ei osuttu yhteenkään koloon (ohilyönti tyhjään kohtaan)
                 if (!e.target.closest('.hole-cell')) {
                     sound.playWoodTap();
                 }
@@ -1246,38 +1266,28 @@
                     <div class="hole-back"></div>
                     <div class="hole-mask">
                         <div class="mascot-wrapper">
-                            <!-- Alkuperäisen Tung Tung Sahurin näköinen hoikka kentungan-puupölkkyhahmo -->
                             <svg viewBox="0 0 130 105" style="width:88%; height:auto; overflow:visible; margin-bottom:-8px;">
-                                <!-- Vasen tikkukäsi -->
                                 <path d="M44 74 Q26 82 32 95" fill="none" stroke="#3f230e" stroke-width="4.5" stroke-linecap="round"/>
-                                <!-- Oikea tikkukäsi + pesäpallomaila -->
                                 <path d="M84 72 L103 65" fill="none" stroke="#3f230e" stroke-width="4.5" stroke-linecap="round"/>
                                 <g transform="translate(103, 68) rotate(-22)">
                                     <rect x="-3" y="-56" width="6.5" height="66" rx="3.2" fill="#d4a373" stroke="#3f230e" stroke-width="2.5"/>
                                     <ellipse cx="0.2" cy="-56" rx="4.2" ry="2.2" fill="#e6b88a" stroke="#3f230e" stroke-width="2"/>
                                     <rect x="-4.2" y="6" width="9" height="4" rx="1.5" fill="#5c3a21"/>
                                 </g>
-                                <!-- Kapea lieriömäinen kentungan-puupölkky -->
                                 <rect x="44" y="10" width="40" height="96" rx="13" fill="#c89262" stroke="#3f230e" stroke-width="4"/>
-                                <!-- Yläpään puukiekko -->
                                 <ellipse cx="64" cy="14" rx="18" ry="6" fill="#e5b887" stroke="#3f230e" stroke-width="2.5"/>
-                                <!-- Puunsyyt -->
                                 <path d="M51 28 L51 96 M77 24 L77 94" stroke="#9c6638" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
-                                <!-- Suuret pyöreät valkoiset tuijottavat silmät -->
                                 <circle cx="55" cy="36" r="9" fill="#ffffff" stroke="#291507" stroke-width="2.5"/>
                                 <circle cx="73" cy="36" r="9" fill="#ffffff" stroke="#291507" stroke-width="2.5"/>
                                 <circle cx="56" cy="36" r="4" fill="#0f0904"/>
                                 <circle cx="72" cy="36" r="4" fill="#0f0904"/>
                                 <circle cx="57.5" cy="34.5" r="1.3" fill="#ffffff"/>
                                 <circle cx="73.5" cy="34.5" r="1.3" fill="#ffffff"/>
-                                <!-- Kulmakarvat -->
                                 <path d="M46 25 Q55 22 61 26" fill="none" stroke="#3f230e" stroke-width="2.6" stroke-linecap="round"/>
                                 <path d="M82 25 Q73 22 67 26" fill="none" stroke="#3f230e" stroke-width="2.6" stroke-linecap="round"/>
-                                <!-- Viivamainen irvistävä suu -->
                                 <path d="M50 53 Q64 62 78 53 Q74 60 64 60 Q54 60 50 53 Z" fill="#7f1d1d" stroke="#291507" stroke-width="2.2"/>
                                 <path d="M53 54.5 L75 54.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
                             </svg>
-                            <!-- Puukyltti -->
                             <div class="wood-sign sign-text">tyngst</div>
                         </div>
                     </div>
@@ -1310,7 +1320,9 @@
          * 6. KYSYMYKSET & HAHMOJEN NOSTATUS
          * =========================================================================
          */
-        function nextQuestion() {
+        function nextQuestion(expectedRoundId) {
+            if (!state.running || expectedRoundId !== state.roundId) return;
+
             let idx;
             do {
                 idx = Math.floor(Math.random() * ADJECTIVES.length);
@@ -1332,7 +1344,9 @@
             hideAllHoles();
             clearTimeout(state.spawnTimer);
             state.spawnTimer = setTimeout(() => {
-                if (state.running) spawnWave();
+                if (state.running && expectedRoundId === state.roundId) {
+                    spawnWave(expectedRoundId);
+                }
             }, 240);
         }
 
@@ -1361,17 +1375,17 @@
             return arr.slice(0, count);
         }
 
-        function spawnWave() {
-            if (!state.running || !state.currentQuestion) return;
+        function spawnWave(expectedRoundId) {
+            if (!state.running || expectedRoundId !== state.roundId || !state.currentQuestion) return;
 
             const freeHoles = state.holes.filter(h => !h.active);
             if (freeHoles.length < 2) {
-                state.spawnTimer = setTimeout(spawnWave, 380);
+                clearTimeout(state.spawnTimer);
+                state.spawnTimer = setTimeout(() => spawnWave(expectedRoundId), 380);
                 return;
             }
 
             const alreadyHasCorrect = state.holes.some(h => h.active && h.isCorrect);
-            // Nostetaan 2-3 hahmoa kerrallaan
             const countToSpawn = Math.min(freeHoles.length, Math.floor(Math.random() * 2) + 2);
 
             const shuffledHoles = [...freeHoles].sort(() => Math.random() - 0.5).slice(0, countToSpawn);
@@ -1399,7 +1413,9 @@
 
             clearTimeout(state.spawnTimer);
             state.spawnTimer = setTimeout(() => {
-                if (state.running) spawnWave();
+                if (state.running && expectedRoundId === state.roundId) {
+                    spawnWave(expectedRoundId);
+                }
             }, visibleDuration + 240);
         }
 
@@ -1416,20 +1432,20 @@
 
         /**
          * =========================================================================
-         * 7. OSUMIEN KÄSITTELY JA 4-PORTAINEN GRADUAALINEN COMBO-ANIMAATIO
+         * 7. OSUMIEN KÄSITTELY JA COMBO-ANIMAATIOT
          * =========================================================================
          */
         function handleHoleWhack(hole, clientX, clientY) {
             if (!state.running) return;
 
             if (!hole.active) {
-                // Tyhjän kolon kopautus
                 sound.playWoodTap();
                 return;
             }
 
+            const currentRound = state.roundId;
+
             if (hole.isCorrect) {
-                // OIKEA OSUMUS!
                 hole.active = false;
                 clearTimeout(hole.hideTimeout);
                 hole.el.classList.add('hit-correct');
@@ -1449,11 +1465,13 @@
 
                 updateHUD();
 
-                setTimeout(() => {
-                    if (state.running) nextQuestion();
+                clearTimeout(state.nextQuestionTimer);
+                state.nextQuestionTimer = setTimeout(() => {
+                    if (state.running && currentRound === state.roundId) {
+                        nextQuestion(currentRound);
+                    }
                 }, 260);
             } else {
-                // VÄÄRÄ OSUMUS!
                 hole.active = false;
                 clearTimeout(hole.hideTimeout);
                 hole.el.classList.add('hit-wrong');
@@ -1480,9 +1498,6 @@
             }
         }
 
-        /**
-         * Laukaisee graduaalisen combo-tekstin ja efektit (1: TUNG, 2: TYNGRE!, 3: TYNGST!!, 4+: DEN TYNGSTA SAHUREN!!!)
-         */
         function triggerGradualComboAnimation(combo, x, y) {
             const el = document.createElement('div');
             el.className = 'combo-callout';
@@ -1507,18 +1522,15 @@
                 triggerShake(false);
                 spawnParticles(x, y, 22, ['#ef4444', '#f97316', '#facc15', '#ffffff']);
             } else {
-                // 4 tai enemmän: DEN TYNGSTA SAHUREN!!!
                 el.innerHTML = 'DEN TYNGSTA<br>SAHUREN!!!';
                 el.classList.add('callout-lvl-4');
                 triggerShake(true);
 
-                // Kultainen välähdys
                 const flash = document.createElement('div');
                 flash.className = 'mega-flash-overlay';
                 document.body.appendChild(flash);
                 setTimeout(() => flash.remove(), 860);
 
-                // Runsaasti partikkeleita sekä osumakohdasta että keskeltä ruutua
                 const colors = ['#facc15', '#f97316', '#ef4444', '#ec4899', '#34d399', '#ffffff'];
                 spawnParticles(x, y, 28, colors);
                 spawnParticles(window.innerWidth / 2, window.innerHeight * 0.46, 36, colors);
@@ -1576,17 +1588,15 @@
 
         /**
          * =========================================================================
-         * 8. YLÄPALKIN, KURSORIN KOON JA 4-PORTAISEN COMBO-MITTARIN PÄIVITYS
+         * 8. HUD-PÄIVITYS
          * =========================================================================
          */
         function updateHUD() {
             scoreDisplay.textContent = state.score;
             timerDisplay.textContent = state.timeLeft;
 
-            // Päivitetään kursorihahmon koko combo-tason mukaan
             updateCursorScale();
 
-            // Päivitetään 4-portainen combo-mittari
             const level = Math.min(state.combo, 4);
             comboStepEls.forEach((stepEl, idx) => {
                 stepEl.className = 'combo-step';
@@ -1605,7 +1615,6 @@
                 comboStatusLabel.style.color = '#fef08a';
             }
 
-            // Sydämet
             let heartsHtml = '';
             for (let i = 0; i < INITIAL_LIVES; i++) {
                 heartsHtml += i < state.lives
@@ -1620,8 +1629,24 @@
          * 9. PELIN KÄYNNISTYS JA LOPETUS
          * =========================================================================
          */
+        function clearAllTimers() {
+            clearInterval(state.clockTimer);
+            clearTimeout(state.spawnTimer);
+            clearTimeout(state.nextQuestionTimer);
+            state.clockTimer = null;
+            state.spawnTimer = null;
+            state.nextQuestionTimer = null;
+        }
+
         function startGame() {
+            if (state.running) return;
+
             sound.init();
+            clearAllTimers();
+
+            state.roundId += 1;
+            const currentRound = state.roundId;
+
             state.running = true;
             state.score = 0;
             state.lives = INITIAL_LIVES;
@@ -1640,10 +1665,9 @@
                 document.body.classList.add('playing-desktop');
             }
 
-            clearInterval(state.clockTimer);
             state.clockTimer = setInterval(() => {
-                if (!state.running) return;
-                state.timeLeft -= 1;
+                if (!state.running || currentRound !== state.roundId) return;
+                state.timeLeft = Math.max(0, state.timeLeft - 1);
                 updateHUD();
 
                 if (state.timeLeft <= 0) {
@@ -1651,13 +1675,15 @@
                 }
             }, 1000);
 
-            nextQuestion();
+            nextQuestion(currentRound);
         }
 
         function endGame(reasonText) {
+            if (!state.running) return;
+
             state.running = false;
-            clearInterval(state.clockTimer);
-            clearTimeout(state.spawnTimer);
+            state.roundId += 1;
+            clearAllTimers();
             hideAllHoles();
             sound.playGameOver();
 
@@ -1671,7 +1697,12 @@
             finalStatsBox.classList.remove('hidden');
             startBtn.textContent = '🔄 PELAA UUDELLEEN';
 
+            // Estetään vahinkoklikkaus heti pelin päättyessä
+            startBtn.disabled = true;
             overlayModal.classList.remove('hidden');
+            setTimeout(() => {
+                startBtn.disabled = false;
+            }, 650);
         }
 
         startBtn.addEventListener('click', startGame);
