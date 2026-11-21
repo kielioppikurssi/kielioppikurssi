@@ -16,32 +16,12 @@
             --amber: #f59e0b;
         }
 
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
-.back-menu-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: #fef3c7;
-    text-decoration: none;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: transform 0.08s ease, filter 0.15s ease;
-}
 
-.back-menu-btn:hover {
-    filter: brightness(1.08);
-}
-
-.back-menu-btn:active {
-    transform: translateY(2px);
-}
         body {
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
@@ -66,7 +46,7 @@
             position: fixed;
             inset: 0;
             pointer-events: none;
-            background-image: 
+            background-image:
                 radial-gradient(2px 2px at 14% 12%, #fef08a 50%, transparent 100%),
                 radial-gradient(2px 2px at 34% 24%, #ffffff 50%, transparent 100%),
                 radial-gradient(3px 3px at 66% 11%, #fde047 50%, transparent 100%),
@@ -108,9 +88,38 @@
 
         .hud-row {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             gap: 8px;
+        }
+
+        .hud-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-menu-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 11px;
+            font-size: 0.82rem;
+            font-weight: 900;
+            color: #fef3c7;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: transform 0.08s ease, filter 0.15s ease;
+        }
+
+        .back-menu-btn:hover {
+            filter: brightness(1.08);
+        }
+
+        .back-menu-btn:active {
+            transform: translateY(2px);
         }
 
         .hud-box {
@@ -755,27 +764,6 @@
     </style>
 </head>
 <body>
-<div class="hud-row">
-    <div style="display:flex; gap:8px; align-items:center;">
-        <a href="index.html" id="backToMenuLink" class="wood-panel back-menu-btn">← Päävalikko</a>
-        <div class="wood-panel hud-box">
-            <span class="hud-label">Pisteet</span>
-            <span id="scoreDisplay" class="hud-val">0</span>
-        </div>
-    </div>
-
-    <div class="wood-panel hud-box" id="livesDisplay" aria-label="Elämät">
-        <span>❤️</span><span>❤️</span><span>❤️</span>
-    </div>
-
-    <div style="display:flex; gap:6px; align-items:center;">
-        <div class="wood-panel hud-box">
-            <span>⏳</span>
-            <span id="timerDisplay" class="hud-val" style="color:#fff;">60</span>
-        </div>
-        <button id="soundToggleBtn" type="button" class="wood-panel sound-btn" title="Äänet ja puhe päälle/pois">🔊</button>
-    </div>
-</div>
     <div class="stars"></div>
 
     <!-- Kustomoitu kursorihahmo -->
@@ -806,16 +794,19 @@
     <!-- YLÄPALKKI -->
     <header class="top-bar">
         <div class="hud-row">
-            <div class="wood-panel hud-box">
-                <span class="hud-label">Pisteet</span>
-                <span id="scoreDisplay" class="hud-val">0</span>
+            <div class="hud-group">
+                <a href="index.html" id="backToMenuLink" class="wood-panel back-menu-btn">← Päävalikko</a>
+                <div class="wood-panel hud-box">
+                    <span class="hud-label">Pisteet</span>
+                    <span id="scoreDisplay" class="hud-val">0</span>
+                </div>
             </div>
 
             <div class="wood-panel hud-box" id="livesDisplay" aria-label="Elämät">
                 <span>❤️</span><span>❤️</span><span>❤️</span>
             </div>
 
-            <div style="display:flex; gap:6px; align-items:center;">
+            <div class="hud-group">
                 <div class="wood-panel hud-box">
                     <span>⏳</span>
                     <span id="timerDisplay" class="hud-val" style="color:#fff;">60</span>
@@ -913,7 +904,6 @@
          * =========================================================================
          */
         const ADJECTIVES = [
-            // Epäsäännölliset ja vokaalinmuutokselliset
             { base: "tung",   fi: "painava / raskas", comp: "tyngre",    sup: "tyngst",    fakes: ["tungare", "tungst", "mera tung"] },
             { base: "stor",   fi: "iso",              comp: "större",    sup: "störst",    fakes: ["storare", "störstä", "storast"] },
             { base: "liten",  fi: "pieni",            comp: "mindre",    sup: "minst",     fakes: ["litenare", "minstä", "mindrast"] },
@@ -928,12 +918,10 @@
             { base: "grov",   fi: "karkea / paksu",   comp: "grövre",    sup: "grövst",    fakes: ["grovare", "grovsta", "grovast"] },
             { base: "ond",    fi: "paha",             comp: "värre",     sup: "värst",     fakes: ["ondare", "ondst", "wärst"] },
 
-            // -er / -el / -en -loppuiset
             { base: "vacker",  fi: "kaunis",          comp: "vackrare",  sup: "vackrast",  fakes: ["vackerare", "vackräst", "vackre"] },
             { base: "enkel",   fi: "yksinkertainen",  comp: "enklare",   sup: "enklast",   fakes: ["enkelare", "enklas", "enkle"] },
             { base: "nyfiken", fi: "utelias",         comp: "nyfiknare", sup: "nyfiknast", fakes: ["nyfikenare", "nyfikaste", "mera nyfiken"] },
 
-            // Säännölliset (-are / -ast)
             { base: "snabb",  fi: "nopea",            comp: "snabbare",  sup: "snabbast",  fakes: ["snäbbre", "snäbbaste", "snabbre"] },
             { base: "rolig",  fi: "hauska",           comp: "roligare",  sup: "roligast",  fakes: ["roligre", "roligst", "mera rolig"] },
             { base: "glad",   fi: "iloinen",          comp: "gladare",   sup: "gladast",   fakes: ["glädre", "gläädare", "glädst"] },
@@ -964,7 +952,7 @@
 
         /**
          * =========================================================================
-         * 2. ÄÄNIEFEKTIT JA RUOTSINKIELINEN PUHESYNTEESI
+         * 2. ÄÄNIEFEKTIT + RUOTSINKIELINEN PUHESYNTEESI JA VARASYNTEESI
          * =========================================================================
          */
         class SoundEngine {
@@ -972,14 +960,22 @@
                 this.ctx = null;
                 this.enabled = true;
                 this.swedishVoice = null;
+                this.ttsSupported =
+                    typeof window !== 'undefined' &&
+                    'speechSynthesis' in window &&
+                    typeof SpeechSynthesisUtterance !== 'undefined';
 
-                if ('speechSynthesis' in window) {
+                if (this.ttsSupported) {
                     const loadVoices = () => {
-                        const voices = window.speechSynthesis.getVoices();
-                        this.swedishVoice =
-                            voices.find(v => v.lang.toLowerCase().startsWith('sv-se')) ||
-                            voices.find(v => v.lang.toLowerCase().startsWith('sv')) ||
-                            null;
+                        try {
+                            const voices = window.speechSynthesis.getVoices() || [];
+                            this.swedishVoice =
+                                voices.find(v => v.lang && v.lang.toLowerCase().startsWith('sv-se')) ||
+                                voices.find(v => v.lang && v.lang.toLowerCase().startsWith('sv')) ||
+                                null;
+                        } catch (_) {
+                            this.swedishVoice = null;
+                        }
                     };
                     loadVoices();
                     window.speechSynthesis.onvoiceschanged = loadVoices;
@@ -992,45 +988,103 @@
                     if (AudioCtx) this.ctx = new AudioCtx();
                 }
                 if (this.ctx && this.ctx.state === 'suspended') {
-                    this.ctx.resume();
+                    this.ctx.resume().catch(() => {});
                 }
             }
 
             toggle() {
                 this.enabled = !this.enabled;
-                if (!this.enabled && 'speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
+                if (!this.enabled && this.ttsSupported) {
+                    try {
+                        window.speechSynthesis.cancel();
+                    } catch (_) {}
                 }
                 return this.enabled;
             }
 
+            playFallbackVoiceChant(combo) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const patterns = {
+                    1: [{ f: 150, t: 0.0, d: 0.22 }],
+                    2: [{ f: 165, t: 0.0, d: 0.14 }, { f: 195, t: 0.15, d: 0.18 }],
+                    3: [{ f: 185, t: 0.0, d: 0.15 }, { f: 230, t: 0.16, d: 0.22 }],
+                    4: [
+                        { f: 130, t: 0.00, d: 0.13 },
+                        { f: 155, t: 0.14, d: 0.16 },
+                        { f: 185, t: 0.31, d: 0.16 },
+                        { f: 145, t: 0.50, d: 0.18 },
+                        { f: 175, t: 0.69, d: 0.16 },
+                        { f: 210, t: 0.86, d: 0.26 }
+                    ]
+                };
+
+                const notes = patterns[Math.min(Math.max(combo, 1), 4)];
+                notes.forEach(n => {
+                    const start = now + n.t;
+                    const osc = this.ctx.createOscillator();
+                    const formant = this.ctx.createBiquadFilter();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(n.f, start);
+                    osc.frequency.linearRampToValueAtTime(n.f * 0.92, start + n.d);
+
+                    formant.type = 'bandpass';
+                    formant.frequency.setValueAtTime(520, start);
+                    formant.Q.setValueAtTime(2.6, start);
+
+                    gain.gain.setValueAtTime(0.001, start);
+                    gain.gain.linearRampToValueAtTime(0.28, start + 0.025);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + n.d);
+
+                    osc.connect(formant);
+                    formant.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(start);
+                    osc.stop(start + n.d + 0.02);
+                });
+            }
+
             speakSwedishCombo(combo) {
-                if (!this.enabled || !('speechSynthesis' in window)) return;
+                if (!this.enabled) return;
+
+                let phrase = 'tung';
+                let pitch = 1.0;
+                let rate = 1.05;
+
+                if (combo === 1) {
+                    phrase = 'tung';
+                    pitch = 1.0;
+                    rate = 1.05;
+                } else if (combo === 2) {
+                    phrase = 'tyngre';
+                    pitch = 1.1;
+                    rate = 1.08;
+                } else if (combo === 3) {
+                    phrase = 'tyngst';
+                    pitch = 1.2;
+                    rate = 1.12;
+                } else {
+                    phrase = 'den tyngsta sahuren';
+                    pitch = 0.88;
+                    rate = 0.95;
+                }
+
+                if (!this.ttsSupported) {
+                    this.playFallbackVoiceChant(combo);
+                    return;
+                }
 
                 try {
-                    window.speechSynthesis.cancel();
-
-                    let phrase = 'tung';
-                    let pitch = 1.0;
-                    let rate = 1.08;
-
-                    if (combo === 1) {
-                        phrase = 'tung';
-                        pitch = 1.02;
-                        rate = 1.1;
-                    } else if (combo === 2) {
-                        phrase = 'tyngre!';
-                        pitch = 1.12;
-                        rate = 1.12;
-                    } else if (combo === 3) {
-                        phrase = 'tyngst!';
-                        pitch = 1.24;
-                        rate = 1.15;
-                    } else {
-                        phrase = 'den tyngsta sahuren!';
-                        pitch = 0.85;
-                        rate = 0.96;
+                    if (window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
                     }
+                    window.speechSynthesis.cancel();
 
                     const utterance = new SpeechSynthesisUtterance(phrase);
                     utterance.lang = 'sv-SE';
@@ -1041,9 +1095,23 @@
                     utterance.rate = rate;
                     utterance.volume = 1.0;
 
+                    let started = false;
+                    utterance.onstart = () => {
+                        started = true;
+                    };
+                    utterance.onerror = () => {
+                        if (!started) this.playFallbackVoiceChant(combo);
+                    };
+
                     window.speechSynthesis.speak(utterance);
-                } catch (err) {
-                    // Ohitetaan jos selain estää puhesynteesin
+
+                    setTimeout(() => {
+                        if (!started && this.enabled) {
+                            this.playFallbackVoiceChant(combo);
+                        }
+                    }, 300);
+                } catch (_) {
+                    this.playFallbackVoiceChant(combo);
                 }
             }
 
@@ -1066,18 +1134,17 @@
                 osc.stop(now + 0.09);
             }
 
-playComboHit(combo) {
-    if (!this.enabled) return;
-    this.init();
+            playComboHit(combo) {
+                if (!this.enabled) return;
+                this.init();
 
-    // Puhutaan ruotsiksi vain tasoilla 1–4, ja maksimitaso (4+) lausutaan vain tasan kerran (combo === 4)
-    if (combo <= 4) {
-        this.speakSwedishCombo(combo);
-    }
+                // Lausutaan kombo 1–4, ja maksimitaso (4) sanotaan vain silloin kun combo === 4
+                if (combo <= 4) {
+                    this.speakSwedishCombo(combo);
+                }
 
-    if (!this.ctx) return;
-    const now = this.ctx.currentTime;
-    // ... loput äänitehosteet pysyvät ennallaan ...
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
 
                 if (combo >= 4) {
                     const freqs = [293.66, 369.99, 440.00, 587.33];
@@ -1089,7 +1156,7 @@ playComboHit(combo) {
                         osc.frequency.setValueAtTime(f * 1.15, start);
                         osc.frequency.exponentialRampToValueAtTime(f, start + 0.14);
 
-                        gain.gain.setValueAtTime(0.26, start);
+                        gain.gain.setValueAtTime(0.22, start);
                         gain.gain.exponentialRampToValueAtTime(0.01, start + 0.36);
 
                         osc.connect(gain);
@@ -1105,7 +1172,7 @@ playComboHit(combo) {
                     osc.frequency.setValueAtTime(baseFreq, now);
                     osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.52, now + 0.15);
 
-                    gain.gain.setValueAtTime(0.32, now);
+                    gain.gain.setValueAtTime(0.28, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
 
                     osc.connect(gain);
@@ -1254,7 +1321,7 @@ playComboHit(combo) {
 
             window.addEventListener('pointerdown', (e) => {
                 if (!state.running) return;
-                if (e.target.closest('#soundToggleBtn')) return;
+                if (e.target.closest('#soundToggleBtn') || e.target.closest('#backToMenuLink')) return;
 
                 if (e.pointerType === 'touch') {
                     state.isTouchDevice = true;
@@ -1741,7 +1808,6 @@ playComboHit(combo) {
             finalStatsBox.classList.remove('hidden');
             startBtn.textContent = '🔄 PELAA UUDELLEEN';
 
-            // Estetään vahinkoklikkaus heti pelin päättyessä
             startBtn.disabled = true;
             overlayModal.classList.remove('hidden');
             setTimeout(() => {
