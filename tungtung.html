@@ -21,7 +21,36 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
+/* Päävalikko-nappi */
+.btn-menu {
+    width: 100%;
+    padding: 11px 18px;
+    margin-top: 10px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #e7bc8a 0%, #a97142 100%);
+    color: #2f1a0a;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    border: 3px solid #3f230e;
+    box-shadow: 0 4px 0 #2b1607, inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: transform 0.08s ease, filter 0.15s ease, opacity 0.2s ease;
+}
 
+.btn-menu:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+
+.btn-menu:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn-menu:not(:disabled):active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #2b1607, inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
         body {
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
