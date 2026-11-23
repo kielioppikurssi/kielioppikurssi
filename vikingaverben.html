@@ -1805,7 +1805,7 @@
 
                 if (chainCompleted) {
                     const summaryForms = state.currentVerb.forms.filter(f => f !== '-').join(' ➔ ');
-                    feedbackBanner.textContent = `⚡ Ketju taottu! ${summaryForms} (+${pointsEarned} p)`;
+                    feedbackBanner.textContent = `⚡ Kedjan färdig! Ketju taottu! ${summaryForms} (+${pointsEarned} p)`;
                     feedbackBanner.style.color = '#6ee7b7';
 
                     clearTimeout(state.spawnTimer);
@@ -1929,7 +1929,7 @@
             if (combo > 15) {
                 return `${chosen.split('<br>')[0]}<br>${combo}x STREAK! ⚡`;
             }
-            return chainCompleted ? `${chosen} • KETJU!` : chosen;
+            return chainCompleted ? `${chosen} • Kedja!` : chosen;
         }
 
 function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
@@ -1937,13 +1937,13 @@ function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
             el.className = 'combo-callout';
 
             if (combo === 1) {
-                el.textContent = chainCompleted ? 'KETJU VALMIS!' : 'Gnista!';
+                el.textContent = chainCompleted ? 'Kedjan färdig!' : 'Gnista!';
                 el.classList.add('callout-lvl-1');
                 el.style.left = `${x}px`;
                 el.style.top = `${y}px`;
                 spawnParticles(x, y, 7, ['#34d399', '#a7f3d0']);
             } else if (combo === 2) {
-                el.textContent = chainCompleted ? 'SMIDE & KETJU!' : 'Smide!';
+                el.textContent = chainCompleted ? 'Smide & kedjan!' : 'Smide!';
                 el.classList.add('callout-lvl-2');
                 el.style.left = `${x}px`;
                 el.style.top = `${y}px`;
@@ -1956,7 +1956,7 @@ function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
                 triggerShake(false);
                 spawnParticles(x, y, 22, ['#facc15', '#38bdf8', '#ffffff']);
             } else if (combo === 4) {
-                el.innerHTML = chainCompleted ? 'THORS ÅSKA!<br>KETJU VALMIS!' : 'Tors åska!<br>RUNMÄSTARE!!!';
+                el.innerHTML = chainCompleted ? 'Tors åska!<br>Kedjan färdig!' : 'Tors åska!<br>RUNMÄSTARE!!!';
                 el.classList.add('callout-lvl-4');
                 triggerShake(true);
 
