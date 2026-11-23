@@ -672,27 +672,25 @@
         }
 
         .callout-lvl-4 {
-            left: 50% !important;
-            top: 46% !important;
-            width: 90vw;
-            max-width: 540px;
-            font-size: clamp(1.6rem, 5.5vw, 2.6rem);
+            width: max-content;
+            max-width: 88vw;
+            font-size: clamp(1.25rem, 4.2vw, 1.95rem);
             background: linear-gradient(90deg, #e0f2fe, #38bdf8, #facc15, #34d399, #818cf8, #38bdf8);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 6px 0 #090d16) drop-shadow(0 0 30px rgba(56, 189, 248, 1));
+            filter: drop-shadow(0 5px 0 #090d16) drop-shadow(0 0 24px rgba(56, 189, 248, 1));
             animation: popLvl4 1.35s cubic-bezier(0.16, 1.45, 0.3, 1) forwards, auroraBar 0.8s linear infinite;
             z-index: 90;
         }
 
         @keyframes popLvl4 {
-            0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.15) rotate(-12deg); }
-            18%  { opacity: 1; transform: translate(-50%, -50%) scale(1.18) rotate(3deg); }
-            32%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05) rotate(-3deg); }
-            48%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(2deg); }
-            68%  { opacity: 1; transform: translate(-50%, -52%) scale(1.1) rotate(0deg); }
-            100% { opacity: 0; transform: translate(-50%, -68%) scale(1.35); }
+            0%   { opacity: 0; transform: translate(-50%, -20%) scale(0.25) rotate(-10deg); }
+            18%  { opacity: 1; transform: translate(-50%, -65%) scale(1.15) rotate(3deg); }
+            32%  { opacity: 1; transform: translate(-50%, -72%) scale(1.04) rotate(-3deg); }
+            48%  { opacity: 1; transform: translate(-50%, -82%) scale(1.12) rotate(2deg); }
+            68%  { opacity: 1; transform: translate(-50%, -95%) scale(1.06) rotate(0deg); }
+            100% { opacity: 0; transform: translate(-50%, -145%) scale(1.2); }
         }
 
         .lightning-flash-overlay {
@@ -1106,70 +1104,70 @@
             {level:1,fi:"totuttaa",forms:["vänja","vänjer","vande","vant"]},
             {level:1,fi:"syödä",forms:["äta","äter","åt","ätit"]},
             {level:2,fi:"tarjota",forms:["erbjuda","erbjuder","erbjöd","erbjudit"]},
-{level:2,fi:"kieltää",forms:["förbjuda","förbjuder","förbjöd","förbjudit"]},
-{level:2,fi:"keskeyttää",forms:["avbryta","avbryter","avbröt","avbrutit"]},
-{level:2,fi:"tarkoittaa",forms:["innebära","innebär","innebar","inneburit"]},
-{level:2,fi:"pettää",forms:["bedra","bedrar","bedrog","bedragit"]},
-{level:2,fi:"pitää parempana",forms:["föredra","föredrar","föredrog","föredrogit"]},
-{level:2,fi:"ilmestyä",forms:["dyka upp","dyker upp","dök upp","dykt upp"]},
-{level:2,fi:"kokea",forms:["erfara","erfar","erfor","erfarit"]},
-{level:2,fi:"oleskella",forms:["befinna sig","befinner sig","befann sig","befunnit sig"]},
-{level:2,fi:"keksiä",forms:["uppfinna","uppfinner","uppfann","uppfunnit"]},
-{level:2,fi:"luovuttaa",forms:["ge upp","ger upp","gav upp","givit upp"]},
-{level:2,fi:"myöntää",forms:["medge","medger","medgav","medgivit"]},
-{level:2,fi:"julkaista",forms:["utge","utger","utgav","utgivit"]},
-{level:2,fi:"käsittää",forms:["begripa","begriper","begrep","begripit"]},
-{level:2,fi:"koskea (asiaa)",forms:["angå","angår","angick","angått"]},
-{level:2,fi:"lähteä (liikenneväline)",forms:["avgå","avgår","avgick","avgått"]},
-{level:2,fi:"tehdä jotain kielteistä",forms:["begå","begår","begick","begått"]},
-{level:2,fi:"sisältyä",forms:["ingå","ingår","ingick","ingått"]},
-{level:2,fi:"olla käynnissä",forms:["pågå","pågår","pågick","pågått"]},
-{level:2,fi:"olla tekemisissä",forms:["umgås","umgås","umgicks","umgåtts"]},
-{level:2,fi:"olla tekemässä jotakin",forms:["hålla på","håller på","höll på","hållit på"]},
-{level:2,fi:"säilyttää",forms:["behålla","behåller","behöll","behållit"]},
-{level:2,fi:"suhtautua",forms:["förhålla sig","förhåller sig","förhöll sig","förhållit sig"]},
-{level:2,fi:"sisältää",forms:["innehålla","innehåller","innehöll","innehållit"]},
-{level:2,fi:"viihdyttää",forms:["underhålla","underhåller","underhöll","underhållit"]},
-{level:2,fi:"ilmetä",forms:["förekomma","förekommer","förekom","förekommit"]},
-{level:2,fi:"menehtyä",forms:["omkomma","omkommer","omkom","omkommit"]},
-{level:2,fi:"kuolla",forms:["avlida","avlider","avled","avlidit"]},
-{level:2,fi:"antaa anteeksi",forms:["förlåta","förlåter","förlät","förlåtit"]},
-{level:2,fi:"sallia",forms:["tillåta","tillåter","tillät","tillåtit"]},
-{level:2,fi:"mennä nukkumaan",forms:["lägga sig","lägger sig","lade sig","lagt sig"]},
-{level:2,fi:"suorittaa tutkinto",forms:["avlägga","avlägger","avlade","avlagt"]},
-{level:2,fi:"lisätä",forms:["tillägga","tillägger","tillade","tillagt"]},
-{level:2,fi:"purkaa",forms:["riva ner","river ner","rev ner","rivit ner"]},
-{level:2,fi:"näyttää joltakin",forms:["se ut","ser ut","såg ut","sett ut"]},
-{level:2,fi:"varoa",forms:["se upp","ser upp","såg upp","sett upp"]},
-{level:2,fi:"olla jotakin mieltä",forms:["anse","anser","ansåg","ansett"]},
-{level:2,fi:"aavistaa",forms:["förutse","förutser","förutsåg","förutsett"]},
-{level:2,fi:"tajuta",forms:["inse","inser","insåg","insett"]},
-{level:2,fi:"lykätä",forms:["skjuta upp","skjuter upp","sköt upp","skjutit upp"]},
-{level:2,fi:"kuvailla",forms:["beskriva","beskriver","beskrev","beskrivit"]},
-{level:2,fi:"ehdottaa",forms:["föreslå","föreslår","föreslog","föreslagit"]},
-{level:2,fi:"nukkua pommiin",forms:["försova sig","försover sig","försov sig","försovit sig"]},
-{level:2,fi:"luopua",forms:["avstå","avstår","avstod","avstått"]},
-{level:2,fi:"pysyä",forms:["bestå","består","bestod","bestått"]},
-{level:2,fi:"koostua jostakin",forms:["bestå av","består av","bestod av","bestått av"]},
-{level:2,fi:"ymmärtää",forms:["förstå","förstår","förstod","förstått"]},
-{level:2,fi:"väittää",forms:["påstå","påstår","påstod","påstått"]},
-{level:2,fi:"saada alkunsa",forms:["uppstå","uppstår","uppstod","uppstått"]},
-{level:2,fi:"sietää",forms:["utstå","utstår","utstod","utstått"]},
-{level:2,fi:"jäädä jäljelle",forms:["återstå","återstår","återstod","återstått"]},
-{level:2,fi:"istuutua",forms:["sätta sig","sätter sig","satte sig","satt sig"]},
-{level:2,fi:"asettua asumaan",forms:["bosätta sig","bosätter sig","bosatte sig","bosatt sig"]},
-{level:2,fi:"korvata",forms:["ersätta","ersätter","ersatte","ersatt"]},
-{level:2,fi:"jatkaa",forms:["fortsätta","fortsätter","fortsatte","fortsatt"]},
-{level:2,fi:"edellyttää",forms:["förutsätta","förutsätter","förutsatte","förutsatt"]},
-{level:2,fi:"työllistää",forms:["sysselsätta","sysselsätter","sysselsatte","sysselsatt"]},
-{level:2,fi:"kääntää",forms:["översätta","översätter","översatte","översatt"]},
-{level:2,fi:"olettaa",forms:["anta","antar","antog","antagit"]},
-{level:2,fi:"vähentyä",forms:["avta","avtar","avtog","avtagit"]},
-{level:2,fi:"osallistua",forms:["delta","deltar","deltog","deltagit"]},
-{level:2,fi:"lisääntyä",forms:["tillta","tilltar","tilltog","tilltagit"]},
-{level:2,fi:"poiketa",forms:["avvika","avviker","avvek","avvikit"]},
-{level:2,fi:"välttää",forms:["undvika","undviker","undvek","undvikit"]},
-{level:2,fi:"tottua",forms:["vänja sig","vänjer sig","vande sig","vant sig"]}
+            {level:2,fi:"kieltää",forms:["förbjuda","förbjuder","förbjöd","förbjudit"]},
+            {level:2,fi:"keskeyttää",forms:["avbryta","avbryter","avbröt","avbrutit"]},
+            {level:2,fi:"tarkoittaa",forms:["innebära","innebär","innebar","inneburit"]},
+            {level:2,fi:"pettää",forms:["bedra","bedrar","bedrog","bedragit"]},
+            {level:2,fi:"pitää parempana",forms:["föredra","föredrar","föredrog","föredrogit"]},
+            {level:2,fi:"ilmestyä",forms:["dyka upp","dyker upp","dök upp","dykt upp"]},
+            {level:2,fi:"kokea",forms:["erfara","erfar","erfor","erfarit"]},
+            {level:2,fi:"oleskella",forms:["befinna sig","befinner sig","befann sig","befunnit sig"]},
+            {level:2,fi:"keksiä",forms:["uppfinna","uppfinner","uppfann","uppfunnit"]},
+            {level:2,fi:"luovuttaa",forms:["ge upp","ger upp","gav upp","givit upp"]},
+            {level:2,fi:"myöntää",forms:["medge","medger","medgav","medgivit"]},
+            {level:2,fi:"julkaista",forms:["utge","utger","utgav","utgivit"]},
+            {level:2,fi:"käsittää",forms:["begripa","begriper","begrep","begripit"]},
+            {level:2,fi:"koskea (asiaa)",forms:["angå","angår","angick","angått"]},
+            {level:2,fi:"lähteä (liikenneväline)",forms:["avgå","avgår","avgick","avgått"]},
+            {level:2,fi:"tehdä jotain kielteistä",forms:["begå","begår","begick","begått"]},
+            {level:2,fi:"sisältyä",forms:["ingå","ingår","ingick","ingått"]},
+            {level:2,fi:"olla käynnissä",forms:["pågå","pågår","pågick","pågått"]},
+            {level:2,fi:"olla tekemisissä",forms:["umgås","umgås","umgicks","umgåtts"]},
+            {level:2,fi:"olla tekemässä jotakin",forms:["hålla på","håller på","höll på","hållit på"]},
+            {level:2,fi:"säilyttää",forms:["behålla","behåller","behöll","behållit"]},
+            {level:2,fi:"suhtautua",forms:["förhålla sig","förhåller sig","förhöll sig","förhållit sig"]},
+            {level:2,fi:"sisältää",forms:["innehålla","innehåller","innehöll","innehållit"]},
+            {level:2,fi:"viihdyttää",forms:["underhålla","underhåller","underhöll","underhållit"]},
+            {level:2,fi:"ilmetä",forms:["förekomma","förekommer","förekom","förekommit"]},
+            {level:2,fi:"menehtyä",forms:["omkomma","omkommer","omkom","omkommit"]},
+            {level:2,fi:"kuolla",forms:["avlida","avlider","avled","avlidit"]},
+            {level:2,fi:"antaa anteeksi",forms:["förlåta","förlåter","förlät","förlåtit"]},
+            {level:2,fi:"sallia",forms:["tillåta","tillåter","tillät","tillåtit"]},
+            {level:2,fi:"mennä nukkumaan",forms:["lägga sig","lägger sig","lade sig","lagt sig"]},
+            {level:2,fi:"suorittaa tutkinto",forms:["avlägga","avlägger","avlade","avlagt"]},
+            {level:2,fi:"lisätä",forms:["tillägga","tillägger","tillade","tillagt"]},
+            {level:2,fi:"purkaa",forms:["riva ner","river ner","rev ner","rivit ner"]},
+            {level:2,fi:"näyttää joltakin",forms:["se ut","ser ut","såg ut","sett ut"]},
+            {level:2,fi:"varoa",forms:["se upp","ser upp","såg upp","sett upp"]},
+            {level:2,fi:"olla jotakin mieltä",forms:["anse","anser","ansåg","ansett"]},
+            {level:2,fi:"aavistaa",forms:["förutse","förutser","förutsåg","förutsett"]},
+            {level:2,fi:"tajuta",forms:["inse","inser","insåg","insett"]},
+            {level:2,fi:"lykätä",forms:["skjuta upp","skjuter upp","sköt upp","skjutit upp"]},
+            {level:2,fi:"kuvailla",forms:["beskriva","beskriver","beskrev","beskrivit"]},
+            {level:2,fi:"ehdottaa",forms:["föreslå","föreslår","föreslog","föreslagit"]},
+            {level:2,fi:"nukkua pommiin",forms:["försova sig","försover sig","försov sig","försovit sig"]},
+            {level:2,fi:"luopua",forms:["avstå","avstår","avstod","avstått"]},
+            {level:2,fi:"pysyä",forms:["bestå","består","bestod","bestått"]},
+            {level:2,fi:"koostua jostakin",forms:["bestå av","består av","bestod av","bestått av"]},
+            {level:2,fi:"ymmärtää",forms:["förstå","förstår","förstod","förstått"]},
+            {level:2,fi:"väittää",forms:["påstå","påstår","påstod","påstått"]},
+            {level:2,fi:"saada alkunsa",forms:["uppstå","uppstår","uppstod","uppstått"]},
+            {level:2,fi:"sietää",forms:["utstå","utstår","utstod","utstått"]},
+            {level:2,fi:"jäädä jäljelle",forms:["återstå","återstår","återstod","återstått"]},
+            {level:2,fi:"istuutua",forms:["sätta sig","sätter sig","satte sig","satt sig"]},
+            {level:2,fi:"asettua asumaan",forms:["bosätta sig","bosätter sig","bosatte sig","bosatt sig"]},
+            {level:2,fi:"korvata",forms:["ersätta","ersätter","ersatte","ersatt"]},
+            {level:2,fi:"jatkaa",forms:["fortsätta","fortsätter","fortsatte","fortsatt"]},
+            {level:2,fi:"edellyttää",forms:["förutsätta","förutsätter","förutsatte","förutsatt"]},
+            {level:2,fi:"työllistää",forms:["sysselsätta","sysselsätter","sysselsatte","sysselsatt"]},
+            {level:2,fi:"kääntää",forms:["översätta","översätter","översatte","översatt"]},
+            {level:2,fi:"olettaa",forms:["anta","antar","antog","antagit"]},
+            {level:2,fi:"vähentyä",forms:["avta","avtar","avtog","avtagit"]},
+            {level:2,fi:"osallistua",forms:["delta","deltar","deltog","deltagit"]},
+            {level:2,fi:"lisääntyä",forms:["tillta","tilltar","tilltog","tilltagit"]},
+            {level:2,fi:"poiketa",forms:["avvika","avviker","avvek","avvikit"]},
+            {level:2,fi:"välttää",forms:["undvika","undviker","undvek","undvikit"]},
+            {level:2,fi:"tottua",forms:["vänja sig","vänjer sig","vande sig","vant sig"]}
         ];
 
         // Kaikki uniikit verbimuodot hämäysvaihtoehtojen lähteeksi
@@ -1227,7 +1225,7 @@
                 return this.enabled;
             }
 
-          speakSwedishWord(word) {
+            speakSwedishWord(word) {
                 if (!this.enabled || !this.ttsSupported || !word || word === '-') return;
                 try {
                     if (!this.swedishVoice) {
@@ -1249,7 +1247,7 @@
                         utterance.voice = this.swedishVoice;
                     }
                     utterance.pitch = 1.02;
-                    utterance.rate = 1.06;
+                    utterance.rate = 1.04;
                     utterance.volume = 1.0;
                     window.speechSynthesis.speak(utterance);
                 } catch (_) {}
@@ -1278,9 +1276,10 @@
                 if (!this.enabled) return;
                 this.init();
 
-                // if (word) {
-               //     this.speakSwedishWord(word);
-              //  }
+                // Luetaan pelaajan klikkaama verbi ruotsiksi
+                if (word) {
+                    this.speakSwedishWord(word);
+                }
 
                 if (!this.ctx) return;
                 const now = this.ctx.currentTime;
@@ -1932,9 +1931,13 @@
             return chainCompleted ? `${chosen} • Kedja!` : chosen;
         }
 
-function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
+        function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
             const el = document.createElement('div');
             el.className = 'combo-callout';
+
+            // Pidetään megakombo (taso 4+) pisteen saantipaikassa, mutta turvallisesti ruudun sisällä
+            const safeX = Math.max(125, Math.min(window.innerWidth - 125, x));
+            const safeY = Math.max(115, Math.min(window.innerHeight - 60, y));
 
             if (combo === 1) {
                 el.textContent = chainCompleted ? 'Kedjan färdig!' : 'Gnista!';
@@ -1958,6 +1961,8 @@ function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
             } else if (combo === 4) {
                 el.innerHTML = chainCompleted ? 'Tors åska!<br>Kedjan färdig!' : 'Tors åska!<br>RUNMÄSTARE!!!';
                 el.classList.add('callout-lvl-4');
+                el.style.left = `${safeX}px`;
+                el.style.top = `${safeY}px`;
                 triggerShake(true);
 
                 const flash = document.createElement('div');
@@ -1966,11 +1971,12 @@ function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
                 setTimeout(() => flash.remove(), 860);
 
                 const colors = ['#38bdf8', '#facc15', '#34d399', '#818cf8', '#ffffff'];
-                spawnParticles(x, y, 28, colors);
-                spawnParticles(window.innerWidth / 2, window.innerHeight * 0.46, 36, colors);
+                spawnParticles(x, y, 36, colors);
             } else {
                 el.innerHTML = pickStreakCalloutHtml(combo, chainCompleted);
                 el.classList.add('callout-lvl-4');
+                el.style.left = `${safeX}px`;
+                el.style.top = `${safeY}px`;
                 triggerShake(combo >= 8);
 
                 const flash = document.createElement('div');
@@ -1978,28 +1984,14 @@ function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
                 document.body.appendChild(flash);
                 setTimeout(() => flash.remove(), 860);
 
-                const extraBurst = Math.min(60, 28 + (combo - 5) * 3);
+                const extraBurst = Math.min(65, 32 + (combo - 5) * 3);
                 const colors = ['#38bdf8', '#facc15', '#34d399', '#818cf8', '#f472b6', '#ffffff'];
                 spawnParticles(x, y, extraBurst, colors);
-                spawnParticles(window.innerWidth / 2, window.innerHeight * 0.46, 36, colors);
             }
 
-            speakCalloutText(el.innerHTML || el.textContent);
             document.body.appendChild(el);
             const removeDelay = combo >= 4 ? 1360 : 1020;
             setTimeout(() => el.remove(), removeDelay);
-        }
-
-        function speakCalloutText(rawHtmlOrText) {
-            const cleanText = rawHtmlOrText
-                .replace(/<br\s*\/?>/gi, ', ')
-                .replace(/<[^>]*>/g, '')
-                .replace(/⚡/g, '')
-                .replace(/\s+/g, ' ')
-                .trim();
-            if (cleanText) {
-                sound.speakSwedishWord(cleanText);
-            }
         }
 
         function spawnSimpleCallout(text, x, y, color) {
