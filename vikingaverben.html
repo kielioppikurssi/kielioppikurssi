@@ -989,7 +989,7 @@
             </p>
 
             <div id="levelSelector" class="level-selector">
-                <button type="button" class="lvl-btn selected" data-level="all">⚔️ KAIKKI (94)</button>
+                <button type="button" class="lvl-btn selected" data-level="all">⚔️ KAIKKI (159 verbiä)</button>
                 <button type="button" class="lvl-btn" data-level="1">🛡️ TASO 1 (Perus)</button>
                 <button type="button" class="lvl-btn" data-level="2">🔥 TASO 2 (Haastava)</button>
             </div>
@@ -1859,59 +1859,59 @@
 
         const STREAK_CALLOUT_POOLS = {
             5: [
-                'BLIXTSNABBT!<br>5x KOMBO',
-                'MJÖLNERS GREPP!<br>5x KOMBO',
-                'JÄRNSLAG!<br>5x KOMBO'
+                'Blixtsnabb!<br>5x KOMBO',
+                'Mjölners grepp!<br>5x KOMBO',
+                'Järnslag!<br>5x KOMBO'
             ],
             6: [
-                'VALHALLA KALLAR!<br>6x KOMBO',
-                'NORRSKENSKRAFT!<br>6x KOMBO',
-                'SMIDESMÄSTARE!<br>6x KOMBO'
+                'Valhalla kallar!<br>6x KOMBO',
+                'Norrskenkraft!<br>6x KOMBO',
+                'Smidesmästare!<br>6x KOMBO'
             ],
             7: [
-                'ODENS ENA ÖGA!<br>7x KOMBO',
-                'STORMENS VREDE!<br>7x KOMBO',
-                'RUNSKRIFT I ELD!<br>7x KOMBO'
+                'Odens ena öga!<br>7x KOMBO',
+                'Stormens vrede!<br>7x KOMBO',
+                'Runskrift i eld!<br>7x KOMBO'
             ],
             8: [
-                'ASAGÅRDS ÅSKA!<br>8x KOMBO',
-                'BÄRSÄRKARASERI!<br>8x KOMBO',
-                'HAMMAREN SJUNGER!<br>8x KOMBO'
+                'Asagårds åska!<br>8x KOMBO',
+                'Bärsarkagång!<br>8x KOMBO',
+                'Hammaren slår!<br>8x KOMBO'
             ],
             9: [
-                'VIKINGAKUNG!<br>9x KOMBO',
-                'BLIXT ÖVER FJORDEN!<br>9x KOMBO',
-                'OBESEGRAD KLINGA!<br>9x KOMBO'
+                'Vikingakung!<br>9x KOMBO',
+                'Blixt över marken!<br>9x KOMBO',
+                'Obesegrad klinga!<br>9x KOMBO'
             ],
             10: [
-                'TIO I RAD!<br>THORS FÖRSTA KRAFT',
-                'LEGENDARISK SMED!<br>10x KOMBO',
-                'GYLLENE RUNE!<br>10x KOMBO'
+                'Tio i rad!<br>Tors kraft!',
+                'Legendarisk smed!<br>10x KOMBO',
+                'Åskan dånar!<br>10x KOMBO'
             ],
             11: [
-                'STJÄRNORNAS BLIXT!<br>11x KOMBO',
-                'EVIG VINTERELD!<br>11x KOMBO',
-                'SVÄRDETS SÅNG!<br>11x KOMBO'
+                'Stjärnorna tänds!<br>11x KOMBO',
+                'Evig vintereld!<br>11x KOMBO',
+                'Svärdet sjunger!<br>11x KOMBO'
             ],
             12: [
-                'VALKYRIORNAS DANS!<br>12x KOMBO',
-                'ÅSKGUDENS ARV!<br>12x KOMBO',
-                'DRAKENS GLÖD!<br>12x KOMBO'
+                'Valkyriornas dans!<br>12x KOMBO',
+                'Åskgudens arv!<br>12x KOMBO',
+                'Drakens skatt!<br>12x KOMBO'
             ],
             13: [
-                'MYTISK RUNMÄSTARE!<br>13x KOMBO',
-                'HIMMELEN RÄMNAR!<br>13x KOMBO',
-                'ODÖDLIG STREAK!<br>13x KOMBO'
+                'Mytisk runmäster!<br>13x KOMBO',
+                'Himmelen rämnar!<br>13x KOMBO',
+                'Odödlig streak!<br>13x KOMBO'
             ],
             14: [
-                'RAGNARÖKS GNISTA!<br>14x KOMBO',
-                'KOSMISKT NORRSKEN!<br>14x KOMBO',
-                'MÄSTARNAS MÄSTARE!<br>14x KOMBO'
+                'Ragnaröks gnista!<br>14x KOMBO',
+                'Kosmiskt norssken!<br>14x KOMBO',
+                'Mästarnas mästare!<br>14x KOMBO'
             ],
             15: [
-                'ÅSKGUDEN HYLLAR DIG!<br>15x KOMBO ⚡',
-                'ALLFADERNS VÄLSIGNELSE!<br>15x KOMBO ⚡',
-                'MAXIMALT ÅSKSLAG!<br>15x KOMBO ⚡'
+                'Åskguden hyllar dig!<br>15x KOMBO ⚡',
+                'Allfaderns välsignelse!<br>15x KOMBO ⚡',
+                'Maximalt åskslag!<br>15x KOMBO ⚡'
             ]
         };
 
@@ -1937,13 +1937,13 @@ function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
             el.className = 'combo-callout';
 
             if (combo === 1) {
-                el.textContent = chainCompleted ? 'KETJU VALMIS!' : 'GNISTA!';
+                el.textContent = chainCompleted ? 'KETJU VALMIS!' : 'Gnista!';
                 el.classList.add('callout-lvl-1');
                 el.style.left = `${x}px`;
                 el.style.top = `${y}px`;
                 spawnParticles(x, y, 7, ['#34d399', '#a7f3d0']);
             } else if (combo === 2) {
-                el.textContent = chainCompleted ? 'SMIDE & KETJU!' : 'SMIDE!';
+                el.textContent = chainCompleted ? 'SMIDE & KETJU!' : 'Smide!';
                 el.classList.add('callout-lvl-2');
                 el.style.left = `${x}px`;
                 el.style.top = `${y}px`;
@@ -1956,7 +1956,7 @@ function triggerGradualComboAnimation(combo, x, y, chainCompleted) {
                 triggerShake(false);
                 spawnParticles(x, y, 22, ['#facc15', '#38bdf8', '#ffffff']);
             } else if (combo === 4) {
-                el.innerHTML = chainCompleted ? 'THORS ÅSKA!<br>KETJU VALMIS!' : 'THORS ÅSKA!<br>RUNMÄSTARE!!!';
+                el.innerHTML = chainCompleted ? 'THORS ÅSKA!<br>KETJU VALMIS!' : 'Tors åska!<br>RUNMÄSTARE!!!';
                 el.classList.add('callout-lvl-4');
                 triggerShake(true);
 
