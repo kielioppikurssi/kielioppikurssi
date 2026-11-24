@@ -293,7 +293,7 @@
         }
 
         .prompt-box {
-            padding: 5px 10px;
+            padding: 6px 12px;
             text-align: center;
         }
 
@@ -302,32 +302,43 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 6px 10px;
+            gap: 8px 14px;
+            margin-bottom: 2px;
         }
 
         .prompt-sub {
-            font-size: 0.65rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: #94a3b8;
+            color: #cbd5e1;
             font-weight: 800;
         }
 
+        /* Korostettu ja selkeästi suurennettu verbin perusmuoto */
         .prompt-base {
-            font-size: clamp(1.2rem, 2.6vh, 1.65rem);
+            font-size: clamp(1.75rem, 4.2vh, 2.55rem);
             font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 2px 0 #090d16;
-            line-height: 1.1;
+            color: #facc15;
+            letter-spacing: 0.025em;
+            background: rgba(15, 23, 42, 0.78);
+            border: 2px solid rgba(250, 204, 21, 0.45);
+            border-radius: 10px;
+            padding: 2px 14px 4px;
+            text-shadow:
+                0 3px 0 #090d16,
+                0 0 18px rgba(250, 204, 21, 0.48),
+                0 0 28px rgba(56, 189, 248, 0.25);
+            box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.25), 0 3px 8px rgba(0, 0, 0, 0.4);
+            line-height: 1.08;
         }
 
         .prompt-fi {
-            font-size: clamp(0.8rem, 2vh, 0.98rem);
+            font-size: clamp(0.84rem, 2.1vh, 1.04rem);
             font-weight: 700;
-            color: #cbd5e1;
+            color: #e2e8f0;
             background: rgba(15, 23, 42, 0.72);
-            padding: 2px 8px;
-            border-radius: 6px;
+            padding: 3px 10px;
+            border-radius: 8px;
             border: 1px solid #334155;
         }
 
@@ -336,7 +347,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 6px;
-            margin-top: 5px;
+            margin-top: 6px;
         }
 
         .chain-slot {
@@ -420,7 +431,7 @@
         .game-board {
             position: relative;
             z-index: 10;
-            width: min(94vw, 760px, 76dvh);
+            width: min(94vw, 760px, 74dvh);
             flex: 1 1 auto;
             min-height: 0;
             display: flex;
@@ -528,16 +539,26 @@
             color: #7f1d1d;
         }
 
+        /* Riimukivilaatikko: skaalautuu ja rivittyy siististi pitkillekin verbimuodoille ilman "..."-katkaisua */
         .sign-text {
+            --tablet-scale: 1;
             width: 96%;
-            padding: 5px 6px;
+            min-height: clamp(28px, 4.4dvh, 38px);
+            max-height: clamp(36px, 5.6dvh, 48px);
+            padding: 3px 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             font-weight: 900;
-            font-size: clamp(0.95rem, 2.5dvh, 1.35rem);
-            line-height: 1.15;
+            font-size: calc(clamp(0.88rem, 2.35dvh, 1.26rem) * var(--tablet-scale));
+            line-height: 1.06;
             z-index: 10;
-            white-space: nowrap;
-            overflow: visible;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: break-word;
+            hyphens: none;
+            overflow: hidden;
         }
 
         @keyframes headShake {
@@ -1533,7 +1554,7 @@
                     <div class="hole-back"></div>
                     <div class="hole-mask">
                         <div class="mascot-wrapper">
-                            <svg viewBox="0 0 130 102" style="width:62%; max-height:58%; height:auto; overflow:visible; margin-bottom:-6px;">
+                            <svg viewBox="0 0 130 102" style="width:60%; max-height:55%; height:auto; overflow:visible; margin-bottom:-6px;">
                                 <!-- Viikinkikypärän sarvet -->
                                 <path d="M42 40 Q20 32 23 12 Q31 24 45 29 Z" fill="#fef3c7" stroke="#090d16" stroke-width="3" stroke-linejoin="round"/>
                                 <path d="M88 40 Q110 32 107 12 Q99 24 85 29 Z" fill="#fef3c7" stroke="#090d16" stroke-width="3" stroke-linejoin="round"/>
@@ -1698,6 +1719,20 @@
             return arr.slice(0, count);
         }
 
+        // Laskee sopivan tekstiskaalauksen riimukiven sanan tai sanaliiton pituuden mukaan
+        function getTabletFontScale(word) {
+            const len = word.length;
+            const longestToken = word.split(/\s+/).reduce((max, part) => Math.max(max, part.length), 0);
+
+            if (len >= 13 || longestToken >= 11) {
+                return 0.72;
+            }
+            if (len >= 10 || longestToken >= 9) {
+                return 0.85;
+            }
+            return 1;
+        }
+
         function spawnWave(expectedRoundId) {
             if (!state.running || expectedRoundId !== state.roundId || !state.currentVerb) return;
 
@@ -1726,6 +1761,7 @@
                 hole.active = true;
                 hole.word = word;
                 hole.isCorrect = isCorrectSlot;
+                hole.signEl.style.setProperty('--tablet-scale', getTabletFontScale(word));
                 hole.signEl.textContent = word;
 
                 hole.el.classList.remove('hit-correct', 'hit-wrong');
