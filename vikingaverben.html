@@ -1947,21 +1947,46 @@
                 'Åskguden hyllar dig!<br>15x KOMBO ⚡',
                 'Allfaderns välsignelse!<br>15x KOMBO ⚡',
                 'Maximalt åskslag!<br>15x KOMBO ⚡'
+            ],
+            16: [
+                'Bifrost glöder!<br>16x KOMBO ⚡',
+                'Midgårds beskyddare!<br>16x KOMBO ⚡',
+                'Stål och blixt!<br>16x KOMBO ⚡'
+            ],
+            17: [
+                'Fenrisulven darrar!<br>17x KOMBO ⚡',
+                'Runornas herre!<br>17x KOMBO ⚡',
+                'Ostoppbar storm!<br>17x KOMBO ⚡'
+            ],
+            18: [
+                'Midgårdsormen viker!<br>18x KOMBO ⚡',
+                'Gudasaga i eld!<br>18x KOMBO ⚡',
+                'Valhalls hjälte!<br>18x KOMBO ⚡'
+            ],
+            19: [
+                'Hela Norden dånar!<br>19x KOMBO ⚡',
+                'Odens spjut träffar!<br>19x KOMBO ⚡',
+                'Legendarisk kraft!<br>19x KOMBO ⚡'
+            ],
+            20: [
+                'GUDOMLIG RUNMÄSTARE!<br>20x KOMBO ⚡',
+                'ASAGÅRDS KRONA!<br>20x KOMBO ⚡',
+                'ODÖDLIG VIKINGALEGEND!<br>20x KOMBO ⚡'
             ]
         };
 
         let lastStreakText = '';
 
         function pickStreakCalloutHtml(combo, chainCompleted) {
-            const clamped = Math.min(Math.max(combo, 5), 15);
-            const candidates = STREAK_CALLOUT_POOLS[clamped] || STREAK_CALLOUT_POOLS[15];
+            const clamped = Math.min(Math.max(combo, 5), 20);
+            const candidates = STREAK_CALLOUT_POOLS[clamped] || STREAK_CALLOUT_POOLS[20];
             let chosen = candidates[Math.floor(Math.random() * candidates.length)];
             if (candidates.length > 1 && chosen === lastStreakText) {
                 chosen = candidates[(candidates.indexOf(chosen) + 1) % candidates.length];
             }
             lastStreakText = chosen;
 
-            if (combo > 15) {
+            if (combo > 20) {
                 return `${chosen.split('<br>')[0]}<br>${combo}x STREAK! ⚡`;
             }
             return chainCompleted ? `${chosen} • Kedja!` : chosen;
