@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Motherload: KonSuKieLiPre-kaivospeli</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f8fafc;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        /* Custom scrollbar for modals */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        .word-chip {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .word-chip:active {
+            transform: scale(0.95);
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.8); }
+        }
+        .glow-amber {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col relative">
+
+    <!-- Yläpalkki (HUD) -->
+    <header class="w-full bg-slate-900/95 border-b border-slate-700/80 px-3 py-2 flex flex-wrap items-center justify-between gap-2 z-10 shadow-lg backdrop-blur-sm">
+        <!-- Vasen: Päävalikko, Rahat & Syvyys -->
+        <div class="flex items-center gap-2 sm:gap-4">
+            <a href="https://kielioppikurssi.github.io" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-sky-300 hover:text-sky-200 border border-sky-500/40 px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow" title="Siirry päävalikkoon">
+                <span>🏠</span>
+                <span class="hidden sm:inline">Päävalikko</span>
+            </a>
+            <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-lg border border-emerald-500/30">
+                <span class="text-emerald-400 font-bold text-sm sm:text-base">$</span>
+                <span id="hud-money" class="mono font-bold text-emerald-300 text-sm sm:text-lg">150</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700">
+                <span class="text-slate-400 text-xs sm:text-sm font-medium">Syvyys:</span>
+                <span id="hud-depth" class="mono font-bold text-sky-300 text-sm sm:text-base">0 m</span>
+            </div>
+            <div class="hidden lg:flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-amber-500/30">
+                <span class="text-amber-400 text-xs sm:text-sm font-medium">KonSuKieLiPre-putki:</span>
+                <span id="hud-streak" class="mono font-bold text-amber-300 text-sm sm:text-base">0 🔥</span>
+            </div>
+        </div>
+
+        <!-- Keskellä: Mittarit (Polttoaine, Ruuma, Runko) -->
+        <div class="flex items-center gap-2 sm:gap-4 flex-1 max-w-xl justify-center">
+            <!-- Fuel -->
+            <div class="flex-1 min-w-[78px]">
+                <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
+                    <span class="text-amber-400">⛽ Bensa</span>
+                    <span id="hud-fuel-text" class="mono text-slate-300">100/100</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="hud-fuel-bar" class="h-full bg-gradient-to-r from-red-500 via-amber-500 to-yellow-400 transition-all duration-150" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Cargo -->
+            <div class="flex-1 min-w-[78px]">
+                <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
+                    <span class="text-purple-400">📦 Ruuma</span>
+                    <span id="hud-cargo-text" class="mono text-slate-300">0/6</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="hud-cargo-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-400 transition-all duration-150" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Hull -->
+            <div class="flex-1 min-w-[78px]">
+                <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
+                    <span class="text-rose-400">🛡️ Runko</span>
+                    <span id="hud-hull-text" class="mono text-slate-300">100/100</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="hud-hull-bar" class="h-full bg-gradient-to-r from-rose-600 to-emerald-400 transition-all duration-150" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Oikea: Toimintonapit -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <button id="btn-rule-help" class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="KonSuKieLiPre-muistisääntö">
+                <span>📘</span><span class="hidden sm:inline">KonSuKieLiPre</span>
+            </button>
+            <button id="btn-mute" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-600 transition" title="Äänet päälle/pois">
+                🔊
+            </button>
+            <button id="btn-reset" class="bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-rose-200 text-xs px-2.5 py-1.5 rounded-lg border border-slate-600 transition" title="Aloita alusta">
+                ↺
+            </button>
+        </div>
+    </header>
+
+    <!-- Pelialue (Canvas) -->
+    <main class="relative flex-1 w-full h-full overflow-hidden">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Aseman toimintopainike (ilmestyy kun pelaaja on rakennuksen kohdalla) -->
+        <div id="station-prompt" class="hidden absolute bottom-28 sm:bottom-10 left-1/2 -translate-x-1/2 z-10">
+            <button id="btn-enter-station" class="glow-amber bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-2xl border-2 border-amber-200 text-sm sm:text-base flex items-center gap-2 transition transform hover:scale-105">
+                <span id="station-prompt-icon">🏪</span>
+                <span id="station-prompt-text">Avaa asema (Enter / Väli)</span>
+            </button>
+        </div>
+
+        <!-- Ilmoitus-toast -->
+        <div id="toast-container" class="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 w-full max-w-md px-4"></div>
+
+        <!-- Mobiiliohjaimet: Analoginen tatti + Toimintopainike -->
+        <div id="mobile-controls" class="sm:hidden absolute bottom-4 inset-x-4 flex justify-between items-end pointer-events-none z-10">
+            <!-- Analoginen ohjaustatti -->
+            <div id="joystick-zone" class="pointer-events-auto relative w-28 h-28 rounded-full bg-slate-900/75 border-2 border-slate-600/80 backdrop-blur-sm shadow-2xl flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full border border-slate-700/80 pointer-events-none"></div>
+                <div id="joystick-knob" class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 border-2 border-amber-200 shadow-lg pointer-events-none transition-transform duration-75" style="transform: translate(0px, 0px);"></div>
+            </div>
+
+            <!-- Toimintopainike mobiiliin -->
+            <div class="pointer-events-auto">
+                <button id="mobile-action-btn" class="hidden w-16 h-16 bg-amber-500 active:bg-amber-400 text-slate-950 font-extrabold rounded-2xl shadow-lg border-2 border-amber-200 flex items-center justify-center text-2xl">
+                    🏢
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 1: RUOTSIN SIVULAUSEEN SANAJÄRJESTYSTEHTÄVÄ (KONSUKIELIPRE)   -->
+    <!-- ===================================================================== -->
+    <div id="quiz-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-slate-900 border-2 border-slate-700 rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[95vh] overflow-y-auto">
+            <!-- Yläotsikko & Löydetty malmi / Bossi -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div id="quiz-ore-badge" class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-white/20">💎</div>
+                    <div>
+                        <span id="quiz-tag" class="text-xs uppercase tracking-wider font-bold text-amber-400">Malmiesiintymä havaittu!</span>
+                        <h2 id="quiz-ore-name" class="text-lg sm:text-xl font-extrabold text-white">Kultasuoni ($250)</h2>
+                    </div>
+                </div>
+                <button id="quiz-rule-hint-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-semibold transition">
+                    💡 KonSuKieLiPre
+                </button>
+            </div>
+
+            <!-- Pika-lunttilappu (piilotettu oletuksena) -->
+            <div id="quiz-inline-hint" class="hidden bg-indigo-950/80 border border-indigo-500/40 rounded-xl p-3 text-xs sm:text-sm text-indigo-100">
+                <strong class="text-amber-300">KonSuKieLiPre-sääntö sivulauseessa:</strong><br>
+                <span class="mono bg-slate-900 px-1.5 py-0.5 rounded text-emerald-300">Kon (konjunktio) + Su (subjekti) + Kie (inte/aldrig) + Li (alltid/ofta/nu/redan) + Pre (predikaatti/verbi + loput)</span>
+            </div>
+
+            <!-- Tehtävänanto: Suomenkielinen lause -->
+            <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700/80">
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-1">Käännä ja järjestä sivulause KonSuKieLiPre-säännön mukaan:</p>
+                <p id="quiz-finnish" class="text-base sm:text-lg font-bold text-white">"Hän sanoi, että hän ei tule tänään."</p>
+            </div>
+
+            <!-- Lauseen rakennusalue -->
+            <div class="flex flex-col gap-2">
+                <label class="text-xs font-semibold text-slate-400">Muodosta ruotsinkielinen lause (klikkaa sanoja):</label>
+                <div id="quiz-answer-area" class="min-h-[64px] bg-slate-950/90 border-2 border-dashed border-slate-700 rounded-xl p-3 flex flex-wrap items-center gap-2">
+                    <span id="quiz-prefix" class="bg-indigo-900/60 text-indigo-200 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base">
+                        Han sa, att
+                    </span>
+                    <div id="quiz-selected-words" class="flex flex-wrap items-center gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Sanapankki (sekoitetut sanat) -->
+            <div class="flex flex-col gap-1.5">
+                <span class="text-xs font-semibold text-slate-400">Valittavat sanat:</span>
+                <div id="quiz-word-bank" class="min-h-[54px] bg-slate-800/40 rounded-xl p-3 flex flex-wrap gap-2 border border-slate-800"></div>
+            </div>
+
+            <!-- Palautelaatikko -->
+            <div id="quiz-feedback" class="hidden rounded-xl p-4 border text-sm sm:text-base"></div>
+
+            <!-- Toimintopainikkeet -->
+            <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-800">
+                <button id="btn-quiz-clear" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl text-sm transition">
+                    Tyhjennä
+                </button>
+                <div class="flex items-center gap-2">
+                    <button id="btn-quiz-check" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
+                        Tarkista ja poraa ⛏️
+                    </button>
+                    <button id="btn-quiz-continue" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
+                        Jatka peliä ▶
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 2: ASEMAT (MYYNTI, HUOLTO, PÄIVITYKSET)                       -->
+    <!-- ===================================================================== -->
+    <div id="station-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-slate-900 border-2 border-slate-700 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <span id="station-modal-icon" class="text-3xl">🏭</span>
+                    <div>
+                        <h2 id="station-modal-title" class="text-xl font-extrabold text-white">Malminjalostamo</h2>
+                        <p id="station-modal-subtitle" class="text-xs text-slate-400">Muuta kerätyt malmit rahaksi</p>
+                    </div>
+                </div>
+                <button id="btn-close-station" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold flex items-center justify-center">✕</button>
+            </div>
+
+            <div id="station-modal-body" class="flex flex-col gap-3"></div>
+
+            <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
+                <div class="text-sm font-bold text-emerald-400">Kassa: $<span id="station-money-display">150</span></div>
+                <button id="btn-close-station-bottom" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-xl text-sm">Sulje (Esc)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 3: KONSUKIELIPRE-MUISTISÄÄNTÖ JA OHJEET                       -->
+    <!-- ===================================================================== -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-slate-900 border-2 border-indigo-500/50 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+                    <span>📘</span> Ruotsin KonSuKieLiPre-sääntö & Peliohjeet
+                </h2>
+                <button id="btn-close-help" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-sm text-slate-200 leading-relaxed">
+                <div class="bg-indigo-950/70 border border-indigo-500/40 rounded-xl p-4">
+                    <h3 class="font-extrabold text-amber-300 text-base mb-1">Mikä on KonSuKieLiPre-sääntö?</h3>
+                    <p class="font-semibold text-white mb-2">
+                        <span class="text-sky-300">Kon</span>junktio +
+                        <span class="text-emerald-300">Su</span>bjekti +
+                        <span class="text-rose-400">Kie</span>ltosana (<em>inte</em>) +
+                        <span class="text-amber-300">Li</span>sämääreet (<em>alltid, ofta, aldrig, redan, nu</em>) +
+                        <span class="text-purple-300">Pre</span>dikaatti (taipunut verbi)
+                    </p>
+                    <p class="text-slate-300 text-xs sm:text-sm">
+                        Ruotsin sivulauseessa kieltosana ja määreet tulevat <strong>ENNEN</strong> taipunutta verbiä (predikaattia)!
+                    </p>
+                    <div class="mt-3 bg-slate-900/90 p-3 rounded-lg border border-slate-700 font-mono text-xs space-y-1.5">
+                        <div class="text-slate-400">Päälause: Han <span class="text-purple-300">kommer</span> <span class="text-rose-400">inte</span> <span class="text-amber-300">alltid</span> idag.</div>
+                        <div class="text-emerald-300">Sivulause: ... <span class="text-sky-300">att</span> <span class="text-emerald-300">han</span> <span class="text-rose-400 font-bold underline">inte</span> <span class="text-amber-300 font-bold underline">alltid</span> <span class="text-purple-300 font-bold">kommer</span> idag.</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/70 rounded-xl p-4 border border-slate-700">
+                    <h3 class="font-bold text-white mb-1.5">⛏️ Kuinka pelataan?</h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-300 text-xs sm:text-sm">
+                        <li><strong>Tietokone:</strong> Liiku ja lennä <strong>WASD</strong>-näppäimillä tai <strong>nuolinäppäimillä</strong>.</li>
+                        <li><strong>Puhelin / Tabletti:</strong> Ohjaa alusta ja poraamista <strong>analogisella tatilla</strong>.</li>
+                        <li><strong>Poraaminen & Bossi:</strong> Poraa malmeja ja kohtaa syvällä (630 m) <strong>Syvyyden Ydin-Bossi</strong> ratkaisemalla KonSuKieLiPre-lauseita!</li>
+                        <li><strong>Maanpinnan asemat:</strong> Myy malmit jalostamossa, tankkaa huoltoasemalla ja päivitä alusta pajalla.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button id="btn-close-help-bottom" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition">
+                Selvä, takaisin kaivokseen!
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 4: GAME OVER / VOITTO                                       -->
+    <!-- ===================================================================== -->
+    <div id="gameover-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-rose-500/60 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl flex flex-col gap-4">
+            <div id="gameover-icon" class="text-5xl">💥</div>
+            <h2 id="gameover-title" class="text-2xl font-extrabold text-rose-400">Polttoaine loppui!</h2>
+            <p id="gameover-desc" class="text-sm text-slate-300">Aluksesi jäi jumiin maan alle ilman polttoainetta.</p>
+            <div class="bg-slate-800 rounded-xl p-3 text-xs text-slate-300 flex justify-around">
+                <div>Syvin piste: <strong id="go-depth" class="text-sky-400">0 m</strong></div>
+                <div>Oikeat KonSuKieLiPret: <strong id="go-solved" class="text-emerald-400">0</strong></div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 mt-2">
+                <button id="btn-rescue" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-sm transition">
+                    🚁 Hinaus pintaan (-$50)
+                </button>
+                <button id="btn-new-game" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition">
+                    Aloita uusi peli
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/**
+ * ============================================================================
+ * 1. ÄÄNISYNTHETISAATTORI (WEB AUDIO API)
+ * ============================================================================
+ */
+class SoundEngine {
+    constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.lastDrillTime = 0;
+        this.lastThrustTime = 0;
+    }
+
+    init() {
+        if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    }
+
+    toggleMute() {
+        this.muted = !this.muted;
+        return this.muted;
+    }
+
+    playDrill() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        if (now - this.lastDrillTime < 0.08) return;
+        this.lastDrillTime = now;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(95 + Math.random() * 35, now);
+        osc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+    }
+
+    playThrust() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        if (now - this.lastThrustTime < 0.07) return;
+        this.lastThrustTime = now;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(70 + Math.random() * 20, now);
+        osc.frequency.linearRampToValueAtTime(40, now + 0.07);
+
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+    }
+
+    playOreFound() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25];
+        notes.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.12, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.2);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.2);
+        });
+    }
+
+    playSuccess() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.07);
+            gain.gain.setValueAtTime(0.14, now + i * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.3);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.07);
+            osc.stop(now + i * 0.07 + 0.3);
+        });
+    }
+
+    playError() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.35);
+
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+    }
+
+    playCash() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [880, 1174.66].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.06);
+            gain.gain.setValueAtTime(0.12, now + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.25);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.06);
+            osc.stop(now + i * 0.06 + 0.25);
+        });
+    }
+}
+
+const sound = new SoundEngine();
+
+/**
+ * ============================================================================
+ * 2. LAAJA RUOTSIN SIVULAUSEEN KONSUKIELIPRE-TEHTÄVÄPANKKI (50 LAUSETTA)
+ * ============================================================================
+ */
+const RULE_SENTENCES = [
+    {
+        fi: "Hän sanoi, että hän ei tule tänään.",
+        prefix: "Han sa, att",
+        words: ["han", "inte", "kommer", "idag"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + inte (Kie) + kommer (Pre) + idag."
+    },
+    {
+        fi: "En voi tulla, koska olen aina väsynyt perjantaisin.",
+        prefix: "Jag kan inte komma, eftersom",
+        words: ["jag", "alltid", "är", "trött", "på fredagar"],
+        explanation: "KonSuKieLiPre: eftersom (Kon) + jag (Su) + alltid (Li) + är (Pre) + trött på fredagar."
+    },
+    {
+        fi: "Kun he eivät asu enää Tukholmassa, he kaipaavat merta.",
+        prefix: "När",
+        words: ["de", "inte", "bor", "i Stockholm", "längre,"],
+        explanation: "KonSuKieLiPre: När (Kon) + de (Su) + inte (Kie) + bor (Pre) + i Stockholm längre."
+    },
+    {
+        fi: "Jos et osta lippua nyt, et pääse sisään.",
+        prefix: "Om",
+        words: ["du", "inte", "köper", "biljetten", "nu,"],
+        explanation: "KonSuKieLiPre: Om (Kon) + du (Su) + inte (Kie) + köper (Pre) + biljetten nu."
+    },
+    {
+        fi: "Vaikka hän ei koskaan harjoittele, hän voittaa aina.",
+        prefix: "Fastän",
+        words: ["han", "aldrig", "tränar,"],
+        explanation: "KonSuKieLiPre: Fastän (Kon) + han (Su) + aldrig (Kie/Li) + tränar (Pre)."
+    },
+    {
+        fi: "Hän kysyi, miksi me emme usein käy täällä.",
+        prefix: "Hon frågade, varför",
+        words: ["vi", "inte", "ofta", "kommer", "hit"],
+        explanation: "KonSuKieLiPre: varför (Kon) + vi (Su) + inte (Kie) + ofta (Li) + kommer (Pre) + hit."
+    },
+    {
+        fi: "Tiedän, että he ovat jo lukeneet kirjan.",
+        prefix: "Jag vet, att",
+        words: ["de", "redan", "har", "läst", "boken"],
+        explanation: "KonSuKieLiPre: att (Kon) + de (Su) + redan (Li) + har (Pre) + läst boken."
+    },
+    {
+        fi: "Hän hymyili, vaikka hän ei ymmärtänyt mitään.",
+        prefix: "Han log, trots att",
+        words: ["han", "inte", "förstod", "någonting"],
+        explanation: "KonSuKieLiPre: trots att (Kon) + han (Su) + inte (Kie) + förstod (Pre) + någonting."
+    },
+    {
+        fi: "Sillä aikaa kun me emme katsoneet, kissa söi kalan.",
+        prefix: "Medan",
+        words: ["vi", "inte", "tittade,"],
+        explanation: "KonSuKieLiPre: Medan (Kon) + vi (Su) + inte (Kie) + tittade (Pre)."
+    },
+    {
+        fi: "Ennen kuin lähdet, sinun täytyy sammuttaa valot.",
+        prefix: "Innan",
+        words: ["du", "går,"],
+        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + går (Pre)."
+    },
+    {
+        fi: "Olen iloinen, koska myös sinä tulet juhliin.",
+        prefix: "Jag är glad, eftersom",
+        words: ["du", "också", "kommer", "på festen"],
+        explanation: "KonSuKieLiPre: eftersom (Kon) + du (Su) + också (Li) + kommer (Pre) + på festen."
+    },
+    {
+        fi: "Hän luulee, että me emme voi auttaa häntä.",
+        prefix: "Han tror, att",
+        words: ["vi", "inte", "kan", "hjälpa", "honom"],
+        explanation: "KonSuKieLiPre: att (Kon) + vi (Su) + inte (Kie) + kan (Pre) + hjälpa honom."
+    },
+    {
+        fi: "Me jäämme kotiin, jos huomenna ei sada lunta.",
+        prefix: "Vi stannar hemma, om",
+        words: ["det", "inte", "snöar", "imorgon"],
+        explanation: "KonSuKieLiPre: om (Kon) + det (Su) + inte (Kie) + snöar (Pre) + imorgon."
+    },
+    {
+        fi: "On harmi, että bussi ei kulje sunnuntaisin.",
+        prefix: "Det är synd, att",
+        words: ["bussen", "inte", "går", "på söndagar"],
+        explanation: "KonSuKieLiPre: att (Kon) + bussen (Su) + inte (Kie) + går (Pre) + på söndagar."
+    },
+    {
+        fi: "Hän kertoi, että hän harvoin juo kahvia illalla.",
+        prefix: "Hon berättade, att",
+        words: ["hon", "sällan", "dricker", "kaffe", "på kvällen"],
+        explanation: "KonSuKieLiPre: att (Kon) + hon (Su) + sällan (Li) + dricker (Pre) + kaffe på kvällen."
+    },
+    {
+        fi: "Koska et halua syödä nyt, säästän ruoan.",
+        prefix: "Eftersom",
+        words: ["du", "inte", "vill", "äta", "nu,"],
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + du (Su) + inte (Kie) + vill (Pre) + äta nu."
+    },
+    {
+        fi: "Epäilen, että hän ei ole vielä saapunut.",
+        prefix: "Jag misstänker, att",
+        words: ["han", "inte", "har", "kommit", "ännu"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + inte (Kie) + har (Pre) + kommit ännu."
+    },
+    {
+        fi: "Kun me emme ole koulussa, pelaamme jalkapalloa.",
+        prefix: "När",
+        words: ["vi", "inte", "är", "i skolan,"],
+        explanation: "KonSuKieLiPre: När (Kon) + vi (Su) + inte (Kie) + är (Pre) + i skolan."
+    },
+    {
+        fi: "Hän osti takin, vaikka se ei ollut halpa.",
+        prefix: "Hon köpte jackan, fastän",
+        words: ["den", "inte", "var", "billig"],
+        explanation: "KonSuKieLiPre: fastän (Kon) + den (Su) + inte (Kie) + var (Pre) + billig."
+    },
+    {
+        fi: "Toivon, että sinä et unohda avaimia.",
+        prefix: "Jag hoppas, att",
+        words: ["du", "inte", "glömmer", "nycklarna"],
+        explanation: "KonSuKieLiPre: att (Kon) + du (Su) + inte (Kie) + glömmer (Pre) + nycklarna."
+    },
+    {
+        fi: "Hän suuttui, koska me emme kuunnelleet häntä.",
+        prefix: "Han blev arg, eftersom",
+        words: ["vi", "inte", "lyssnade", "på honom"],
+        explanation: "KonSuKieLiPre: eftersom (Kon) + vi (Su) + inte (Kie) + lyssnade (Pre) + på honom."
+    },
+    {
+        fi: "Tiedätkö, miksi hän ei koskaan vastaa viesteihin?",
+        prefix: "Vet du, varför",
+        words: ["han", "aldrig", "svarar", "på meddelanden?"],
+        explanation: "KonSuKieLiPre: varför (Kon) + han (Su) + aldrig (Kie/Li) + svarar (Pre) + på meddelanden."
+    },
+    {
+        fi: "Meidän täytyy kiirehtiä, jotta emme myöhästy junasta.",
+        prefix: "Vi måste skynda oss, så att",
+        words: ["vi", "inte", "missar", "tåget"],
+        explanation: "KonSuKieLiPre: så att (Kon) + vi (Su) + inte (Kie) + missar (Pre) + tåget."
+    },
+    {
+        fi: "Hän sanoi, että hän on nyt valmis lähtemään.",
+        prefix: "Hon sa, att",
+        words: ["hon", "nu", "är", "redo", "att gå"],
+        explanation: "KonSuKieLiPre: att (Kon) + hon (Su) + nu (Li) + är (Pre) + redo att gå."
+    },
+    {
+        fi: "Vaikka meillä ei ole paljon rahaa, olemme onnellisia.",
+        prefix: "Trots att",
+        words: ["vi", "inte", "har", "mycket pengar,"],
+        explanation: "KonSuKieLiPre: Trots att (Kon) + vi (Su) + inte (Kie) + har (Pre) + mycket pengar."
+    },
+    {
+        fi: "Ennen kuin he eivät enää jaksaneet kävellä, he pitivät tauon.",
+        prefix: "Innan",
+        words: ["de", "inte", "orkade", "gå", "längre,"],
+        explanation: "KonSuKieLiPre: Innan (Kon) + de (Su) + inte (Kie) + orkade (Pre) + gå längre."
+    },
+    {
+        fi: "Opettaja huomasi, että oppilaat eivät olleet tehneet läksyjä.",
+        prefix: "Läraren märkte, att",
+        words: ["eleverna", "inte", "hade", "gjort", "läxorna"],
+        explanation: "KonSuKieLiPre: att (Kon) + eleverna (Su) + inte (Kie) + hade (Pre) + gjort läxorna."
+    },
+    {
+        fi: "Jos hän ei soita tänään, lähetän hänelle sähköpostia.",
+        prefix: "Om",
+        words: ["han", "inte", "ringer", "idag,"],
+        explanation: "KonSuKieLiPre: Om (Kon) + han (Su) + inte (Kie) + ringer (Pre) + idag."
+    },
+    {
+        fi: "Hän ei tullut kouluun, koska hän oli yhä sairas.",
+        prefix: "Han kom inte till skolan, eftersom",
+        words: ["han", "fortfarande", "var", "sjuk"],
+        explanation: "KonSuKieLiPre: eftersom (Kon) + han (Su) + fortfarande (Li) + var (Pre) + sjuk."
+    },
+    {
+        fi: "Pelkään, että emme ehdi nähdä elokuvaa.",
+        prefix: "Jag är rädd, att",
+        words: ["vi", "inte", "hinner", "se", "filmen"],
+        explanation: "KonSuKieLiPre: att (Kon) + vi (Su) + inte (Kie) + hinner (Pre) + se filmen."
+    },
+    // --- 20 UUTTA LAUSETTA (31–50) ---
+    {
+        fi: "Hän sanoi, että hän ei aina syö aamiaista.",
+        prefix: "Han sa, att",
+        words: ["han", "inte", "alltid", "äter", "frukost"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + inte (Kie) + alltid (Li) + äter (Pre) + frukost."
+    },
+    {
+        fi: "Koska me emme tiedä vastausta, kysymme opettajalta.",
+        prefix: "Eftersom",
+        words: ["vi", "inte", "vet", "svaret,"],
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + vi (Su) + inte (Kie) + vet (Pre) + svaret."
+    },
+    {
+        fi: "Hän lupasi, että hän soittaa minulle huomenna.",
+        prefix: "Han lovade, att",
+        words: ["han", "ringer", "mig", "imorgon"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + ringer (Pre) + mig imorgon."
+    },
+    {
+        fi: "Kun tulet kotiin, voimme juoda teetä.",
+        prefix: "När",
+        words: ["du", "kommer", "hem,"],
+        explanation: "KonSuKieLiPre: När (Kon) + du (Su) + kommer (Pre) + hem."
+    },
+    {
+        fi: "En usko, että hän ei koskaan matkusta junalla.",
+        prefix: "Jag tror inte, att",
+        words: ["hon", "aldrig", "reser", "med tåg"],
+        explanation: "KonSuKieLiPre: att (Kon) + hon (Su) + aldrig (Kie/Li) + reser (Pre) + med tåg."
+    },
+    {
+        fi: "Jäämme sisälle, jos ulkona sataa rankasti.",
+        prefix: "Vi stannar inne, om",
+        words: ["det", "regnar", "kraftigt", "ute"],
+        explanation: "KonSuKieLiPre: om (Kon) + det (Su) + regnar (Pre) + kraftigt ute."
+    },
+    {
+        fi: "Hän selitti, että hän ei vielä ymmärrä tehtävää.",
+        prefix: "Han förklarade, att",
+        words: ["han", "inte", "ännu", "förstår", "uppgiften"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + inte (Kie) + ännu (Li) + förstår (Pre) + uppgiften."
+    },
+    {
+        fi: "Vaikka hän on kiireinen, hän auttaa aina ystäviään.",
+        prefix: "Fastän",
+        words: ["hon", "är", "upptagen,"],
+        explanation: "KonSuKieLiPre: Fastän (Kon) + hon (Su) + är (Pre) + upptagen."
+    },
+    {
+        fi: "Hän ihmetteli, miksi he eivät olleet paikalla.",
+        prefix: "Hon undrade, varför",
+        words: ["de", "inte", "var", "på plats"],
+        explanation: "KonSuKieLiPre: varför (Kon) + de (Su) + inte (Kie) + var (Pre) + på plats."
+    },
+    {
+        fi: "Meidän pitää lähteä, jotta emme jää myöhään.",
+        prefix: "Vi måste gå, så att",
+        words: ["vi", "inte", "blir", "sena"],
+        explanation: "KonSuKieLiPre: så att (Kon) + vi (Su) + inte (Kie) + blir (Pre) + sena."
+    },
+    {
+        fi: "Hän sanoi, että hän jo tuntee uuden opettajan.",
+        prefix: "Han sa, att",
+        words: ["han", "redan", "känner", "den nya läraren"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + redan (Li) + känner (Pre) + den nya läraren."
+    },
+    {
+        fi: "Kun he eivät nähneet meitä, he kävelivät ohi.",
+        prefix: "När",
+        words: ["de", "inte", "såg", "oss,"],
+        explanation: "KonSuKieLiPre: När (Kon) + de (Su) + inte (Kie) + såg (Pre) + oss."
+    },
+    {
+        fi: "Olen varma, että sinä opit ruotsia nopeasti.",
+        prefix: "Jag är säker på, att",
+        words: ["du", "lär", "dig svenska", "snabbt"],
+        explanation: "KonSuKieLiPre: att (Kon) + du (Su) + lär (Pre) + dig svenska snabbt."
+    },
+    {
+        fi: "Koska hän ei usein katso televisiota, hän lukee paljon.",
+        prefix: "Eftersom",
+        words: ["han", "inte", "ofta", "tittar", "på tv,"],
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + han (Su) + inte (Kie) + ofta (Li) + tittar (Pre) + på tv."
+    },
+    {
+        fi: "Hän sanoi, että he myös asuvat tässä kaupungissa.",
+        prefix: "Hon sa, att",
+        words: ["de", "också", "bor", "i den här staden"],
+        explanation: "KonSuKieLiPre: att (Kon) + de (Su) + också (Li) + bor (Pre) + i den här staden."
+    },
+    {
+        fi: "Ennen kuin syöt, pese kätesi saippualla.",
+        prefix: "Innan",
+        words: ["du", "äter,"],
+        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + äter (Pre)."
+    },
+    {
+        fi: "Hän ei tiennyt, että kauppa oli jo kiinni.",
+        prefix: "Han visste inte, att",
+        words: ["affären", "redan", "var", "stängd"],
+        explanation: "KonSuKieLiPre: att (Kon) + affären (Su) + redan (Li) + var (Pre) + stängd."
+    },
+    {
+        fi: "Jos me emme harjoittele, emme voita ottelua.",
+        prefix: "Om",
+        words: ["vi", "inte", "tränar,"],
+        explanation: "KonSuKieLiPre: Om (Kon) + vi (Su) + inte (Kie) + tränar (Pre)."
+    },
+    {
+        fi: "Vaikka sää on kylmä, menemme lenkille.",
+        prefix: "Trots att",
+        words: ["vädret", "är", "kallt,"],
+        explanation: "KonSuKieLiPre: Trots att (Kon) + vädret (Su) + är (Pre) + kallt."
+    },
+    {
+        fi: "Hän toivoi, että hän nyt löytäisi avaimensa.",
+        prefix: "Hon hoppades, att",
+        words: ["hon", "nu", "skulle hitta", "sina nycklar"],
+        explanation: "KonSuKieLiPre: att (Kon) + hon (Su) + nu (Li) + skulle hitta (Pre) + sina nycklar."
+    }
+];
+
+/**
+ * ============================================================================
+ * 3. PELIN VAKIOT, MAAPERÄTYYPIT JA PÄIVITYKSET
+ * ============================================================================
+ */
+const TILE_SIZE = 44;
+const GRID_COLS = 36;
+const GRID_ROWS = 130; // 130 * 5m = 650m syvyys (bossi pohjalla ~630m)
+const SURFACE_ROW = 6;
+
+const BLOCKS = {
+    EMPTY: { id: 0, name: 'Tyhjä', solid: false },
+    DIRT:  { id: 1, name: 'Multa', solid: true, color: '#5c3a21', border: '#462b18', hardness: 1, isOre: false },
+    ROCK:  { id: 2, name: 'Kova kallio', solid: true, color: '#475569', border: '#334155', hardness: 2, isOre: false },
+    HARD_ROCK: { id: 3, name: 'Graniitti', solid: true, color: '#1e293b', border: '#0f172a', hardness: 3, isOre: false },
+    COPPER: { id: 4, name: 'Kuparimalmi', solid: true, color: '#5c3a21', oreColor: '#f97316', glow: '#fdba74', value: 40, hardness: 1, isOre: true, icon: '🟠' },
+    SILVER: { id: 5, name: 'Hopeasuoni', solid: true, color: '#52341e', oreColor: '#e2e8f0', glow: '#ffffff', value: 90, hardness: 1, isOre: true, icon: '⚪' },
+    GOLD:   { id: 6, name: 'Kultahippu', solid: true, color: '#4a2e1b', oreColor: '#eab308', glow: '#fef08a', value: 180, hardness: 1, isOre: true, icon: '🟡' },
+    RUBY:   { id: 7, name: 'Rubiinikide', solid: true, color: '#422818', oreColor: '#f43f5e', glow: '#fda4af', value: 320, hardness: 2, isOre: true, icon: '🔴' },
+    DIAMOND:{ id: 8, name: 'Timantti', solid: true, color: '#3a2214', oreColor: '#38bdf8', glow: '#bae6fd', value: 550, hardness: 2, isOre: true, icon: '💎' },
+    UNOBTAINIUM: { id: 9, name: 'Svenskium-kristalli', solid: true, color: '#2e1a10', oreColor: '#c084fc', glow: '#f3e8ff', value: 1000, hardness: 3, isOre: true, icon: '🔮' }
+};
+
+const BLOCK_BY_ID = Object.values(BLOCKS).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
+
+const STATIONS = [
+    {
+        id: 'sell',
+        name: 'Malminjalostamo',
+        subtitle: 'Myy ruumassa olevat malmit rahaksi',
+        icon: '🏭',
+        colStart: 4,
+        colEnd: 8,
+        color: '#10b981',
+        roofColor: '#059669'
+    },
+    {
+        id: 'fuel',
+        name: 'Huolto & Tankkaus',
+        subtitle: 'Täytä polttoainetankki ja korjaa runko',
+        icon: '⛽',
+        colStart: 15,
+        colEnd: 19,
+        color: '#f59e0b',
+        roofColor: '#d97706'
+    },
+    {
+        id: 'upgrade',
+        name: 'Pora- & Aluspaja',
+        subtitle: 'Päivitä pora, tankki, ruuma ja runko',
+        icon: '🔧',
+        colStart: 26,
+        colEnd: 30,
+        color: '#6366f1',
+        roofColor: '#4f46e5'
+    }
+];
+
+const UPGRADES = {
+    drill: [
+        { level: 1, name: 'Peruspora (Taso 1)', desc: 'Poraa multaa ja perusmalmeja', power: 1, speed: 1.0, cost: 0 },
+        { level: 2, name: 'Teräspora (Taso 2)', desc: 'Poraa myös kalliota ja rubiineja', power: 2, speed: 1.35, cost: 250 },
+        { level: 3, name: 'Timanttipora (Taso 3)', desc: 'Murskaa graniitin ja kaiken!', power: 3, speed: 1.75, cost: 750 }
+    ],
+    fuel: [
+        { level: 1, name: 'Pieni tankki (100 L)', cap: 100, cost: 0 },
+        { level: 2, name: 'Keskikokoinen tankki (180 L)', cap: 180, cost: 180 },
+        { level: 3, name: 'Suuri tankki (300 L)', cap: 300, cost: 450 },
+        { level: 4, name: 'Fuusiotankki (500 L)', cap: 500, cost: 1000 }
+    ],
+    cargo: [
+        { level: 1, name: 'Pieni ruuma (6 malmia)', cap: 6, cost: 0 },
+        { level: 2, name: 'Laajennettu ruuma (10 malmia)', cap: 10, cost: 200 },
+        { level: 3, name: 'Rahtiruuma (16 malmia)', cap: 16, cost: 500 },
+        { level: 4, name: 'Tila-avaruusruuma (25 malmia)', cap: 25, cost: 1100 }
+    ],
+    hull: [
+        { level: 1, name: 'Peltirunko (100 HP)', cap: 100, cost: 0 },
+        { level: 2, name: 'Vahvistettu runko (175 HP)', cap: 175, cost: 200 },
+        { level: 3, name: 'Titaanirunko (280 HP)', cap: 280, cost: 550 }
+    ]
+};
+
+/**
+ * ============================================================================
+ * 4. PELIN TILA, SYVYYDEN BOSSI JA MAAILMAN GENEROINTI
+ * ============================================================================
+ */
+let grid = [];
+let particles = [];
+let floatingTexts = [];
+let keys = {};
+let activeStation = null;
+let isPaused = false;
+let gameOver = false;
+
+// Alkuperäisen Motherloadin syvyyteen sijoitettu bossi
+let boss = {
+    name: 'Syvyyden Ydin-Bossi',
+    col: 17,
+    row: GRID_ROWS - 4,
+    width: TILE_SIZE * 3,
+    height: TILE_SIZE * 2.4,
+    hp: 3,
+    maxHp: 3,
+    defeated: false,
+    reward: 3500
+};
+
+let player = {
+    x: 12 * TILE_SIZE,
+    y: (SURFACE_ROW - 1) * TILE_SIZE,
+    vx: 0,
+    vy: 0,
+    width: 32,
+    height: 34,
+    facing: 1,
+    money: 150,
+    fuel: 100,
+    hull: 100,
+    cargo: [],
+    upgrades: { drill: 1, fuel: 1, cargo: 1, hull: 1 },
+    drilling: {
+        active: false,
+        targetCol: -1,
+        targetRow: -1,
+        progress: 0,
+        duration: 0.55
+    },
+    stats: {
+        maxDepth: 0,
+        solvedCount: 0,
+        streak: 0
+    }
+};
+
+let currentQuiz = null;
+let usedSentenceIndices = new Set();
+
+function getMaxFuel() { return UPGRADES.fuel[player.upgrades.fuel - 1].cap; }
+function getMaxCargo() { return UPGRADES.cargo[player.upgrades.cargo - 1].cap; }
+function getMaxHull() { return UPGRADES.hull[player.upgrades.hull - 1].cap; }
+function getDrillPower() { return UPGRADES.drill[player.upgrades.drill - 1].power; }
+function getDrillSpeed() { return UPGRADES.drill[player.upgrades.drill - 1].speed; }
+
+function generateWorld() {
+    grid = [];
+    for (let r = 0; r < GRID_ROWS; r++) {
+        const row = [];
+        for (let c = 0; c < GRID_COLS; c++) {
+            if (r < SURFACE_ROW) {
+                row.push(BLOCKS.EMPTY.id);
+            } else if (r === SURFACE_ROW) {
+                row.push(BLOCKS.DIRT.id);
+            } else {
+                const depth = r - SURFACE_ROW;
+                const rand = Math.random();
+
+                // Luolakammiotyhjä bossin ympärille pohjalle
+                if (r >= boss.row - 2 && c >= boss.col - 1 && c <= boss.col + 3) {
+                    row.push(BLOCKS.EMPTY.id);
+                    continue;
+                }
+
+                if (depth > 8 && rand < 0.05) {
+                    row.push(BLOCKS.EMPTY.id);
+                    continue;
+                }
+                if (depth > 12 && rand < 0.14) {
+                    row.push(BLOCKS.ROCK.id);
+                    continue;
+                }
+                if (depth > 45 && rand < 0.22) {
+                    row.push(BLOCKS.HARD_ROCK.id);
+                    continue;
+                }
+
+                if (depth < 22) {
+                    if (rand < 0.14) row.push(BLOCKS.COPPER.id);
+                    else if (rand < 0.21) row.push(BLOCKS.SILVER.id);
+                    else row.push(BLOCKS.DIRT.id);
+                } else if (depth < 48) {
+                    if (rand < 0.08) row.push(BLOCKS.COPPER.id);
+                    else if (rand < 0.17) row.push(BLOCKS.SILVER.id);
+                    else if (rand < 0.25) row.push(BLOCKS.GOLD.id);
+                    else row.push(BLOCKS.DIRT.id);
+                } else if (depth < 82) {
+                    if (rand < 0.09) row.push(BLOCKS.GOLD.id);
+                    else if (rand < 0.19) row.push(BLOCKS.RUBY.id);
+                    else if (rand < 0.25) row.push(BLOCKS.DIAMOND.id);
+                    else row.push(BLOCKS.DIRT.id);
+                } else {
+                    if (rand < 0.08) row.push(BLOCKS.RUBY.id);
+                    else if (rand < 0.18) row.push(BLOCKS.DIAMOND.id);
+                    else if (rand < 0.26) row.push(BLOCKS.UNOBTAINIUM.id);
+                    else row.push(BLOCKS.DIRT.id);
+                }
+            }
+        }
+        grid.push(row);
+    }
+}
+
+function resetGame() {
+    boss.hp = boss.maxHp;
+    boss.defeated = false;
+    generateWorld();
+    player = {
+        x: 12 * TILE_SIZE,
+        y: (SURFACE_ROW - 1) * TILE_SIZE,
+        vx: 0,
+        vy: 0,
+        width: 32,
+        height: 34,
+        facing: 1,
+        money: 150,
+        fuel: 100,
+        hull: 100,
+        cargo: [],
+        upgrades: { drill: 1, fuel: 1, cargo: 1, hull: 1 },
+        drilling: { active: false, targetCol: -1, targetRow: -1, progress: 0, duration: 0.55 },
+        stats: { maxDepth: 0, solvedCount: 0, streak: 0 }
+    };
+    particles = [];
+    floatingTexts = [];
+    isPaused = false;
+    gameOver = false;
+    usedSentenceIndices.clear();
+    document.getElementById('gameover-modal').classList.add('hidden');
+    updateHUD();
+    showToast('Tervetuloa kaivokseen! Poraa malmeja ja etsi syvyyden bossi (630 m)!', 'info');
+}
+
+/**
+ * ============================================================================
+ * 5. HIUKKASET, LEIJUVAT TEKSTIT JA TOAST-ILMOITUKSET
+ * ============================================================================
+ */
+function spawnParticles(x, y, color, count = 8, speed = 90) {
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = (0.3 + Math.random() * 0.7) * speed;
+        particles.push({
+            x, y,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd - 20,
+            size: 2.5 + Math.random() * 3.5,
+            color,
+            life: 0.35 + Math.random() * 0.3,
+            maxLife: 0.65
+        });
+    }
+}
+
+function addFloatingText(x, y, text, color = '#fbbf24') {
+    floatingTexts.push({
+        x, y, text, color,
+        vy: -35,
+        life: 1.3
+    });
+}
+
+function showToast(msg, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    const styles = {
+        info: 'bg-slate-800/95 border-slate-600 text-slate-100',
+        success: 'bg-emerald-900/95 border-emerald-500 text-emerald-100',
+        warn: 'bg-amber-900/95 border-amber-500 text-amber-100',
+        error: 'bg-rose-900/95 border-rose-500 text-rose-100'
+    };
+    el.className = `${styles[type] || styles.info} border px-4 py-2 rounded-xl shadow-xl text-xs sm:text-sm font-semibold text-center transition-all duration-300 transform translate-y-0 opacity-100`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+        el.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => el.remove(), 300);
+    }, 2600);
+}
+
+/**
+ * ============================================================================
+ * 6. RUOTSIN SIVULAUSEEN KONSUKIELIPRE-TEHTÄVÄLOGIIKKA (MALMI & BOSSI)
+ * ============================================================================
+ */
+function triggerQuiz(options) {
+    // options: { isBoss: boolean, col?: number, row?: number, block?: object }
+    isPaused = true;
+    keys = {};
+    resetJoystick();
+    sound.playOreFound();
+
+    if (usedSentenceIndices.size >= RULE_SENTENCES.length) {
+        usedSentenceIndices.clear();
+    }
+    let idx;
+    do {
+        idx = Math.floor(Math.random() * RULE_SENTENCES.length);
+    } while (usedSentenceIndices.has(idx));
+    usedSentenceIndices.add(idx);
+
+    const sentence = RULE_SENTENCES[idx];
+    let shuffled = [...sentence.words];
+    for (let attempt = 0; attempt < 10; attempt++) {
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        if (shuffled.join(' ') !== sentence.words.join(' ')) break;
+    }
+
+    currentQuiz = {
+        isBoss: !!options.isBoss,
+        col: options.col,
+        row: options.row,
+        block: options.block,
+        sentence,
+        bankWords: shuffled.map((w, i) => ({ id: i, text: w, used: false })),
+        selectedWordIds: [],
+        answered: false
+    };
+
+    const badge = document.getElementById('quiz-ore-badge');
+    const tagEl = document.getElementById('quiz-tag');
+    const nameEl = document.getElementById('quiz-ore-name');
+
+    if (currentQuiz.isBoss) {
+        badge.textContent = '👾';
+        badge.style.backgroundColor = 'rgba(244, 63, 94, 0.25)';
+        tagEl.textContent = `Syvyyden Bossi — Osuma ${boss.maxHp - boss.hp + 1}/${boss.maxHp}`;
+        tagEl.className = 'text-xs uppercase tracking-wider font-extrabold text-rose-400';
+        nameEl.textContent = `${boss.name} (HP: ${boss.hp}/${boss.maxHp})`;
+    } else {
+        badge.textContent = options.block.icon;
+        badge.style.backgroundColor = options.block.oreColor + '33';
+        tagEl.textContent = 'Malmiesiintymä havaittu!';
+        tagEl.className = 'text-xs uppercase tracking-wider font-bold text-amber-400';
+        nameEl.textContent = `${options.block.name} (Arvo: $${options.block.value})`;
+    }
+
+    document.getElementById('quiz-finnish').textContent = `"${sentence.fi}"`;
+    document.getElementById('quiz-prefix').textContent = sentence.prefix;
+
+    document.getElementById('quiz-inline-hint').classList.add('hidden');
+    document.getElementById('quiz-feedback').classList.add('hidden');
+    document.getElementById('btn-quiz-check').classList.remove('hidden');
+    document.getElementById('btn-quiz-clear').classList.remove('hidden');
+    document.getElementById('btn-quiz-continue').classList.add('hidden');
+
+    renderQuizWords();
+    document.getElementById('quiz-modal').classList.remove('hidden');
+}
+
+function renderQuizWords() {
+    if (!currentQuiz) return;
+    const selectedContainer = document.getElementById('quiz-selected-words');
+    const bankContainer = document.getElementById('quiz-word-bank');
+
+    selectedContainer.innerHTML = '';
+    bankContainer.innerHTML = '';
+
+    currentQuiz.selectedWordIds.forEach(wordId => {
+        const wordObj = currentQuiz.bankWords.find(w => w.id === wordId);
+        const btn = document.createElement('button');
+        btn.className = 'word-chip bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-sm sm:text-base shadow cursor-pointer';
+        btn.textContent = wordObj.text;
+        if (!currentQuiz.answered) {
+            btn.onclick = () => {
+                wordObj.used = false;
+                currentQuiz.selectedWordIds = currentQuiz.selectedWordIds.filter(id => id !== wordId);
+                renderQuizWords();
+            };
+        }
+        selectedContainer.appendChild(btn);
+    });
+
+    currentQuiz.bankWords.forEach(wordObj => {
+        const btn = document.createElement('button');
+        if (wordObj.used) {
+            btn.className = 'word-chip bg-slate-800/40 text-slate-600 border border-slate-700/50 px-3 py-1.5 rounded-lg text-sm sm:text-base cursor-default';
+            btn.textContent = wordObj.text;
+            btn.disabled = true;
+        } else {
+            btn.className = 'word-chip bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 font-semibold px-3 py-1.5 rounded-lg text-sm sm:text-base shadow cursor-pointer';
+            btn.textContent = wordObj.text;
+            if (!currentQuiz.answered) {
+                btn.onclick = () => {
+                    wordObj.used = true;
+                    currentQuiz.selectedWordIds.push(wordObj.id);
+                    renderQuizWords();
+                };
+            }
+        }
+        bankContainer.appendChild(btn);
+    });
+}
+
+function checkQuizAnswer() {
+    if (!currentQuiz || currentQuiz.answered) return;
+
+    if (currentQuiz.selectedWordIds.length < currentQuiz.bankWords.length) {
+        showToast('Valitse kaikki sanat lauseeseen ennen tarkistusta!', 'warn');
+        return;
+    }
+
+    currentQuiz.answered = true;
+    const userWords = currentQuiz.selectedWordIds.map(id => currentQuiz.bankWords.find(w => w.id === id).text);
+    const correctWords = currentQuiz.sentence.words;
+    const isCorrect = userWords.join(' ') === correctWords.join(' ');
+
+    const feedbackEl = document.getElementById('quiz-feedback');
+    feedbackEl.classList.remove('hidden', 'bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100', 'bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+
+    if (currentQuiz.isBoss) {
+        const bx = (boss.col + 1.5) * TILE_SIZE;
+        const by = (boss.row + 1.2) * TILE_SIZE;
+
+        if (isCorrect) {
+            sound.playSuccess();
+            boss.hp = Math.max(0, boss.hp - 1);
+            player.stats.solvedCount++;
+            player.stats.streak++;
+            spawnParticles(bx, by, '#f43f5e', 24, 150);
+
+            if (boss.hp <= 0) {
+                boss.defeated = true;
+                player.money += boss.reward;
+                addFloatingText(bx, by - 20, `BOSSI VOITETTU! +$${boss.reward}`, '#34d399');
+                feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+                feedbackEl.innerHTML = `
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">🏆 SYVYYDEN YDIN-BOSSI KUKISTETTU! (+$${boss.reward})</div>
+                    <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
+                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${correctWords.join(' ')}</span>
+                    </div>
+                    <div class="text-xs text-emerald-200">Valloitit syvimmän kaivoksen mestarin KonSuKieLiPre-taidoillasi!</div>
+                `;
+            } else {
+                addFloatingText(bx, by - 15, `Osuma bossiin! (${boss.hp} HP jäljellä)`, '#fbbf24');
+                feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+                feedbackEl.innerHTML = `
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">⚔️ Täysosuma bossiin! Bossilla ${boss.hp}/${boss.maxHp} HP jäljellä.</div>
+                    <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
+                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${correctWords.join(' ')}</span>
+                    </div>
+                    <div class="text-xs text-emerald-200">Porauta uudelleen bossia päin antaaksesi seuraavan iskun!</div>
+                `;
+            }
+        } else {
+            sound.playError();
+            player.stats.streak = 0;
+            player.hull = Math.max(0, player.hull - 20);
+            player.vy = -180;
+            spawnParticles(player.x + 16, player.y + 16, '#f43f5e', 16, 110);
+            addFloatingText(player.x + 16, player.y - 10, 'Bossi iski! -20 HP', '#fb7185');
+
+            feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+            feedbackEl.innerHTML = `
+                <div class="font-extrabold text-rose-300 text-base mb-1">💥 Bossi torjui iskun ja vaurioitti runkoa (-20 HP)!</div>
+                <div class="text-xs text-rose-200 mb-1">Oikea KonSuKieLiPre-sanajärjestys:</div>
+                <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white mb-2">
+                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${correctWords.join(' ')}</span>
+                </div>
+                <div class="text-xs text-slate-200 bg-slate-900/60 p-2 rounded border border-slate-700">
+                    💡 <strong>Selitys:</strong> ${currentQuiz.sentence.explanation}
+                </div>
+            `;
+        }
+    } else {
+        // Normaali malmi
+        grid[currentQuiz.row][currentQuiz.col] = BLOCKS.EMPTY.id;
+        const wx = currentQuiz.col * TILE_SIZE + TILE_SIZE / 2;
+        const wy = currentQuiz.row * TILE_SIZE + TILE_SIZE / 2;
+
+        if (isCorrect) {
+            sound.playSuccess();
+            player.stats.solvedCount++;
+            player.stats.streak++;
+            const streakBonus = Math.min(player.stats.streak * 10, 100);
+            player.money += streakBonus;
+
+            let cargoMsg = '';
+            if (player.cargo.length < getMaxCargo()) {
+                player.cargo.push(currentQuiz.block.id);
+                cargoMsg = `${currentQuiz.block.name} kerätty ruumaan!`;
+            } else {
+                cargoMsg = `Ruuma oli täynnä, mutta sait silti +$${streakBonus} KonSuKieLiPre-bonuksen!`;
+            }
+
+            spawnParticles(wx, wy, currentQuiz.block.oreColor, 18, 130);
+            addFloatingText(wx, wy - 10, `+${currentQuiz.block.name}!`, '#34d399');
+
+            feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+            feedbackEl.innerHTML = `
+                <div class="font-extrabold text-emerald-300 text-base mb-1">✅ Oikein! Loistavaa KonSuKieLiPre-hallintaa! (+$${streakBonus} bonus)</div>
+                <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
+                    ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${correctWords.join(' ')}</span>
+                </div>
+                <div class="text-xs text-emerald-200">${cargoMsg}</div>
+            `;
+        } else {
+            sound.playError();
+            player.stats.streak = 0;
+            spawnParticles(wx, wy, '#64748b', 14, 90);
+            addFloatingText(wx, wy - 10, 'Malmi mureni!', '#fb7185');
+
+            feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+            feedbackEl.innerHTML = `
+                <div class="font-extrabold text-rose-300 text-base mb-1">❌ Melkein! Malmi mureni poratessa.</div>
+                <div class="text-xs text-rose-200 mb-1">Oikea KonSuKieLiPre-sanajärjestys:</div>
+                <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white mb-2">
+                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${correctWords.join(' ')}</span>
+                </div>
+                <div class="text-xs text-slate-200 bg-slate-900/60 p-2 rounded border border-slate-700">
+                    💡 <strong>Selitys:</strong> ${currentQuiz.sentence.explanation}
+                </div>
+            `;
+        }
+    }
+
+    document.getElementById('btn-quiz-check').classList.add('hidden');
+    document.getElementById('btn-quiz-clear').classList.add('hidden');
+    document.getElementById('btn-quiz-continue').classList.remove('hidden');
+    renderQuizWords();
+    updateHUD();
+}
+
+function closeQuizModal() {
+    const wasBossWin = currentQuiz && currentQuiz.isBoss && boss.defeated;
+    document.getElementById('quiz-modal').classList.add('hidden');
+    currentQuiz = null;
+    isPaused = false;
+
+    if (player.hull <= 0) {
+        triggerGameOver('Alus tuhoutui!', 'Syvyyden Ydin-Bossi murskasi aluksesi rungon.');
+        return;
+    }
+
+    if (wasBossWin) {
+        gameOver = true;
+        isPaused = true;
+        document.getElementById('gameover-icon').textContent = '🏆';
+        document.getElementById('gameover-title').textContent = 'Kaivos valloitettu!';
+        document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-emerald-400';
+        document.getElementById('gameover-desc').textContent = `Kukistit Syvyyden Ydin-Bossin ja ansaitsit $${boss.reward} palkkion!`;
+        document.getElementById('go-depth').textContent = `${player.stats.maxDepth} m`;
+        document.getElementById('go-solved').textContent = player.stats.solvedCount;
+        document.getElementById('gameover-modal').classList.remove('hidden');
+    }
+}
+
+/**
+ * ============================================================================
+ * 7. ASEMAT (MYYNTI, HUOLTO, PÄIVITYKSET)
+ * ============================================================================
+ */
+function openStationModal(station) {
+    isPaused = true;
+    keys = {};
+    resetJoystick();
+    const modal = document.getElementById('station-modal');
+    document.getElementById('station-modal-icon').textContent = station.icon;
+    document.getElementById('station-modal-title').textContent = station.name;
+    document.getElementById('station-modal-subtitle').textContent = station.subtitle;
+    document.getElementById('station-money-display').textContent = player.money;
+
+    const body = document.getElementById('station-modal-body');
+    body.innerHTML = '';
+
+    if (station.id === 'sell') {
+        if (player.cargo.length === 0) {
+            body.innerHTML = `
+                <div class="bg-slate-800/70 rounded-xl p-6 text-center text-slate-400 border border-slate-700">
+                    <div class="text-3xl mb-2">📦</div>
+                    <p class="font-semibold text-slate-200">Ruumasi on tyhjä!</p>
+                    <p class="text-xs mt-1">Poraa maan alta malmeja ja ratkaise KonSuKieLiPre-tehtäviä kerätäksesi lastia.</p>
+                </div>
+            `;
+        } else {
+            const counts = {};
+            let totalValue = 0;
+            player.cargo.forEach(id => {
+                counts[id] = (counts[id] || 0) + 1;
+                totalValue += BLOCK_BY_ID[id].value;
+            });
+
+            let listHtml = '<div class="space-y-2">';
+            Object.entries(counts).forEach(([id, count]) => {
+                const b = BLOCK_BY_ID[id];
+                listHtml += `
+                    <div class="flex items-center justify-between bg-slate-800 px-3.5 py-2.5 rounded-xl border border-slate-700">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xl">${b.icon}</span>
+                            <div>
+                                <div class="font-bold text-sm text-white">${b.name}</div>
+                                <div class="text-xs text-slate-400">${count} kpl × $${b.value}</div>
+                            </div>
+                        </div>
+                        <div class="mono font-bold text-emerald-400">$${count * b.value}</div>
+                    </div>
+                `;
+            });
+            listHtml += '</div>';
+
+            body.innerHTML = `
+                ${listHtml}
+                <button id="btn-sell-all" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl shadow-lg text-base transition">
+                    Myy kaikki malmit (+$${totalValue}) 💰
+                </button>
+            `;
+
+            document.getElementById('btn-sell-all').onclick = () => {
+                sound.playCash();
+                player.money += totalValue;
+                player.cargo = [];
+                updateHUD();
+                showToast(`Myit malmit hintaan $${totalValue}!`, 'success');
+                openStationModal(station);
+            };
+        }
+    } else if (station.id === 'fuel') {
+        const missingFuel = Math.ceil(getMaxFuel() - player.fuel);
+        const fuelCost = Math.max(0, Math.ceil(missingFuel * 0.4));
+        const missingHull = Math.ceil(getMaxHull() - player.hull);
+        const hullCost = Math.max(0, Math.ceil(missingHull * 0.6));
+
+        body.innerHTML = `
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
+                <div>
+                    <div class="font-bold text-amber-400 text-base">⛽ Tankkaa polttoainetta</div>
+                    <div class="text-xs text-slate-300">Nykyinen: ${Math.floor(player.fuel)} / ${getMaxFuel()} L</div>
+                </div>
+                <button id="btn-buy-fuel" class="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-extrabold px-4 py-2 rounded-xl text-sm transition" ${missingFuel <= 0 || player.money < fuelCost ? 'disabled' : ''}>
+                    ${missingFuel <= 0 ? 'Täynnä' : `Tankkaa ($${fuelCost})`}
+                </button>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
+                <div>
+                    <div class="font-bold text-rose-400 text-base">🛡️ Korjaa aluksen runko</div>
+                    <div class="text-xs text-slate-300">Kestävyys: ${Math.floor(player.hull)} / ${getMaxHull()} HP</div>
+                </div>
+                <button id="btn-buy-repair" class="bg-rose-500 hover:bg-rose-400 disabled:bg-slate-700 disabled:text-slate-500 text-white font-extrabold px-4 py-2 rounded-xl text-sm transition" ${missingHull <= 0 || player.money < hullCost ? 'disabled' : ''}>
+                    ${missingHull <= 0 ? 'Kunnossa' : `Korjaa ($${hullCost})`}
+                </button>
+            </div>
+        `;
+
+        const btnFuel = document.getElementById('btn-buy-fuel');
+        if (btnFuel) {
+            btnFuel.onclick = () => {
+                if (player.money >= fuelCost && missingFuel > 0) {
+                    sound.playCash();
+                    player.money -= fuelCost;
+                    player.fuel = getMaxFuel();
+                    updateHUD();
+                    showToast('Tankki täynnä!', 'success');
+                    openStationModal(station);
+                }
+            };
+        }
+        const btnRepair = document.getElementById('btn-buy-repair');
+        if (btnRepair) {
+            btnRepair.onclick = () => {
+                if (player.money >= hullCost && missingHull > 0) {
+                    sound.playCash();
+                    player.money -= hullCost;
+                    player.hull = getMaxHull();
+                    updateHUD();
+                    showToast('Runko korjattu!', 'success');
+                    openStationModal(station);
+                }
+            };
+        }
+    } else if (station.id === 'upgrade') {
+        const categories = [
+            { key: 'drill', label: '⛏️ Poranterä', list: UPGRADES.drill },
+            { key: 'fuel', label: '⛽ Polttoainetankki', list: UPGRADES.fuel },
+            { key: 'cargo', label: '📦 Ruumatila', list: UPGRADES.cargo },
+            { key: 'hull', label: '🛡️ Runkopanssari', list: UPGRADES.hull }
+        ];
+
+        categories.forEach(cat => {
+            const curLvl = player.upgrades[cat.key];
+            const curItem = cat.list[curLvl - 1];
+            const nextItem = cat.list[curLvl];
+
+            const card = document.createElement('div');
+            card.className = 'bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex items-center justify-between gap-3';
+            card.innerHTML = `
+                <div>
+                    <div class="text-xs font-bold text-indigo-400 uppercase">${cat.label}</div>
+                    <div class="font-bold text-white text-sm">${curItem.name}</div>
+                    ${nextItem ? `<div class="text-xs text-slate-400 mt-0.5">Seuraava: <span class="text-slate-200">${nextItem.name}</span></div>` : `<div class="text-xs text-emerald-400 mt-0.5">Maksimitaso saavutettu!</div>`}
+                </div>
+                <div>
+                    ${nextItem ? `
+                        <button data-upg="${cat.key}" class="upg-btn bg-indigo-500 hover:bg-indigo-400 disabled:bg-slate-700 disabled:text-slate-500 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition" ${player.money < nextItem.cost ? 'disabled' : ''}>
+                            Päivitä ($${nextItem.cost})
+                        </button>
+                    ` : `<span class="bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 rounded-lg text-xs font-bold">MAX</span>`}
+                </div>
+            `;
+            body.appendChild(card);
+        });
+
+        body.querySelectorAll('.upg-btn').forEach(btn => {
+            btn.onclick = () => {
+                const key = btn.getAttribute('data-upg');
+                const curLvl = player.upgrades[key];
+                const nextItem = UPGRADES[key][curLvl];
+                if (nextItem && player.money >= nextItem.cost) {
+                    sound.playCash();
+                    player.money -= nextItem.cost;
+                    player.upgrades[key]++;
+                    if (key === 'fuel') player.fuel = getMaxFuel();
+                    if (key === 'hull') player.hull = getMaxHull();
+                    updateHUD();
+                    showToast(`Päivitetty: ${nextItem.name}!`, 'success');
+                    openStationModal(station);
+                }
+            };
+        });
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeStationModal() {
+    document.getElementById('station-modal').classList.add('hidden');
+    isPaused = false;
+}
+
+/**
+ * ============================================================================
+ * 8. FYSIIKKA, LIIKE, PORAUS JA BOSSI-KOHTAAMINEN
+ * ============================================================================
+ */
+function getTileAt(col, row) {
+    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return BLOCKS.HARD_ROCK;
+    return BLOCK_BY_ID[grid[row][col]] || BLOCKS.EMPTY;
+}
+
+function checkCollision(nx, ny) {
+    const margin = 4;
+    const left = Math.floor((nx + margin) / TILE_SIZE);
+    const right = Math.floor((nx + player.width - margin) / TILE_SIZE);
+    const top = Math.floor((ny + margin) / TILE_SIZE);
+    const bottom = Math.floor((ny + player.height - 2) / TILE_SIZE);
+
+    for (let r = top; r <= bottom; r++) {
+        for (let c = left; c <= right; c++) {
+            if (getTileAt(c, r).solid) return true;
+        }
+    }
+    return false;
+}
+
+function checkBossCollision(nx, ny) {
+    if (boss.defeated) return false;
+    const bx = boss.col * TILE_SIZE;
+    const by = boss.row * TILE_SIZE;
+    return (
+        nx < bx + boss.width &&
+        nx + player.width > bx &&
+        ny < by + boss.height &&
+        ny + player.height > by
+    );
+}
+
+function isGrounded() {
+    const margin = 5;
+    const left = Math.floor((player.x + margin) / TILE_SIZE);
+    const right = Math.floor((player.x + player.width - margin) / TILE_SIZE);
+    const bottom = Math.floor((player.y + player.height + 2) / TILE_SIZE);
+
+    for (let c = left; c <= right; c++) {
+        if (getTileAt(c, bottom).solid) return true;
+    }
+    return false;
+}
+
+function triggerGameOver(reasonTitle, reasonDesc) {
+    gameOver = true;
+    isPaused = true;
+    resetJoystick();
+    document.getElementById('gameover-icon').textContent = '💥';
+    document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-rose-400';
+    document.getElementById('gameover-title').textContent = reasonTitle;
+    document.getElementById('gameover-desc').textContent = reasonDesc;
+    document.getElementById('go-depth').textContent = `${player.stats.maxDepth} m`;
+    document.getElementById('go-solved').textContent = player.stats.solvedCount;
+    document.getElementById('gameover-modal').classList.remove('hidden');
+}
+
+function update(dt) {
+    if (isPaused || gameOver) return;
+
+    //Yhdistetään näppäimistö (WASD + Nuolinäppäimet) sekä analoginen tatti
+    const leftPressed = keys['ArrowLeft'] || keys['KeyA'] || joystick.x < -0.28;
+    const rightPressed = keys['ArrowRight'] || keys['KeyD'] || joystick.x > 0.28;
+    const upPressed = keys['ArrowUp'] || keys['KeyW'] || joystick.y < -0.32;
+    const downPressed = keys['ArrowDown'] || keys['KeyS'] || joystick.y > 0.35;
+
+    const analogStrengthX = Math.max(
+        (keys['ArrowLeft'] || keys['KeyA'] || keys['ArrowRight'] || keys['KeyD']) ? 1 : 0,
+        Math.min(1, Math.abs(joystick.x))
+    );
+
+    const grounded = isGrounded();
+    const moveAccel = grounded ? 680 : 420;
+    const maxVx = 210 * (analogStrengthX > 0 ? Math.max(0.45, analogStrengthX) : 1);
+    const gravity = 460;
+    const thrustAccel = 740 * (upPressed && joystick.y < -0.32 ? Math.max(0.65, Math.min(1, -joystick.y)) : 1);
+
+    if (leftPressed || rightPressed || upPressed || player.drilling.active) {
+        const burnRate = upPressed ? 1.8 : 0.75;
+        player.fuel = Math.max(0, player.fuel - burnRate * dt);
+        if (player.fuel <= 0) {
+            triggerGameOver('Polttoaine loppui!', 'Aluksesi moottori sammui syvällä maan alla.');
+            return;
+        }
+    }
+
+    if (player.drilling.active) {
+        sound.playDrill();
+        player.drilling.progress += dt * getDrillSpeed();
+
+        const targetX = player.drilling.targetCol * TILE_SIZE + TILE_SIZE / 2;
+        const targetY = player.drilling.targetRow * TILE_SIZE + TILE_SIZE / 2;
+
+        player.x += (targetX - player.width / 2 - player.x) * 8 * dt;
+        player.y += (targetY - player.height / 2 - player.y) * 8 * dt;
+
+        const block = getTileAt(player.drilling.targetCol, player.drilling.targetRow);
+        if (Math.random() < 0.5) {
+            spawnParticles(targetX, targetY, block.oreColor || block.color, 2, 70);
+        }
+
+        if (upPressed) {
+            player.drilling.active = false;
+            player.drilling.progress = 0;
+        } else if (player.drilling.progress >= player.drilling.duration) {
+            const c = player.drilling.targetCol;
+            const r = player.drilling.targetRow;
+            player.drilling.active = false;
+            player.drilling.progress = 0;
+
+            if (block.isOre) {
+                triggerQuiz({ isBoss: false, col: c, row: r, block });
+                return;
+            } else {
+                grid[r][c] = BLOCKS.EMPTY.id;
+                spawnParticles(targetX, targetY, block.color, 12, 95);
+            }
+        }
+    } else {
+        if (leftPressed) {
+            player.vx -= moveAccel * dt;
+            player.facing = -1;
+        } else if (rightPressed) {
+            player.vx += moveAccel * dt;
+            player.facing = 1;
+        } else {
+            player.vx *= grounded ? Math.pow(0.001, dt) : Math.pow(0.15, dt);
+            if (Math.abs(player.vx) < 5) player.vx = 0;
+        }
+        player.vx = Math.max(-maxVx, Math.min(maxVx, player.vx));
+
+        if (upPressed) {
+            player.vy -= thrustAccel * dt;
+            sound.playThrust();
+            if (Math.random() < 0.7) {
+                spawnParticles(
+                    player.x + player.width / 2 + (Math.random() - 0.5) * 10,
+                    player.y + player.height,
+                    Math.random() < 0.5 ? '#f59e0b' : '#ef4444',
+                    1,
+                    60
+                );
+            }
+        } else {
+            player.vy += gravity * dt;
+        }
+        player.vy = Math.max(-290, Math.min(480, player.vy));
+
+        let nextX = player.x + player.vx * dt;
+        nextX = Math.max(0, Math.min(GRID_COLS * TILE_SIZE - player.width, nextX));
+
+        if (checkBossCollision(nextX, player.y)) {
+            player.vx = -player.facing * 140;
+            triggerQuiz({ isBoss: true });
+            return;
+        }
+
+        if (!checkCollision(nextX, player.y)) {
+            player.x = nextX;
+        } else {
+            if (grounded && (leftPressed || rightPressed)) {
+                const dir = leftPressed ? -1 : 1;
+                const checkCol = Math.floor((player.x + player.width / 2 + dir * (TILE_SIZE * 0.6)) / TILE_SIZE);
+                const checkRow = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+                tryStartDrill(checkCol, checkRow);
+            }
+            player.vx = 0;
+        }
+
+        let nextY = player.y + player.vy * dt;
+        nextY = Math.max(0, Math.min(GRID_ROWS * TILE_SIZE - player.height, nextY));
+
+        if (checkBossCollision(player.x, nextY)) {
+            player.vy = -170;
+            triggerQuiz({ isBoss: true });
+            return;
+        }
+
+        if (!checkCollision(player.x, nextY)) {
+            player.y = nextY;
+        } else {
+            if (player.vy > 340) {
+                const dmg = Math.floor((player.vy - 320) * 0.25);
+                player.hull = Math.max(0, player.hull - dmg);
+                sound.playError();
+                addFloatingText(player.x + 16, player.y, `-${dmg} HP`, '#fb7185');
+                if (player.hull <= 0) {
+                    triggerGameOver('Alus tuhoutui!', 'Törmäsit liian kovaa maaperään ja runko hajosi.');
+                    return;
+                }
+            }
+
+            if (downPressed && player.vy >= 0) {
+                const checkCol = Math.floor((player.x + player.width / 2) / TILE_SIZE);
+                const checkRow = Math.floor((player.y + player.height + 6) / TILE_SIZE);
+                tryStartDrill(checkCol, checkRow);
+            }
+            player.vy = 0;
+        }
+    }
+
+    const currentDepth = Math.max(0, Math.floor((player.y + player.height - SURFACE_ROW * TILE_SIZE) / TILE_SIZE * 5));
+    if (currentDepth > player.stats.maxDepth) {
+        player.stats.maxDepth = currentDepth;
+    }
+
+    checkStationProximity();
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 120 * dt;
+        p.life -= dt;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.y += ft.vy * dt;
+        ft.life -= dt;
+        if (ft.life <= 0) floatingTexts.splice(i, 1);
+    }
+
+    updateHUD();
+}
+
+function tryStartDrill(col, row) {
+    if (col < 0 || col >= GRID_COLS || row < SURFACE_ROW || row >= GRID_ROWS) return;
+    const block = getTileAt(col, row);
+    if (!block.solid) return;
+
+    if (block.hardness > getDrillPower()) {
+        if (Math.random() < 0.15) {
+            showToast(`Liian kova (${block.name})! Päivitä poranterää pajalla.`, 'warn');
+        }
+        return;
+    }
+
+    if (block.isOre && player.cargo.length >= getMaxCargo()) {
+        showToast('Ruuma on täynnä! Voit silti ratkaista tehtävän bonuksen vuoksi.', 'warn');
+    }
+
+    player.drilling.active = true;
+    player.drilling.targetCol = col;
+    player.drilling.targetRow = row;
+    player.drilling.progress = 0;
+    player.drilling.duration = 0.42 * block.hardness;
+}
+
+function checkStationProximity() {
+    const playerCol = (player.x + player.width / 2) / TILE_SIZE;
+    const playerRow = (player.y + player.height) / TILE_SIZE;
+
+    const promptEl = document.getElementById('station-prompt');
+    const mobileBtn = document.getElementById('mobile-action-btn');
+
+    if (Math.abs(playerRow - SURFACE_ROW) < 1.2) {
+        const found = STATIONS.find(s => playerCol >= s.colStart && playerCol <= s.colEnd + 1);
+        if (found) {
+            activeStation = found;
+            document.getElementById('station-prompt-icon').textContent = found.icon;
+            document.getElementById('station-prompt-text').textContent = `Avaa: ${found.name} (Enter)`;
+            promptEl.classList.remove('hidden');
+            mobileBtn.textContent = found.icon;
+            mobileBtn.classList.remove('hidden');
+            return;
+        }
+    }
+
+    activeStation = null;
+    promptEl.classList.add('hidden');
+    mobileBtn.classList.add('hidden');
+}
+
+function updateHUD() {
+    document.getElementById('hud-money').textContent = player.money;
+    const currentDepth = Math.max(0, Math.floor((player.y + player.height - SURFACE_ROW * TILE_SIZE) / TILE_SIZE * 5));
+    document.getElementById('hud-depth').textContent = `${currentDepth} m`;
+    document.getElementById('hud-streak').textContent = `${player.stats.streak} 🔥`;
+
+    const maxF = getMaxFuel();
+    document.getElementById('hud-fuel-text').textContent = `${Math.ceil(player.fuel)}/${maxF}`;
+    document.getElementById('hud-fuel-bar').style.width = `${(player.fuel / maxF) * 100}%`;
+
+    const maxC = getMaxCargo();
+    document.getElementById('hud-cargo-text').textContent = `${player.cargo.length}/${maxC}`;
+    document.getElementById('hud-cargo-bar').style.width = `${(player.cargo.length / maxC) * 100}%`;
+
+    const maxH = getMaxHull();
+    document.getElementById('hud-hull-text').textContent = `${Math.ceil(player.hull)}/${maxH}`;
+    document.getElementById('hud-hull-bar').style.width = `${(player.hull / maxH) * 100}%`;
+}
+
+/**
+ * ============================================================================
+ * 9. PIIRTÄMINEN (CANVAS RENDERING)
+ * ============================================================================
+ */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    const parent = canvas.parentElement;
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+function draw() {
+    const w = canvas.width;
+    const h = canvas.height;
+
+    const worldW = GRID_COLS * TILE_SIZE;
+    const worldH = GRID_ROWS * TILE_SIZE;
+
+    let camX = player.x + player.width / 2 - w / 2;
+    let camY = player.y + player.height / 2 - h / 2;
+    camX = Math.max(0, Math.min(Math.max(0, worldW - w), camX));
+    camY = Math.max(0, Math.min(Math.max(0, worldH - h), camY));
+
+    const skyY = SURFACE_ROW * TILE_SIZE - camY;
+    const skyGrad = ctx.createLinearGradient(0, Math.min(0, skyY - 250), 0, Math.max(100, skyY + 60));
+    skyGrad.addColorStop(0, '#0f172a');
+    skyGrad.addColorStop(0.5, '#1e3a8a');
+    skyGrad.addColorStop(1, '#38bdf8');
+    ctx.fillStyle = '#090d16';
+    ctx.fillRect(0, 0, w, h);
+
+    if (skyY > 0) {
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, Math.min(h, skyY));
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(0, skyY);
+        for (let mx = 0; mx <= w + 120; mx += 120) {
+            const mh = 45 + Math.sin((mx + camX * 0.3) * 0.01) * 30;
+            ctx.lineTo(mx, skyY - mh);
+        }
+        ctx.lineTo(w, skyY);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    ctx.save();
+    ctx.translate(-camX, -camY);
+
+    // Maanpinnan asemat
+    STATIONS.forEach(st => {
+        const sx = st.colStart * TILE_SIZE;
+        const sw = (st.colEnd - st.colStart + 1) * TILE_SIZE;
+        const sh = TILE_SIZE * 1.45;
+        const sy = SURFACE_ROW * TILE_SIZE - sh;
+
+        ctx.fillStyle = '#1e293b';
+        ctx.strokeStyle = st.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(sx + 4, sy, sw - 8, sh, [8, 8, 0, 0]);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = st.roofColor;
+        ctx.beginPath();
+        ctx.roundRect(sx, sy - 10, sw, 14, 6);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${st.icon} ${st.name}`, sx + sw / 2, sy + 24);
+
+        ctx.fillStyle = st.color + '44';
+        ctx.fillRect(sx + 8, SURFACE_ROW * TILE_SIZE - 5, sw - 16, 5);
+    });
+
+    const startCol = Math.max(0, Math.floor(camX / TILE_SIZE));
+    const endCol = Math.min(GRID_COLS - 1, Math.ceil((camX + w) / TILE_SIZE));
+    const startRow = Math.max(0, Math.floor(camY / TILE_SIZE));
+    const endRow = Math.min(GRID_ROWS - 1, Math.ceil((camY + h) / TILE_SIZE));
+
+    for (let r = startRow; r <= endRow; r++) {
+        for (let c = startCol; c <= endCol; c++) {
+            const id = grid[r][c];
+            if (id === BLOCKS.EMPTY.id) {
+                if (r >= SURFACE_ROW) {
+                    ctx.fillStyle = r > GRID_ROWS - 10 ? '#1b0d14' : '#111622';
+                    ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+                continue;
+            }
+
+            const block = BLOCK_BY_ID[id];
+            const bx = c * TILE_SIZE;
+            const by = r * TILE_SIZE;
+
+            ctx.fillStyle = block.color;
+            ctx.fillRect(bx, by, TILE_SIZE, TILE_SIZE);
+
+            if (r === SURFACE_ROW) {
+                ctx.fillStyle = '#16a34a';
+                ctx.fillRect(bx, by, TILE_SIZE, 6);
+            }
+
+            ctx.strokeStyle = block.border || 'rgba(0,0,0,0.25)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(bx + 0.5, by + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
+
+            if (block.isOre) {
+                ctx.save();
+                ctx.shadowColor = block.glow;
+                ctx.shadowBlur = 8;
+                ctx.fillStyle = block.oreColor;
+
+                const offsets = [
+                    { ox: 12, oy: 14, rad: 5 },
+                    { ox: 28, oy: 18, rad: 6 },
+                    { ox: 19, oy: 30, rad: 5.5 }
+                ];
+                offsets.forEach(o => {
+                    ctx.beginPath();
+                    ctx.arc(bx + o.ox, by + o.oy, o.rad, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.restore();
+            } else if (block.id === BLOCKS.ROCK.id || block.id === BLOCKS.HARD_ROCK.id) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.beginPath();
+                ctx.moveTo(bx + 8, by + 10);
+                ctx.lineTo(bx + 20, by + 22);
+                ctx.lineTo(bx + 34, by + 16);
+                ctx.stroke();
+            }
+        }
+    }
+
+    // Syvyyden Ydin-Bossi pohjalla
+    if (!boss.defeated) {
+        drawBoss(ctx);
+    }
+
+    // Porauksen edistymispalkki
+    if (player.drilling.active) {
+        const dx = player.drilling.targetCol * TILE_SIZE;
+        const dy = player.drilling.targetRow * TILE_SIZE;
+        const pct = Math.min(1, player.drilling.progress / player.drilling.duration);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.fillRect(dx + 4, dy + TILE_SIZE - 10, TILE_SIZE - 8, 6);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(dx + 4, dy + TILE_SIZE - 10, (TILE_SIZE - 8) * pct, 6);
+    }
+
+    drawPlayerPod(ctx);
+
+    particles.forEach(p => {
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    floatingTexts.forEach(ft => {
+        ctx.globalAlpha = Math.min(1, ft.life);
+        ctx.font = 'bold 13px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#000000';
+        ctx.fillText(ft.text, ft.x + 1, ft.y + 1);
+        ctx.fillStyle = ft.color;
+        ctx.fillText(ft.text, ft.x, ft.y);
+    });
+    ctx.globalAlpha = 1;
+
+    ctx.restore();
+}
+
+function drawBoss(ctx) {
+    const bx = boss.col * TILE_SIZE;
+    const by = boss.row * TILE_SIZE;
+    const pulse = Math.sin(performance.now() * 0.006) * 3;
+
+    ctx.save();
+    ctx.translate(bx + boss.width / 2, by + boss.height / 2 + pulse * 0.4);
+
+    // Hehku
+    ctx.shadowColor = '#f43f5e';
+    ctx.shadowBlur = 18;
+
+    // Bossin runko
+    ctx.fillStyle = '#31102f';
+    ctx.strokeStyle = '#f43f5e';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(-boss.width / 2, -boss.height / 2, boss.width, boss.height, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    // Silmät / ydinsensori
+    ctx.fillStyle = '#fda4af';
+    ctx.beginPath();
+    ctx.arc(-22, -6, 9, 0, Math.PI * 2);
+    ctx.arc(22, -6, 9, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#e11d48';
+    ctx.beginPath();
+    ctx.arc(-22, -6, 4, 0, Math.PI * 2);
+    ctx.arc(22, -6, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Nimi ja HP-palkit yläpuolella
+    ctx.font = 'bold 12px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fda4af';
+    ctx.fillText(`👾 ${boss.name}`, 0, -boss.height / 2 - 18);
+
+    const barW = 90;
+    const barH = 7;
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(-barW / 2, -boss.height / 2 - 12, barW, barH);
+    ctx.fillStyle = '#f43f5e';
+    ctx.fillRect(-barW / 2, -boss.height / 2 - 12, barW * (boss.hp / boss.maxHp), barH);
+
+    ctx.restore();
+}
+
+function drawPlayerPod(ctx) {
+    const px = player.x;
+    const py = player.y;
+    const pw = player.width;
+    const ph = player.height;
+
+    ctx.save();
+    ctx.translate(px + pw / 2, py + ph / 2);
+
+    if (player.drilling.active) {
+        ctx.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+    }
+
+    ctx.fillStyle = '#1e293b';
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(-pw / 2 + 2, ph / 2 - 8, pw - 4, 8, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#f59e0b';
+    ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-pw / 2 + 3, -ph / 2 + 4, pw - 6, ph - 11, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.roundRect(player.facing === 1 ? 0 : -11, -ph / 2 + 7, 11, 9, 4);
+    ctx.fill();
+
+    ctx.fillStyle = '#cbd5e1';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.2;
+
+    if (player.drilling.active && player.drilling.targetRow > Math.floor((py + ph / 2) / TILE_SIZE)) {
+        ctx.beginPath();
+        ctx.moveTo(-7, ph / 2 - 2);
+        ctx.lineTo(7, ph / 2 - 2);
+        ctx.lineTo(0, ph / 2 + 9);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    } else {
+        const dir = player.facing;
+        ctx.beginPath();
+        ctx.moveTo(dir * (pw / 2 - 3), -4);
+        ctx.lineTo(dir * (pw / 2 - 3), 8);
+        ctx.lineTo(dir * (pw / 2 + 8), 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+/**
+ * ============================================================================
+ * 10. OHJAIMET (WASD + NUOLINÄPPÄIMET + ANALOGINEN TATTI) JA PÄÄSILMUKKA
+ * ============================================================================
+ */
+const joystick = { active: false, x: 0, y: 0, pointerId: null };
+const joystickZone = document.getElementById('joystick-zone');
+const joystickKnob = document.getElementById('joystick-knob');
+const JOYSTICK_MAX_RADIUS = 34;
+
+function resetJoystick() {
+    joystick.active = false;
+    joystick.x = 0;
+    joystick.y = 0;
+    joystick.pointerId = null;
+    if (joystickKnob) {
+        joystickKnob.style.transform = 'translate(0px, 0px)';
+    }
+}
+
+function updateJoystickFromClient(clientX, clientY) {
+    const rect = joystickZone.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = clientX - cx;
+    let dy = clientY - cy;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > JOYSTICK_MAX_RADIUS) {
+        dx = (dx / dist) * JOYSTICK_MAX_RADIUS;
+        dy = (dy / dist) * JOYSTICK_MAX_RADIUS;
+    }
+
+    joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+    joystick.x = dx / JOYSTICK_MAX_RADIUS;
+    joystick.y = dy / JOYSTICK_MAX_RADIUS;
+}
+
+if (joystickZone) {
+    joystickZone.addEventListener('pointerdown', e => {
+        if (isPaused || gameOver) return;
+        e.preventDefault();
+        joystickZone.setPointerCapture(e.pointerId);
+        joystick.active = true;
+        joystick.pointerId = e.pointerId;
+        updateJoystickFromClient(e.clientX, e.clientY);
+    });
+
+    joystickZone.addEventListener('pointermove', e => {
+        if (!joystick.active || e.pointerId !== joystick.pointerId) return;
+        e.preventDefault();
+        updateJoystickFromClient(e.clientX, e.clientY);
+    });
+
+    const endStick = e => {
+        if (e.pointerId === joystick.pointerId) {
+            resetJoystick();
+        }
+    };
+    joystickZone.addEventListener('pointerup', endStick);
+    joystickZone.addEventListener('pointercancel', endStick);
+}
+
+window.addEventListener('keydown', e => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        if (!isPaused) e.preventDefault();
+    }
+    keys[e.code] = true;
+
+    if ((e.code === 'Enter' || e.code === 'Space') && !isPaused && activeStation) {
+        openStationModal(activeStation);
+    }
+    if (e.code === 'Escape') {
+        if (!document.getElementById('station-modal').classList.contains('hidden')) closeStationModal();
+        if (!document.getElementById('help-modal').classList.contains('hidden')) {
+            document.getElementById('help-modal').classList.add('hidden');
+            isPaused = false;
+        }
+    }
+});
+
+window.addEventListener('keyup', e => {
+    keys[e.code] = false;
+});
+
+document.getElementById('mobile-action-btn').onclick = () => {
+    if (activeStation && !isPaused) openStationModal(activeStation);
+};
+
+document.getElementById('btn-enter-station').onclick = () => {
+    if (activeStation && !isPaused) openStationModal(activeStation);
+};
+document.getElementById('btn-close-station').onclick = closeStationModal;
+document.getElementById('btn-close-station-bottom').onclick = closeStationModal;
+
+document.getElementById('btn-rule-help').onclick = () => {
+    isPaused = true;
+    resetJoystick();
+    document.getElementById('help-modal').classList.remove('hidden');
+};
+document.getElementById('btn-close-help').onclick = () => {
+    document.getElementById('help-modal').classList.add('hidden');
+    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden')) isPaused = false;
+};
+document.getElementById('btn-close-help-bottom').onclick = () => {
+    document.getElementById('help-modal').classList.add('hidden');
+    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden')) isPaused = false;
+};
+
+document.getElementById('btn-mute').onclick = (e) => {
+    const muted = sound.toggleMute();
+    e.target.textContent = muted ? '🔇' : '🔊';
+};
+
+document.getElementById('btn-reset').onclick = () => {
+    resetGame();
+};
+
+document.getElementById('quiz-rule-hint-btn').onclick = () => {
+    document.getElementById('quiz-inline-hint').classList.toggle('hidden');
+};
+
+document.getElementById('btn-quiz-clear').onclick = () => {
+    if (!currentQuiz || currentQuiz.answered) return;
+    currentQuiz.bankWords.forEach(w => w.used = false);
+    currentQuiz.selectedWordIds = [];
+    renderQuizWords();
+};
+
+document.getElementById('btn-quiz-check').onclick = checkQuizAnswer;
+document.getElementById('btn-quiz-continue').onclick = closeQuizModal;
+
+document.getElementById('btn-rescue').onclick = () => {
+    player.money = Math.max(0, player.money - 50);
+    player.x = 17 * TILE_SIZE;
+    player.y = (SURFACE_ROW - 1) * TILE_SIZE;
+    player.vx = 0;
+    player.vy = 0;
+    player.fuel = Math.max(25, getMaxFuel() * 0.35);
+    player.hull = Math.max(30, getMaxHull() * 0.5);
+    gameOver = false;
+    isPaused = false;
+    document.getElementById('gameover-modal').classList.add('hidden');
+    updateHUD();
+    showToast('Alus hinattiin maanpinnalle!', 'info');
+};
+
+document.getElementById('btn-new-game').onclick = resetGame;
+
+let lastTimestamp = 0;
+function gameLoop(timestamp) {
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000);
+    lastTimestamp = timestamp;
+
+    update(dt);
+    draw();
+
+    requestAnimationFrame(gameLoop);
+}
+
+window.onload = function () {
+    resizeCanvas();
+    resetGame();
+    requestAnimationFrame(gameLoop);
+};
+</script>
+</body>
+</html>
