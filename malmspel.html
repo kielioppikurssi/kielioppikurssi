@@ -1031,25 +1031,25 @@ const STATIONS = [
 const UPGRADES = {
     drill: [
         { level: 1, name: 'Basborr (Nivå 1)', desc: 'Poraa multaa ja perusmalmeja', power: 1, speed: 1.0, cost: 0 },
-        { level: 2, name: 'Stålborr (Nivå 2)', desc: 'Poraa myös kalliota ja rubiineja', power: 2, speed: 1.35, cost: 250 },
-        { level: 3, name: 'Diamantborr (Nivå 3)', desc: 'Murskaa graniitin ja nobeliumin!', power: 3, speed: 1.75, cost: 750 }
+        { level: 2, name: 'Stålborr (Nivå 2)', desc: 'Poraa myös kalliota ja rubiineja', power: 2, speed: 1.35, cost: 1000 },
+        { level: 3, name: 'Diamantborr (Nivå 3)', desc: 'Murskaa graniitin ja nobeliumin!', power: 3, speed: 1.75, cost: 10000 }
     ],
     fuel: [
         { level: 1, name: 'Liten tank (100 L)', cap: 100, cost: 0 },
-        { level: 2, name: 'Mellantank (180 L)', cap: 180, cost: 180 },
-        { level: 3, name: 'Stor tank (300 L)', cap: 300, cost: 450 },
-        { level: 4, name: 'Fusionstank (500 L)', cap: 500, cost: 1000 }
+        { level: 2, name: 'Mellantank (180 L)', cap: 180, cost: 1000 },
+        { level: 3, name: 'Stor tank (300 L)', cap: 300, cost: 5000 },
+        { level: 4, name: 'Fusionstank (500 L)', cap: 500, cost: 10000 }
     ],
     cargo: [
         { level: 1, name: 'Litet lastutrymme (6)', cap: 6, cost: 0 },
-        { level: 2, name: 'Utökat lastutrymme (10)', cap: 10, cost: 200 },
-        { level: 3, name: 'Tungt lastutrymme (16)', cap: 16, cost: 500 },
-        { level: 4, name: 'Rymdlastutrymme (25)', cap: 25, cost: 1100 }
+        { level: 2, name: 'Utökat lastutrymme (10)', cap: 10, cost: 2000 },
+        { level: 3, name: 'Tungt lastutrymme (16)', cap: 16, cost: 5000 },
+        { level: 4, name: 'Rymdlastutrymme (25)', cap: 25, cost: 11000 }
     ],
     hull: [
         { level: 1, name: 'Plåtskrov (100 HP)', cap: 100, cost: 0 },
-        { level: 2, name: 'Förstärkt skrov (175 HP)', cap: 175, cost: 200 },
-        { level: 3, name: 'Titanskrov (280 HP)', cap: 280, cost: 550 }
+        { level: 2, name: 'Förstärkt skrov (175 HP)', cap: 175, cost: 2000 },
+        { level: 3, name: 'Titanskrov (280 HP)', cap: 280, cost: 5050 }
     ]
 };
 
@@ -1768,10 +1768,10 @@ function openStationModal(station) {
                             <span class="text-xl">${b.icon}</span>
                             <div>
                                 <div class="font-bold text-sm text-white">${b.name}</div>
-                                <div class="text-xs text-slate-400">${count} st × $${b.value}</div>
+                                <div class="text-xs text-slate-400">${count} st × ${b.value} SEK</div>
                             </div>
                         </div>
-                        <div class="mono font-bold text-emerald-400">$${count * b.value}</div>
+                        <div class="mono font-bold text-emerald-400">${count * b.value} SEK</div>
                     </div>
                 `;
             });
