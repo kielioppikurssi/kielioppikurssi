@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Motherload: KonSuKieLiPre-kaivospeli</title>
+    <title>Malmspel: KonSuKieLiPre-kaivospeli</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -24,7 +24,6 @@
             width: 100%;
             height: 100%;
         }
-        /* Custom scrollbar for modals */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -57,20 +56,20 @@
     <header class="w-full bg-slate-900/95 border-b border-slate-700/80 px-3 py-2 flex flex-wrap items-center justify-between gap-2 z-10 shadow-lg backdrop-blur-sm">
         <!-- Vasen: Päävalikko, Rahat & Syvyys -->
         <div class="flex items-center gap-2 sm:gap-4">
-            <a href="https://kielioppikurssi.github.io" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-sky-300 hover:text-sky-200 border border-sky-500/40 px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow" title="Siirry päävalikkoon">
+            <a href="https://kielioppikurssi.github.io" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-sky-300 hover:text-sky-200 border border-sky-500/40 px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow" title="Till huvudmenyn / Päävalikkoon">
                 <span>🏠</span>
-                <span class="hidden sm:inline">Päävalikko</span>
+                <span class="hidden sm:inline">Start / Päävalikko</span>
             </a>
             <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-lg border border-emerald-500/30">
                 <span class="text-emerald-400 font-bold text-sm sm:text-base">$</span>
                 <span id="hud-money" class="mono font-bold text-emerald-300 text-sm sm:text-lg">150</span>
             </div>
             <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700">
-                <span class="text-slate-400 text-xs sm:text-sm font-medium">Syvyys:</span>
+                <span class="text-slate-400 text-xs sm:text-sm font-medium">Djup:</span>
                 <span id="hud-depth" class="mono font-bold text-sky-300 text-sm sm:text-base">0 m</span>
             </div>
             <div class="hidden lg:flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-amber-500/30">
-                <span class="text-amber-400 text-xs sm:text-sm font-medium">KonSuKieLiPre-putki:</span>
+                <span class="text-amber-400 text-xs sm:text-sm font-medium">KonSuKieLiPre-svit:</span>
                 <span id="hud-streak" class="mono font-bold text-amber-300 text-sm sm:text-base">0 🔥</span>
             </div>
         </div>
@@ -80,7 +79,7 @@
             <!-- Fuel -->
             <div class="flex-1 min-w-[78px]">
                 <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
-                    <span class="text-amber-400">⛽ Bensa</span>
+                    <span class="text-amber-400">⛽ Bensin</span>
                     <span id="hud-fuel-text" class="mono text-slate-300">100/100</span>
                 </div>
                 <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
@@ -91,7 +90,7 @@
             <!-- Cargo -->
             <div class="flex-1 min-w-[78px]">
                 <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
-                    <span class="text-purple-400">📦 Ruuma</span>
+                    <span class="text-purple-400">📦 Last</span>
                     <span id="hud-cargo-text" class="mono text-slate-300">0/6</span>
                 </div>
                 <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
@@ -102,7 +101,7 @@
             <!-- Hull -->
             <div class="flex-1 min-w-[78px]">
                 <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
-                    <span class="text-rose-400">🛡️ Runko</span>
+                    <span class="text-rose-400">🛡️ Skrov</span>
                     <span id="hud-hull-text" class="mono text-slate-300">100/100</span>
                 </div>
                 <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
@@ -113,14 +112,14 @@
 
         <!-- Oikea: Toimintonapit -->
         <div class="flex items-center gap-1.5 sm:gap-2">
-            <button id="btn-rule-help" class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="KonSuKieLiPre-muistisääntö">
+            <button id="btn-rule-help" class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="KonSuKieLiPre-regel & instruktioner">
                 <span>📘</span><span class="hidden sm:inline">KonSuKieLiPre</span>
             </button>
-            <button id="btn-mute" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-600 transition" title="Äänet päälle/pois">
+            <button id="btn-mute" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-600 transition" title="Ljud på/av">
                 🔊
             </button>
-            <button id="btn-reset" class="bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-rose-200 text-xs px-2.5 py-1.5 rounded-lg border border-slate-600 transition" title="Aloita alusta">
-                ↺
+            <button id="btn-new-game-top" class="bg-rose-700 hover:bg-rose-600 active:bg-rose-800 text-white text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg border border-rose-500/50 shadow transition flex items-center gap-1" title="Aloita uusi peli (nollaa tallennuksen)">
+                <span>↺</span><span>Uusi peli</span>
             </button>
         </div>
     </header>
@@ -129,11 +128,11 @@
     <main class="relative flex-1 w-full h-full overflow-hidden">
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Aseman toimintopainike (ilmestyy kun pelaaja on rakennuksen kohdalla) -->
+        <!-- Aseman toimintopainike -->
         <div id="station-prompt" class="hidden absolute bottom-28 sm:bottom-10 left-1/2 -translate-x-1/2 z-10">
             <button id="btn-enter-station" class="glow-amber bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-2xl border-2 border-amber-200 text-sm sm:text-base flex items-center gap-2 transition transform hover:scale-105">
                 <span id="station-prompt-icon">🏪</span>
-                <span id="station-prompt-text">Avaa asema (Enter / Väli)</span>
+                <span id="station-prompt-text">Öppna station (Enter)</span>
             </button>
         </div>
 
@@ -142,13 +141,11 @@
 
         <!-- Mobiiliohjaimet: Analoginen tatti + Toimintopainike -->
         <div id="mobile-controls" class="sm:hidden absolute bottom-4 inset-x-4 flex justify-between items-end pointer-events-none z-10">
-            <!-- Analoginen ohjaustatti -->
             <div id="joystick-zone" class="pointer-events-auto absolute bottom-12 left-7 w-28 h-28 rounded-full bg-slate-900/75 border-2 border-slate-600/80 backdrop-blur-sm shadow-2xl flex items-center justify-center">
                 <div class="w-12 h-12 rounded-full border border-slate-700/80 pointer-events-none"></div>
                 <div id="joystick-knob" class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 border-2 border-amber-200 shadow-lg pointer-events-none transition-transform duration-75" style="transform: translate(0px, 0px);"></div>
             </div>
 
-            <!-- Toimintopainike mobiiliin -->
             <div class="pointer-events-auto">
                 <button id="mobile-action-btn" class="hidden w-16 h-16 bg-amber-500 active:bg-amber-400 text-slate-950 font-extrabold rounded-2xl shadow-lg border-2 border-amber-200 flex items-center justify-center text-2xl">
                     🏢
@@ -167,8 +164,8 @@
                 <div class="flex items-center gap-3">
                     <div id="quiz-ore-badge" class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-white/20">💎</div>
                     <div>
-                        <span id="quiz-tag" class="text-xs uppercase tracking-wider font-bold text-amber-400">Malmiesiintymä havaittu!</span>
-                        <h2 id="quiz-ore-name" class="text-lg sm:text-xl font-extrabold text-white">Kultasuoni ($250)</h2>
+                        <span id="quiz-tag" class="text-xs uppercase tracking-wider font-bold text-amber-400">Malmfyndighet hittad!</span>
+                        <h2 id="quiz-ore-name" class="text-lg sm:text-xl font-extrabold text-white">Guldkorn ($180)</h2>
                     </div>
                 </div>
                 <button id="quiz-rule-hint-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-semibold transition">
@@ -176,33 +173,66 @@
                 </button>
             </div>
 
-            <!-- Pika-lunttilappu (piilotettu oletuksena) -->
+            <!-- Pika-lunttilappu -->
             <div id="quiz-inline-hint" class="hidden bg-indigo-950/80 border border-indigo-500/40 rounded-xl p-3 text-xs sm:text-sm text-indigo-100">
-                <strong class="text-amber-300">KonSuKieLiPre-sääntö sivulauseessa:</strong><br>
-                <span class="mono bg-slate-900 px-1.5 py-0.5 rounded text-emerald-300">Kon (konjunktio) + Su (subjekti) + Kie (inte/aldrig) + Li (alltid/ofta/nu/redan) + Pre (predikaatti/verbi + loput)</span>
+                <strong class="text-amber-300">KonSuKieLiPre i bisats:</strong><br>
+                <span class="mono bg-slate-900 px-1.5 py-0.5 rounded text-emerald-300">Kon (konjunktion) + Su (subjekt) + Kie (inte/aldrig) + Li (alltid/ofta/nu/redan) + Pre (predikat / böjt verb)</span>
             </div>
 
             <!-- Tehtävänanto: Suomenkielinen lause -->
             <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700/80">
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-1">Käännä ja järjestä sivulause KonSuKieLiPre-säännön mukaan:</p>
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">
+                        Översätt bisatsen med KonSuKieLiPre (käännä sivulause):
+                    </p>
+                    <span id="quiz-mode-pill" class="hidden text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-fuchsia-950 text-fuchsia-200 border border-fuchsia-500/50">
+                        ✍️ Fri skrivning (ingen ordlista!)
+                    </span>
+                </div>
                 <p id="quiz-finnish" class="text-base sm:text-lg font-bold text-white">"Hän sanoi, että hän ei tule tänään."</p>
             </div>
 
-            <!-- Lauseen rakennusalue -->
-            <div class="flex flex-col gap-2">
-                <label class="text-xs font-semibold text-slate-400">Muodosta ruotsinkielinen lause (klikkaa sanoja):</label>
-                <div id="quiz-answer-area" class="min-h-[64px] bg-slate-950/90 border-2 border-dashed border-slate-700 rounded-xl p-3 flex flex-wrap items-center gap-2">
-                    <span id="quiz-prefix" class="bg-indigo-900/60 text-indigo-200 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base">
-                        Han sa, att
-                    </span>
-                    <div id="quiz-selected-words" class="flex flex-wrap items-center gap-2"></div>
+            <!-- Lauseen rakennusalue: SANAPANKKITILA (tavalliset malmit) -->
+            <div id="quiz-bank-mode" class="flex flex-col gap-3">
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-400">Bygg bisatsen (klicka på orden / valitse sanat):</label>
+                    <div id="quiz-answer-area" class="min-h-[64px] bg-slate-950/90 border-2 border-dashed border-slate-700 rounded-xl p-3 flex flex-wrap items-center gap-2">
+                        <span id="quiz-prefix-bank" class="bg-indigo-900/60 text-indigo-200 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base">
+                            Han sa, att
+                        </span>
+                        <div id="quiz-selected-words" class="flex flex-wrap items-center gap-2"></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-slate-400">Ordbank (valittavat sanat):</span>
+                    <div id="quiz-word-bank" class="min-h-[54px] bg-slate-800/40 rounded-xl p-3 flex flex-wrap gap-2 border border-slate-800"></div>
                 </div>
             </div>
 
-            <!-- Sanapankki (sekoitetut sanat) -->
-            <div class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-slate-400">Valittavat sanat:</span>
-                <div id="quiz-word-bank" class="min-h-[54px] bg-slate-800/40 rounded-xl p-3 flex flex-wrap gap-2 border border-slate-800"></div>
+            <!-- Lauseen rakennusalue: VAPAA KIRJOITUSTILA (Nobelium & Bossi) -->
+            <div id="quiz-free-mode" class="hidden flex-col gap-2">
+                <label for="quiz-free-input" id="quiz-free-label" class="text-xs font-semibold text-fuchsia-300">
+                    Skriv bisatsens fortsättning själv (kirjoita sivulauseen loppuosa itse — ei valmiita sanoja!):
+                </label>
+                <div class="bg-slate-950/95 border-2 border-fuchsia-500/50 focus-within:border-amber-400 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center gap-2.5 shadow-inner">
+                    <span id="quiz-prefix-free" class="bg-indigo-900/70 text-indigo-200 border border-indigo-500/40 px-3 py-2 rounded-lg font-bold text-sm sm:text-base shrink-0">
+                        Han sa, att
+                    </span>
+                    <input
+                        id="quiz-free-input"
+                        type="text"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        placeholder="Skriv här på svenska (KonSuKieLiPre)..."
+                        class="flex-1 bg-slate-900 text-white placeholder-slate-500 border border-slate-700 focus:border-amber-400 focus:outline-none rounded-lg px-3.5 py-2 text-sm sm:text-base font-medium"
+                    />
+                </div>
+                <p class="text-[11px] text-slate-400">
+                    Tips: Muista sivulauseen sanajärjestys (<em>subjekti + inte/aldrig + alltid/ofta/nu/redan + verb</em>). Paina <kbd class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600 text-slate-200">Enter</kbd> tarkistaaksesi.
+                </p>
             </div>
 
             <!-- Palautelaatikko -->
@@ -211,14 +241,14 @@
             <!-- Toimintopainikkeet -->
             <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-800">
                 <button id="btn-quiz-clear" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl text-sm transition">
-                    Tyhjennä
+                    Rensa / Tyhjennä
                 </button>
                 <div class="flex items-center gap-2">
                     <button id="btn-quiz-check" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
-                        Tarkista ja poraa ⛏️
+                        Kontrollera & borra ⛏️
                     </button>
                     <button id="btn-quiz-continue" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
-                        Jatka peliä ▶
+                        Fortsätt / Jatka ▶
                     </button>
                 </div>
             </div>
@@ -234,8 +264,8 @@
                 <div class="flex items-center gap-3">
                     <span id="station-modal-icon" class="text-3xl">🏭</span>
                     <div>
-                        <h2 id="station-modal-title" class="text-xl font-extrabold text-white">Malminjalostamo</h2>
-                        <p id="station-modal-subtitle" class="text-xs text-slate-400">Muuta kerätyt malmit rahaksi</p>
+                        <h2 id="station-modal-title" class="text-xl font-extrabold text-white">Malmförädling</h2>
+                        <p id="station-modal-subtitle" class="text-xs text-slate-400">Sälj din last mot pengar</p>
                     </div>
                 </div>
                 <button id="btn-close-station" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold flex items-center justify-center">✕</button>
@@ -245,7 +275,7 @@
 
             <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
                 <div class="text-sm font-bold text-emerald-400">Kassa: $<span id="station-money-display">150</span></div>
-                <button id="btn-close-station-bottom" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-xl text-sm">Sulje (Esc)</button>
+                <button id="btn-close-station-bottom" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-xl text-sm">Stäng / Sulje (Esc)</button>
             </div>
         </div>
     </div>
@@ -257,43 +287,50 @@
         <div class="bg-slate-900 border-2 border-indigo-500/50 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
-                    <span>📘</span> Ruotsin KonSuKieLiPre-sääntö & Peliohjeet
+                    <span>📘</span> KonSuKieLiPre-regeln & Spelguide
                 </h2>
                 <button id="btn-close-help" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold">✕</button>
             </div>
 
             <div class="space-y-3 text-sm text-slate-200 leading-relaxed">
                 <div class="bg-indigo-950/70 border border-indigo-500/40 rounded-xl p-4">
-                    <h3 class="font-extrabold text-amber-300 text-base mb-1">Mikä on KonSuKieLiPre-sääntö?</h3>
+                    <h3 class="font-extrabold text-amber-300 text-base mb-1">Ordföljd i svensk bisats — KonSuKieLiPre</h3>
                     <p class="font-semibold text-white mb-2">
-                        <span class="text-sky-300">Kon</span>junktio +
-                        <span class="text-emerald-300">Su</span>bjekti +
+                        <span class="text-sky-300">Kon</span>junktion +
+                        <span class="text-emerald-300">Su</span>bjekt +
                         <span class="text-rose-400">Kie</span>ltosana (<em>inte</em>) +
-                        <span class="text-amber-300">Li</span>sämääreet (<em>alltid, ofta, aldrig, redan, nu</em>) +
-                        <span class="text-purple-300">Pre</span>dikaatti (taipunut verbi)
+                        <span class="text-amber-300">Li</span>ikkuvat määreet (<em>alltid, ofta, aldrig, redan, nu</em>) +
+                        <span class="text-purple-300">Pre</span>dikat (böjt verb)
                     </p>
                     <p class="text-slate-300 text-xs sm:text-sm">
-                        Ruotsin sivulauseessa kieltosana ja määreet tulevat <strong>ENNEN</strong> taipunutta verbiä (predikaattia)!
+                        I en bisats på svenska placeras <em>inte</em> och satsadverbialen <strong>FÖRE</strong> det böjda verbet (predikatet) — till skillnad från huvudsatsen!
                     </p>
                     <div class="mt-3 bg-slate-900/90 p-3 rounded-lg border border-slate-700 font-mono text-xs space-y-1.5">
-                        <div class="text-slate-400">Päälause: Han <span class="text-purple-300">kommer</span> <span class="text-rose-400">inte</span> <span class="text-amber-300">alltid</span> idag.</div>
-                        <div class="text-emerald-300">Sivulause: ... <span class="text-sky-300">att</span> <span class="text-emerald-300">han</span> <span class="text-rose-400 font-bold underline">inte</span> <span class="text-amber-300 font-bold underline">alltid</span> <span class="text-purple-300 font-bold">kommer</span> idag.</div>
+                        <div class="text-slate-400">Huvudsats: Han <span class="text-purple-300">kommer</span> <span class="text-rose-400">inte</span> <span class="text-amber-300">alltid</span> idag.</div>
+                        <div class="text-emerald-300">Bisats: ... <span class="text-sky-300">att</span> <span class="text-emerald-300">han</span> <span class="text-rose-400 font-bold underline">inte</span> <span class="text-amber-300 font-bold underline">alltid</span> <span class="text-purple-300 font-bold">kommer</span> idag.</div>
                     </div>
                 </div>
 
+                <div class="bg-fuchsia-950/40 border border-fuchsia-500/40 rounded-xl p-4">
+                    <h3 class="font-extrabold text-fuchsia-300 text-sm mb-1">⚛️ Nobelium (No) & Djupets Kärnboss</h3>
+                    <p class="text-xs sm:text-sm text-slate-200">
+                         <strong>Nobelium</strong> och <strong>Djupets Kärnboss</strong> (630 m) kräver <strong>fri skrivning</strong> — du skriver bisatsen själv utan ordlista!
+                    </p>
+                </div>
+
                 <div class="bg-slate-800/70 rounded-xl p-4 border border-slate-700">
-                    <h3 class="font-bold text-white mb-1.5">⛏️ Kuinka pelataan?</h3>
+                    <h3 class="font-bold text-white mb-1.5">⛏️ Kontroller / Kuinka pelataan?</h3>
                     <ul class="list-disc list-inside space-y-1 text-slate-300 text-xs sm:text-sm">
-                        <li><strong>Tietokone:</strong> Liiku ja lennä <strong>WASD</strong>-näppäimillä tai <strong>nuolinäppäimillä</strong>.</li>
-                        <li><strong>Puhelin / Tabletti:</strong> Ohjaa alusta ja poraamista <strong>analogisella tatilla</strong>.</li>
-                        <li><strong>Poraaminen & Bossi:</strong> Poraa malmeja ja kohtaa syvällä (630 m) <strong>Syvyyden Ydin-Bossi</strong> ratkaisemalla KonSuKieLiPre-lauseita!</li>
-                        <li><strong>Maanpinnan asemat:</strong> Myy malmit jalostamossa, tankkaa huoltoasemalla ja päivitä alusta pajalla.</li>
+                        <li><strong>Dator:</strong> Flyg och borra med <strong>WASD</strong> eller <strong>piltangenterna</strong>.</li>
+                        <li><strong>Mobil / Surfplatta:</strong> Styr med den <strong>analoga spaken</strong>.</li>
+                        <li><strong>Stationer uppe:</strong> Sälj malm på <em>Malmförädling</em>, tanka på <em>Tank & Service</em> och uppgradera på <em>Borrverkstad</em>.</li>
+                        <li><strong>Autospar:</strong> Spelet sparas automatiskt i webbläsaren.</li>
                     </ul>
                 </div>
             </div>
 
             <button id="btn-close-help-bottom" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition">
-                Selvä, takaisin kaivokseen!
+                Kör i gång / Takaisin kaivokseen!
             </button>
         </div>
     </div>
@@ -304,18 +341,18 @@
     <div id="gameover-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border-2 border-rose-500/60 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl flex flex-col gap-4">
             <div id="gameover-icon" class="text-5xl">💥</div>
-            <h2 id="gameover-title" class="text-2xl font-extrabold text-rose-400">Polttoaine loppui!</h2>
-            <p id="gameover-desc" class="text-sm text-slate-300">Aluksesi jäi jumiin maan alle ilman polttoainetta.</p>
+            <h2 id="gameover-title" class="text-2xl font-extrabold text-rose-400">Slut på bensin!</h2>
+            <p id="gameover-desc" class="text-sm text-slate-300">Din borrkapsel blev stående under jord.</p>
             <div class="bg-slate-800 rounded-xl p-3 text-xs text-slate-300 flex justify-around">
-                <div>Syvin piste: <strong id="go-depth" class="text-sky-400">0 m</strong></div>
-                <div>Oikeat KonSuKieLiPret: <strong id="go-solved" class="text-emerald-400">0</strong></div>
+                <div>Maxdjup: <strong id="go-depth" class="text-sky-400">0 m</strong></div>
+                <div>Rätta bisatser: <strong id="go-solved" class="text-emerald-400">0</strong></div>
             </div>
             <div class="flex flex-col sm:flex-row gap-2 mt-2">
                 <button id="btn-rescue" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-sm transition">
-                    🚁 Hinaus pintaan (-$50)
+                    🚁 Bogsera upp (-$50)
                 </button>
                 <button id="btn-new-game" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition">
-                    Aloita uusi peli
+                    Nytt spel / Uusi peli
                 </button>
             </div>
         </div>
@@ -347,6 +384,7 @@ class SoundEngine {
 
     toggleMute() {
         this.muted = !this.muted;
+        saveGameState();
         return this.muted;
     }
 
@@ -497,10 +535,10 @@ const RULE_SENTENCES = [
         explanation: "KonSuKieLiPre: eftersom (Kon) + jag (Su) + alltid (Li) + är (Pre) + trött på fredagar."
     },
     {
-        fi: "Kun he eivät asu enää Tukholmassa, he kaipaavat merta.",
-        prefix: "När",
-        words: ["de", "inte", "bor", "i Stockholm", "längre,"],
-        explanation: "KonSuKieLiPre: När (Kon) + de (Su) + inte (Kie) + bor (Pre) + i Stockholm längre."
+        fi: "Koska he eivät asu Tukholmassa, he kaipaavat merta.",
+        prefix: "Eftersom",
+        words: ["de", "inte", "bor", "i Stockholm"],
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + de (Su) + inte (Kie) + bor (Pre) + i Stockholm."
     },
     {
         fi: "Jos et osta lippua nyt, et pääse sisään.",
@@ -635,12 +673,6 @@ const RULE_SENTENCES = [
         explanation: "KonSuKieLiPre: Trots att (Kon) + vi (Su) + inte (Kie) + har (Pre) + mycket pengar."
     },
     {
-        fi: "Ennen kuin he eivät enää jaksaneet kävellä, he pitivät tauon.",
-        prefix: "Innan",
-        words: ["de", "inte", "orkade", "gå", "längre,"],
-        explanation: "KonSuKieLiPre: Innan (Kon) + de (Su) + inte (Kie) + orkade (Pre) + gå längre."
-    },
-    {
         fi: "Opettaja huomasi, että oppilaat eivät olleet tehneet läksyjä.",
         prefix: "Läraren märkte, att",
         words: ["eleverna", "inte", "hade", "gjort", "läxorna"],
@@ -664,7 +696,6 @@ const RULE_SENTENCES = [
         words: ["vi", "inte", "hinner", "se", "filmen"],
         explanation: "KonSuKieLiPre: att (Kon) + vi (Su) + inte (Kie) + hinner (Pre) + se filmen."
     },
-    // --- 20 UUTTA LAUSETTA (31–50) ---
     {
         fi: "Hän sanoi, että hän ei aina syö aamiaista.",
         prefix: "Han sa, att",
@@ -789,25 +820,39 @@ const RULE_SENTENCES = [
 
 /**
  * ============================================================================
- * 3. PELIN VAKIOT, MAAPERÄTYYPIT JA PÄIVITYKSET
+ * 3. PELIN VAKIOT, MAAPERÄTYYPIT (SIS. Nobelium) JA PÄIVITYKSET
  * ============================================================================
  */
 const TILE_SIZE = 44;
 const GRID_COLS = 36;
-const GRID_ROWS = 130; // 130 * 5m = 650m syvyys (bossi pohjalla ~630m)
+const GRID_ROWS = 130;
 const SURFACE_ROW = 6;
+const STORAGE_KEY = 'malmspel_konsukielipre_save_v1';
 
 const BLOCKS = {
-    EMPTY: { id: 0, name: 'Tyhjä', solid: false },
-    DIRT:  { id: 1, name: 'Multa', solid: true, color: '#5c3a21', border: '#462b18', hardness: 1, isOre: false },
-    ROCK:  { id: 2, name: 'Kova kallio', solid: true, color: '#475569', border: '#334155', hardness: 2, isOre: false },
-    HARD_ROCK: { id: 3, name: 'Graniitti', solid: true, color: '#1e293b', border: '#0f172a', hardness: 3, isOre: false },
-    COPPER: { id: 4, name: 'Kuparimalmi', solid: true, color: '#5c3a21', oreColor: '#f97316', glow: '#fdba74', value: 40, hardness: 1, isOre: true, icon: '🟠' },
-    SILVER: { id: 5, name: 'Hopeasuoni', solid: true, color: '#52341e', oreColor: '#e2e8f0', glow: '#ffffff', value: 90, hardness: 1, isOre: true, icon: '⚪' },
-    GOLD:   { id: 6, name: 'Kultahippu', solid: true, color: '#4a2e1b', oreColor: '#eab308', glow: '#fef08a', value: 180, hardness: 1, isOre: true, icon: '🟡' },
-    RUBY:   { id: 7, name: 'Rubiinikide', solid: true, color: '#422818', oreColor: '#f43f5e', glow: '#fda4af', value: 320, hardness: 2, isOre: true, icon: '🔴' },
-    DIAMOND:{ id: 8, name: 'Timantti', solid: true, color: '#3a2214', oreColor: '#38bdf8', glow: '#bae6fd', value: 550, hardness: 2, isOre: true, icon: '💎' },
-    UNOBTAINIUM: { id: 9, name: 'Svenskium-kristalli', solid: true, color: '#2e1a10', oreColor: '#c084fc', glow: '#f3e8ff', value: 1000, hardness: 3, isOre: true, icon: '🔮' }
+    EMPTY: { id: 0, name: 'Tomt / Tyhjä', solid: false },
+    DIRT:  { id: 1, name: 'Jord / Multa', solid: true, color: '#5c3a21', border: '#462b18', hardness: 1, isOre: false },
+    ROCK:  { id: 2, name: 'Berg / Kallio', solid: true, color: '#475569', border: '#334155', hardness: 2, isOre: false },
+    HARD_ROCK: { id: 3, name: 'Granit / Graniitti', solid: true, color: '#1e293b', border: '#0f172a', hardness: 3, isOre: false },
+    COPPER: { id: 4, name: 'Kopparmalm (Kupari)', solid: true, color: '#5c3a21', oreColor: '#f97316', glow: '#fdba74', value: 40, hardness: 1, isOre: true, icon: '🟠' },
+    SILVER: { id: 5, name: 'Silverådra (Hopea)', solid: true, color: '#52341e', oreColor: '#e2e8f0', glow: '#ffffff', value: 90, hardness: 1, isOre: true, icon: '⚪' },
+    GOLD:   { id: 6, name: 'Guldkorn (Kulta)', solid: true, color: '#4a2e1b', oreColor: '#eab308', glow: '#fef08a', value: 180, hardness: 1, isOre: true, icon: '🟡' },
+    RUBY:   { id: 7, name: 'Rubinkristall (Rubiini)', solid: true, color: '#422818', oreColor: '#f43f5e', glow: '#fda4af', value: 320, hardness: 2, isOre: true, icon: '🔴' },
+    DIAMOND:{ id: 8, name: 'Diamant (Timantti)', solid: true, color: '#3a2214', oreColor: '#38bdf8', glow: '#bae6fd', value: 550, hardness: 2, isOre: true, icon: '💎' },
+    UNOBTAINIUM: { id: 9, name: 'Svenskium-kristall', solid: true, color: '#2e1a10', oreColor: '#c084fc', glow: '#f3e8ff', value: 1000, hardness: 3, isOre: true, icon: '🔮' },
+    NOBELIUM: {
+        id: 10,
+        name: 'Nobelium (No)',
+        solid: true,
+        color: '#231336',
+        oreColor: '#e879f9',
+        glow: '#f0abfc',
+        value: 1800,
+        hardness: 3,
+        isOre: true,
+        requiresFreeText: true,
+        icon: '⚛️'
+    }
 };
 
 const BLOCK_BY_ID = Object.values(BLOCKS).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
@@ -815,8 +860,8 @@ const BLOCK_BY_ID = Object.values(BLOCKS).reduce((acc, b) => { acc[b.id] = b; re
 const STATIONS = [
     {
         id: 'sell',
-        name: 'Malminjalostamo',
-        subtitle: 'Myy ruumassa olevat malmit rahaksi',
+        name: 'Malmförädling',
+        subtitle: 'Sälj din last (Myy malmit rahaksi)',
         icon: '🏭',
         colStart: 4,
         colEnd: 8,
@@ -825,8 +870,8 @@ const STATIONS = [
     },
     {
         id: 'fuel',
-        name: 'Huolto & Tankkaus',
-        subtitle: 'Täytä polttoainetankki ja korjaa runko',
+        name: 'Tank & Service',
+        subtitle: 'Tanka bensin & laga skrovet',
         icon: '⛽',
         colStart: 15,
         colEnd: 19,
@@ -835,8 +880,8 @@ const STATIONS = [
     },
     {
         id: 'upgrade',
-        name: 'Pora- & Aluspaja',
-        subtitle: 'Päivitä pora, tankki, ruuma ja runko',
+        name: 'Borrverkstad',
+        subtitle: 'Uppgradera borr, tank, last & skrov',
         icon: '🔧',
         colStart: 26,
         colEnd: 30,
@@ -847,32 +892,32 @@ const STATIONS = [
 
 const UPGRADES = {
     drill: [
-        { level: 1, name: 'Peruspora (Taso 1)', desc: 'Poraa multaa ja perusmalmeja', power: 1, speed: 1.0, cost: 0 },
-        { level: 2, name: 'Teräspora (Taso 2)', desc: 'Poraa myös kalliota ja rubiineja', power: 2, speed: 1.35, cost: 250 },
-        { level: 3, name: 'Timanttipora (Taso 3)', desc: 'Murskaa graniitin ja kaiken!', power: 3, speed: 1.75, cost: 750 }
+        { level: 1, name: 'Basborr (Nivå 1)', desc: 'Poraa multaa ja perusmalmeja', power: 1, speed: 1.0, cost: 0 },
+        { level: 2, name: 'Stålborr (Nivå 2)', desc: 'Poraa myös kalliota ja rubiineja', power: 2, speed: 1.35, cost: 250 },
+        { level: 3, name: 'Diamantborr (Nivå 3)', desc: 'Murskaa graniitin ja nobeliumin!', power: 3, speed: 1.75, cost: 750 }
     ],
     fuel: [
-        { level: 1, name: 'Pieni tankki (100 L)', cap: 100, cost: 0 },
-        { level: 2, name: 'Keskikokoinen tankki (180 L)', cap: 180, cost: 180 },
-        { level: 3, name: 'Suuri tankki (300 L)', cap: 300, cost: 450 },
-        { level: 4, name: 'Fuusiotankki (500 L)', cap: 500, cost: 1000 }
+        { level: 1, name: 'Liten tank (100 L)', cap: 100, cost: 0 },
+        { level: 2, name: 'Mellantank (180 L)', cap: 180, cost: 180 },
+        { level: 3, name: 'Stor tank (300 L)', cap: 300, cost: 450 },
+        { level: 4, name: 'Fusionstank (500 L)', cap: 500, cost: 1000 }
     ],
     cargo: [
-        { level: 1, name: 'Pieni ruuma (6 malmia)', cap: 6, cost: 0 },
-        { level: 2, name: 'Laajennettu ruuma (10 malmia)', cap: 10, cost: 200 },
-        { level: 3, name: 'Rahtiruuma (16 malmia)', cap: 16, cost: 500 },
-        { level: 4, name: 'Tila-avaruusruuma (25 malmia)', cap: 25, cost: 1100 }
+        { level: 1, name: 'Litet lastutrymme (6)', cap: 6, cost: 0 },
+        { level: 2, name: 'Utökat lastutrymme (10)', cap: 10, cost: 200 },
+        { level: 3, name: 'Tungt lastutrymme (16)', cap: 16, cost: 500 },
+        { level: 4, name: 'Rymdlastutrymme (25)', cap: 25, cost: 1100 }
     ],
     hull: [
-        { level: 1, name: 'Peltirunko (100 HP)', cap: 100, cost: 0 },
-        { level: 2, name: 'Vahvistettu runko (175 HP)', cap: 175, cost: 200 },
-        { level: 3, name: 'Titaanirunko (280 HP)', cap: 280, cost: 550 }
+        { level: 1, name: 'Plåtskrov (100 HP)', cap: 100, cost: 0 },
+        { level: 2, name: 'Förstärkt skrov (175 HP)', cap: 175, cost: 200 },
+        { level: 3, name: 'Titanskrov (280 HP)', cap: 280, cost: 550 }
     ]
 };
 
 /**
  * ============================================================================
- * 4. PELIN TILA, SYVYYDEN BOSSI JA MAAILMAN GENEROINTI
+ * 4. PELIN TILA, TALLENNUS (LOCALSTORAGE) JA MAAILMAN GENEROINTI
  * ============================================================================
  */
 let grid = [];
@@ -882,10 +927,10 @@ let keys = {};
 let activeStation = null;
 let isPaused = false;
 let gameOver = false;
+let saveTimer = 0;
 
-// Alkuperäisen Motherloadin syvyyteen sijoitettu bossi
 let boss = {
-    name: 'Syvyyden Ydin-Bossi',
+    name: 'Djupets Kärnboss',
     col: 17,
     row: GRID_ROWS - 4,
     width: TILE_SIZE * 3,
@@ -893,7 +938,7 @@ let boss = {
     hp: 3,
     maxHp: 3,
     defeated: false,
-    reward: 3500
+    reward: 4000
 };
 
 let player = {
@@ -932,8 +977,126 @@ function getMaxHull() { return UPGRADES.hull[player.upgrades.hull - 1].cap; }
 function getDrillPower() { return UPGRADES.drill[player.upgrades.drill - 1].power; }
 function getDrillSpeed() { return UPGRADES.drill[player.upgrades.drill - 1].speed; }
 
+function saveGameState() {
+    try {
+        const payload = {
+            version: 1,
+            savedAt: Date.now(),
+            muted: sound.muted,
+            gameOver,
+            grid,
+            boss: {
+                hp: boss.hp,
+                maxHp: boss.maxHp,
+                defeated: boss.defeated
+            },
+            player: {
+                x: player.x,
+                y: player.y,
+                vx: 0,
+                vy: 0,
+                facing: player.facing,
+                money: player.money,
+                fuel: player.fuel,
+                hull: player.hull,
+                cargo: [...player.cargo],
+                upgrades: { ...player.upgrades },
+                stats: { ...player.stats }
+            },
+            usedSentenceIndices: Array.from(usedSentenceIndices)
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch (err) {
+        // Ohitetaan virheet esim. yksityisen selaustilan kiintiörajoissa
+    }
+}
+
+function clearSavedGameState() {
+    try {
+        localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {}
+}
+
+function loadGameState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data || !Array.isArray(data.grid) || data.grid.length !== GRID_ROWS || !data.player) {
+            return false;
+        }
+
+        grid = data.grid;
+        sound.muted = !!data.muted;
+        document.getElementById('btn-mute').textContent = sound.muted ? '🔇' : '🔊';
+
+        if (data.boss) {
+            boss.hp = typeof data.boss.hp === 'number' ? data.boss.hp : boss.maxHp;
+            boss.defeated = !!data.boss.defeated;
+        }
+
+        player = {
+            x: typeof data.player.x === 'number' ? data.player.x : 12 * TILE_SIZE,
+            y: typeof data.player.y === 'number' ? data.player.y : (SURFACE_ROW - 1) * TILE_SIZE,
+            vx: 0,
+            vy: 0,
+            width: 32,
+            height: 34,
+            facing: data.player.facing === -1 ? -1 : 1,
+            money: typeof data.player.money === 'number' ? data.player.money : 150,
+            fuel: typeof data.player.fuel === 'number' ? data.player.fuel : 100,
+            hull: typeof data.player.hull === 'number' ? data.player.hull : 100,
+            cargo: Array.isArray(data.player.cargo) ? [...data.player.cargo] : [],
+            upgrades: {
+                drill: data.player.upgrades?.drill || 1,
+                fuel: data.player.upgrades?.fuel || 1,
+                cargo: data.player.upgrades?.cargo || 1,
+                hull: data.player.upgrades?.hull || 1
+            },
+            drilling: { active: false, targetCol: -1, targetRow: -1, progress: 0, duration: 0.55 },
+            stats: {
+                maxDepth: data.player.stats?.maxDepth || 0,
+                solvedCount: data.player.stats?.solvedCount || 0,
+                streak: data.player.stats?.streak || 0
+            }
+        };
+
+        usedSentenceIndices = new Set(Array.isArray(data.usedSentenceIndices) ? data.usedSentenceIndices : []);
+        particles = [];
+        floatingTexts = [];
+        gameOver = !!data.gameOver;
+        isPaused = gameOver;
+
+        if (gameOver) {
+            if (boss.defeated) {
+                document.getElementById('gameover-icon').textContent = '🏆';
+                document.getElementById('gameover-title').textContent = 'Gruvan erövrad!';
+                document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-emerald-400';
+                document.getElementById('gameover-desc').textContent = `Du besegrade Djupets Kärnboss och vann $${boss.reward} i belöning!`;
+            } else {
+                document.getElementById('gameover-icon').textContent = '💥';
+                document.getElementById('gameover-title').textContent = 'Spelet slutade';
+                document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-rose-400';
+                document.getElementById('gameover-desc').textContent = 'Bogsera upp kapseln eller starta ett nytt spel.';
+            }
+            document.getElementById('go-depth').textContent = `${player.stats.maxDepth} m`;
+            document.getElementById('go-solved').textContent = player.stats.solvedCount;
+            document.getElementById('gameover-modal').classList.remove('hidden');
+        } else {
+            document.getElementById('gameover-modal').classList.add('hidden');
+        }
+
+        updateHUD();
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
 function generateWorld() {
     grid = [];
+    let nobeliumSpawned = 0;
+
     for (let r = 0; r < GRID_ROWS; r++) {
         const row = [];
         for (let c = 0; c < GRID_COLS; c++) {
@@ -945,9 +1108,14 @@ function generateWorld() {
                 const depth = r - SURFACE_ROW;
                 const rand = Math.random();
 
-                // Luolakammiotyhjä bossin ympärille pohjalle
                 if (r >= boss.row - 2 && c >= boss.col - 1 && c <= boss.col + 3) {
                     row.push(BLOCKS.EMPTY.id);
+                    continue;
+                }
+
+                if (depth >= 70 && rand < 0.045) {
+                    row.push(BLOCKS.NOBELIUM.id);
+                    nobeliumSpawned++;
                     continue;
                 }
 
@@ -988,9 +1156,20 @@ function generateWorld() {
         }
         grid.push(row);
     }
+
+    if (nobeliumSpawned < 3) {
+        for (let k = 0; k < 4; k++) {
+            const rr = GRID_ROWS - 12 - k * 5;
+            const cc = 6 + k * 7;
+            if (rr > SURFACE_ROW + 70 && cc < GRID_COLS) {
+                grid[rr][cc] = BLOCKS.NOBELIUM.id;
+            }
+        }
+    }
 }
 
-function resetGame() {
+function startNewGame(notify = true) {
+    clearSavedGameState();
     boss.hp = boss.maxHp;
     boss.defeated = false;
     generateWorld();
@@ -1012,12 +1191,19 @@ function resetGame() {
     };
     particles = [];
     floatingTexts = [];
+    currentQuiz = null;
     isPaused = false;
     gameOver = false;
     usedSentenceIndices.clear();
+    document.getElementById('quiz-modal').classList.add('hidden');
+    document.getElementById('station-modal').classList.add('hidden');
+    document.getElementById('help-modal').classList.add('hidden');
     document.getElementById('gameover-modal').classList.add('hidden');
     updateHUD();
-    showToast('Tervetuloa kaivokseen! Poraa malmeja ja etsi syvyyden bossi (630 m)!', 'info');
+    saveGameState();
+    if (notify) {
+        showToast('Uusi peli aloitettu! (Nytt spel startat)', 'info');
+    }
 }
 
 /**
@@ -1064,16 +1250,23 @@ function showToast(msg, type = 'info') {
     setTimeout(() => {
         el.classList.add('opacity-0', '-translate-y-2');
         setTimeout(() => el.remove(), 300);
-    }, 2600);
+    }, 2800);
 }
 
 /**
  * ============================================================================
- * 6. RUOTSIN SIVULAUSEEN KONSUKIELIPRE-TEHTÄVÄLOGIIKKA (MALMI & BOSSI)
+ * 6. RUOTSIN SIVULAUSEEN KONSUKIELIPRE-TEHTÄVÄLOGIIKKA (SANAPANKKI + VAPAA TEKSTI)
  * ============================================================================
  */
+function normalizeSwedishSentence(str) {
+    return str
+        .toLowerCase()
+        .replace(/[.,!?;:"]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 function triggerQuiz(options) {
-    // options: { isBoss: boolean, col?: number, row?: number, block?: object }
     isPaused = true;
     keys = {};
     resetJoystick();
@@ -1089,6 +1282,8 @@ function triggerQuiz(options) {
     usedSentenceIndices.add(idx);
 
     const sentence = RULE_SENTENCES[idx];
+    const isFreeText = !!(options.isBoss || (options.block && options.block.requiresFreeText));
+
     let shuffled = [...sentence.words];
     for (let attempt = 0; attempt < 10; attempt++) {
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1100,6 +1295,7 @@ function triggerQuiz(options) {
 
     currentQuiz = {
         isBoss: !!options.isBoss,
+        isFreeText,
         col: options.col,
         row: options.row,
         block: options.block,
@@ -1112,36 +1308,61 @@ function triggerQuiz(options) {
     const badge = document.getElementById('quiz-ore-badge');
     const tagEl = document.getElementById('quiz-tag');
     const nameEl = document.getElementById('quiz-ore-name');
+    const pillEl = document.getElementById('quiz-mode-pill');
+    const bankModeEl = document.getElementById('quiz-bank-mode');
+    const freeModeEl = document.getElementById('quiz-free-mode');
+    const freeInput = document.getElementById('quiz-free-input');
+    const clearBtn = document.getElementById('btn-quiz-clear');
 
     if (currentQuiz.isBoss) {
         badge.textContent = '👾';
         badge.style.backgroundColor = 'rgba(244, 63, 94, 0.25)';
-        tagEl.textContent = `Syvyyden Bossi — Osuma ${boss.maxHp - boss.hp + 1}/${boss.maxHp}`;
+        tagEl.textContent = `Djupets Kärnboss — Träff ${boss.maxHp - boss.hp + 1}/${boss.maxHp} (Fri skrivning)`;
         tagEl.className = 'text-xs uppercase tracking-wider font-extrabold text-rose-400';
         nameEl.textContent = `${boss.name} (HP: ${boss.hp}/${boss.maxHp})`;
     } else {
         badge.textContent = options.block.icon;
         badge.style.backgroundColor = options.block.oreColor + '33';
-        tagEl.textContent = 'Malmiesiintymä havaittu!';
-        tagEl.className = 'text-xs uppercase tracking-wider font-bold text-amber-400';
-        nameEl.textContent = `${options.block.name} (Arvo: $${options.block.value})`;
+        tagEl.textContent = isFreeText
+            ? '⚛️ Världens starkaste grundämne — Fri skrivning!'
+            : 'Malmfyndighet hittad! (Malmiesiintymä)';
+        tagEl.className = isFreeText
+            ? 'text-xs uppercase tracking-wider font-extrabold text-fuchsia-400'
+            : 'text-xs uppercase tracking-wider font-bold text-amber-400';
+        nameEl.textContent = `${options.block.name} (Värde: $${options.block.value})`;
     }
 
     document.getElementById('quiz-finnish').textContent = `"${sentence.fi}"`;
-    document.getElementById('quiz-prefix').textContent = sentence.prefix;
+
+    if (isFreeText) {
+        pillEl.classList.remove('hidden');
+        bankModeEl.classList.add('hidden');
+        freeModeEl.classList.remove('hidden');
+        document.getElementById('quiz-prefix-free').textContent = sentence.prefix;
+        freeInput.value = '';
+        freeInput.disabled = false;
+        clearBtn.textContent = 'Rensa text';
+        setTimeout(() => freeInput.focus(), 60);
+    } else {
+        pillEl.classList.add('hidden');
+        bankModeEl.classList.remove('hidden');
+        freeModeEl.classList.add('hidden');
+        document.getElementById('quiz-prefix-bank').textContent = sentence.prefix;
+        clearBtn.textContent = 'Rensa / Tyhjennä';
+        renderQuizWords();
+    }
 
     document.getElementById('quiz-inline-hint').classList.add('hidden');
     document.getElementById('quiz-feedback').classList.add('hidden');
     document.getElementById('btn-quiz-check').classList.remove('hidden');
-    document.getElementById('btn-quiz-clear').classList.remove('hidden');
+    clearBtn.classList.remove('hidden');
     document.getElementById('btn-quiz-continue').classList.add('hidden');
 
-    renderQuizWords();
     document.getElementById('quiz-modal').classList.remove('hidden');
 }
 
 function renderQuizWords() {
-    if (!currentQuiz) return;
+    if (!currentQuiz || currentQuiz.isFreeText) return;
     const selectedContainer = document.getElementById('quiz-selected-words');
     const bankContainer = document.getElementById('quiz-word-bank');
 
@@ -1187,15 +1408,33 @@ function renderQuizWords() {
 function checkQuizAnswer() {
     if (!currentQuiz || currentQuiz.answered) return;
 
-    if (currentQuiz.selectedWordIds.length < currentQuiz.bankWords.length) {
-        showToast('Valitse kaikki sanat lauseeseen ennen tarkistusta!', 'warn');
-        return;
+    const correctWords = currentQuiz.sentence.words;
+    const expectedFull = correctWords.join(' ');
+    let isCorrect = false;
+    let displayUserAnswer = '';
+
+    if (currentQuiz.isFreeText) {
+        const freeInput = document.getElementById('quiz-free-input');
+        const rawText = freeInput.value.trim();
+        if (!rawText) {
+            showToast('Skriv bisatsens fortsättning först! (Kirjoita sivulause ensin)', 'warn');
+            freeInput.focus();
+            return;
+        }
+        freeInput.disabled = true;
+        displayUserAnswer = rawText;
+        isCorrect = normalizeSwedishSentence(rawText) === normalizeSwedishSentence(expectedFull);
+    } else {
+        if (currentQuiz.selectedWordIds.length < currentQuiz.bankWords.length) {
+            showToast('Välj alla ord först! (Valitse kaikki sanat)', 'warn');
+            return;
+        }
+        const userWords = currentQuiz.selectedWordIds.map(id => currentQuiz.bankWords.find(w => w.id === id).text);
+        displayUserAnswer = userWords.join(' ');
+        isCorrect = displayUserAnswer === expectedFull;
     }
 
     currentQuiz.answered = true;
-    const userWords = currentQuiz.selectedWordIds.map(id => currentQuiz.bankWords.find(w => w.id === id).text);
-    const correctWords = currentQuiz.sentence.words;
-    const isCorrect = userWords.join(' ') === correctWords.join(' ');
 
     const feedbackEl = document.getElementById('quiz-feedback');
     feedbackEl.classList.remove('hidden', 'bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100', 'bg-rose-950/90', 'border-rose-500', 'text-rose-100');
@@ -1209,53 +1448,55 @@ function checkQuizAnswer() {
             boss.hp = Math.max(0, boss.hp - 1);
             player.stats.solvedCount++;
             player.stats.streak++;
+            const bossStrikeBonus = 250;
+            player.money += bossStrikeBonus;
             spawnParticles(bx, by, '#f43f5e', 24, 150);
 
             if (boss.hp <= 0) {
                 boss.defeated = true;
                 player.money += boss.reward;
-                addFloatingText(bx, by - 20, `BOSSI VOITETTU! +$${boss.reward}`, '#34d399');
+                addFloatingText(bx, by - 20, `KÄRNBOSS BESEGRAD! +$${boss.reward}`, '#34d399');
                 feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
                 feedbackEl.innerHTML = `
-                    <div class="font-extrabold text-emerald-300 text-base mb-1">🏆 SYVYYDEN YDIN-BOSSI KUKISTETTU! (+$${boss.reward})</div>
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">🏆 DJUPETS KÄRNBOSS BESEGRAD! (+$${boss.reward + bossStrikeBonus})</div>
                     <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
-                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${correctWords.join(' ')}</span>
+                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
                     </div>
-                    <div class="text-xs text-emerald-200">Valloitit syvimmän kaivoksen mestarin KonSuKieLiPre-taidoillasi!</div>
+                    <div class="text-xs text-emerald-200">Snyggt jobbat! Du bemästrar svensk bisatsordföljd (KonSuKieLiPre) på fri hand!</div>
                 `;
             } else {
-                addFloatingText(bx, by - 15, `Osuma bossiin! (${boss.hp} HP jäljellä)`, '#fbbf24');
+                addFloatingText(bx, by - 15, `Fullträff! +$${bossStrikeBonus} (${boss.hp} HP kvar)`, '#fbbf24');
                 feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
                 feedbackEl.innerHTML = `
-                    <div class="font-extrabold text-emerald-300 text-base mb-1">⚔️ Täysosuma bossiin! Bossilla ${boss.hp}/${boss.maxHp} HP jäljellä.</div>
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">⚔️ Fullträff med fri skrivning! +$${bossStrikeBonus} (Bossen har ${boss.hp}/${boss.maxHp} HP kvar)</div>
                     <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
-                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${correctWords.join(' ')}</span>
+                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
                     </div>
-                    <div class="text-xs text-emerald-200">Porauta uudelleen bossia päin antaaksesi seuraavan iskun!</div>
+                    <div class="text-xs text-emerald-200">Borra mot bossen igen för nästa attack!</div>
                 `;
             }
         } else {
             sound.playError();
             player.stats.streak = 0;
-            player.hull = Math.max(0, player.hull - 20);
+            player.hull = Math.max(0, player.hull - 25);
             player.vy = -180;
             spawnParticles(player.x + 16, player.y + 16, '#f43f5e', 16, 110);
-            addFloatingText(player.x + 16, player.y - 10, 'Bossi iski! -20 HP', '#fb7185');
+            addFloatingText(player.x + 16, player.y - 10, 'Bossen slog tillbaka! -25 HP', '#fb7185');
 
             feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
             feedbackEl.innerHTML = `
-                <div class="font-extrabold text-rose-300 text-base mb-1">💥 Bossi torjui iskun ja vaurioitti runkoa (-20 HP)!</div>
-                <div class="text-xs text-rose-200 mb-1">Oikea KonSuKieLiPre-sanajärjestys:</div>
+                <div class="font-extrabold text-rose-300 text-base mb-1">💥 Bossen blockerade! Skrovet tog skada (-25 HP).</div>
+                <div class="text-xs text-rose-200 mb-1">Ditt svar: <span class="mono line-through text-rose-300">${displayUserAnswer}</span></div>
+                <div class="text-xs text-emerald-200 mb-1">Korrekt bisats:</div>
                 <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white mb-2">
-                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${correctWords.join(' ')}</span>
+                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${expectedFull}</span>
                 </div>
                 <div class="text-xs text-slate-200 bg-slate-900/60 p-2 rounded border border-slate-700">
-                    💡 <strong>Selitys:</strong> ${currentQuiz.sentence.explanation}
+                    💡 <strong>Förklaring:</strong> ${currentQuiz.sentence.explanation}
                 </div>
             `;
         }
     } else {
-        // Normaali malmi
         grid[currentQuiz.row][currentQuiz.col] = BLOCKS.EMPTY.id;
         const wx = currentQuiz.col * TILE_SIZE + TILE_SIZE / 2;
         const wy = currentQuiz.row * TILE_SIZE + TILE_SIZE / 2;
@@ -1264,25 +1505,26 @@ function checkQuizAnswer() {
             sound.playSuccess();
             player.stats.solvedCount++;
             player.stats.streak++;
-            const streakBonus = Math.min(player.stats.streak * 10, 100);
+            const baseBonus = currentQuiz.isFreeText ? 120 : 0;
+            const streakBonus = Math.min(player.stats.streak * 10, 100) + baseBonus;
             player.money += streakBonus;
 
             let cargoMsg = '';
             if (player.cargo.length < getMaxCargo()) {
                 player.cargo.push(currentQuiz.block.id);
-                cargoMsg = `${currentQuiz.block.name} kerätty ruumaan!`;
+                cargoMsg = `${currentQuiz.block.name} lastad i kapseln!`;
             } else {
-                cargoMsg = `Ruuma oli täynnä, mutta sait silti +$${streakBonus} KonSuKieLiPre-bonuksen!`;
+                cargoMsg = `Lastutrymmet var fullt, men du fick +$${streakBonus} i bonus!`;
             }
 
-            spawnParticles(wx, wy, currentQuiz.block.oreColor, 18, 130);
+            spawnParticles(wx, wy, currentQuiz.block.oreColor, 20, 135);
             addFloatingText(wx, wy - 10, `+${currentQuiz.block.name}!`, '#34d399');
 
             feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
             feedbackEl.innerHTML = `
-                <div class="font-extrabold text-emerald-300 text-base mb-1">✅ Oikein! Loistavaa KonSuKieLiPre-hallintaa! (+$${streakBonus} bonus)</div>
+                <div class="font-extrabold text-emerald-300 text-base mb-1">✅ Rätt! Bra jobbat med KonSuKieLiPre! (+$${streakBonus})</div>
                 <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
-                    ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${correctWords.join(' ')}</span>
+                    ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
                 </div>
                 <div class="text-xs text-emerald-200">${cargoMsg}</div>
             `;
@@ -1290,17 +1532,18 @@ function checkQuizAnswer() {
             sound.playError();
             player.stats.streak = 0;
             spawnParticles(wx, wy, '#64748b', 14, 90);
-            addFloatingText(wx, wy - 10, 'Malmi mureni!', '#fb7185');
+            addFloatingText(wx, wy - 10, 'Malmen smulade sönder!', '#fb7185');
 
             feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
             feedbackEl.innerHTML = `
-                <div class="font-extrabold text-rose-300 text-base mb-1">❌ Melkein! Malmi mureni poratessa.</div>
-                <div class="text-xs text-rose-200 mb-1">Oikea KonSuKieLiPre-sanajärjestys:</div>
+                <div class="font-extrabold text-rose-300 text-base mb-1">❌ Nästan! Malmen smulade sönder vid borrning.</div>
+                ${currentQuiz.isFreeText ? `<div class="text-xs text-rose-200 mb-1">Ditt svar: <span class="mono line-through text-rose-300">${displayUserAnswer}</span></div>` : ''}
+                <div class="text-xs text-rose-200 mb-1">Korrekt KonSuKieLiPre-ordföljd:</div>
                 <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white mb-2">
-                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${correctWords.join(' ')}</span>
+                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${expectedFull}</span>
                 </div>
                 <div class="text-xs text-slate-200 bg-slate-900/60 p-2 rounded border border-slate-700">
-                    💡 <strong>Selitys:</strong> ${currentQuiz.sentence.explanation}
+                    💡 <strong>Förklaring:</strong> ${currentQuiz.sentence.explanation}
                 </div>
             `;
         }
@@ -1309,8 +1552,11 @@ function checkQuizAnswer() {
     document.getElementById('btn-quiz-check').classList.add('hidden');
     document.getElementById('btn-quiz-clear').classList.add('hidden');
     document.getElementById('btn-quiz-continue').classList.remove('hidden');
-    renderQuizWords();
+    if (!currentQuiz.isFreeText) {
+        renderQuizWords();
+    }
     updateHUD();
+    saveGameState();
 }
 
 function closeQuizModal() {
@@ -1320,20 +1566,23 @@ function closeQuizModal() {
     isPaused = false;
 
     if (player.hull <= 0) {
-        triggerGameOver('Alus tuhoutui!', 'Syvyyden Ydin-Bossi murskasi aluksesi rungon.');
+        triggerGameOver('Skrovet förstördes!', 'Djupets Kärnboss krossade din borrkapsel.');
         return;
     }
 
     if (wasBossWin) {
         gameOver = true;
         isPaused = true;
+        saveGameState();
         document.getElementById('gameover-icon').textContent = '🏆';
-        document.getElementById('gameover-title').textContent = 'Kaivos valloitettu!';
+        document.getElementById('gameover-title').textContent = 'Gruvan erövrad!';
         document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-emerald-400';
-        document.getElementById('gameover-desc').textContent = `Kukistit Syvyyden Ydin-Bossin ja ansaitsit $${boss.reward} palkkion!`;
+        document.getElementById('gameover-desc').textContent = `Du besegrade Djupets Kärnboss och vann $${boss.reward} i belöning!`;
         document.getElementById('go-depth').textContent = `${player.stats.maxDepth} m`;
         document.getElementById('go-solved').textContent = player.stats.solvedCount;
         document.getElementById('gameover-modal').classList.remove('hidden');
+    } else {
+        saveGameState();
     }
 }
 
@@ -1360,8 +1609,8 @@ function openStationModal(station) {
             body.innerHTML = `
                 <div class="bg-slate-800/70 rounded-xl p-6 text-center text-slate-400 border border-slate-700">
                     <div class="text-3xl mb-2">📦</div>
-                    <p class="font-semibold text-slate-200">Ruumasi on tyhjä!</p>
-                    <p class="text-xs mt-1">Poraa maan alta malmeja ja ratkaise KonSuKieLiPre-tehtäviä kerätäksesi lastia.</p>
+                    <p class="font-semibold text-slate-200">Lastutrymmet är tomt! (Ruuma on tyhjä)</p>
+                    <p class="text-xs mt-1">Borra malm eller Nobelium under jord och lös KonSuKieLiPre-uppgifter.</p>
                 </div>
             `;
         } else {
@@ -1381,7 +1630,7 @@ function openStationModal(station) {
                             <span class="text-xl">${b.icon}</span>
                             <div>
                                 <div class="font-bold text-sm text-white">${b.name}</div>
-                                <div class="text-xs text-slate-400">${count} kpl × $${b.value}</div>
+                                <div class="text-xs text-slate-400">${count} st × $${b.value}</div>
                             </div>
                         </div>
                         <div class="mono font-bold text-emerald-400">$${count * b.value}</div>
@@ -1393,7 +1642,7 @@ function openStationModal(station) {
             body.innerHTML = `
                 ${listHtml}
                 <button id="btn-sell-all" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl shadow-lg text-base transition">
-                    Myy kaikki malmit (+$${totalValue}) 💰
+                    Sälj all malm (+$${totalValue}) 💰
                 </button>
             `;
 
@@ -1402,7 +1651,8 @@ function openStationModal(station) {
                 player.money += totalValue;
                 player.cargo = [];
                 updateHUD();
-                showToast(`Myit malmit hintaan $${totalValue}!`, 'success');
+                saveGameState();
+                showToast(`Sålde malmen för $${totalValue}!`, 'success');
                 openStationModal(station);
             };
         }
@@ -1415,21 +1665,21 @@ function openStationModal(station) {
         body.innerHTML = `
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
                 <div>
-                    <div class="font-bold text-amber-400 text-base">⛽ Tankkaa polttoainetta</div>
-                    <div class="text-xs text-slate-300">Nykyinen: ${Math.floor(player.fuel)} / ${getMaxFuel()} L</div>
+                    <div class="font-bold text-amber-400 text-base">⛽ Tanka bensin</div>
+                    <div class="text-xs text-slate-300">Nuvarande: ${Math.floor(player.fuel)} / ${getMaxFuel()} L</div>
                 </div>
                 <button id="btn-buy-fuel" class="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-extrabold px-4 py-2 rounded-xl text-sm transition" ${missingFuel <= 0 || player.money < fuelCost ? 'disabled' : ''}>
-                    ${missingFuel <= 0 ? 'Täynnä' : `Tankkaa ($${fuelCost})`}
+                    ${missingFuel <= 0 ? 'Fulltankad' : `Tanka ($${fuelCost})`}
                 </button>
             </div>
 
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
                 <div>
-                    <div class="font-bold text-rose-400 text-base">🛡️ Korjaa aluksen runko</div>
-                    <div class="text-xs text-slate-300">Kestävyys: ${Math.floor(player.hull)} / ${getMaxHull()} HP</div>
+                    <div class="font-bold text-rose-400 text-base">🛡️ Laga skrovet</div>
+                    <div class="text-xs text-slate-300">Skrovstyrka: ${Math.floor(player.hull)} / ${getMaxHull()} HP</div>
                 </div>
                 <button id="btn-buy-repair" class="bg-rose-500 hover:bg-rose-400 disabled:bg-slate-700 disabled:text-slate-500 text-white font-extrabold px-4 py-2 rounded-xl text-sm transition" ${missingHull <= 0 || player.money < hullCost ? 'disabled' : ''}>
-                    ${missingHull <= 0 ? 'Kunnossa' : `Korjaa ($${hullCost})`}
+                    ${missingHull <= 0 ? 'Hel' : `Laga ($${hullCost})`}
                 </button>
             </div>
         `;
@@ -1442,7 +1692,8 @@ function openStationModal(station) {
                     player.money -= fuelCost;
                     player.fuel = getMaxFuel();
                     updateHUD();
-                    showToast('Tankki täynnä!', 'success');
+                    saveGameState();
+                    showToast('Bensintanken är full!', 'success');
                     openStationModal(station);
                 }
             };
@@ -1455,17 +1706,18 @@ function openStationModal(station) {
                     player.money -= hullCost;
                     player.hull = getMaxHull();
                     updateHUD();
-                    showToast('Runko korjattu!', 'success');
+                    saveGameState();
+                    showToast('Skrovet är lagat!', 'success');
                     openStationModal(station);
                 }
             };
         }
     } else if (station.id === 'upgrade') {
         const categories = [
-            { key: 'drill', label: '⛏️ Poranterä', list: UPGRADES.drill },
-            { key: 'fuel', label: '⛽ Polttoainetankki', list: UPGRADES.fuel },
-            { key: 'cargo', label: '📦 Ruumatila', list: UPGRADES.cargo },
-            { key: 'hull', label: '🛡️ Runkopanssari', list: UPGRADES.hull }
+            { key: 'drill', label: '⛏️ Borrkrona', list: UPGRADES.drill },
+            { key: 'fuel', label: '⛽ Bensintank', list: UPGRADES.fuel },
+            { key: 'cargo', label: '📦 Lastutrymme', list: UPGRADES.cargo },
+            { key: 'hull', label: '🛡️ Skrovpansar', list: UPGRADES.hull }
         ];
 
         categories.forEach(cat => {
@@ -1479,12 +1731,12 @@ function openStationModal(station) {
                 <div>
                     <div class="text-xs font-bold text-indigo-400 uppercase">${cat.label}</div>
                     <div class="font-bold text-white text-sm">${curItem.name}</div>
-                    ${nextItem ? `<div class="text-xs text-slate-400 mt-0.5">Seuraava: <span class="text-slate-200">${nextItem.name}</span></div>` : `<div class="text-xs text-emerald-400 mt-0.5">Maksimitaso saavutettu!</div>`}
+                    ${nextItem ? `<div class="text-xs text-slate-400 mt-0.5">Nästa: <span class="text-slate-200">${nextItem.name}</span></div>` : `<div class="text-xs text-emerald-400 mt-0.5">Maxnivå uppnådd!</div>`}
                 </div>
                 <div>
                     ${nextItem ? `
                         <button data-upg="${cat.key}" class="upg-btn bg-indigo-500 hover:bg-indigo-400 disabled:bg-slate-700 disabled:text-slate-500 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition" ${player.money < nextItem.cost ? 'disabled' : ''}>
-                            Päivitä ($${nextItem.cost})
+                            Uppgradera ($${nextItem.cost})
                         </button>
                     ` : `<span class="bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 rounded-lg text-xs font-bold">MAX</span>`}
                 </div>
@@ -1504,7 +1756,8 @@ function openStationModal(station) {
                     if (key === 'fuel') player.fuel = getMaxFuel();
                     if (key === 'hull') player.hull = getMaxHull();
                     updateHUD();
-                    showToast(`Päivitetty: ${nextItem.name}!`, 'success');
+                    saveGameState();
+                    showToast(`Uppgraderad: ${nextItem.name}!`, 'success');
                     openStationModal(station);
                 }
             };
@@ -1517,6 +1770,7 @@ function openStationModal(station) {
 function closeStationModal() {
     document.getElementById('station-modal').classList.add('hidden');
     isPaused = false;
+    saveGameState();
 }
 
 /**
@@ -1572,6 +1826,7 @@ function triggerGameOver(reasonTitle, reasonDesc) {
     gameOver = true;
     isPaused = true;
     resetJoystick();
+    saveGameState();
     document.getElementById('gameover-icon').textContent = '💥';
     document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-rose-400';
     document.getElementById('gameover-title').textContent = reasonTitle;
@@ -1584,7 +1839,12 @@ function triggerGameOver(reasonTitle, reasonDesc) {
 function update(dt) {
     if (isPaused || gameOver) return;
 
-    //Yhdistetään näppäimistö (WASD + Nuolinäppäimet) sekä analoginen tatti
+    saveTimer += dt;
+    if (saveTimer >= 3) {
+        saveTimer = 0;
+        saveGameState();
+    }
+
     const leftPressed = keys['ArrowLeft'] || keys['KeyA'] || joystick.x < -0.28;
     const rightPressed = keys['ArrowRight'] || keys['KeyD'] || joystick.x > 0.28;
     const upPressed = keys['ArrowUp'] || keys['KeyW'] || joystick.y < -0.32;
@@ -1605,7 +1865,7 @@ function update(dt) {
         const burnRate = upPressed ? 1.8 : 0.75;
         player.fuel = Math.max(0, player.fuel - burnRate * dt);
         if (player.fuel <= 0) {
-            triggerGameOver('Polttoaine loppui!', 'Aluksesi moottori sammui syvällä maan alla.');
+            triggerGameOver('Slut på bensin!', 'Motorn stannade djupt under jord.');
             return;
         }
     }
@@ -1640,6 +1900,7 @@ function update(dt) {
             } else {
                 grid[r][c] = BLOCKS.EMPTY.id;
                 spawnParticles(targetX, targetY, block.color, 12, 95);
+                saveGameState();
             }
         }
     } else {
@@ -1711,7 +1972,7 @@ function update(dt) {
                 sound.playError();
                 addFloatingText(player.x + 16, player.y, `-${dmg} HP`, '#fb7185');
                 if (player.hull <= 0) {
-                    triggerGameOver('Alus tuhoutui!', 'Törmäsit liian kovaa maaperään ja runko hajosi.');
+                    triggerGameOver('Skrovet förstördes!', 'Hård landning skadade kapseln.');
                     return;
                 }
             }
@@ -1758,13 +2019,13 @@ function tryStartDrill(col, row) {
 
     if (block.hardness > getDrillPower()) {
         if (Math.random() < 0.15) {
-            showToast(`Liian kova (${block.name})! Päivitä poranterää pajalla.`, 'warn');
+            showToast(`För hårt (${block.name})! Uppgradera borren på Borrverkstad.`, 'warn');
         }
         return;
     }
 
     if (block.isOre && player.cargo.length >= getMaxCargo()) {
-        showToast('Ruuma on täynnä! Voit silti ratkaista tehtävän bonuksen vuoksi.', 'warn');
+        showToast('Lastutrymmet är fullt — du kan ändå få bonuspengar!', 'warn');
     }
 
     player.drilling.active = true;
@@ -1786,7 +2047,7 @@ function checkStationProximity() {
         if (found) {
             activeStation = found;
             document.getElementById('station-prompt-icon').textContent = found.icon;
-            document.getElementById('station-prompt-text').textContent = `Avaa: ${found.name} (Enter)`;
+            document.getElementById('station-prompt-text').textContent = `Öppna: ${found.name} (Enter)`;
             promptEl.classList.remove('hidden');
             mobileBtn.textContent = found.icon;
             mobileBtn.classList.remove('hidden');
@@ -1872,7 +2133,6 @@ function draw() {
     ctx.save();
     ctx.translate(-camX, -camY);
 
-    // Maanpinnan asemat
     STATIONS.forEach(st => {
         const sx = st.colStart * TILE_SIZE;
         const sw = (st.colEnd - st.colStart + 1) * TILE_SIZE;
@@ -1936,7 +2196,7 @@ function draw() {
             if (block.isOre) {
                 ctx.save();
                 ctx.shadowColor = block.glow;
-                ctx.shadowBlur = 8;
+                ctx.shadowBlur = block.id === BLOCKS.NOBELIUM.id ? 14 : 8;
                 ctx.fillStyle = block.oreColor;
 
                 const offsets = [
@@ -1949,6 +2209,12 @@ function draw() {
                     ctx.arc(bx + o.ox, by + o.oy, o.rad, 0, Math.PI * 2);
                     ctx.fill();
                 });
+
+                if (block.id === BLOCKS.NOBELIUM.id) {
+                    ctx.strokeStyle = '#fdf4ff';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(bx + 5, by + 5, TILE_SIZE - 10, TILE_SIZE - 10);
+                }
                 ctx.restore();
             } else if (block.id === BLOCKS.ROCK.id || block.id === BLOCKS.HARD_ROCK.id) {
                 ctx.strokeStyle = 'rgba(255,255,255,0.08)';
@@ -1961,12 +2227,10 @@ function draw() {
         }
     }
 
-    // Syvyyden Ydin-Bossi pohjalla
     if (!boss.defeated) {
         drawBoss(ctx);
     }
 
-    // Porauksen edistymispalkki
     if (player.drilling.active) {
         const dx = player.drilling.targetCol * TILE_SIZE;
         const dy = player.drilling.targetRow * TILE_SIZE;
@@ -2010,11 +2274,9 @@ function drawBoss(ctx) {
     ctx.save();
     ctx.translate(bx + boss.width / 2, by + boss.height / 2 + pulse * 0.4);
 
-    // Hehku
     ctx.shadowColor = '#f43f5e';
     ctx.shadowBlur = 18;
 
-    // Bossin runko
     ctx.fillStyle = '#31102f';
     ctx.strokeStyle = '#f43f5e';
     ctx.lineWidth = 3;
@@ -2025,7 +2287,6 @@ function drawBoss(ctx) {
 
     ctx.shadowBlur = 0;
 
-    // Silmät / ydinsensori
     ctx.fillStyle = '#fda4af';
     ctx.beginPath();
     ctx.arc(-22, -6, 9, 0, Math.PI * 2);
@@ -2038,7 +2299,6 @@ function drawBoss(ctx) {
     ctx.arc(22, -6, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    // Nimi ja HP-palkit yläpuolella
     ctx.font = 'bold 12px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fda4af';
@@ -2183,6 +2443,12 @@ window.addEventListener('keydown', e => {
     }
     keys[e.code] = true;
 
+    if (currentQuiz && !currentQuiz.answered && e.code === 'Enter') {
+        e.preventDefault();
+        checkQuizAnswer();
+        return;
+    }
+
     if ((e.code === 'Enter' || e.code === 'Space') && !isPaused && activeStation) {
         openStationModal(activeStation);
     }
@@ -2198,6 +2464,9 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => {
     keys[e.code] = false;
 });
+
+window.addEventListener('pagehide', saveGameState);
+window.addEventListener('beforeunload', saveGameState);
 
 document.getElementById('mobile-action-btn').onclick = () => {
     if (activeStation && !isPaused) openStationModal(activeStation);
@@ -2216,11 +2485,11 @@ document.getElementById('btn-rule-help').onclick = () => {
 };
 document.getElementById('btn-close-help').onclick = () => {
     document.getElementById('help-modal').classList.add('hidden');
-    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden')) isPaused = false;
+    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden') && !gameOver) isPaused = false;
 };
 document.getElementById('btn-close-help-bottom').onclick = () => {
     document.getElementById('help-modal').classList.add('hidden');
-    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden')) isPaused = false;
+    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden') && !gameOver) isPaused = false;
 };
 
 document.getElementById('btn-mute').onclick = (e) => {
@@ -2228,8 +2497,8 @@ document.getElementById('btn-mute').onclick = (e) => {
     e.target.textContent = muted ? '🔇' : '🔊';
 };
 
-document.getElementById('btn-reset').onclick = () => {
-    resetGame();
+document.getElementById('btn-new-game-top').onclick = () => {
+    startNewGame(true);
 };
 
 document.getElementById('quiz-rule-hint-btn').onclick = () => {
@@ -2238,9 +2507,15 @@ document.getElementById('quiz-rule-hint-btn').onclick = () => {
 
 document.getElementById('btn-quiz-clear').onclick = () => {
     if (!currentQuiz || currentQuiz.answered) return;
-    currentQuiz.bankWords.forEach(w => w.used = false);
-    currentQuiz.selectedWordIds = [];
-    renderQuizWords();
+    if (currentQuiz.isFreeText) {
+        const inp = document.getElementById('quiz-free-input');
+        inp.value = '';
+        inp.focus();
+    } else {
+        currentQuiz.bankWords.forEach(w => w.used = false);
+        currentQuiz.selectedWordIds = [];
+        renderQuizWords();
+    }
 };
 
 document.getElementById('btn-quiz-check').onclick = checkQuizAnswer;
@@ -2258,10 +2533,11 @@ document.getElementById('btn-rescue').onclick = () => {
     isPaused = false;
     document.getElementById('gameover-modal').classList.add('hidden');
     updateHUD();
-    showToast('Alus hinattiin maanpinnalle!', 'info');
+    saveGameState();
+    showToast('Kapseln bogserades till ytan! (Alus hinattiin pintaan)', 'info');
 };
 
-document.getElementById('btn-new-game').onclick = resetGame;
+document.getElementById('btn-new-game').onclick = () => startNewGame(true);
 
 let lastTimestamp = 0;
 function gameLoop(timestamp) {
@@ -2277,9 +2553,16 @@ function gameLoop(timestamp) {
 
 window.onload = function () {
     resizeCanvas();
-    resetGame();
+    const loaded = loadGameState();
+    if (loaded) {
+        showToast('Tallennettu peli ladattu! (Sparat spel laddat)', 'success');
+    } else {
+        startNewGame(false);
+        showToast('Välkommen till gruvan! Leta efter Nobelium (no) & Djupets Kärnboss (630 m)!', 'info');
+    }
     requestAnimationFrame(gameLoop);
 };
 </script>
 </body>
 </html>
+```[cite: 1]
