@@ -111,6 +111,44 @@
             100% { transform: translateX(6%) skewX(10deg) scaleY(1.22); opacity: 1; }
         }
 
+        /* =========================================================================
+           MARDRÖMSLÄGE (NIGHTMARE MODE) TEEMA
+           ========================================================================= */
+        body.nightmare-active {
+            background:
+                radial-gradient(ellipse at 50% -10%, rgba(220, 38, 38, 0.38) 0%, transparent 58%),
+                radial-gradient(ellipse at 85% 15%, rgba(153, 27, 27, 0.32) 0%, transparent 50%),
+                linear-gradient(180deg, #090104 0%, #1c0509 42%, #2e080f 78%, #1a060a 100%);
+        }
+
+        body.nightmare-active .aurora-ribbon {
+            background: linear-gradient(
+                115deg,
+                transparent 15%,
+                rgba(220, 38, 38, 0.26) 35%,
+                rgba(249, 115, 22, 0.24) 50%,
+                rgba(127, 29, 29, 0.28) 68%,
+                transparent 85%
+            );
+            animation: stormClouds 4s ease-in-out infinite alternate;
+        }
+
+        body.nightmare-active .grid-frame {
+            border-color: rgba(239, 68, 68, 0.65);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85), 0 0 24px rgba(220, 38, 38, 0.35), inset 0 1px 0 rgba(254, 202, 202, 0.2);
+        }
+
+        body.nightmare-active .stone-panel {
+            border-color: #450a0a;
+            box-shadow: 0 3px 0 #180204, inset 0 1px 0 rgba(248, 113, 113, 0.22);
+        }
+
+        body.nightmare-active .prompt-base {
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.55);
+            text-shadow: 0 3px 0 #090d16, 0 0 18px rgba(239, 68, 68, 0.65);
+        }
+
         .storm-flash-layer {
             position: fixed;
             inset: 0;
@@ -913,7 +951,7 @@
 
         .modal-card {
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             padding: 22px 20px;
             text-align: center;
         }
@@ -940,11 +978,15 @@
             margin-bottom: 16px;
         }
 
+        .level-selector.has-nightmare {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
         .lvl-btn {
             background: rgba(15, 23, 42, 0.8);
             border: 2px solid #334155;
             border-radius: 12px;
-            padding: 8px 6px;
+            padding: 9px 6px;
             color: #94a3b8;
             font-size: 0.78rem;
             font-weight: 900;
@@ -957,6 +999,49 @@
             border-color: #38bdf8;
             color: #ffffff;
             box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+        }
+
+        /* Mardrömsläge-nappi ja sen avausanimaatio */
+        .lvl-btn.nightmare-btn {
+            background: linear-gradient(180deg, #450a0a 0%, #1c0508 100%);
+            border-color: #991b1b;
+            color: #fca5a5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lvl-btn.nightmare-btn.selected {
+            background: linear-gradient(180deg, #dc2626 0%, #7f1d1d 100%);
+            border-color: #fca5a5;
+            color: #ffffff;
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.8), inset 0 1px 0 rgba(254, 202, 202, 0.4);
+        }
+
+        .lvl-btn.nightmare-btn.just-unlocked {
+            animation: nightmareUnlockPulse 1.1s ease-in-out 2;
+        }
+
+        @keyframes nightmareUnlockPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 24px rgba(248, 113, 113, 1); border-color: #fef08a; }
+        }
+
+        .nightmare-unlock-banner {
+            background: linear-gradient(90deg, rgba(127, 29, 29, 0.85), rgba(185, 28, 28, 0.92), rgba(127, 29, 29, 0.85));
+            border: 1.5px solid #f87171;
+            border-radius: 10px;
+            padding: 7px 10px;
+            margin-bottom: 12px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #fef2f2;
+            box-shadow: 0 0 14px rgba(220, 38, 38, 0.55);
+            animation: fadeInSlide 0.4s ease-out;
+        }
+
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .stats-box {
@@ -982,7 +1067,13 @@
             border: 3px solid #082f49;
             box-shadow: 0 5px 0 #082f49;
             cursor: pointer;
-            transition: transform 0.08s ease, opacity 0.2s ease;
+            transition: transform 0.08s ease, opacity 0.2s ease, background 0.2s ease;
+        }
+
+        .btn-start.nightmare-start {
+            background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
+            border-color: #450a0a;
+            box-shadow: 0 5px 0 #450a0a, 0 0 18px rgba(239, 68, 68, 0.5);
         }
 
         .btn-start:disabled {
@@ -1143,10 +1234,15 @@
                 Katso ylhäältä verbin perusmuoto ja kopauta Thorin vasaralla sen muodot oikeassa järjestyksessä: <b>1. Preesens ➔ 2. Imperfekti ➔ 3. Supiini</b>. Varo vääriä muotoja ja väärää järjestystä!
             </p>
 
+            <div id="nightmareUnlockBanner" class="nightmare-unlock-banner" style="display:none;">
+                💀 <b>MARDRÖMSLÄGE AVATTU!</b> Kokeile selviätkö salaman nopeasta painajaisesta (1 elämä, 60 s, tuplapisteet)!
+            </div>
+
             <div id="levelSelector" class="level-selector">
                 <button type="button" class="lvl-btn selected" data-level="all">⚔️ KAIKKI (150+ verbiä)</button>
                 <button type="button" class="lvl-btn" data-level="1">🛡️ TASO 1 (Perus)</button>
                 <button type="button" class="lvl-btn" data-level="2">🔥 TASO 2 (Haastava)</button>
+                <button type="button" id="nightmareLvlBtn" class="lvl-btn nightmare-btn" data-level="nightmare" style="display:none;">💀 MARDRÖMSLÄGE</button>
             </div>
 
             <div id="finalStatsBox" class="stats-box hidden">
@@ -1432,7 +1528,6 @@
                 if (!this.enabled) return;
                 this.init();
 
-                // Luetaan pelaajan klikkaama verbi ruotsiksi
                 if (word) {
                     this.speakSwedishWord(word);
                 }
@@ -1440,7 +1535,6 @@
                 if (!this.ctx) return;
                 const now = this.ctx.currentTime;
 
-                // Alasimen metallinen kilahdus + ukkosjylinä jos 4x kombo tai ketju valmis
                 if (combo >= 4 || chainCompleted) {
                     const freqs = chainCompleted ? [329.63, 415.30, 493.88, 659.25] : [293.66, 369.99, 440.00, 587.33];
                     freqs.forEach((f, idx) => {
@@ -1502,7 +1596,6 @@
                 if (!this.ctx) return;
 
                 const now = this.ctx.currentTime;
-                // Matala ukkosjylinä + sähköinen salamanisku
                 const bufferSize = Math.floor(this.ctx.sampleRate * 1.15);
                 const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
                 const data = noiseBuffer.getChannelData(0);
@@ -1527,6 +1620,34 @@
                 gain.connect(this.ctx.destination);
                 noise.start(now);
                 noise.stop(now + 1.15);
+            }
+
+            playNightmareHorn() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                [110, 103.83, 73.42].forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 0.85, now + 0.65);
+
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(420, now);
+
+                    gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.008, now + 0.72);
+
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + 0.75);
+                });
             }
 
             playGameOver() {
@@ -1555,20 +1676,40 @@
 
         /**
          * =========================================================================
-         * 3. PELIN TILA & DOM-ELEMENTIT
+         * 3. PELIN TILA, TALLENNUS & DOM-ELEMENTIT
          * =========================================================================
          */
         const GAME_DURATION = 75;
+        const NIGHTMARE_DURATION = 60;
         const INITIAL_LIVES = 3;
+        const NIGHTMARE_LIVES = 1;
         const TOTAL_HOLES = 9;
         const FIXED_CURSOR_SCALE = 0.56;
+        const UNLOCK_STORAGE_KEY = 'vikingaverben_nightmare_unlocked_v1';
 
         const FORM_LABELS = ['PREESENS', 'IMPERFEKTI', 'SUPIINI'];
+
+        function readNightmareUnlocked() {
+            try {
+                return localStorage.getItem(UNLOCK_STORAGE_KEY) === '1';
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function saveNightmareUnlocked() {
+            try {
+                localStorage.setItem(UNLOCK_STORAGE_KEY, '1');
+            } catch (_) {}
+        }
 
         const state = {
             running: false,
             roundId: 0,
             selectedLevel: 'all',
+            nightmareUnlocked: readNightmareUnlocked(),
+            gamesPlayed: 0,
+            maxLivesCurrentGame: INITIAL_LIVES,
             score: 0,
             lives: INITIAL_LIVES,
             timeLeft: GAME_DURATION,
@@ -1576,9 +1717,7 @@
             correctHits: 0,
             completedVerbs: 0,
             currentVerb: null,
-            // targetForms = [preesens, imperfekti, supiini] (forms[1..3])
             targetForms: [],
-            // stepIndex: 0 = Preesens, 1 = Imperfekti, 2 = Supiini
             stepIndex: 0,
             holes: [],
             spawnTimer: null,
@@ -1604,6 +1743,9 @@
         const startBtn = document.getElementById('startBtn');
         const soundToggleBtn = document.getElementById('soundToggleBtn');
         const customCursor = document.getElementById('customCursor');
+        const levelSelectorEl = document.getElementById('levelSelector');
+        const nightmareLvlBtn = document.getElementById('nightmareLvlBtn');
+        const nightmareUnlockBanner = document.getElementById('nightmareUnlockBanner');
 
         const chainSlotEls = [
             document.getElementById('chainSlot0'),
@@ -1624,6 +1766,33 @@
             document.getElementById('comboStep3'),
             document.getElementById('comboStep4')
         ];
+
+        function isNightmareMode() {
+            return state.selectedLevel === 'nightmare';
+        }
+
+        function refreshLevelSelectorUI(justUnlocked = false) {
+            if (state.nightmareUnlocked) {
+                nightmareLvlBtn.style.display = '';
+                levelSelectorEl.classList.add('has-nightmare');
+                if (justUnlocked) {
+                    nightmareUnlockBanner.style.display = 'block';
+                    nightmareLvlBtn.classList.remove('just-unlocked');
+                    void nightmareLvlBtn.offsetWidth;
+                    nightmareLvlBtn.classList.add('just-unlocked');
+                }
+            } else {
+                nightmareLvlBtn.style.display = 'none';
+                levelSelectorEl.classList.remove('has-nightmare');
+                nightmareUnlockBanner.style.display = 'none';
+            }
+
+            if (isNightmareMode()) {
+                startBtn.classList.add('nightmare-start');
+            } else {
+                startBtn.classList.remove('nightmare-start');
+            }
+        }
 
         /**
          * =========================================================================
@@ -1775,6 +1944,7 @@
         function getFilteredVerbs() {
             if (state.selectedLevel === '1') return VERBS.filter(v => v.level === 1);
             if (state.selectedLevel === '2') return VERBS.filter(v => v.level === 2);
+            // Sekä 'all' että 'nightmare' käyttävät koko verbilistaa
             return VERBS;
         }
 
@@ -1817,16 +1987,13 @@
 
             state.lastUsedVerbInf = chosen.forms.join(',');
             state.currentVerb = chosen;
-            // forms: [0: infinitiivi, 1: preesens, 2: imperfekti, 3: supiini]
             state.targetForms = [chosen.forms[1], chosen.forms[2], chosen.forms[3]];
             state.stepIndex = 0;
 
-            // Ohita mahdollinen "-" -alkuinen muoto
             while (state.stepIndex < 3 && state.targetForms[state.stepIndex] === '-') {
                 state.stepIndex++;
             }
 
-            // Näytä perusmuoto (tai preesens jos perusmuoto on "-", esim. måste / ska)
             const displayInf = chosen.forms[0] !== '-' ? chosen.forms[0] : chosen.forms[1];
             promptBase.textContent = displayInf;
             promptFi.textContent = `(${chosen.fi})`;
@@ -1835,25 +2002,25 @@
             hideAllHoles();
 
             clearTimeout(state.spawnTimer);
+            const initialDelay = isNightmareMode() ? 130 : 220;
             state.spawnTimer = setTimeout(() => {
                 if (state.running && expectedRoundId === state.roundId) {
                     spawnWave(expectedRoundId);
                 }
-            }, 220);
+            }, initialDelay);
         }
 
-        // Luo uskottavia vääriä muotoja: saman verbin muita aikamuotoja + heikkoja taivutushämäyksiä + muiden verbien muotoja
         function buildDistractors(verb, expectedAnswer, count) {
             const pool = new Set();
 
-            // 1. Saman verbin muut muodot (esim. supiini tai perusmuoto kun haetaan preesensiä/imperfektiä)
+            // 1. Saman verbin muut muodot
             verb.forms.forEach(f => {
                 if (f && f !== '-' && f !== expectedAnswer) {
                     pool.add(f);
                 }
             });
 
-            // 2. Klassiset heikon taivutuksen harhautukset (esim. "skrivade", "skrivt", "gådde")
+            // 2. Heikon taivutuksen harhautukset
             const inf = verb.forms[0] !== '-' ? verb.forms[0] : verb.forms[1];
             if (inf) {
                 const stem = inf.endsWith('a') ? inf.slice(0, -1) : inf;
@@ -1862,16 +2029,26 @@
                     `${inf}t`,
                     `${stem}ade`,
                     `${stem}at`,
-                    `${stem}te`
+                    `${stem}te`,
+                    `${stem}de`
                 ];
                 fakeWeak.forEach(fw => {
                     if (fw !== expectedAnswer) pool.add(fw);
                 });
             }
 
-            // 3. Satunnaisia muiden epäsäännöllisten verbien muotoja
+            // 3. Mardrömsläge-tilassa suositaan samankaltaisia vokaaleja / alkukirjaimia hämäyksinä
+            if (isNightmareMode() && expectedAnswer.length >= 2) {
+                const prefix = expectedAnswer.slice(0, 2).toLowerCase();
+                const lookalikes = ALL_UNIQUE_FORMS.filter(
+                    f => f !== expectedAnswer && f.toLowerCase().startsWith(prefix)
+                );
+                lookalikes.sort(() => Math.random() - 0.5).slice(0, 4).forEach(la => pool.add(la));
+            }
+
+            // 4. Satunnaisia muiden epäsäännöllisten verbien muotoja
             let guard = 0;
-            while (pool.size < count + 5 && guard < 60) {
+            while (pool.size < count + 6 && guard < 70) {
                 guard++;
                 const randForm = ALL_UNIQUE_FORMS[Math.floor(Math.random() * ALL_UNIQUE_FORMS.length)];
                 if (randForm !== expectedAnswer) {
@@ -1887,7 +2064,6 @@
             return arr.slice(0, count);
         }
 
-        // Laskee sopivan tekstiskaalauksen riimukiven sanan tai sanaliiton pituuden mukaan
         function getTabletFontScale(word) {
             const len = word.length;
             const longestToken = word.split(/\s+/).reduce((max, part) => Math.max(max, part.length), 0);
@@ -1907,20 +2083,27 @@
             const expectedAnswer = getCurrentExpectedWord();
             if (!expectedAnswer || expectedAnswer === '-') return;
 
+            const nightmare = isNightmareMode();
             const freeHoles = state.holes.filter(h => !h.active);
             if (freeHoles.length < 2) {
                 clearTimeout(state.spawnTimer);
-                state.spawnTimer = setTimeout(() => spawnWave(expectedRoundId), 360);
+                state.spawnTimer = setTimeout(() => spawnWave(expectedRoundId), nightmare ? 220 : 360);
                 return;
             }
 
             const alreadyHasCorrect = state.holes.some(h => h.active && h.isCorrect);
-            const countToSpawn = Math.min(freeHoles.length, Math.floor(Math.random() * 2) + 2);
+            // Mardrömsläge nostaa 4–5 riimukiveä kerralla, normaalitila 2–3
+            const desiredCount = nightmare
+                ? Math.floor(Math.random() * 2) + 4
+                : Math.floor(Math.random() * 2) + 2;
+            const countToSpawn = Math.min(freeHoles.length, desiredCount);
 
             const shuffledHoles = [...freeHoles].sort(() => Math.random() - 0.5).slice(0, countToSpawn);
             const distractors = buildDistractors(state.currentVerb, expectedAnswer, countToSpawn);
 
-            const visibleDuration = Math.max(2200, 3050 - state.correctHits * 18);
+            const visibleDuration = nightmare
+                ? Math.max(1150, 1780 - state.correctHits * 15)
+                : Math.max(2200, 3050 - state.correctHits * 18);
 
             shuffledHoles.forEach((hole, idx) => {
                 const isCorrectSlot = !alreadyHasCorrect && idx === 0;
@@ -1938,7 +2121,7 @@
                 clearTimeout(hole.hideTimeout);
                 hole.hideTimeout = setTimeout(() => {
                     hideHole(hole);
-                }, visibleDuration + Math.random() * 350);
+                }, visibleDuration + Math.random() * (nightmare ? 200 : 350));
             });
 
             clearTimeout(state.spawnTimer);
@@ -1946,7 +2129,7 @@
                 if (state.running && expectedRoundId === state.roundId) {
                     spawnWave(expectedRoundId);
                 }
-            }, visibleDuration + 240);
+            }, visibleDuration + (nightmare ? 140 : 240));
         }
 
         function hideHole(hole) {
@@ -1975,6 +2158,7 @@
 
             const currentRound = state.roundId;
             const expectedAnswer = getCurrentExpectedWord();
+            const nightmare = isNightmareMode();
 
             if (hole.isCorrect && hole.word === expectedAnswer) {
                 hole.active = false;
@@ -1984,7 +2168,6 @@
                 state.combo += 1;
                 state.correctHits += 1;
 
-                // Siirrytään ketjussa eteenpäin
                 state.stepIndex += 1;
                 while (state.stepIndex < 3 && state.targetForms[state.stepIndex] === '-') {
                     state.stepIndex += 1;
@@ -1992,8 +2175,9 @@
 
                 const chainCompleted = state.stepIndex >= 3;
                 const comboLevel = Math.min(state.combo, 4);
-                const basePoints = 100 + (comboLevel - 1) * 40;
-                const chainBonus = chainCompleted ? 150 : 0;
+                const multiplier = nightmare ? 2 : 1;
+                const basePoints = (100 + (comboLevel - 1) * 40) * multiplier;
+                const chainBonus = chainCompleted ? (150 * multiplier) : 0;
                 const pointsEarned = basePoints + chainBonus;
                 state.score += pointsEarned;
 
@@ -2011,7 +2195,7 @@
 
                 if (chainCompleted) {
                     const summaryForms = state.currentVerb.forms.filter(f => f !== '-').join(' ➔ ');
-                    feedbackBanner.textContent = `⚡ Kedjan färdig! Ketju taottu! ${summaryForms} (+${pointsEarned} p)`;
+                    feedbackBanner.textContent = `${nightmare ? '💀' : '⚡'} Kedjan färdig! Ketju taottu! ${summaryForms} (+${pointsEarned} p)`;
                     feedbackBanner.style.color = '#6ee7b7';
 
                     clearTimeout(state.spawnTimer);
@@ -2020,20 +2204,19 @@
                         if (state.running && currentRound === state.roundId) {
                             nextVerb(currentRound);
                         }
-                    }, 420);
+                    }, nightmare ? 280 : 420);
                 } else {
                     const nextLabel = FORM_LABELS[state.stepIndex];
                     feedbackBanner.textContent = `Oikein (${hole.word})! Seuraavaksi: ${nextLabel} (+${pointsEarned} p)`;
                     feedbackBanner.style.color = '#7dd3fc';
 
-                    // Piilotetaan vanhat ruudut ja nostetaan heti uutta aaltoa seuraavalle muodolle
                     hideAllHoles();
                     clearTimeout(state.spawnTimer);
                     state.spawnTimer = setTimeout(() => {
                         if (state.running && currentRound === state.roundId) {
                             spawnWave(currentRound);
                         }
-                    }, 180);
+                    }, nightmare ? 120 : 180);
                 }
             } else {
                 hole.active = false;
@@ -2044,7 +2227,7 @@
                 state.lives = Math.max(0, state.lives - 1);
 
                 sound.playWrongBonk();
-                triggerShake(false);
+                triggerShake(nightmare);
                 spawnSimpleCallout(`VÄÄRIN! (${hole.word})`, clientX, clientY, '#fca5a5');
 
                 const currentLabel = FORM_LABELS[state.stepIndex] || '';
@@ -2058,7 +2241,7 @@
                 }, 380);
 
                 if (state.lives <= 0) {
-                    endGame('Salama sammui – elämät loppuivat!');
+                    endGame(nightmare ? 'Mardrömmen slukade dig!' : 'Salama sammui – elämät loppuivat!');
                 }
             }
         }
@@ -2168,7 +2351,6 @@
             const el = document.createElement('div');
             el.className = 'combo-callout';
 
-            // Pidetään megakombo (taso 4+) pisteen saantipaikassa, mutta turvallisesti ruudun sisällä
             const safeX = Math.max(125, Math.min(window.innerWidth - 125, x));
             const safeY = Math.max(115, Math.min(window.innerHeight - 60, y));
 
@@ -2311,11 +2493,13 @@
                 comboStatusLabel.style.color = '#7dd3fc';
             }
 
+            const maxLives = state.maxLivesCurrentGame;
+            const icon = maxLives === 1 ? '💀' : '⚡';
             let boltsHtml = '';
-            for (let i = 0; i < INITIAL_LIVES; i++) {
+            for (let i = 0; i < maxLives; i++) {
                 boltsHtml += i < state.lives
-                    ? '<span>⚡</span>'
-                    : '<span style="opacity:0.25; filter:grayscale(1);">⚡</span>';
+                    ? `<span>${icon}</span>`
+                    : `<span style="opacity:0.25; filter:grayscale(1);">${icon}</span>`;
             }
             livesDisplay.innerHTML = boltsHtml;
         }
@@ -2342,17 +2526,27 @@
 
             state.roundId += 1;
             const currentRound = state.roundId;
+            const nightmare = isNightmareMode();
 
             state.running = true;
             state.score = 0;
-            state.lives = INITIAL_LIVES;
-            state.timeLeft = GAME_DURATION;
+            state.maxLivesCurrentGame = nightmare ? NIGHTMARE_LIVES : INITIAL_LIVES;
+            state.lives = state.maxLivesCurrentGame;
+            state.timeLeft = nightmare ? NIGHTMARE_DURATION : GAME_DURATION;
             state.combo = 0;
             state.correctHits = 0;
             state.completedVerbs = 0;
 
-            feedbackBanner.textContent = 'Tao muodot järjestyksessä: Preesens ➔ Imperfekti ➔ Supiini!';
-            feedbackBanner.style.color = '#bae6fd';
+            if (nightmare) {
+                document.body.classList.add('nightmare-active');
+                sound.playNightmareHorn();
+                feedbackBanner.textContent = '💀 MARDRÖMSLÄGE: 1 elämä, huippuvauhti ja 2x pisteet!';
+                feedbackBanner.style.color = '#fca5a5';
+            } else {
+                document.body.classList.remove('nightmare-active');
+                feedbackBanner.textContent = 'Tao muodot järjestyksessä: Preesens ➔ Imperfekti ➔ Supiini!';
+                feedbackBanner.style.color = '#bae6fd';
+            }
 
             updateHUD();
             overlayModal.classList.add('hidden');
@@ -2378,21 +2572,35 @@
         function endGame(reasonText) {
             if (!state.running) return;
 
+            const wasNightmare = isNightmareMode();
             state.running = false;
             state.roundId += 1;
+            state.gamesPlayed += 1;
             clearAllTimers();
             hideAllHoles();
             sound.playGameOver();
 
             customCursor.style.opacity = '0';
-            document.body.classList.remove('playing-desktop', 'storm-mode');
+            document.body.classList.remove('playing-desktop', 'storm-mode', 'nightmare-active');
+
+            // Avataan Mardrömsläge 1. pelikerran jälkeen
+            let justUnlocked = false;
+            if (!state.nightmareUnlocked && state.gamesPlayed >= 1) {
+                state.nightmareUnlocked = true;
+                saveNightmareUnlocked();
+                justUnlocked = true;
+            }
+            refreshLevelSelectorUI(justUnlocked);
 
             modalTitle.textContent = reasonText.toUpperCase();
-            modalDesc.textContent = 'Upeasti taottu! Valitse taso ja yritä rikkoa ennätyksesi.';
+            modalTitle.style.color = wasNightmare ? '#f87171' : '#38bdf8';
+            modalDesc.textContent = justUnlocked
+                ? 'Upeaa! Ensimmäinen pelikerta suoritettu ja uusi MARDRÖMSLÄGE on nyt avattu!'
+                : 'Upeasti taottu! Valitse taso ja yritä rikkoa ennätyksesi.';
             finalScore.textContent = state.score;
             finalCorrectCount.textContent = `Oikeita osumia: ${state.correctHits} kpl • Valmiita verbiketjuja: ${state.completedVerbs} kpl`;
             finalStatsBox.classList.remove('hidden');
-            startBtn.textContent = '🔄 TAO UUDELLEEN';
+            startBtn.textContent = isNightmareMode() ? '💀 TAO PAINAJAISESSA' : '🔄 TAO UUDELLEEN';
 
             startBtn.disabled = true;
             overlayModal.classList.remove('hidden');
@@ -2407,6 +2615,14 @@
                 document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 state.selectedLevel = btn.dataset.level;
+
+                if (state.selectedLevel === 'nightmare') {
+                    startBtn.classList.add('nightmare-start');
+                    startBtn.textContent = '💀 ALOITA MARDRÖMSLÄGE';
+                } else {
+                    startBtn.classList.remove('nightmare-start');
+                    startBtn.textContent = state.gamesPlayed > 0 ? '🔄 TAO UUDELLEEN' : '⚡ ALOITA TAONTA';
+                }
             });
         });
 
@@ -2419,6 +2635,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             initCustomCursor();
             buildGrid();
+            refreshLevelSelectorUI(false);
             updateHUD();
         });
     </script>
