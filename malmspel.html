@@ -1072,7 +1072,7 @@ function loadGameState() {
                 document.getElementById('gameover-icon').textContent = '🏆';
                 document.getElementById('gameover-title').textContent = 'Gruvan erövrad!';
                 document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-emerald-400';
-                document.getElementById('gameover-desc').textContent = `Du besegrade Djupets Kärnboss och vann $${boss.reward} i belöning!`;
+                document.getElementById('gameover-desc').textContent = `Du besegrade Djupets Kärnboss och vann ${boss.reward} SEK i belöning!`;
             } else {
                 document.getElementById('gameover-icon').textContent = '💥';
                 document.getElementById('gameover-title').textContent = 'Spelet slutade';
@@ -1329,7 +1329,7 @@ function triggerQuiz(options) {
         tagEl.className = isFreeText
             ? 'text-xs uppercase tracking-wider font-extrabold text-fuchsia-400'
             : 'text-xs uppercase tracking-wider font-bold text-amber-400';
-        nameEl.textContent = `${options.block.name} (Värde: SEK ${options.block.value})`;
+        nameEl.textContent = `${options.block.name} (Värde: ${options.block.value} SEK)`;
     }
 
     document.getElementById('quiz-finnish').textContent = `"${sentence.fi}"`;
@@ -1455,20 +1455,20 @@ function checkQuizAnswer() {
             if (boss.hp <= 0) {
                 boss.defeated = true;
                 player.money += boss.reward;
-                addFloatingText(bx, by - 20, `KÄRNBOSS BESEGRAD! +$${boss.reward}`, '#34d399');
+                addFloatingText(bx, by - 20, `KÄRNBOSS BESEGRAD! +${boss.reward} SEK`, '#34d399');
                 feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
                 feedbackEl.innerHTML = `
-                    <div class="font-extrabold text-emerald-300 text-base mb-1">🏆 DJUPETS KÄRNBOSS BESEGRAD! (+$${boss.reward + bossStrikeBonus})</div>
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">🏆 DJUPETS KÄRNBOSS BESEGRAD! (+${boss.reward + bossStrikeBonus} SEK)</div>
                     <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
                         ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
                     </div>
                     <div class="text-xs text-emerald-200">Snyggt jobbat! Du bemästrar svensk bisatsordföljd (KonSuKieLiPre) på fri hand!</div>
                 `;
             } else {
-                addFloatingText(bx, by - 15, `Fullträff! +$${bossStrikeBonus} (${boss.hp} HP kvar)`, '#fbbf24');
+                addFloatingText(bx, by - 15, `Fullträff! +${bossStrikeBonus} SEK (${boss.hp} HP kvar)`, '#fbbf24');
                 feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
                 feedbackEl.innerHTML = `
-                    <div class="font-extrabold text-emerald-300 text-base mb-1">⚔️ Fullträff med fri skrivning! +$${bossStrikeBonus} (Bossen har ${boss.hp}/${boss.maxHp} HP kvar)</div>
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">⚔️ Fullträff med fri skrivning! +${bossStrikeBonus} SEK (Bossen har ${boss.hp}/${boss.maxHp} HP kvar)</div>
                     <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
                         ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
                     </div>
@@ -1714,7 +1714,7 @@ function openStationModal(station) {
         }
     } else if (station.id === 'upgrade') {
         const categories = [
-            { key: 'drill', label: '⛏️ Borrkrona', list: UPGRADES.drill },
+            { key: 'drill', label: '⛏️ Borrspets', list: UPGRADES.drill },
             { key: 'fuel', label: '⛽ Bensintank', list: UPGRADES.fuel },
             { key: 'cargo', label: '📦 Lastutrymme', list: UPGRADES.cargo },
             { key: 'hull', label: '🛡️ Skrovpansar', list: UPGRADES.hull }
