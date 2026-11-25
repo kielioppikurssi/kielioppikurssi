@@ -1329,7 +1329,7 @@ function triggerQuiz(options) {
         tagEl.className = isFreeText
             ? 'text-xs uppercase tracking-wider font-extrabold text-fuchsia-400'
             : 'text-xs uppercase tracking-wider font-bold text-amber-400';
-        nameEl.textContent = `${options.block.name} (Värde: $${options.block.value})`;
+        nameEl.textContent = `${options.block.name} (Värde: SEK ${options.block.value})`;
     }
 
     document.getElementById('quiz-finnish').textContent = `"${sentence.fi}"`;
