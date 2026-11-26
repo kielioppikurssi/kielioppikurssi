@@ -1,0 +1,3303 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Шахта слов: Русский язык (A2–B1) • Sanakaivos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f8fafc;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.8); }
+        }
+        .glow-amber {
+            animation: pulse-glow 2s infinite;
+        }
+        .tts-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 0.5rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: rgba(56, 189, 248, 0.14);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .tts-btn:hover {
+            background: rgba(56, 189, 248, 0.28);
+            color: #e0f2fe;
+        }
+        .tts-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col relative">
+
+    <!-- Yläpalkki (HUD) -->
+    <header class="w-full bg-slate-900/95 border-b border-slate-700/80 px-3 py-2 flex flex-wrap items-center justify-between gap-2 z-10 shadow-lg backdrop-blur-sm">
+        <!-- Vasen: Päävalikko, Rahat & Syvyys -->
+        <div class="flex items-center gap-2 sm:gap-4">
+            <a href="https://kielioppikurssi.github.io" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-sky-300 hover:text-sky-200 border border-sky-500/40 px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow" title="Главное меню / Päävalikko">
+                <span>🏠</span>
+                <span class="hidden sm:inline">Меню</span>
+            </a>
+            <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-lg border border-emerald-500/30">
+                <span class="text-emerald-400 font-bold text-sm sm:text-base">₽</span>
+                <span id="hud-money" class="mono font-bold text-emerald-300 text-sm sm:text-lg">150</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700">
+                <span class="text-slate-400 text-xs sm:text-sm font-medium">Глубина:</span>
+                <span id="hud-depth" class="mono font-bold text-sky-300 text-sm sm:text-base">0 м</span>
+            </div>
+            <div class="hidden lg:flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-amber-500/30">
+                <span class="text-amber-400 text-xs sm:text-sm font-medium">Верно:</span>
+                <span id="hud-streak" class="mono font-bold text-amber-300 text-sm sm:text-base">0 🔥</span>
+            </div>
+        </div>
+
+        <!-- Keskellä: Mittarit (Polttoaine, Ruuma, Runko) -->
+        <div class="flex items-center gap-2 sm:gap-4 flex-1 max-w-xl justify-center">
+            <!-- Fuel -->
+            <div class="flex-1 min-w-[78px]">
+                <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
+                    <span class="text-amber-400">⛽ Топливо</span>
+                    <span id="hud-fuel-text" class="mono text-slate-300">100/100</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="hud-fuel-bar" class="h-full bg-gradient-to-r from-red-500 via-amber-500 to-yellow-400 transition-all duration-150" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Cargo -->
+            <div class="flex-1 min-w-[78px]">
+                <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
+                    <span class="text-purple-400">📦 Трюм</span>
+                    <span id="hud-cargo-text" class="mono text-slate-300">0/6</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="hud-cargo-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-400 transition-all duration-150" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Hull -->
+            <div class="flex-1 min-w-[78px]">
+                <div class="flex justify-between text-[11px] sm:text-xs font-semibold mb-0.5">
+                    <span class="text-rose-400">🛡️ Корпус</span>
+                    <span id="hud-hull-text" class="mono text-slate-300">100/100</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="hud-hull-bar" class="h-full bg-gradient-to-r from-rose-600 to-emerald-400 transition-all duration-150" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Oikea: Toimintonapit -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <button id="btn-auto-tts" class="bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-500/40 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="Автоозвучка русских слов при открытии заданий / Automaattinen venäjän ääni">
+                <span id="auto-tts-icon">🗣️</span><span id="auto-tts-label" class="hidden md:inline">Автозвук: ВКЛ</span>
+            </button>
+            <button id="btn-rule-help" class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="Справка и правила (RU + FI) / Ohjeet ja sanasto">
+                <span>🇷🇺</span><span class="hidden sm:inline">Справка / Ohje</span>
+            </button>
+            <button id="btn-mute" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-600 transition" title="Звук вкл/выкл">
+                🔊
+            </button>
+            <button id="btn-new-game-top" class="bg-rose-700 hover:bg-rose-600 active:bg-rose-800 text-white text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg border border-rose-500/50 shadow transition flex items-center gap-1" title="Новая игра (сбросить прогресс)">
+                <span>↺</span><span>Новая игра</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Pelialue (Canvas) -->
+    <main class="relative flex-1 w-full h-full overflow-hidden">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Aseman toimintopainike -->
+        <div id="station-prompt" class="hidden absolute bottom-28 sm:bottom-10 left-1/2 -translate-x-1/2 z-10">
+            <button id="btn-enter-station" class="glow-amber bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-2xl border-2 border-amber-200 text-sm sm:text-base flex items-center gap-2 transition transform hover:scale-105">
+                <span id="station-prompt-icon">🏪</span>
+                <span id="station-prompt-text">Открыть станцию (Enter)</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Pelialue (Canvas) -->
+    <main class="relative flex-1 w-full h-full overflow-hidden">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Aseman toimintopainike -->
+        <div id="station-prompt" class="hidden absolute bottom-28 sm:bottom-10 left-1/2 -translate-x-1/2 z-10">
+            <button id="btn-enter-station" class="glow-amber bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-2xl border-2 border-amber-200 text-sm sm:text-base flex items-center gap-2 transition transform hover:scale-105">
+                <span id="station-prompt-icon">🏪</span>
+                <span id="station-prompt-text">Öppna station (Enter)</span>
+            </button>
+        </div>
+
+        <!-- Ilmoitus-toast -->
+        <div id="toast-container" class="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 w-full max-w-md px-4"></div>
+
+        <!-- Mobiiliohjaimet: Analoginen tatti + Toimintopainike -->
+        <div id="mobile-controls" class="sm:hidden absolute bottom-4 inset-x-4 flex justify-between items-end pointer-events-none z-10">
+            <div id="joystick-zone" class="pointer-events-auto absolute bottom-12 left-7 w-28 h-28 rounded-full bg-slate-900/75 border-2 border-slate-600/80 backdrop-blur-sm shadow-2xl flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full border border-slate-700/80 pointer-events-none"></div>
+                <div id="joystick-knob" class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 border-2 border-amber-200 shadow-lg pointer-events-none transition-transform duration-75" style="transform: translate(0px, 0px);"></div>
+            </div>
+
+            <div class="pointer-events-auto">
+                <button id="mobile-action-btn" class="hidden w-16 h-16 bg-amber-500 active:bg-amber-400 text-slate-950 font-extrabold rounded-2xl shadow-lg border-2 border-amber-200 flex items-center justify-center text-2xl">
+                    🏢
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 1: VENÄJÄN SANASTOTEHTÄVÄ (A2–B1)                              -->
+    <!-- ===================================================================== -->
+    <div id="quiz-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-slate-900 border-2 border-slate-700 rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[95vh] overflow-y-auto">
+            <!-- Yläotsikko & Löydetty malmi / Bossi -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div id="quiz-ore-badge" class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-white/20">💎</div>
+                    <div>
+                        <span id="quiz-tag" class="text-xs uppercase tracking-wider font-bold text-amber-400">Найдена руда! / Malmi löytyi!</span>
+                        <h2 id="quiz-ore-name" class="text-lg sm:text-xl font-extrabold text-white">Золото (Au)</h2>
+                    </div>
+                </div>
+                <button id="quiz-rule-hint-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-semibold transition">
+                    💡 Подсказка / Vinkki
+                </button>
+            </div>
+
+            <!-- Pika-lunttilappu -->
+            <div id="quiz-inline-hint" class="hidden bg-indigo-950/80 border border-indigo-500/40 rounded-xl p-3 text-xs sm:text-sm text-indigo-100">
+                <strong class="text-amber-300">Уровни заданий (A2–B1) • Tehtävätasot:</strong><br>
+                <span class="text-emerald-300 font-semibold">Zn, Cu, Sn, Ag, Co, Au:</span> Выбор ответа (RU) — нажми на русское слово / Valitse venäjän sana<br>
+                <span class="text-amber-300 font-semibold">Cr, Pt, C, U, Sv:</span> Напиши перевод на <strong>финский</strong> — русское слово озвучивается / Kirjoita sana <strong>suomeksi</strong><br>
+                <span class="text-fuchsia-300 font-semibold">No, Sg, Босс:</span> Напиши слово по-<strong>русски</strong> кириллицей / Kirjoita sana <strong>venäjäksi</strong>
+            </div>
+
+            <!-- Tehtävänanto -->
+            <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700/80">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                    <p id="quiz-prompt-label" class="text-xs text-slate-400 font-semibold uppercase tracking-wide">
+                        Выберите правильное русское слово • Valitse oikea venäjänkielinen sana:
+                    </p>
+                    <span id="quiz-mode-pill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-200 border border-indigo-500/50">
+                        Словарь: 500+ слов (A2–B1)
+                    </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 mt-1">
+                    <p id="quiz-finnish" class="text-xl sm:text-2xl font-extrabold text-white"></p>
+                    <div id="quiz-prompt-tts-slot"></div>
+                </div>
+                <p id="quiz-category-sub" class="text-xs text-slate-400 mt-1.5"></p>
+            </div>
+
+            <!-- MONIVALINTATILA (helpot alkuaineet) -->
+            <div id="quiz-mcq-mode" class="hidden flex-col gap-2.5">
+                <label class="text-xs font-semibold text-slate-400">Выберите вариант (1–4) • Valitse vaihtoehto (1–4):</label>
+                <div id="quiz-mcq-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+            </div>
+
+            <!-- KIRJOITUSTILA (keskivaikeat = suomeksi, vaikeat & bossi = venäjäksi) -->
+            <div id="quiz-write-mode" class="hidden flex-col gap-2">
+                <label for="quiz-free-input" id="quiz-free-label" class="text-xs font-semibold text-amber-300">
+                    Введите перевод • Kirjoita käännös:
+                </label>
+                <div class="bg-slate-950/95 border-2 border-amber-500/40 focus-within:border-amber-400 rounded-xl p-3 flex flex-col gap-2 shadow-inner">
+                    <input
+                        id="quiz-free-input"
+                        type="text"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        placeholder="Введите ответ • Kirjoita vastaus..."
+                        class="w-full bg-slate-900 text-white placeholder-slate-500 border border-slate-700 focus:border-amber-400 focus:outline-none rounded-lg px-3.5 py-2.5 text-base font-semibold"
+                    />
+                    <div id="cyrillic-helper" class="hidden flex-wrap items-center gap-1 pt-1 border-t border-slate-800/80">
+                        <span class="text-[11px] text-slate-400 mr-1">Кириллица • Kyrilliset:</span>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400">
+                    Нажмите <kbd class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600 text-slate-200">Enter</kbd> для проверки • Paina Enter tarkistaaksesi.
+                </p>
+            </div>
+
+            <!-- Palautelaatikko -->
+            <div id="quiz-feedback" class="hidden rounded-xl p-4 border text-sm sm:text-base"></div>
+
+            <!-- Toimintopainikkeet -->
+            <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-800">
+                <button id="btn-quiz-clear" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl text-sm transition">
+                    Очистить
+                </button>
+                <div class="flex items-center gap-2">
+                    <button id="btn-quiz-check" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
+                        Проверить и бурить ⛏️
+                    </button>
+                    <button id="btn-quiz-continue" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
+                        Продолжить ▶
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 2: ASEMAT (MYYNTI, HUOLTO, PÄIVITYKSET)                       -->
+    <!-- ===================================================================== -->
+    <div id="station-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-slate-900 border-2 border-slate-700 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <span id="station-modal-icon" class="text-3xl">🏭</span>
+                    <div>
+                        <h2 id="station-modal-title" class="text-xl font-extrabold text-white">Переработка руды</h2>
+                        <p id="station-modal-subtitle" class="text-xs text-slate-400">Продажа добытой руды</p>
+                    </div>
+                </div>
+                <button id="btn-close-station" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold flex items-center justify-center">✕</button>
+            </div>
+
+            <div id="station-modal-body" class="flex flex-col gap-3"></div>
+
+            <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
+                <div class="text-sm font-bold text-emerald-400">Баланс: <span id="station-money-display">150</span> ₽</div>
+                <button id="btn-close-station-bottom" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-xl text-sm">Закрыть (Esc)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 3: OHJEET JA SANASTOINFO (RU + FI KAKSIKIELINEN)              -->
+    <!-- ===================================================================== -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-slate-900 border-2 border-indigo-500/50 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+                    <span>🇷🇺</span> Справка &amp; Sanasto (RU + FI)
+                </h2>
+                <button id="btn-close-help" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-sm text-slate-200 leading-relaxed">
+                <div class="bg-indigo-950/70 border border-indigo-500/40 rounded-xl p-4 space-y-2">
+                    <h3 class="font-extrabold text-amber-300 text-base">Уровни заданий и озвучка • Tehtävätasot ja ääni</h3>
+                    <ul class="list-disc list-inside space-y-1.5 text-xs sm:text-sm text-slate-200">
+                        <li><strong class="text-emerald-300">Zn, Cu, Sn, Ag, Co, Au:</strong> Выбор слова на русском (кнопка «Слушать» на каждом слове) • Monivalinta, valitse venäjänkielinen sana.</li>
+                        <li><strong class="text-amber-300">Cr, Pt, C, U, Sv:</strong> Введите перевод на <strong>финский</strong> (русское слово озвучивается автоматически) • Kirjoita käännös <strong>suomeksi</strong>.</li>
+                        <li><strong class="text-fuchsia-300">No, Sg, Ядерный босс:</strong> Введите слово по-<strong>русски</strong> кириллицей • Kirjoita sana <strong>venäjäksi</strong> kyrillisin kirjaimin.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/70 rounded-xl p-4 border border-slate-700 space-y-2">
+                    <h3 class="font-bold text-white">⛏️ Управление • Ohjaimet</h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-300 text-xs sm:text-sm">
+                        <li><strong>ПК / Tietokone:</strong> Полёт и бурение — <strong>WASD</strong> или <strong>стрелки</strong> / nuolinäppäimet.</li>
+                        <li><strong>Сенсорный экран / Mobiili:</strong> Аналоговый джойстик / analoginen tatti.</li>
+                        <li><strong>Станции наверху / Yläasemat:</strong> Переработка (продажа), Топливо и ремонт, Мастерская улучшений.</li>
+                        <li><strong>Автосохранение / Automaattitallennus:</strong> Прогресс сохраняется в браузере / Tallentuu selaimeen.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button id="btn-close-help-bottom" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition">
+                В шахту! • Takaisin kaivokseen!
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 4: GAME OVER / VOITTO                                       -->
+    <!-- ===================================================================== -->
+    <div id="gameover-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-rose-500/60 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl flex flex-col gap-4">
+            <div id="gameover-icon" class="text-5xl">💥</div>
+            <h2 id="gameover-title" class="text-2xl font-extrabold text-rose-400">Закончилось топливо!</h2>
+            <p id="gameover-desc" class="text-sm text-slate-300">Буровая капсула остановилась под землёй.</p>
+            <div class="bg-slate-800 rounded-xl p-3 text-xs text-slate-300 flex justify-around">
+                <div>Макс. глубина: <strong id="go-depth" class="text-sky-400">0 м</strong></div>
+                <div>Верных слов: <strong id="go-solved" class="text-emerald-400">0</strong></div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 mt-2">
+                <button id="btn-rescue" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-sm transition">
+                    🚁 Эвакуация (-50 ₽)
+                </button>
+                <button id="btn-new-game" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition">
+                    Новая игра
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/**
+ * ============================================================================
+ * 1. ÄÄNISYNTHETISAATTORI (WEB AUDIO API) & VENÄJÄN PUHESYNTEESİ (ru-RU)
+ * ============================================================================
+ */
+class SoundEngine {
+    constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.lastDrillTime = 0;
+        this.lastThrustTime = 0;
+    }
+
+    init() {
+        try {
+            if (!this.ctx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) this.ctx = new AudioCtx();
+            }
+            if (this.ctx && this.ctx.state === 'suspended') {
+                this.ctx.resume().catch(() => {});
+            }
+        } catch (err) {
+            // AudioContext ei käytettävissä
+        }
+    }
+
+    toggleMute() {
+        this.muted = !this.muted;
+        saveGameState();
+        return this.muted;
+    }
+
+    playDrill() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        if (now - this.lastDrillTime < 0.08) return;
+        this.lastDrillTime = now;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(95 + Math.random() * 35, now);
+        osc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+    }
+
+    playThrust() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        if (now - this.lastThrustTime < 0.07) return;
+        this.lastThrustTime = now;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(70 + Math.random() * 20, now);
+        osc.frequency.linearRampToValueAtTime(40, now + 0.07);
+
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+    }
+
+    playOreFound() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25];
+        notes.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.12, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.2);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.2);
+        });
+    }
+
+    playSuccess() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.07);
+            gain.gain.setValueAtTime(0.14, now + i * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.3);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.07);
+            osc.stop(now + i * 0.07 + 0.3);
+        });
+    }
+
+    playError() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.35);
+
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+    }
+
+    playCash() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [880, 1174.66].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.06);
+            gain.gain.setValueAtTime(0.12, now + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.25);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.06);
+            osc.stop(now + i * 0.06 + 0.25);
+        });
+    }
+}
+
+const sound = new SoundEngine();
+
+let autoRussianSpeech = true;
+let speechRetryTimer = null;
+
+function updateAutoSpeechButton() {
+    const iconEl = document.getElementById('auto-tts-icon');
+    const labelEl = document.getElementById('auto-tts-label');
+    const btnEl = document.getElementById('btn-auto-tts');
+    if (iconEl) iconEl.textContent = autoRussianSpeech ? '🗣️' : '🔕';
+    if (labelEl) labelEl.textContent = autoRussianSpeech ? 'Автозвук: ВКЛ' : 'Автозвук: ВЫКЛ';
+    if (btnEl) {
+        if (autoRussianSpeech) {
+            btnEl.className = 'bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-500/40 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1';
+        } else {
+            btnEl.className = 'bg-slate-800 hover:bg-slate-700 text-slate-400 border border-slate-600 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1';
+        }
+    }
+}
+
+function getRussianVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices() || [];
+    return (
+        voices.find(v => v.lang && v.lang.toLowerCase() === 'ru-ru') ||
+        voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru')) ||
+        null
+    );
+}
+
+function speakRussian(text, options = {}) {
+    const cleanText = (text || '').trim();
+    if (!cleanText) return;
+    if (sound && sound.muted && !options.force) return;
+    if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+        if (options.showUnavailableToast) {
+            showToast('Синтез речи не поддерживается браузером.', 'warn');
+        }
+        return;
+    }
+
+    if (speechRetryTimer) {
+        clearTimeout(speechRetryTimer);
+        speechRetryTimer = null;
+    }
+
+    const doSpeak = () => {
+        try {
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(cleanText);
+            utter.lang = 'ru-RU';
+            const ruVoice = getRussianVoice();
+            if (ruVoice) utter.voice = ruVoice;
+            utter.rate = options.rate || 0.92;
+            utter.pitch = options.pitch || 1.0;
+
+            utter.onerror = (evt) => {
+                if (evt && evt.error === 'not-allowed' && options.retryOnGesture) {
+                    const retryOnce = () => {
+                        window.removeEventListener('pointerdown', retryOnce, true);
+                        window.removeEventListener('keydown', retryOnce, true);
+                        speakRussian(cleanText, { force: true, rate: options.rate });
+                    };
+                    window.addEventListener('pointerdown', retryOnce, true);
+                    window.addEventListener('keydown', retryOnce, true);
+                }
+            };
+
+            window.speechSynthesis.speak(utter);
+        } catch (e) {
+            // Ohitetaan virheet ympäristöissä joissa puhesynteesi on estetty
+        }
+    };
+
+    const existingVoices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    if (!existingVoices || existingVoices.length === 0) {
+        speechRetryTimer = setTimeout(doSpeak, 120);
+    } else {
+        doSpeak();
+    }
+}
+
+function createRussianListenButton(ruWord, extraClasses = '') {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `tts-btn ${extraClasses}`.trim();
+    btn.title = `Слушать: ${ruWord}`;
+    btn.setAttribute('aria-label', `Слушать: ${ruWord}`);
+    btn.innerHTML = `<span>🔊</span><span>Слушать</span>`;
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        speakRussian(ruWord, { force: true, showUnavailableToast: true });
+    });
+    return btn;
+}
+
+if ('speechSynthesis' in window && typeof window.speechSynthesis.addEventListener === 'function') {
+    window.speechSynthesis.addEventListener('voiceschanged', () => {
+        getRussianVoice();
+    });
+}
+
+/**
+ * ============================================================================
+ * 2. LAAJA VENÄJÄN SANASTO (A2–B1, 500+ SANAA)
+ * ============================================================================
+ */
+const RU_VOCAB = [
+    { "ru": "дом", "fi": "talo / koti", "cat": "koti ja asuminen" },
+    { "ru": "квартира", "fi": "asunto", "cat": "koti ja asuminen" },
+    { "ru": "комната", "fi": "huone", "cat": "koti ja asuminen" },
+    { "ru": "кухня", "fi": "keittiö", "cat": "koti ja asuminen" },
+    { "ru": "спальня", "fi": "makuuhuone", "cat": "koti ja asuminen" },
+    { "ru": "ванная", "fi": "kylpyhuone", "cat": "koti ja asuminen" },
+    { "ru": "окно", "fi": "ikkuna", "cat": "koti ja asuminen" },
+    { "ru": "дверь", "fi": "ovi", "cat": "koti ja asuminen" },
+    { "ru": "стена", "fi": "seinä", "cat": "koti ja asuminen" },
+    { "ru": "пол", "fi": "lattia", "cat": "koti ja asuminen" },
+    { "ru": "потолок", "fi": "katto", "cat": "koti ja asuminen" },
+    { "ru": "крыша", "fi": "katto (rakennuksen)", "cat": "koti ja asuminen" },
+    { "ru": "стол", "fi": "pöytä", "cat": "koti ja asuminen" },
+    { "ru": "стул", "fi": "tuoli", "cat": "koti ja asuminen" },
+    { "ru": "диван", "fi": "sohva", "cat": "koti ja asuminen" },
+    { "ru": "кровать", "fi": "sänky", "cat": "koti ja asuminen" },
+    { "ru": "шкаф", "fi": "kaappi", "cat": "koti ja asuminen" },
+    { "ru": "зеркало", "fi": "peili", "cat": "koti ja asuminen" },
+    { "ru": "лампа", "fi": "lamppu", "cat": "koti ja asuminen" },
+    { "ru": "ключ", "fi": "avain", "cat": "koti ja asuminen" },
+    { "ru": "замок", "fi": "lukko / linna", "cat": "koti ja asuminen" },
+    { "ru": "лестница", "fi": "portaat / tikapuut", "cat": "koti ja asuminen" },
+    { "ru": "балкон", "fi": "parveke", "cat": "koti ja asuminen" },
+    { "ru": "двор", "fi": "piha", "cat": "koti ja asuminen" },
+    { "ru": "сад", "fi": "puutarha", "cat": "koti ja asuminen" },
+    { "ru": "забор", "fi": "aita", "cat": "koti ja asuminen" },
+    { "ru": "вещь", "fi": "asia / tavara", "cat": "koti ja asuminen" },
+    { "ru": "порядок", "fi": "järjestys", "cat": "koti ja asuminen" },
+    { "ru": "мусор", "fi": "roskat", "cat": "koti ja asuminen" },
+    { "ru": "уборка", "fi": "siivous", "cat": "koti ja asuminen" },
+    { "ru": "подушка", "fi": "tyyny", "cat": "koti ja asuminen" },
+    { "ru": "одеяло", "fi": "peitto", "cat": "koti ja asuminen" },
+    { "ru": "полотенце", "fi": "pyyhe", "cat": "koti ja asuminen" },
+    { "ru": "мыло", "fi": "saippua", "cat": "koti ja asuminen" },
+    { "ru": "щётка", "fi": "harja", "cat": "koti ja asuminen" },
+    { "ru": "утюг", "fi": "silitysrauta", "cat": "koti ja asuminen" },
+    { "ru": "пылесос", "fi": "pölynimuri", "cat": "koti ja asuminen" },
+    { "ru": "холодильник", "fi": "jääkaappi", "cat": "koti ja asuminen" },
+    { "ru": "плита", "fi": "liesi / laatta", "cat": "koti ja asuminen" },
+    { "ru": "микроволновка", "fi": "mikroaaltouuni", "cat": "koti ja asuminen" },
+    { "ru": "чайник", "fi": "vedenkeitin", "cat": "koti ja asuminen" },
+    { "ru": "тарелка", "fi": "lautanen", "cat": "koti ja asuminen" },
+    { "ru": "чашка", "fi": "kuppi", "cat": "koti ja asuminen" },
+    { "ru": "стакан", "fi": "lasi", "cat": "koti ja asuminen" },
+    { "ru": "ложка", "fi": "lusikka", "cat": "koti ja asuminen" },
+    { "ru": "вилка", "fi": "haarukka", "cat": "koti ja asuminen" },
+    { "ru": "нож", "fi": "veitsi", "cat": "koti ja asuminen" },
+    { "ru": "кастрюля", "fi": "kattila", "cat": "koti ja asuminen" },
+    { "ru": "сковорода", "fi": "paistinpannu", "cat": "koti ja asuminen" },
+    { "ru": "сосед", "fi": "naapuri", "cat": "koti ja asuminen" },
+    { "ru": "гость", "fi": "vieras", "cat": "koti ja asuminen" },
+    { "ru": "хозяин", "fi": "isäntä / omistaja", "cat": "koti ja asuminen" },
+    { "ru": "аренда", "fi": "vuokra", "cat": "koti ja asuminen" },
+    { "ru": "ремонт", "fi": "remontti / korjaus", "cat": "koti ja asuminen" },
+    { "ru": "этаж", "fi": "kerros", "cat": "koti ja asuminen" },
+    { "ru": "лифт", "fi": "hissi", "cat": "koti ja asuminen" },
+    { "ru": "подвал", "fi": "kellari", "cat": "koti ja asuminen" },
+    { "ru": "чердак", "fi": "ullakko", "cat": "koti ja asuminen" },
+    { "ru": "коробка", "fi": "laatikko / pahvilaatikko", "cat": "koti ja asuminen" },
+    { "ru": "мешок", "fi": "säkki", "cat": "koti ja asuminen" },
+    { "ru": "корзина", "fi": "kori", "cat": "koti ja asuminen" },
+    { "ru": "свеча", "fi": "kynttilä", "cat": "koti ja asuminen" },
+    { "ru": "ковёр", "fi": "matto", "cat": "koti ja asuminen" },
+    { "ru": "штора", "fi": "verho", "cat": "koti ja asuminen" },
+    { "ru": "розетка", "fi": "pistorasia", "cat": "koti ja asuminen" },
+    { "ru": "человек", "fi": "ihminen", "cat": "ihminen ja terveys" },
+    { "ru": "люди", "fi": "ihmiset", "cat": "ihminen ja terveys" },
+    { "ru": "мужчина", "fi": "mies", "cat": "ihminen ja terveys" },
+    { "ru": "женщина", "fi": "nainen", "cat": "ihminen ja terveys" },
+    { "ru": "ребёнок", "fi": "lapsi", "cat": "ihminen ja terveys" },
+    { "ru": "дети", "fi": "lapset", "cat": "ihminen ja terveys" },
+    { "ru": "мальчик", "fi": "poika", "cat": "ihminen ja terveys" },
+    { "ru": "девочка", "fi": "tyttö", "cat": "ihminen ja terveys" },
+    { "ru": "друг", "fi": "ystävä", "cat": "ihminen ja terveys" },
+    { "ru": "подруга", "fi": "ystävätär / naisystävä", "cat": "ihminen ja terveys" },
+    { "ru": "знакомый", "fi": "tuttava", "cat": "ihminen ja terveys" },
+    { "ru": "семья", "fi": "perhe", "cat": "ihminen ja terveys" },
+    { "ru": "родители", "fi": "vanhemmat", "cat": "ihminen ja terveys" },
+    { "ru": "мать", "fi": "äiti", "cat": "ihminen ja terveys" },
+    { "ru": "отец", "fi": "isä", "cat": "ihminen ja terveys" },
+    { "ru": "брат", "fi": "veli", "cat": "ihminen ja terveys" },
+    { "ru": "сестра", "fi": "sisko", "cat": "ihminen ja terveys" },
+    { "ru": "голова", "fi": "pää", "cat": "ihminen ja terveys" },
+    { "ru": "лицо", "fi": "kasvot", "cat": "ihminen ja terveys" },
+    { "ru": "глаз", "fi": "silmä", "cat": "ihminen ja terveys" },
+    { "ru": "ухо", "fi": "korva", "cat": "ihminen ja terveys" },
+    { "ru": "нос", "fi": "nenä", "cat": "ihminen ja terveys" },
+    { "ru": "рот", "fi": "suu", "cat": "ihminen ja terveys" },
+    { "ru": "зуб", "fi": "hammas", "cat": "ihminen ja terveys" },
+    { "ru": "волосы", "fi": "hiukset", "cat": "ihminen ja terveys" },
+    { "ru": "рука", "fi": "käsi / käsivarsi", "cat": "ihminen ja terveys" },
+    { "ru": "нога", "fi": "jalka", "cat": "ihminen ja terveys" },
+    { "ru": "сердце", "fi": "sydän", "cat": "ihminen ja terveys" },
+    { "ru": "спина", "fi": "selkä", "cat": "ihminen ja terveys" },
+    { "ru": "шея", "fi": "kaula / niska", "cat": "ihminen ja terveys" },
+    { "ru": "плечо", "fi": "olkapää", "cat": "ihminen ja terveys" },
+    { "ru": "палец", "fi": "sormi / varvas", "cat": "ihminen ja terveys" },
+    { "ru": "здоровье", "fi": "terveys", "cat": "ihminen ja terveys" },
+    { "ru": "болезнь", "fi": "sairaus", "cat": "ihminen ja terveys" },
+    { "ru": "боль", "fi": "kipu", "cat": "ihminen ja terveys" },
+    { "ru": "врач", "fi": "lääkäri", "cat": "ihminen ja terveys" },
+    { "ru": "больница", "fi": "sairaala", "cat": "ihminen ja terveys" },
+    { "ru": "аптека", "fi": "apteekki", "cat": "ihminen ja terveys" },
+    { "ru": "лекарство", "fi": "lääke", "cat": "ihminen ja terveys" },
+    { "ru": "таблетка", "fi": "tabletti", "cat": "ihminen ja terveys" },
+    { "ru": "температура", "fi": "lämpötila / kuume", "cat": "ihminen ja terveys" },
+    { "ru": "простуда", "fi": "flunssa / vilustuminen", "cat": "ihminen ja terveys" },
+    { "ru": "усталость", "fi": "väsymys", "cat": "ihminen ja terveys" },
+    { "ru": "сон", "fi": "uni / unelma", "cat": "ihminen ja terveys" },
+    { "ru": "сила", "fi": "voima", "cat": "ihminen ja terveys" },
+    { "ru": "слабость", "fi": "heikkous", "cat": "ihminen ja terveys" },
+    { "ru": "настроение", "fi": "mieliala", "cat": "ihminen ja terveys" },
+    { "ru": "радость", "fi": "ilo", "cat": "ihminen ja terveys" },
+    { "ru": "грусть", "fi": "suru", "cat": "ihminen ja terveys" },
+    { "ru": "страх", "fi": "pelko", "cat": "ihminen ja terveys" },
+    { "ru": "злость", "fi": "suuttumus / vihaisuus", "cat": "ihminen ja terveys" },
+    { "ru": "удивление", "fi": "yllättyneisyys / hämmästys", "cat": "ihminen ja terveys" },
+    { "ru": "надежда", "fi": "toivo", "cat": "ihminen ja terveys" },
+    { "ru": "мечта", "fi": "unelma / haave", "cat": "ihminen ja terveys" },
+    { "ru": "любовь", "fi": "rakkaus", "cat": "ihminen ja terveys" },
+    { "ru": "обида", "fi": "loukkaantuminen / kauna", "cat": "ihminen ja terveys" },
+    { "ru": "стыд", "fi": "häpeä", "cat": "ihminen ja terveys" },
+    { "ru": "гордость", "fi": "ylpeys", "cat": "ihminen ja terveys" },
+    { "ru": "скука", "fi": "ikävystyminen / tylsyys", "cat": "ihminen ja terveys" },
+    { "ru": "тревога", "fi": "ahdistus / huoli", "cat": "ihminen ja terveys" },
+    { "ru": "уверенность", "fi": "varmuus / itsevarmuus", "cat": "ihminen ja terveys" },
+    { "ru": "сомнение", "fi": "epäilys", "cat": "ihminen ja terveys" },
+    { "ru": "внимание", "fi": "huomio / tarkkaavaisuus", "cat": "ihminen ja terveys" },
+    { "ru": "память", "fi": "muisti", "cat": "ihminen ja terveys" },
+    { "ru": "мысль", "fi": "ajatus", "cat": "ihminen ja terveys" },
+    { "ru": "чувство", "fi": "tunne", "cat": "ihminen ja terveys" },
+    { "ru": "характер", "fi": "luonne", "cat": "ihminen ja terveys" },
+    { "ru": "привычка", "fi": "tapa / tottumus", "cat": "ihminen ja terveys" },
+    { "ru": "опыт", "fi": "kokemus", "cat": "ihminen ja terveys" },
+    { "ru": "успех", "fi": "menestys", "cat": "ihminen ja terveys" },
+    { "ru": "природа", "fi": "luonto", "cat": "luonto ja kaivos" },
+    { "ru": "земля", "fi": "maa / maaperä", "cat": "luonto ja kaivos" },
+    { "ru": "камень", "fi": "kivi", "cat": "luonto ja kaivos" },
+    { "ru": "скала", "fi": "kallio", "cat": "luonto ja kaivos" },
+    { "ru": "гора", "fi": "vuori", "cat": "luonto ja kaivos" },
+    { "ru": "песок", "fi": "hiekka", "cat": "luonto ja kaivos" },
+    { "ru": "глина", "fi": "savi", "cat": "luonto ja kaivos" },
+    { "ru": "почва", "fi": "maaperä / multa", "cat": "luonto ja kaivos" },
+    { "ru": "глубина", "fi": "syvyys", "cat": "luonto ja kaivos" },
+    { "ru": "поверхность", "fi": "pinta", "cat": "luonto ja kaivos" },
+    { "ru": "шахта", "fi": "kaivos", "cat": "luonto ja kaivos" },
+    { "ru": "руда", "fi": "malmi", "cat": "luonto ja kaivos" },
+    { "ru": "металл", "fi": "metalli", "cat": "luonto ja kaivos" },
+    { "ru": "золото", "fi": "kulta", "cat": "luonto ja kaivos" },
+    { "ru": "серебро", "fi": "hopea", "cat": "luonto ja kaivos" },
+    { "ru": "медь", "fi": "kupari", "cat": "luonto ja kaivos" },
+    { "ru": "железо", "fi": "rauta", "cat": "luonto ja kaivos" },
+    { "ru": "алмаз", "fi": "timantti", "cat": "luonto ja kaivos" },
+    { "ru": "уголь", "fi": "hiili", "cat": "luonto ja kaivos" },
+    { "ru": "нефть", "fi": "öljy / raakaöljy", "cat": "luonto ja kaivos" },
+    { "ru": "газ", "fi": "kaasu", "cat": "luonto ja kaivos" },
+    { "ru": "вода", "fi": "vesi", "cat": "luonto ja kaivos" },
+    { "ru": "река", "fi": "joki", "cat": "luonto ja kaivos" },
+    { "ru": "озеро", "fi": "järvi", "cat": "luonto ja kaivos" },
+    { "ru": "море", "fi": "meri", "cat": "luonto ja kaivos" },
+    { "ru": "океан", "fi": "valtameri", "cat": "luonto ja kaivos" },
+    { "ru": "лес", "fi": "metsä", "cat": "luonto ja kaivos" },
+    { "ru": "дерево", "fi": "puu", "cat": "luonto ja kaivos" },
+    { "ru": "лист", "fi": "lehti / arkki", "cat": "luonto ja kaivos" },
+    { "ru": "трава", "fi": "ruoho", "cat": "luonto ja kaivos" },
+    { "ru": "цветок", "fi": "kukka", "cat": "luonto ja kaivos" },
+    { "ru": "поле", "fi": "pelto / kenttä", "cat": "luonto ja kaivos" },
+    { "ru": "небо", "fi": "taivas", "cat": "luonto ja kaivos" },
+    { "ru": "солнце", "fi": "aurinko", "cat": "luonto ja kaivos" },
+    { "ru": "луна", "fi": "kuu", "cat": "luonto ja kaivos" },
+    { "ru": "звезда", "fi": "tähti", "cat": "luonto ja kaivos" },
+    { "ru": "облако", "fi": "pilvi", "cat": "luonto ja kaivos" },
+    { "ru": "дождь", "fi": "sade", "cat": "luonto ja kaivos" },
+    { "ru": "снег", "fi": "lumi", "cat": "luonto ja kaivos" },
+    { "ru": "ветер", "fi": "tuuli", "cat": "luonto ja kaivos" },
+    { "ru": "мороз", "fi": "pakkanen", "cat": "luonto ja kaivos" },
+    { "ru": "жара", "fi": "helle / kuumuus", "cat": "luonto ja kaivos" },
+    { "ru": "погода", "fi": "sää", "cat": "luonto ja kaivos" },
+    { "ru": "огонь", "fi": "tuli", "cat": "luonto ja kaivos" },
+    { "ru": "дым", "fi": "savu", "cat": "luonto ja kaivos" },
+    { "ru": "пыль", "fi": "pöly", "cat": "luonto ja kaivos" },
+    { "ru": "свет", "fi": "valo", "cat": "luonto ja kaivos" },
+    { "ru": "темнота", "fi": "pimeys", "cat": "luonto ja kaivos" },
+    { "ru": "тень", "fi": "varjo", "cat": "luonto ja kaivos" },
+    { "ru": "воздух", "fi": "ilma", "cat": "luonto ja kaivos" },
+    { "ru": "берег", "fi": "ranta", "cat": "luonto ja kaivos" },
+    { "ru": "остров", "fi": "saari", "cat": "luonto ja kaivos" },
+    { "ru": "волна", "fi": "aalto", "cat": "luonto ja kaivos" },
+    { "ru": "лёд", "fi": "jää", "cat": "luonto ja kaivos" },
+    { "ru": "грязь", "fi": "muta / lika", "cat": "luonto ja kaivos" },
+    { "ru": "пещера", "fi": "luola", "cat": "luonto ja kaivos" },
+    { "ru": "туннель", "fi": "tunneli", "cat": "luonto ja kaivos" },
+    { "ru": "взрыв", "fi": "räjähdys", "cat": "luonto ja kaivos" },
+    { "ru": "искры", "fi": "kipinät", "cat": "luonto ja kaivos" },
+    { "ru": "кристалл", "fi": "kristalli", "cat": "luonto ja kaivos" },
+    { "ru": "животное", "fi": "eläin", "cat": "luonto ja kaivos" },
+    { "ru": "птица", "fi": "lintu", "cat": "luonto ja kaivos" },
+    { "ru": "рыба", "fi": "kala", "cat": "luonto ja kaivos" },
+    { "ru": "собака", "fi": "koira", "cat": "luonto ja kaivos" },
+    { "ru": "кошка", "fi": "kissa", "cat": "luonto ja kaivos" },
+    { "ru": "лесник", "fi": "metsuri / metsänvartija", "cat": "luonto ja kaivos" },
+    { "ru": "климат", "fi": "ilmasto", "cat": "luonto ja kaivos" },
+    { "ru": "берёза", "fi": "koivu", "cat": "luonto ja kaivos" },
+    { "ru": "сосна", "fi": "mänty", "cat": "luonto ja kaivos" },
+    { "ru": "город", "fi": "kaupunki", "cat": "kaupunki ja matkustus" },
+    { "ru": "улица", "fi": "katu", "cat": "kaupunki ja matkustus" },
+    { "ru": "площадь", "fi": "aukio / pinta-ala", "cat": "kaupunki ja matkustus" },
+    { "ru": "дорога", "fi": "tie", "cat": "kaupunki ja matkustus" },
+    { "ru": "путь", "fi": "matka / reitti / tie", "cat": "kaupunki ja matkustus" },
+    { "ru": "мост", "fi": "silta", "cat": "kaupunki ja matkustus" },
+    { "ru": "перекрёсток", "fi": "risteys", "cat": "kaupunki ja matkustus" },
+    { "ru": "светофор", "fi": "liikennevalo", "cat": "kaupunki ja matkustus" },
+    { "ru": "остановка", "fi": "pysäkki / pysähdys", "cat": "kaupunki ja matkustus" },
+    { "ru": "вокзал", "fi": "rautatieasema / terminaali", "cat": "kaupunki ja matkustus" },
+    { "ru": "аэропорт", "fi": "lentokenttä", "cat": "kaupunki ja matkustus" },
+    { "ru": "поезд", "fi": "juna", "cat": "kaupunki ja matkustus" },
+    { "ru": "автобус", "fi": "bussi", "cat": "kaupunki ja matkustus" },
+    { "ru": "трамвай", "fi": "raitovaunu / ratikka", "cat": "kaupunki ja matkustus" },
+    { "ru": "метро", "fi": "metro", "cat": "kaupunki ja matkustus" },
+    { "ru": "машина", "fi": "auto / kone", "cat": "kaupunki ja matkustus" },
+    { "ru": "автомобиль", "fi": "auto", "cat": "kaupunki ja matkustus" },
+    { "ru": "велосипед", "fi": "polkupyörä", "cat": "kaupunki ja matkustus" },
+    { "ru": "самолёт", "fi": "lentokone", "cat": "kaupunki ja matkustus" },
+    { "ru": "корабль", "fi": "laiva", "cat": "kaupunki ja matkustus" },
+    { "ru": "билет", "fi": "lippu", "cat": "kaupunki ja matkustus" },
+    { "ru": "паспорт", "fi": "passi", "cat": "kaupunki ja matkustus" },
+    { "ru": "чемодан", "fi": "matkalaukku", "cat": "kaupunki ja matkustus" },
+    { "ru": "рюкзак", "fi": "reppu", "cat": "kaupunki ja matkustus" },
+    { "ru": "карта", "fi": "kartta / kortti", "cat": "kaupunki ja matkustus" },
+    { "ru": "гостиница", "fi": "hotelli", "cat": "kaupunki ja matkustus" },
+    { "ru": "магазин", "fi": "kauppa / myymälä", "cat": "kaupunki ja matkustus" },
+    { "ru": "рынок", "fi": "tori / markkinat", "cat": "kaupunki ja matkustus" },
+    { "ru": "ресторан", "fi": "ravintola", "cat": "kaupunki ja matkustus" },
+    { "ru": "кафе", "fi": "kahvila", "cat": "kaupunki ja matkustus" },
+    { "ru": "банк", "fi": "pankki", "cat": "kaupunki ja matkustus" },
+    { "ru": "почта", "fi": "posti", "cat": "kaupunki ja matkustus" },
+    { "ru": "музей", "fi": "museo", "cat": "kaupunki ja matkustus" },
+    { "ru": "театр", "fi": "teatteri", "cat": "kaupunki ja matkustus" },
+    { "ru": "кино", "fi": "elokuva / elokuvateatteri", "cat": "kaupunki ja matkustus" },
+    { "ru": "парк", "fi": "puisto", "cat": "kaupunki ja matkustus" },
+    { "ru": "центр", "fi": "keskus / keskusta", "cat": "kaupunki ja matkustus" },
+    { "ru": "район", "fi": "kaupunginosa / alue", "cat": "kaupunki ja matkustus" },
+    { "ru": "окраина", "fi": "laitakaupunki", "cat": "kaupunki ja matkustus" },
+    { "ru": "направление", "fi": "suunta", "cat": "kaupunki ja matkustus" },
+    { "ru": "север", "fi": "pohjoinen", "cat": "kaupunki ja matkustus" },
+    { "ru": "юг", "fi": "etelä", "cat": "kaupunki ja matkustus" },
+    { "ru": "восток", "fi": "itä", "cat": "kaupunki ja matkustus" },
+    { "ru": "запад", "fi": "länsi", "cat": "kaupunki ja matkustus" },
+    { "ru": "слева", "fi": "vasemmalla", "cat": "kaupunki ja matkustus" },
+    { "ru": "справа", "fi": "oikealla", "cat": "kaupunki ja matkustus" },
+    { "ru": "прямо", "fi": "suoraan", "cat": "kaupunki ja matkustus" },
+    { "ru": "назад", "fi": "taaksepäin", "cat": "kaupunki ja matkustus" },
+    { "ru": "вперёд", "fi": "eteenpäin", "cat": "kaupunki ja matkustus" },
+    { "ru": "вверх", "fi": "ylös", "cat": "kaupunki ja matkustus" },
+    { "ru": "вниз", "fi": "alas", "cat": "kaupunki ja matkustus" },
+    { "ru": "внутри", "fi": "sisällä", "cat": "kaupunki ja matkustus" },
+    { "ru": "снаружи", "fi": "ulkopuolella", "cat": "kaupunki ja matkustus" },
+    { "ru": "далеко", "fi": "kaukana", "cat": "kaupunki ja matkustus" },
+    { "ru": "близко", "fi": "lähellä", "cat": "kaupunki ja matkustus" },
+    { "ru": "путешествие", "fi": "matka / matkustaminen", "cat": "kaupunki ja matkustus" },
+    { "ru": "экскурсия", "fi": "retki / kiertoajelu", "cat": "kaupunki ja matkustus" },
+    { "ru": "багаж", "fi": "matkatavarat", "cat": "kaupunki ja matkustus" },
+    { "ru": "водитель", "fi": "kuljettaja / ajaja", "cat": "kaupunki ja matkustus" },
+    { "ru": "пассажир", "fi": "matkustaja", "cat": "kaupunki ja matkustus" },
+    { "ru": "еда", "fi": "ruoka", "cat": "ruoka ja ostokset" },
+    { "ru": "пища", "fi": "ravinto / ruoka", "cat": "ruoka ja ostokset" },
+    { "ru": "завтрак", "fi": "aamiainen", "cat": "ruoka ja ostokset" },
+    { "ru": "обед", "fi": "lounas / päivällinen", "cat": "ruoka ja ostokset" },
+    { "ru": "ужин", "fi": "illallinen", "cat": "ruoka ja ostokset" },
+    { "ru": "хлеб", "fi": "leipä", "cat": "ruoka ja ostokset" },
+    { "ru": "масло", "fi": "voi / öljy", "cat": "ruoka ja ostokset" },
+    { "ru": "сыр", "fi": "juusto", "cat": "ruoka ja ostokset" },
+    { "ru": "молоко", "fi": "maito", "cat": "ruoka ja ostokset" },
+    { "ru": "мясо", "fi": "liha", "cat": "ruoka ja ostokset" },
+    { "ru": "курица", "fi": "kana", "cat": "ruoka ja ostokset" },
+    { "ru": "суп", "fi": "keitto", "cat": "ruoka ja ostokset" },
+    { "ru": "каша", "fi": "puuro", "cat": "ruoka ja ostokset" },
+    { "ru": "яйцо", "fi": "muna", "cat": "ruoka ja ostokset" },
+    { "ru": "овощи", "fi": "vihannekset / kasvikset", "cat": "ruoka ja ostokset" },
+    { "ru": "фрукты", "fi": "hedelmät", "cat": "ruoka ja ostokset" },
+    { "ru": "картофель", "fi": "peruna", "cat": "ruoka ja ostokset" },
+    { "ru": "помидор", "fi": "tomaatti", "cat": "ruoka ja ostokset" },
+    { "ru": "огурец", "fi": "kurkku", "cat": "ruoka ja ostokset" },
+    { "ru": "яблоко", "fi": "omena", "cat": "ruoka ja ostokset" },
+    { "ru": "банан", "fi": "banaani", "cat": "ruoka ja ostokset" },
+    { "ru": "апельсин", "fi": "appelsiini", "cat": "ruoka ja ostokset" },
+    { "ru": "сахар", "fi": "sokeri", "cat": "ruoka ja ostokset" },
+    { "ru": "соль", "fi": "suola", "cat": "ruoka ja ostokset" },
+    { "ru": "перец", "fi": "pippuri / paprika", "cat": "ruoka ja ostokset" },
+    { "ru": "чай", "fi": "tee", "cat": "ruoka ja ostokset" },
+    { "ru": "кофе", "fi": "kahvi", "cat": "ruoka ja ostokset" },
+    { "ru": "сок", "fi": "mehu", "cat": "ruoka ja ostokset" },
+    { "ru": "пирог", "fi": "piirakka", "cat": "ruoka ja ostokset" },
+    { "ru": "торт", "fi": "kakku", "cat": "ruoka ja ostokset" },
+    { "ru": "мороженое", "fi": "jäätelö", "cat": "ruoka ja ostokset" },
+    { "ru": "конфета", "fi": "karkki / makeinen", "cat": "ruoka ja ostokset" },
+    { "ru": "бутерброд", "fi": "voileipä", "cat": "ruoka ja ostokset" },
+    { "ru": "салат", "fi": "salaatti", "cat": "ruoka ja ostokset" },
+    { "ru": "цена", "fi": "hinta", "cat": "ruoka ja ostokset" },
+    { "ru": "деньги", "fi": "raha / rahat", "cat": "ruoka ja ostokset" },
+    { "ru": "скидка", "fi": "alennus", "cat": "ruoka ja ostokset" },
+    { "ru": "чек", "fi": "kuitti / shekki", "cat": "ruoka ja ostokset" },
+    { "ru": "кошелёк", "fi": "lompakko", "cat": "ruoka ja ostokset" },
+    { "ru": "покупка", "fi": "ostos", "cat": "ruoka ja ostokset" },
+    { "ru": "продавец", "fi": "myyjä", "cat": "ruoka ja ostokset" },
+    { "ru": "покупатель", "fi": "ostaja", "cat": "ruoka ja ostokset" },
+    { "ru": "очередь", "fi": "jono", "cat": "ruoka ja ostokset" },
+    { "ru": "пакет", "fi": "pussi / paketti", "cat": "ruoka ja ostokset" },
+    { "ru": "бутылка", "fi": "pullo", "cat": "ruoka ja ostokset" },
+    { "ru": "банка", "fi": "purkki / tölkki", "cat": "ruoka ja ostokset" },
+    { "ru": "одежда", "fi": "vaatteet", "cat": "ruoka ja ostokset" },
+    { "ru": "обувь", "fi": "jalkineet / kengät", "cat": "ruoka ja ostokset" },
+    { "ru": "рубашка", "fi": "paita / kauluspaita", "cat": "ruoka ja ostokset" },
+    { "ru": "куртка", "fi": "takki", "cat": "ruoka ja ostokset" },
+    { "ru": "пальто", "fi": "päällystakki / mantteli", "cat": "ruoka ja ostokset" },
+    { "ru": "брюки", "fi": "housut", "cat": "ruoka ja ostokset" },
+    { "ru": "платье", "fi": "mekko", "cat": "ruoka ja ostokset" },
+    { "ru": "юбка", "fi": "hame", "cat": "ruoka ja ostokset" },
+    { "ru": "шапка", "fi": "pipo / hatun / lakki", "cat": "ruoka ja ostokset" },
+    { "ru": "перчатки", "fi": "käsineet / hanskat", "cat": "ruoka ja ostokset" },
+    { "ru": "носки", "fi": "sukat", "cat": "ruoka ja ostokset" },
+    { "ru": "сапоги", "fi": "saappaat", "cat": "ruoka ja ostokset" },
+    { "ru": "размер", "fi": "koko", "cat": "ruoka ja ostokset" },
+    { "ru": "качество", "fi": "laatu", "cat": "ruoka ja ostokset" },
+    { "ru": "работа", "fi": "työ", "cat": "työ ja opiskelu" },
+    { "ru": "профессия", "fi": "ammatti", "cat": "työ ja opiskelu" },
+    { "ru": "офис", "fi": "toimisto", "cat": "työ ja opiskelu" },
+    { "ru": "начальник", "fi": "esimies / pomo", "cat": "työ ja opiskelu" },
+    { "ru": "коллега", "fi": "kollega / työkaveri", "cat": "työ ja opiskelu" },
+    { "ru": "зарплата", "fi": "palkka", "cat": "työ ja opiskelu" },
+    { "ru": "встреча", "fi": "tapaaminen / kokous", "cat": "työ ja opiskelu" },
+    { "ru": "задача", "fi": "tehtävä / pulma", "cat": "työ ja opiskelu" },
+    { "ru": "проект", "fi": "projekti / hanke", "cat": "työ ja opiskelu" },
+    { "ru": "ошибка", "fi": "virhe", "cat": "työ ja opiskelu" },
+    { "ru": "решение", "fi": "ratkaisu / päätös", "cat": "työ ja opiskelu" },
+    { "ru": "результат", "fi": "tulos", "cat": "työ ja opiskelu" },
+    { "ru": "школа", "fi": "koulu", "cat": "työ ja opiskelu" },
+    { "ru": "университет", "fi": "yliopisto", "cat": "työ ja opiskelu" },
+    { "ru": "урок", "fi": "oppitunti / läksy", "cat": "työ ja opiskelu" },
+    { "ru": "экзамен", "fi": "tentti / koe", "cat": "työ ja opiskelu" },
+    { "ru": "учитель", "fi": "opettaja", "cat": "työ ja opiskelu" },
+    { "ru": "ученик", "fi": "oppilas", "cat": "työ ja opiskelu" },
+    { "ru": "студент", "fi": "opiskelija", "cat": "työ ja opiskelu" },
+    { "ru": "книга", "fi": "kirja", "cat": "työ ja opiskelu" },
+    { "ru": "журнал", "fi": "lehti / aikakauslehti", "cat": "työ ja opiskelu" },
+    { "ru": "газета", "fi": "sanomalehti", "cat": "työ ja opiskelu" },
+    { "ru": "слово", "fi": "sana", "cat": "työ ja opiskelu" },
+    { "ru": "предложение", "fi": "lause / ehdotus / tarjous", "cat": "työ ja opiskelu" },
+    { "ru": "вопрос", "fi": "kysymys", "cat": "työ ja opiskelu" },
+    { "ru": "ответ", "fi": "vastaus", "cat": "työ ja opiskelu" },
+    { "ru": "правило", "fi": "sääntö", "cat": "työ ja opiskelu" },
+    { "ru": "пример", "fi": "esimerkki", "cat": "työ ja opiskelu" },
+    { "ru": "язык", "fi": "kieli", "cat": "työ ja opiskelu" },
+    { "ru": "письмо", "fi": "kirje", "cat": "työ ja opiskelu" },
+    { "ru": "сообщение", "fi": "viesti / ilmoitus", "cat": "työ ja opiskelu" },
+    { "ru": "новости", "fi": "uutiset", "cat": "työ ja opiskelu" },
+    { "ru": "информация", "fi": "tieto / informaatio", "cat": "työ ja opiskelu" },
+    { "ru": "телефон", "fi": "puhelin", "cat": "työ ja opiskelu" },
+    { "ru": "компьютер", "fi": "tietokone", "cat": "työ ja opiskelu" },
+    { "ru": "экран", "fi": "näyttö / ruutu", "cat": "työ ja opiskelu" },
+    { "ru": "клавиатура", "fi": "näppäimistö", "cat": "työ ja opiskelu" },
+    { "ru": "кнопка", "fi": "nappi / painike", "cat": "työ ja opiskelu" },
+    { "ru": "программа", "fi": "ohjelma", "cat": "työ ja opiskelu" },
+    { "ru": "сеть", "fi": "verkko", "cat": "työ ja opiskelu" },
+    { "ru": "сайт", "fi": "verkkosivusto / sivusto", "cat": "työ ja opiskelu" },
+    { "ru": "пароль", "fi": "salasana", "cat": "työ ja opiskelu" },
+    { "ru": "фотография", "fi": "valokuva", "cat": "työ ja opiskelu" },
+    { "ru": "картина", "fi": "maalaus / taulu", "cat": "työ ja opiskelu" },
+    { "ru": "музыка", "fi": "musiikki", "cat": "työ ja opiskelu" },
+    { "ru": "песня", "fi": "laulu", "cat": "työ ja opiskelu" },
+    { "ru": "фильм", "fi": "elokuva / filmi", "cat": "työ ja opiskelu" },
+    { "ru": "история", "fi": "historia / tarina", "cat": "työ ja opiskelu" },
+    { "ru": "культура", "fi": "kulttuuri", "cat": "työ ja opiskelu" },
+    { "ru": "спорт", "fi": "urheilu", "cat": "työ ja opiskelu" },
+    { "ru": "игра", "fi": "peli / leikki", "cat": "työ ja opiskelu" },
+    { "ru": "команда", "fi": "joukkue / tiimi", "cat": "työ ja opiskelu" },
+    { "ru": "победа", "fi": "voitto", "cat": "työ ja opiskelu" },
+    { "ru": "поражение", "fi": "tappio", "cat": "työ ja opiskelu" },
+    { "ru": "тренировка", "fi": "harjoitus / treeni", "cat": "työ ja opiskelu" },
+    { "ru": "инструмент", "fi": "työkalu / soitin", "cat": "työ ja opiskelu" },
+    { "ru": "двигатель", "fi": "moottori", "cat": "työ ja opiskelu" },
+    { "ru": "топливо", "fi": "polttoaine", "cat": "työ ja opiskelu" },
+    { "ru": "энергия", "fi": "energia", "cat": "työ ja opiskelu" },
+    { "ru": "батарея", "fi": "akku / paristo", "cat": "työ ja opiskelu" },
+    { "ru": "провод", "fi": "johto / kaapeli", "cat": "työ ja opiskelu" },
+    { "ru": "сигнал", "fi": "signaali / merkki", "cat": "työ ja opiskelu" },
+    { "ru": "безопасность", "fi": "turvallisuus", "cat": "työ ja opiskelu" },
+    { "ru": "время", "fi": "aika", "cat": "aika ja ominaisuudet" },
+    { "ru": "час", "fi": "tunti", "cat": "aika ja ominaisuudet" },
+    { "ru": "минута", "fi": "minuutti", "cat": "aika ja ominaisuudet" },
+    { "ru": "секунда", "fi": "sekunti", "cat": "aika ja ominaisuudet" },
+    { "ru": "день", "fi": "päivä", "cat": "aika ja ominaisuudet" },
+    { "ru": "ночь", "fi": "yö", "cat": "aika ja ominaisuudet" },
+    { "ru": "утро", "fi": "aamu", "cat": "aika ja ominaisuudet" },
+    { "ru": "вечер", "fi": "ilta", "cat": "aika ja ominaisuudet" },
+    { "ru": "неделя", "fi": "viikko", "cat": "aika ja ominaisuudet" },
+    { "ru": "месяц", "fi": "kuukausi", "cat": "aika ja ominaisuudet" },
+    { "ru": "год", "fi": "vuosi", "cat": "aika ja ominaisuudet" },
+    { "ru": "весна", "fi": "kevät", "cat": "aika ja ominaisuudet" },
+    { "ru": "лето", "fi": "kesä", "cat": "aika ja ominaisuudet" },
+    { "ru": "осень", "fi": "syksy", "cat": "aika ja ominaisuudet" },
+    { "ru": "зима", "fi": "talvi", "cat": "aika ja ominaisuudet" },
+    { "ru": "сегодня", "fi": "tänään", "cat": "aika ja ominaisuudet" },
+    { "ru": "вчера", "fi": "eilen", "cat": "aika ja ominaisuudet" },
+    { "ru": "завтра", "fi": "huomenna", "cat": "aika ja ominaisuudet" },
+    { "ru": "сейчас", "fi": "nyt / juuri nyt", "cat": "aika ja ominaisuudet" },
+    { "ru": "потом", "fi": "sitten / myöhemmin", "cat": "aika ja ominaisuudet" },
+    { "ru": "рано", "fi": "aikaisin", "cat": "aika ja ominaisuudet" },
+    { "ru": "поздно", "fi": "myöhään", "cat": "aika ja ominaisuudet" },
+    { "ru": "всегда", "fi": "aina", "cat": "aika ja ominaisuudet" },
+    { "ru": "никогда", "fi": "ei koskaan / koskaan", "cat": "aika ja ominaisuudet" },
+    { "ru": "часто", "fi": "usein", "cat": "aika ja ominaisuudet" },
+    { "ru": "редко", "fi": "harvoin", "cat": "aika ja ominaisuudet" },
+    { "ru": "иногда", "fi": "joskus", "cat": "aika ja ominaisuudet" },
+    { "ru": "обычно", "fi": "tavallisesti / yleensä", "cat": "aika ja ominaisuudet" },
+    { "ru": "уже", "fi": "jo", "cat": "aika ja ominaisuudet" },
+    { "ru": "ещё", "fi": "vielä / lisää", "cat": "aika ja ominaisuudet" },
+    { "ru": "снова", "fi": "uudelleen / taas", "cat": "aika ja ominaisuudet" },
+    { "ru": "вдруг", "fi": "yhtäkkiä", "cat": "aika ja ominaisuudet" },
+    { "ru": "сразу", "fi": "heti / samantien", "cat": "aika ja ominaisuudet" },
+    { "ru": "медленно", "fi": "hitaasti", "cat": "aika ja ominaisuudet" },
+    { "ru": "быстро", "fi": "nopeasti", "cat": "aika ja ominaisuudet" },
+    { "ru": "хорошо", "fi": "hyvin", "cat": "aika ja ominaisuudet" },
+    { "ru": "плохо", "fi": "huonosti", "cat": "aika ja ominaisuudet" },
+    { "ru": "важно", "fi": "tärkeää / tärkeästi", "cat": "aika ja ominaisuudet" },
+    { "ru": "сложно", "fi": "vaikeaa / monimutkaista", "cat": "aika ja ominaisuudet" },
+    { "ru": "просто", "fi": "yksinkertaista / helposti", "cat": "aika ja ominaisuudet" },
+    { "ru": "новый", "fi": "uusi", "cat": "aika ja ominaisuudet" },
+    { "ru": "старый", "fi": "vanha", "cat": "aika ja ominaisuudet" },
+    { "ru": "большой", "fi": "suuri / iso", "cat": "aika ja ominaisuudet" },
+    { "ru": "маленький", "fi": "pieni", "cat": "aika ja ominaisuudet" },
+    { "ru": "высокий", "fi": "korkea / pitkä (ihminen)", "cat": "aika ja ominaisuudet" },
+    { "ru": "низкий", "fi": "matala", "cat": "aika ja ominaisuudet" },
+    { "ru": "длинный", "fi": "pitkä", "cat": "aika ja ominaisuudet" },
+    { "ru": "короткий", "fi": "lyhyt", "cat": "aika ja ominaisuudet" },
+    { "ru": "широкий", "fi": "leveä", "cat": "aika ja ominaisuudet" },
+    { "ru": "узкий", "fi": "kapea", "cat": "aika ja ominaisuudet" },
+    { "ru": "тяжёлый", "fi": "raskas / vaikea", "cat": "aika ja ominaisuudet" },
+    { "ru": "лёгкий", "fi": "kevyt / helppo", "cat": "aika ja ominaisuudet" },
+    { "ru": "твёрдый", "fi": "kova / kiinteä", "cat": "aika ja ominaisuudet" },
+    { "ru": "мягкий", "fi": "pehmeä", "cat": "aika ja ominaisuudet" },
+    { "ru": "горячий", "fi": "kuuma", "cat": "aika ja ominaisuudet" },
+    { "ru": "холодный", "fi": "kylmä", "cat": "aika ja ominaisuudet" },
+    { "ru": "тёплый", "fi": "lämmin", "cat": "aika ja ominaisuudet" },
+    { "ru": "чистый", "fi": "puhdas", "cat": "aika ja ominaisuudet" },
+    { "ru": "грязный", "fi": "likainen", "cat": "aika ja ominaisuudet" },
+    { "ru": "полный", "fi": "täysi", "cat": "aika ja ominaisuudet" },
+    { "ru": "пустой", "fi": "tyhjä", "cat": "aika ja ominaisuudet" },
+    { "ru": "опасный", "fi": "vaarallinen", "cat": "aika ja ominaisuudet" },
+    { "ru": "безопасный", "fi": "turvallinen", "cat": "aika ja ominaisuudet" },
+    { "ru": "трудный", "fi": "vaikea / rankka", "cat": "aika ja ominaisuudet" },
+    { "ru": "свободный", "fi": "vapaa / vapaana", "cat": "aika ja ominaisuudet" },
+    { "ru": "готовый", "fi": "valmis", "cat": "aika ja ominaisuudet" },
+    { "ru": "нужный", "fi": "tarpeellinen / tarvittava", "cat": "aika ja ominaisuudet" },
+    { "ru": "главный", "fi": "pää- / tärkein / keskeinen", "cat": "aika ja ominaisuudet" },
+    { "ru": "последний", "fi": "viimeinen", "cat": "aika ja ominaisuudet" },
+    { "ru": "следующий", "fi": "seuraava", "cat": "aika ja ominaisuudet" },
+    { "ru": "разный", "fi": "erilainen / monenlainen", "cat": "aika ja ominaisuudet" },
+    { "ru": "одинаковый", "fi": "samanlainen / identtinen", "cat": "aika ja ominaisuudet" },
+    { "ru": "полезный", "fi": "hyödyllinen", "cat": "aika ja ominaisuudet" },
+    { "ru": "интересный", "fi": "mielenkiintoinen", "cat": "aika ja ominaisuudet" },
+    { "ru": "скучный", "fi": "tylsä", "cat": "aika ja ominaisuudet" },
+    { "ru": "работать", "fi": "työskennellä / toimia", "cat": "verbit" },
+    { "ru": "учиться", "fi": "opiskella / oppia", "cat": "verbit" },
+    { "ru": "изучать", "fi": "tutkia / opiskella (ainetta)", "cat": "verbit" },
+    { "ru": "понимать", "fi": "ymmärtää", "cat": "verbit" },
+    { "ru": "знать", "fi": "tietää / osata", "cat": "verbit" },
+    { "ru": "думать", "fi": "ajatella / luulla", "cat": "verbit" },
+    { "ru": "верить", "fi": "uskoa", "cat": "verbit" },
+    { "ru": "ждать", "fi": "odottaa", "cat": "verbit" },
+    { "ru": "искать", "fi": "etsiä", "cat": "verbit" },
+    { "ru": "находить", "fi": "löytää", "cat": "verbit" },
+    { "ru": "терять", "fi": "kadottaa / menettää", "cat": "verbit" },
+    { "ru": "брать", "fi": "ottaa", "cat": "verbit" },
+    { "ru": "давать", "fi": "antaa", "cat": "verbit" },
+    { "ru": "получать", "fi": "saada / vastaanottaa", "cat": "verbit" },
+    { "ru": "покупать", "fi": "ostaa", "cat": "verbit" },
+    { "ru": "продавать", "fi": "myydä", "cat": "verbit" },
+    { "ru": "платить", "fi": "maksaa", "cat": "verbit" },
+    { "ru": "менять", "fi": "vaihtaa / muuttaa", "cat": "verbit" },
+    { "ru": "строить", "fi": "rakentaa", "cat": "verbit" },
+    { "ru": "ломать", "fi": "rikkoa / särkeä", "cat": "verbit" },
+    { "ru": "чинить", "fi": "korjata", "cat": "verbit" },
+    { "ru": "открывать", "fi": "avata", "cat": "verbit" },
+    { "ru": "закрывать", "fi": "sulkea", "cat": "verbit" },
+    { "ru": "начинать", "fi": "aloittaa", "cat": "verbit" },
+    { "ru": "заканчивать", "fi": "lopettaa / päättää", "cat": "verbit" },
+    { "ru": "продолжать", "fi": "jatkaa", "cat": "verbit" },
+    { "ru": "помогать", "fi": "auttaa", "cat": "verbit" },
+    { "ru": "мешать", "fi": "häiritä / estää / sekoittaa", "cat": "verbit" },
+    { "ru": "решать", "fi": "ratkaista / päättää", "cat": "verbit" },
+    { "ru": "выбирать", "fi": "valita", "cat": "verbit" },
+    { "ru": "проверять", "fi": "tarkistaa", "cat": "verbit" },
+    { "ru": "забывать", "fi": "unohtaa", "cat": "verbit" },
+    { "ru": "помнить", "fi": "muistaa", "cat": "verbit" },
+    { "ru": "вспоминать", "fi": "muistella / palauttaa mieleen", "cat": "verbit" },
+    { "ru": "объяснять", "fi": "selittää", "cat": "verbit" },
+    { "ru": "спрашивать", "fi": "kysyä", "cat": "verbit" },
+    { "ru": "отвечать", "fi": "vastata", "cat": "verbit" },
+    { "ru": "советовать", "fi": "neuvoa / suositella", "cat": "verbit" },
+    { "ru": "обещать", "fi": "luvata", "cat": "verbit" },
+    { "ru": "просить", "fi": "pyytää", "cat": "verbit" },
+    { "ru": "приглашать", "fi": "kutsua", "cat": "verbit" },
+    { "ru": "встречать", "fi": "kohdata / ottaa vastaan", "cat": "verbit" },
+    { "ru": "прощаться", "fi": "jättää hyvästit", "cat": "verbit" },
+    { "ru": "гулять", "fi": "ulkoilla / kävellä", "cat": "verbit" },
+    { "ru": "бежать", "fi": "juosta", "cat": "verbit" },
+    { "ru": "прыгать", "fi": "hypätä", "cat": "verbit" },
+    { "ru": "лететь", "fi": "lentää", "cat": "verbit" },
+    { "ru": "плыть", "fi": "uida / purjehtia", "cat": "verbit" },
+    { "ru": "ехать", "fi": "matkustaa (ajoneuvolla)", "cat": "verbit" },
+    { "ru": "идти", "fi": "kävellä / mennä (jalan)", "cat": "verbit" },
+    { "ru": "приходить", "fi": "saapua / tulla (jalan)", "cat": "verbit" },
+    { "ru": "уходить", "fi": "lähteä pois (jalan)", "cat": "verbit" },
+    { "ru": "возвращаться", "fi": "palata", "cat": "verbit" },
+    { "ru": "опаздывать", "fi": "myöhästyä", "cat": "verbit" },
+    { "ru": "спешить", "fi": "kiirehtiä", "cat": "verbit" },
+    { "ru": "останавливаться", "fi": "pysähtyä", "cat": "verbit" },
+    { "ru": "падать", "fi": "pudota / kaatua", "cat": "verbit" },
+    { "ru": "подниматься", "fi": "nousta / kiivetä", "cat": "verbit" },
+    { "ru": "спускаться", "fi": "laskeutua / mennä alas", "cat": "verbit" },
+    { "ru": "бояться", "fi": "pelätä", "cat": "verbit" },
+    { "ru": "надеяться", "fi": "toivoa", "cat": "verbit" },
+    { "ru": "мечтать", "fi": "unelmoida / haaveilla", "cat": "verbit" },
+    { "ru": "радоваться", "fi": "iloita", "cat": "verbit" },
+    { "ru": "сердиться", "fi": "suuttua / olla vihainen", "cat": "verbit" },
+    { "ru": "защищать", "fi": "puolustaa / suojella", "cat": "verbit" },
+    { "ru": "страна", "fi": "maa / valtio", "cat": "yhteiskunta ja maailma" },
+    { "ru": "государство", "fi": "valtio", "cat": "yhteiskunta ja maailma" },
+    { "ru": "столица", "fi": "pääkaupunki", "cat": "yhteiskunta ja maailma" },
+    { "ru": "граница", "fi": "raja", "cat": "yhteiskunta ja maailma" },
+    { "ru": "закон", "fi": "laki", "cat": "yhteiskunta ja maailma" },
+    { "ru": "право", "fi": "oikeus / laki", "cat": "yhteiskunta ja maailma" },
+    { "ru": "свобода", "fi": "vapaus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "мир", "fi": "rauha / maailma", "cat": "yhteiskunta ja maailma" },
+    { "ru": "война", "fi": "sota", "cat": "yhteiskunta ja maailma" },
+    { "ru": "общество", "fi": "yhteiskunta", "cat": "yhteiskunta ja maailma" },
+    { "ru": "население", "fi": "väestö", "cat": "yhteiskunta ja maailma" },
+    { "ru": "житель", "fi": "asukas", "cat": "yhteiskunta ja maailma" },
+    { "ru": "гражданин", "fi": "kansalainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "политика", "fi": "politiikka", "cat": "yhteiskunta ja maailma" },
+    { "ru": "экономика", "fi": "talous / taloustiede", "cat": "yhteiskunta ja maailma" },
+    { "ru": "рынок труда", "fi": "työmarkkinat", "cat": "yhteiskunta ja maailma" },
+    { "ru": "компания", "fi": "yritys / yhtiö / seura", "cat": "yhteiskunta ja maailma" },
+    { "ru": "фирма", "fi": "toimisto / yritys / firma", "cat": "yhteiskunta ja maailma" },
+    { "ru": "договор", "fi": "sopimus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "счёт", "fi": "tili / lasku / tulos", "cat": "yhteiskunta ja maailma" },
+    { "ru": "налог", "fi": "vero", "cat": "yhteiskunta ja maailma" },
+    { "ru": "бюджет", "fi": "budjetti / talousarvio", "cat": "yhteiskunta ja maailma" },
+    { "ru": "прибыль", "fi": "voitto / tuotto", "cat": "yhteiskunta ja maailma" },
+    { "ru": "убыток", "fi": "tappio / vahinko", "cat": "yhteiskunta ja maailma" },
+    { "ru": "средство", "fi": "keino / väline / varat", "cat": "yhteiskunta ja maailma" },
+    { "ru": "способ", "fi": "tapa / menetelmä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "цель", "fi": "tavoite / päämäärä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "причина", "fi": "syy / peruste", "cat": "yhteiskunta ja maailma" },
+    { "ru": "условие", "fi": "ehto", "cat": "yhteiskunta ja maailma" },
+    { "ru": "возможность", "fi": "mahdollisuus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "случай", "fi": "tapaus / sattuma", "cat": "yhteiskunta ja maailma" },
+    { "ru": "событие", "fi": "tapahtuma", "cat": "yhteiskunta ja maailma" },
+    { "ru": "праздник", "fi": "juhla / juhlapyhä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "подарок", "fi": "lahja", "cat": "yhteiskunta ja maailma" },
+    { "ru": "приглашение", "fi": "kutsu", "cat": "yhteiskunta ja maailma" },
+    { "ru": "разговор", "fi": "keskustelu / puhe", "cat": "yhteiskunta ja maailma" },
+    { "ru": "спор", "fi": "kiista / väittely", "cat": "yhteiskunta ja maailma" },
+    { "ru": "согласие", "fi": "suostumus / yksimielisyys", "cat": "yhteiskunta ja maailma" },
+    { "ru": "отказ", "fi": "kieltäytyminen / hylkäys", "cat": "yhteiskunta ja maailma" },
+    { "ru": "помощь", "fi": "apu", "cat": "yhteiskunta ja maailma" },
+    { "ru": "поддержка", "fi": "tuki / kannatus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "уважение", "fi": "kunnioitus / arvostus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "доверие", "fi": "luottamus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "правда", "fi": "totuus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "ложь", "fi": "valhe", "cat": "yhteiskunta ja maailma" },
+    { "ru": "секрет", "fi": "salaisuus / salainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "тайна", "fi": "salaisuus / arvoitus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "влияние", "fi": "vaikutus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "развитие", "fi": "kehitys / kehittyminen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "изменение", "fi": "muutos", "cat": "yhteiskunta ja maailma" },
+    { "ru": "движение", "fi": "liike / liikenne", "cat": "yhteiskunta ja maailma" },
+    { "ru": "поведение", "fi": "käytös / käyttäytyminen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "отношение", "fi": "suhde / asenne", "cat": "yhteiskunta ja maailma" },
+    { "ru": "мнение", "fi": "mielipide", "cat": "yhteiskunta ja maailma" },
+    { "ru": "взгляд", "fi": "katse / näkemys", "cat": "yhteiskunta ja maailma" },
+    { "ru": "идея", "fi": "idea / ajatus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "план", "fi": "suunnitelma", "cat": "yhteiskunta ja maailma" },
+    { "ru": "совет", "fi": "neuvo / neuvosto", "cat": "yhteiskunta ja maailma" },
+    { "ru": "инструкция", "fi": "ohje / käyttöohje", "cat": "yhteiskunta ja maailma" },
+    { "ru": "справка", "fi": "todistus / tiedustelu", "cat": "yhteiskunta ja maailma" },
+    { "ru": "документ", "fi": "asiakirja / dokumentti", "cat": "yhteiskunta ja maailma" },
+    { "ru": "заявление", "fi": "hakemus / lausunto", "cat": "yhteiskunta ja maailma" },
+    { "ru": "место", "fi": "paikka / sija", "cat": "yhteiskunta ja maailma" },
+    { "ru": "сторона", "fi": "puoli / suunta", "cat": "yhteiskunta ja maailma" },
+    { "ru": "край", "fi": "reuna / seutu / ääri", "cat": "yhteiskunta ja maailma" },
+    { "ru": "середина", "fi": "keskikohta / puoliväli", "cat": "yhteiskunta ja maailma" },
+    { "ru": "начало", "fi": "alku", "cat": "yhteiskunta ja maailma" },
+    { "ru": "конец", "fi": "loppu", "cat": "yhteiskunta ja maailma" },
+    { "ru": "часть", "fi": "osa", "cat": "yhteiskunta ja maailma" },
+    { "ru": "кусок", "fi": "pala / kappale", "cat": "yhteiskunta ja maailma" },
+    { "ru": "группа", "fi": "ryhmä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "ряд", "fi": "rivi / sarja", "cat": "yhteiskunta ja maailma" },
+    { "ru": "номер", "fi": "numero / huone (hotellissa)", "cat": "yhteiskunta ja maailma" },
+    { "ru": "список", "fi": "lista / luettelo", "cat": "yhteiskunta ja maailma" },
+    { "ru": "таблица", "fi": "taulukko", "cat": "yhteiskunta ja maailma" },
+    { "ru": "форма", "fi": "muoto / lomake", "cat": "yhteiskunta ja maailma" },
+    { "ru": "цвет", "fi": "väri", "cat": "yhteiskunta ja maailma" },
+    { "ru": "белый", "fi": "valkoinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "чёрный", "fi": "musta", "cat": "yhteiskunta ja maailma" },
+    { "ru": "красный", "fi": "punainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "синий", "fi": "sininen (tummansininen)", "cat": "yhteiskunta ja maailma" },
+    { "ru": "голубой", "fi": "vaaleansininen / taivaansininen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "зелёный", "fi": "vihreä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "жёлтый", "fi": "keltainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "серый", "fi": "harmaa", "cat": "yhteiskunta ja maailma" },
+    { "ru": "коричневый", "fi": "ruskea", "cat": "yhteiskunta ja maailma" },
+    { "ru": "розовый", "fi": "vaaleanpunainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "оранжевый", "fi": "oranssi", "cat": "yhteiskunta ja maailma" },
+    { "ru": "фиолетовый", "fi": "violetti / liila", "cat": "yhteiskunta ja maailma" },
+    { "ru": "светлый", "fi": "vaalea / valoisa", "cat": "yhteiskunta ja maailma" },
+    { "ru": "тёмный", "fi": "tumma / pimeä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "яркий", "fi": "kirkas / loistava", "cat": "yhteiskunta ja maailma" },
+    { "ru": "тихий", "fi": "hiljainen / tyyni", "cat": "yhteiskunta ja maailma" },
+    { "ru": "громкий", "fi": "kovaääninen / meluisa", "cat": "yhteiskunta ja maailma" },
+    { "ru": "шум", "fi": "melu / häly", "cat": "yhteiskunta ja maailma" },
+    { "ru": "тишина", "fi": "hiljaisuus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "звук", "fi": "ääni", "cat": "yhteiskunta ja maailma" },
+    { "ru": "голос", "fi": "ääni (puhe/laulu)", "cat": "yhteiskunta ja maailma" },
+    { "ru": "речь", "fi": "puhe / kieli", "cat": "yhteiskunta ja maailma" },
+    { "ru": "смысл", "fi": "merkitys / järki / tarkoitus", "cat": "yhteiskunta ja maailma" },
+    { "ru": "значение", "fi": "merkitys / arvo", "cat": "yhteiskunta ja maailma" },
+    { "ru": "тема", "fi": "aihe / teema", "cat": "yhteiskunta ja maailma" },
+    { "ru": "проблема", "fi": "ongelma", "cat": "yhteiskunta ja maailma" },
+    { "ru": "проверка", "fi": "tarkistus / koe", "cat": "yhteiskunta ja maailma" },
+    { "ru": "оценка", "fi": "arvosana / arvio", "cat": "yhteiskunta ja maailma" },
+    { "ru": "успешный", "fi": "onnistunut / menestyksekäs", "cat": "yhteiskunta ja maailma" },
+    { "ru": "знаменитый", "fi": "kuuluisa", "cat": "yhteiskunta ja maailma" },
+    { "ru": "известный", "fi": "tunnettu / kuuluisa", "cat": "yhteiskunta ja maailma" },
+    { "ru": "точный", "fi": "tarkka / täsmällinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "верный", "fi": "oikea / uskollinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "неверный", "fi": "väärä / epätarkka", "cat": "yhteiskunta ja maailma" },
+    { "ru": "правильный", "fi": "oikea / asianmukainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "неправильный", "fi": "väärä / virheellinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "понятный", "fi": "ymmärrettävä / selvä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "непонятный", "fi": "epäselvä / vaikeaselkoinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "возможный", "fi": "mahdollinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "невозможный", "fi": "mahdoton", "cat": "yhteiskunta ja maailma" },
+    { "ru": "обязательный", "fi": "pakollinen / ehdoton", "cat": "yhteiskunta ja maailma" },
+    { "ru": "вредный", "fi": "haitallinen / vahingollinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "приятный", "fi": "miellyttävä / mukava", "cat": "yhteiskunta ja maailma" },
+    { "ru": "неприятный", "fi": "epämiellyttävä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "весёлый", "fi": "iloinen / hauska", "cat": "yhteiskunta ja maailma" },
+    { "ru": "грустный", "fi": "surullinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "злой", "fi": "vihainen / ilkeä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "добрый", "fi": "kiltti / ystävällinen / hyvä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "строгий", "fi": "ankara / tiukka", "cat": "yhteiskunta ja maailma" },
+    { "ru": "честный", "fi": "rehellinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "умный", "fi": "fiksu / älykäs", "cat": "yhteiskunta ja maailma" },
+    { "ru": "глупый", "fi": "tyhmä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "ленивый", "fi": "laiska", "cat": "yhteiskunta ja maailma" },
+    { "ru": "смелый", "fi": "rohkea", "cat": "yhteiskunta ja maailma" },
+    { "ru": "осторожный", "fi": "varovainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "усталый", "fi": "väsynyt", "cat": "yhteiskunta ja maailma" },
+    { "ru": "здоровый", "fi": "terve", "cat": "yhteiskunta ja maailma" },
+    { "ru": "больной", "fi": "sairas / kipeä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "молодой", "fi": "nuori", "cat": "yhteiskunta ja maailma" },
+    { "ru": "взрослый", "fi": "aikuinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "живой", "fi": "elävä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "богатый", "fi": "rikas", "cat": "yhteiskunta ja maailma" },
+    { "ru": "бедный", "fi": "köyhä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "дорогой", "fi": "kallis / rakas", "cat": "yhteiskunta ja maailma" },
+    { "ru": "дёшево", "fi": "halvalla / edullisesti", "cat": "yhteiskunta ja maailma" },
+    { "ru": "дешёвый", "fi": "halpa / edullinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "бесплатный", "fi": "ilmainen / maksuton", "cat": "yhteiskunta ja maailma" },
+    { "ru": "современный", "fi": "nykyaikainen / moderni", "cat": "yhteiskunta ja maailma" },
+    { "ru": "древний", "fi": "muinainen / ikivanha", "cat": "yhteiskunta ja maailma" },
+    { "ru": "местный", "fi": "paikallinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "иностранный", "fi": "ulkomainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "международный", "fi": "kansainvälinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "общественный", "fi": "julkinen / yhteiskunnallinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "личный", "fi": "henkilökohtainen / oma", "cat": "yhteiskunta ja maailma" },
+    { "ru": "общий", "fi": "yleinen / yhteinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "отдельный", "fi": "erillinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "целый", "fi": "kokonainen / ehjä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "лишний", "fi": "ylimääräinen / turha", "cat": "yhteiskunta ja maailma" },
+    { "ru": "достаточный", "fi": "riittävä", "cat": "yhteiskunta ja maailma" },
+    { "ru": "реальный", "fi": "todellinen / reaalinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "настоящий", "fi": "aito / todellinen / nykyinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "особенный", "fi": "erityinen / erikoinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "странный", "fi": "outo / kummallinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "простой", "fi": "yksinkertainen / helppo", "cat": "yhteiskunta ja maailma" },
+    { "ru": "ранний", "fi": "aikainen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "поздний", "fi": "myöhäinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "вчерашний", "fi": "eilinen", "cat": "yhteiskunta ja maailma" },
+    { "ru": "сегодняшний", "fi": "tämän päivän", "cat": "yhteiskunta ja maailma" },
+    { "ru": "завтрашний", "fi": "huominen", "cat": "yhteiskunta ja maailma" }
+];
+
+const CYRILLIC_CHARS = ['ё', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю'];
+
+function buildCyrillicHelper() {
+    const helper = document.getElementById('cyrillic-helper');
+    if (!helper || helper.dataset.built === '1') return;
+    helper.dataset.built = '1';
+    CYRILLIC_CHARS.forEach(ch => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = ch;
+        btn.className = 'bg-slate-800 hover:bg-indigo-600 text-slate-100 font-bold text-xs px-2 py-1 rounded border border-slate-600 transition cursor-pointer';
+        btn.onclick = () => {
+            const inp = document.getElementById('quiz-free-input');
+            if (!inp || inp.disabled) return;
+            const start = inp.selectionStart ?? inp.value.length;
+            const end = inp.selectionEnd ?? inp.value.length;
+            inp.value = inp.value.slice(0, start) + ch + inp.value.slice(end);
+            inp.focus();
+            inp.setSelectionRange(start + 1, start + 1);
+        };
+        helper.appendChild(btn);
+    });
+}
+
+/**
+ * ============================================================================
+ * 3. LOHKOT, ALKUAIHEET, PÄIVITYKSET JA ASEMAT (VAATIMUSTEN MUKAINEN JARJESTYS)
+ * ============================================================================
+ */
+const TILE_SIZE = 44;
+const GRID_COLS = 36;
+const SURFACE_ROW = 5;
+const CHAMBER_TOP_ROW = 94;
+const CHAMBER_FLOOR_ROW = 99;
+const CHAMBER_LEFT_COL = 7;
+const CHAMBER_RIGHT_COL = 28;
+const GRID_ROWS = 101;
+const SAVE_STORAGE_KEY = 'malmspel_ru_vocab_v1';
+
+const BLOCKS = {
+    EMPTY: { id: 0, name: 'Пусто', solid: false, color: 'transparent' },
+    DIRT: { id: 1, name: 'Земля', solid: true, hardness: 1, drillTime: 0.32, fuelMult: 1.0, color: '#5c3a21', border: '#422815' },
+    ROCK: { id: 2, name: 'Порода', solid: true, hardness: 1, drillTime: 0.55, fuelMult: 1.25, color: '#64748b', border: '#475569' },
+    HARD_ROCK: { id: 3, name: 'Твёрдый гранит', solid: true, hardness: 2, drillTime: 0.85, fuelMult: 1.55, color: '#475569', border: '#334155' },
+    BEDROCK: { id: 4, name: 'Коренная порода', solid: true, hardness: 99, unbreakable: true, color: '#0f172a', border: '#020617' },
+
+    // Helpot alkuaineet (monivalinta)
+    ZINK: { id: 5, name: 'Цинк (Zn)', solid: true, isOre: true, hardness: 1, drillTime: 0.45, fuelMult: 1.15, value: 90, color: '#5c3a21', oreColor: '#94a3b8', glow: '#cbd5e1', icon: '⚪' },
+    KOPPAR: { id: 6, name: 'Медь (Cu)', solid: true, isOre: true, hardness: 1, drillTime: 0.50, fuelMult: 1.2, value: 140, color: '#5c3a21', oreColor: '#ea580c', glow: '#fb923c', icon: '🟠' },
+    TENN: { id: 7, name: 'Олово (Sn)', solid: true, isOre: true, hardness: 1, drillTime: 0.55, fuelMult: 1.25, value: 210, color: '#64748b', oreColor: '#cbd5e1', glow: '#e2e8f0', icon: '🪙' },
+    SILVER: { id: 8, name: 'Серебро (Ag)', solid: true, isOre: true, hardness: 1, drillTime: 0.62, fuelMult: 1.35, value: 320, color: '#64748b', oreColor: '#f8fafc', glow: '#ffffff', icon: '🥈' },
+    KOBOLT: { id: 9, name: 'Кобальт (Co)', solid: true, isOre: true, hardness: 2, drillTime: 0.75, fuelMult: 1.5, value: 460, color: '#475569', oreColor: '#3b82f6', glow: '#60a5fa', icon: '🔵' },
+    GULD: { id: 10, name: 'Золото (Au)', solid: true, isOre: true, hardness: 2, drillTime: 0.85, fuelMult: 1.65, value: 650, color: '#475569', oreColor: '#facc15', glow: '#fde047', icon: '🟡' },
+
+    // Keskivaikeat alkuaineet (kirjoita sana suomeksi)
+    KROM: { id: 11, name: 'Хром (Cr)', solid: true, isOre: true, requiresFinnishWrite: true, hardness: 2, drillTime: 0.90, fuelMult: 1.75, value: 880, color: '#475569', oreColor: '#34d399', glow: '#6ee7b7', icon: '🟢' },
+    PLATINA: { id: 12, name: 'Платина (Pt)', solid: true, isOre: true, requiresFinnishWrite: true, hardness: 2, drillTime: 1.00, fuelMult: 1.9, value: 1150, color: '#475569', oreColor: '#e0e7ff', glow: '#c7d2fe', icon: '💠' },
+    KOL: { id: 13, name: 'Углерод (C)', solid: true, isOre: true, requiresFinnishWrite: true, hardness: 3, drillTime: 1.10, fuelMult: 2.05, value: 1450, color: '#334155', oreColor: '#38bdf8', glow: '#7dd3fc', icon: '💎' },
+    URAN: { id: 14, name: 'Уран (U)', solid: true, isOre: true, requiresFinnishWrite: true, hardness: 3, drillTime: 1.25, fuelMult: 2.25, value: 1850, color: '#334155', oreColor: '#a3e635', glow: '#bef264', icon: '☢️' },
+    SVAVEL: { id: 15, name: 'Сера (S)', solid: true, isOre: true, requiresFinnishWrite: true, hardness: 3, drillTime: 1.35, fuelMult: 2.4, value: 2300, color: '#334155', oreColor: '#fde047', glow: '#facc15', icon: '🌋' },
+
+    // Vaikeat alkuaineet (kirjoita sana venäjäksi)
+    NOBELIUM: { id: 16, name: 'Нобелий (No)', solid: true, isOre: true, requiresRussianWrite: true, hardness: 3, drillTime: 1.50, fuelMult: 2.65, value: 2950, color: '#1e1b4b', oreColor: '#e879f9', glow: '#f0abfc', icon: '⚛️' },
+    SEABORGIUM: { id: 17, name: 'Сиборгий (Sg)', solid: true, isOre: true, requiresRussianWrite: true, hardness: 3, drillTime: 1.70, fuelMult: 2.9, value: 3800, color: '#1e1b4b', oreColor: '#fb7185', glow: '#fda4af', icon: '👑' }
+};
+
+const BLOCK_BY_ID = {};
+Object.values(BLOCKS).forEach(b => { BLOCK_BY_ID[b.id] = b; });
+
+const UPGRADES = {
+    drill: [
+        { level: 1, name: 'Ур. 1: Стальной бур', power: 1, speedMult: 1.0, cost: 0 },
+        { level: 2, name: 'Ур. 2: Карбид вольфрама', power: 2, speedMult: 1.35, cost: 420 },
+        { level: 3, name: 'Ур. 3: Алмазный бур', power: 3, speedMult: 1.75, cost: 1100 }
+    ],
+    fuel: [
+        { level: 1, name: 'Ур. 1: Бак 100 л', maxFuel: 100, cost: 0 },
+        { level: 2, name: 'Ур. 2: Бак 160 л', maxFuel: 160, cost: 350 },
+        { level: 3, name: 'Ур. 3: Бак 240 л', maxFuel: 240, cost: 900 }
+    ],
+    cargo: [
+        { level: 1, name: 'Ур. 1: Трюм 6', maxCargo: 6, cost: 0 },
+        { level: 2, name: 'Ур. 2: Трюм 12', maxCargo: 12, cost: 380 },
+        { level: 3, name: 'Ур. 3: Трюм 20', maxCargo: 20, cost: 950 }
+    ],
+    hull: [
+        { level: 1, name: 'Ур. 1: Базовый корпус', maxHull: 100, cost: 0 },
+        { level: 2, name: 'Ур. 2: Усиленный корпус', maxHull: 150, cost: 400 },
+        { level: 3, name: 'Ур. 3: Титановая броня', maxHull: 220, cost: 1000 }
+    ]
+};
+
+const STATIONS = [
+    { id: 'sell', name: 'Переработка', subtitle: 'Продажа добытой руды', icon: '🏭', colStart: 7, colEnd: 11, color: '#10b981', roofColor: '#059669' },
+    { id: 'fuel', name: 'Топливо и ремонт', subtitle: 'Заправка и ремонт корпуса', icon: '⛽', colStart: 13, colEnd: 16, color: '#f59e0b', roofColor: '#d97706' },
+    { id: 'upgrade', name: 'Мастерская', subtitle: 'Улучшение бура, бака, трюма и корпуса', icon: '🔧', colStart: 21, colEnd: 25, color: '#6366f1', roofColor: '#4f46e5' }
+];
+
+/**
+ * ============================================================================
+ * 4. PELITILA, TALLENNUS & APUFUNKTIOT
+ * ============================================================================
+ */
+let grid = [];
+let particles = [];
+let floatingTexts = [];
+let keys = {};
+let isPaused = false;
+let gameOver = false;
+let activeStation = null;
+let currentQuiz = null;
+let usedSentenceIndices = new Set();
+let saveTimer = 0;
+
+const boss = {
+    name: 'Ядерный босс глубин',
+    col: 16.5,
+    row: CHAMBER_FLOOR_ROW - 3,
+    width: TILE_SIZE * 2.5,
+    height: TILE_SIZE * 2.5,
+    hp: 3,
+    maxHp: 3,
+    reward: 5000,
+    defeated: false
+};
+
+const player = {
+    x: 17 * TILE_SIZE,
+    y: (SURFACE_ROW - 1) * TILE_SIZE,
+    vx: 0,
+    vy: 0,
+    width: 30,
+    height: 30,
+    facing: 1,
+    fuel: 100,
+    hull: 100,
+    money: 150,
+    cargo: [],
+    upgrades: { drill: 1, fuel: 1, cargo: 1, hull: 1 },
+    drilling: { active: false, targetCol: 0, targetRow: 0, progress: 0, duration: 0.5 },
+    stats: { maxDepth: 0, solvedCount: 0, streak: 0 }
+};
+
+function getMaxFuel() { return UPGRADES.fuel[player.upgrades.fuel - 1].maxFuel; }
+function getMaxCargo() { return UPGRADES.cargo[player.upgrades.cargo - 1].maxCargo; }
+function getMaxHull() { return UPGRADES.hull[player.upgrades.hull - 1].maxHull; }
+function getDrillPower() { return UPGRADES.drill[player.upgrades.drill - 1].power; }
+function getDrillSpeed() { return UPGRADES.drill[player.upgrades.drill - 1].speedMult; }
+
+function saveGameState() {
+    try {
+        if (typeof localStorage === 'undefined') return;
+        const payload = {
+            version: 1,
+            savedAt: Date.now(),
+            grid,
+            player: {
+                x: player.x,
+                y: player.y,
+                vx: player.vx,
+                vy: player.vy,
+                facing: player.facing,
+                fuel: player.fuel,
+                hull: player.hull,
+                money: player.money,
+                cargo: player.cargo,
+                upgrades: player.upgrades,
+                stats: player.stats
+            },
+            boss: {
+                hp: boss.hp,
+                maxHp: boss.maxHp,
+                defeated: boss.defeated,
+                col: boss.col,
+                row: boss.row
+            },
+            usedSentenceIndices: Array.from(usedSentenceIndices),
+            muted: sound.muted,
+            autoRussianSpeech,
+            gameOver
+        };
+        localStorage.setItem(SAVE_STORAGE_KEY, JSON.stringify(payload));
+    } catch (err) {
+        // Ignorera storage-virheet esim. yksityisessä tilassa
+    }
+}
+
+function loadGameState() {
+    try {
+        if (typeof localStorage === 'undefined') return false;
+        const raw = localStorage.getItem(SAVE_STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data || !Array.isArray(data.grid) || data.grid.length !== GRID_ROWS || !data.player) {
+            return false;
+        }
+        for (let r = 0; r < GRID_ROWS; r++) {
+            if (!Array.isArray(data.grid[r]) || data.grid[r].length !== GRID_COLS) {
+                return false;
+            }
+        }
+
+        grid = data.grid;
+        player.x = typeof data.player.x === 'number' ? data.player.x : 17 * TILE_SIZE;
+        player.y = typeof data.player.y === 'number' ? data.player.y : (SURFACE_ROW - 1) * TILE_SIZE;
+        player.vx = 0;
+        player.vy = 0;
+        player.facing = data.player.facing === -1 ? -1 : 1;
+        player.upgrades = {
+            drill: data.player.upgrades?.drill || 1,
+            fuel: data.player.upgrades?.fuel || 1,
+            cargo: data.player.upgrades?.cargo || 1,
+            hull: data.player.upgrades?.hull || 1
+        };
+        player.fuel = typeof data.player.fuel === 'number' ? Math.min(getMaxFuel(), Math.max(0, data.player.fuel)) : getMaxFuel();
+        player.hull = typeof data.player.hull === 'number' ? Math.min(getMaxHull(), Math.max(0, data.player.hull)) : getMaxHull();
+        player.money = typeof data.player.money === 'number' ? data.player.money : 150;
+        player.cargo = Array.isArray(data.player.cargo) ? data.player.cargo.filter(id => !!BLOCK_BY_ID[id]) : [];
+        player.stats = {
+            maxDepth: data.player.stats?.maxDepth || 0,
+            solvedCount: data.player.stats?.solvedCount || 0,
+            streak: data.player.stats?.streak || 0
+        };
+        player.drilling = { active: false, targetCol: 0, targetRow: 0, progress: 0, duration: 0.5 };
+
+        if (data.boss) {
+            boss.hp = typeof data.boss.hp === 'number' ? data.boss.hp : boss.maxHp;
+            boss.defeated = !!data.boss.defeated;
+            boss.col = typeof data.boss.col === 'number' ? data.boss.col : 16.5;
+            boss.row = CHAMBER_FLOOR_ROW - 3;
+        }
+
+        usedSentenceIndices = new Set(Array.isArray(data.usedSentenceIndices) ? data.usedSentenceIndices : []);
+        sound.muted = !!data.muted;
+        if (typeof data.autoRussianSpeech === 'boolean') {
+            autoRussianSpeech = data.autoRussianSpeech;
+        }
+        document.getElementById('btn-mute').textContent = sound.muted ? '🔇' : '🔊';
+        updateAutoSpeechButton();
+
+        particles = [];
+        floatingTexts = [];
+        gameOver = !!data.gameOver;
+        isPaused = gameOver;
+        updateHUD();
+        if (gameOver) {
+            document.getElementById('gameover-modal').classList.remove('hidden');
+        }
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+function clearSavedGame() {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem(SAVE_STORAGE_KEY);
+        }
+    } catch (err) {
+        // Ignorera virheet
+    }
+}
+
+function showToast(msg, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    const colors = {
+        info: 'bg-slate-800/95 border-sky-500/60 text-sky-100',
+        success: 'bg-emerald-950/95 border-emerald-500/60 text-emerald-100',
+        warn: 'bg-amber-950/95 border-amber-500/60 text-amber-100'
+    };
+    toast.className = `${colors[type] || colors.info} border px-4 py-2 rounded-xl shadow-xl text-xs sm:text-sm font-bold transition-all duration-300`;
+    toast.textContent = msg;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-8px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 2600);
+}
+
+function spawnParticles(x, y, color, count = 10, speed = 110) {
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = (0.25 + Math.random() * 0.75) * speed;
+        const life = 0.35 + Math.random() * 0.35;
+        particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd - 40,
+            size: 2.5 + Math.random() * 3.5,
+            color,
+            life,
+            maxLife: life
+        });
+    }
+}
+
+function addFloatingText(x, y, text, color = '#ffffff') {
+    floatingTexts.push({
+        x,
+        y,
+        text,
+        color,
+        vy: -36,
+        life: 1.25
+    });
+}
+
+/**
+ * ============================================================================
+ * 5. KAIVOKSEN GENEROINTI JA UUDEN PELIN ALOITUS
+ * ============================================================================
+ */
+function generateMineGrid() {
+    const newGrid = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(BLOCKS.EMPTY.id));
+
+    for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+            if (c === 0 || c === GRID_COLS - 1 || r === GRID_ROWS - 1) {
+                newGrid[r][c] = BLOCKS.BEDROCK.id;
+                continue;
+            }
+            if (r < SURFACE_ROW) {
+                newGrid[r][c] = BLOCKS.EMPTY.id;
+                continue;
+            }
+
+            const inBossChamber = r >= CHAMBER_TOP_ROW && r < CHAMBER_FLOOR_ROW && c >= CHAMBER_LEFT_COL && c <= CHAMBER_RIGHT_COL;
+            if (inBossChamber) {
+                newGrid[r][c] = BLOCKS.EMPTY.id;
+                continue;
+            }
+
+            if (r === CHAMBER_FLOOR_ROW) {
+                newGrid[r][c] = BLOCKS.BEDROCK.id;
+                continue;
+            }
+
+            const depthRatio = (r - SURFACE_ROW) / (CHAMBER_FLOOR_ROW - SURFACE_ROW);
+            const rand = Math.random();
+
+            if (depthRatio < 0.16) {
+                if (rand < 0.78) newGrid[r][c] = BLOCKS.DIRT.id;
+                else if (rand < 0.86) newGrid[r][c] = BLOCKS.ZINK.id;
+                else if (rand < 0.93) newGrid[r][c] = BLOCKS.KOPPAR.id;
+                else newGrid[r][c] = BLOCKS.ROCK.id;
+            } else if (depthRatio < 0.34) {
+                if (rand < 0.42) newGrid[r][c] = BLOCKS.DIRT.id;
+                else if (rand < 0.74) newGrid[r][c] = BLOCKS.ROCK.id;
+                else if (rand < 0.82) newGrid[r][c] = BLOCKS.KOPPAR.id;
+                else if (rand < 0.90) newGrid[r][c] = BLOCKS.TENN.id;
+                else if (rand < 0.96) newGrid[r][c] = BLOCKS.SILVER.id;
+                else newGrid[r][c] = BLOCKS.HARD_ROCK.id;
+            } else if (depthRatio < 0.56) {
+                if (rand < 0.48) newGrid[r][c] = BLOCKS.ROCK.id;
+                else if (rand < 0.76) newGrid[r][c] = BLOCKS.HARD_ROCK.id;
+                else if (rand < 0.83) newGrid[r][c] = BLOCKS.SILVER.id;
+                else if (rand < 0.90) newGrid[r][c] = BLOCKS.KOBOLT.id;
+                else if (rand < 0.955) newGrid[r][c] = BLOCKS.GULD.id;
+                else newGrid[r][c] = BLOCKS.KROM.id;
+            } else if (depthRatio < 0.78) {
+                if (rand < 0.44) newGrid[r][c] = BLOCKS.HARD_ROCK.id;
+                else if (rand < 0.70) newGrid[r][c] = BLOCKS.ROCK.id;
+                else if (rand < 0.77) newGrid[r][c] = BLOCKS.KROM.id;
+                else if (rand < 0.84) newGrid[r][c] = BLOCKS.PLATINA.id;
+                else if (rand < 0.90) newGrid[r][c] = BLOCKS.KOL.id;
+                else if (rand < 0.955) newGrid[r][c] = BLOCKS.URAN.id;
+                else newGrid[r][c] = BLOCKS.SVAVEL.id;
+            } else {
+                if (rand < 0.46) newGrid[r][c] = BLOCKS.HARD_ROCK.id;
+                else if (rand < 0.68) newGrid[r][c] = BLOCKS.ROCK.id;
+                else if (rand < 0.75) newGrid[r][c] = BLOCKS.URAN.id;
+                else if (rand < 0.82) newGrid[r][c] = BLOCKS.SVAVEL.id;
+                else if (rand < 0.91) newGrid[r][c] = BLOCKS.NOBELIUM.id;
+                else newGrid[r][c] = BLOCKS.SEABORGIUM.id;
+            }
+        }
+    }
+
+    for (let c = 1; c < GRID_COLS - 1; c++) {
+        if (newGrid[SURFACE_ROW][c] === BLOCKS.EMPTY.id) {
+            newGrid[SURFACE_ROW][c] = BLOCKS.DIRT.id;
+        }
+    }
+
+    return newGrid;
+}
+
+function startNewGame(resetSaved = true) {
+    if (resetSaved) clearSavedGame();
+    grid = generateMineGrid();
+    particles = [];
+    floatingTexts = [];
+    usedSentenceIndices.clear();
+    currentQuiz = null;
+    activeStation = null;
+    resetJoystick();
+
+    player.x = 17 * TILE_SIZE;
+    player.y = (SURFACE_ROW - 1) * TILE_SIZE;
+    player.vx = 0;
+    player.vy = 0;
+    player.facing = 1;
+    player.upgrades = { drill: 1, fuel: 1, cargo: 1, hull: 1 };
+    player.fuel = getMaxFuel();
+    player.hull = getMaxHull();
+    player.money = 150;
+    player.cargo = [];
+    player.drilling = { active: false, targetCol: 0, targetRow: 0, progress: 0, duration: 0.5 };
+    player.stats = { maxDepth: 0, solvedCount: 0, streak: 0 };
+
+    boss.hp = boss.maxHp;
+    boss.defeated = false;
+    boss.col = 16.5;
+    boss.row = CHAMBER_FLOOR_ROW - 3;
+
+    gameOver = false;
+    isPaused = false;
+    document.getElementById('gameover-modal').classList.add('hidden');
+    document.getElementById('quiz-modal').classList.add('hidden');
+    document.getElementById('station-modal').classList.add('hidden');
+    document.getElementById('help-modal').classList.add('hidden');
+    updateHUD();
+    saveGameState();
+    if (resetSaved) {
+        showToast('Новая игра началась!', 'info');
+    }
+}
+
+/**
+ * ============================================================================
+ * 6. SANASTOTEHTÄVÄT, TARKISTUS & VENÄJÄN PUHESYNTEESİ
+ * ============================================================================
+ */
+function normalizeAnswer(str) {
+    return (str || '')
+        .toLowerCase()
+        .replace(/ё/g, 'е')
+        .replace(/[.,!?;:"()\[\]…\/\-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function isFinnishAnswerMatch(userRaw, fiGloss) {
+    const normUser = normalizeAnswer(userRaw);
+    if (!normUser) return false;
+    const parts = fiGloss.split('/').map(p => normalizeAnswer(p.replace(/\([^)]*\)/g, '')));
+    return parts.includes(normUser);
+}
+
+function isRussianAnswerMatch(userRaw, ruWord) {
+    const normUser = normalizeAnswer(userRaw);
+    const normRu = normalizeAnswer(ruWord);
+    return normUser.length > 0 && normUser === normRu;
+}
+
+function pickUnusedVocabItem() {
+    if (!Array.isArray(RU_VOCAB) || RU_VOCAB.length === 0) {
+        return { ru: 'дом', fi: 'talo / koti', cat: 'koti ja asuminen' };
+    }
+    const available = [];
+    for (let i = 0; i < RU_VOCAB.length; i++) {
+        if (!usedSentenceIndices.has(i)) available.push(i);
+    }
+    let chosenIdx;
+    if (available.length > 0) {
+        chosenIdx = available[Math.floor(Math.random() * available.length)];
+    } else {
+        usedSentenceIndices.clear();
+        chosenIdx = Math.floor(Math.random() * RU_VOCAB.length);
+    }
+    usedSentenceIndices.add(chosenIdx);
+    return RU_VOCAB[chosenIdx];
+}
+
+function triggerQuiz(options) {
+    isPaused = true;
+    keys = {};
+    resetJoystick();
+    sound.playOreFound();
+    buildCyrillicHelper();
+
+    const item = pickUnusedVocabItem();
+
+    let mode = 'mcq';
+    if (options.isBoss || (options.block && options.block.requiresRussianWrite)) {
+        mode = 'write_ru';
+    } else if (options.block && options.block.requiresFinnishWrite) {
+        mode = 'write_fi';
+    }
+
+    let mcqOptions = [];
+    if (mode === 'mcq') {
+        const distractors = [];
+        const usedRu = new Set([normalizeAnswer(item.ru)]);
+        let guard = 0;
+        while (distractors.length < 3 && guard < 300) {
+            guard++;
+            const cand = RU_VOCAB[Math.floor(Math.random() * RU_VOCAB.length)];
+            const normCand = normalizeAnswer(cand.ru);
+            if (!usedRu.has(normCand)) {
+                usedRu.add(normCand);
+                distractors.push(cand.ru);
+            }
+        }
+        mcqOptions = [item.ru, ...distractors];
+        for (let i = mcqOptions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [mcqOptions[i], mcqOptions[j]] = [mcqOptions[j], mcqOptions[i]];
+        }
+    }
+
+    currentQuiz = {
+        isBoss: !!options.isBoss,
+        mode,
+        col: options.col,
+        row: options.row,
+        block: options.block,
+        item,
+        mcqOptions,
+        selectedOption: null,
+        answered: false
+    };
+
+    const badge = document.getElementById('quiz-ore-badge');
+    const tagEl = document.getElementById('quiz-tag');
+    const nameEl = document.getElementById('quiz-ore-name');
+    const pillEl = document.getElementById('quiz-mode-pill');
+    const promptEl = document.getElementById('quiz-prompt-label');
+    const wordEl = document.getElementById('quiz-finnish');
+    const promptTtsSlot = document.getElementById('quiz-prompt-tts-slot');
+    const catEl = document.getElementById('quiz-category-sub');
+    const mcqModeEl = document.getElementById('quiz-mcq-mode');
+    const writeModeEl = document.getElementById('quiz-write-mode');
+    const freeInput = document.getElementById('quiz-free-input');
+    const freeLabel = document.getElementById('quiz-free-label');
+    const cyrHelper = document.getElementById('cyrillic-helper');
+    const clearBtn = document.getElementById('btn-quiz-clear');
+
+    promptTtsSlot.innerHTML = '';
+
+    if (currentQuiz.isBoss) {
+        badge.textContent = '👾';
+        badge.style.backgroundColor = 'rgba(244, 63, 94, 0.25)';
+        tagEl.textContent = `Ядерный босс — Удар ${boss.maxHp - boss.hp + 1}/${boss.maxHp} • Kirjoita sana venäjäksi`;
+        tagEl.className = 'text-xs uppercase tracking-wider font-extrabold text-rose-400';
+        nameEl.textContent = `${boss.name} (HP: ${boss.hp}/${boss.maxHp})`;
+    } else {
+        badge.textContent = options.block.icon;
+        badge.style.backgroundColor = options.block.oreColor + '33';
+        nameEl.textContent = `${options.block.name} (${options.block.value} ₽)`;
+        if (mode === 'write_ru') {
+            tagEl.textContent = 'Сложно • Kirjoita sana venäjäksi';
+            tagEl.className = 'text-xs uppercase tracking-wider font-extrabold text-fuchsia-400';
+        } else if (mode === 'write_fi') {
+            tagEl.textContent = 'Средне • Kirjoita sana suomeksi';
+            tagEl.className = 'text-xs uppercase tracking-wider font-extrabold text-amber-400';
+        } else {
+            tagEl.textContent = 'Легко • Valitse venäjänkielinen sana';
+            tagEl.className = 'text-xs uppercase tracking-wider font-bold text-emerald-400';
+        }
+    }
+
+    catEl.textContent = `Тема / Aihe: ${item.cat} • ${RU_VOCAB.length} слов`;
+
+    if (mode === 'mcq') {
+        pillEl.textContent = '🟢 Легко • Monivalinta';
+        pillEl.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-200 border border-emerald-500/50';
+        promptEl.textContent = 'Выберите перевод на русский • Valitse venäjänkielinen vastine:';
+        wordEl.textContent = item.fi;
+        mcqModeEl.classList.remove('hidden');
+        writeModeEl.classList.add('hidden');
+        clearBtn.textContent = 'Сбросить';
+        renderQuizMcq();
+    } else if (mode === 'write_fi') {
+        pillEl.textContent = '🟡 Средне • Suomeksi';
+        pillEl.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-200 border border-amber-500/50';
+        promptEl.textContent = 'Напишите перевод на финский • Kirjoita sanan suomenkielinen merkitys:';
+        wordEl.textContent = item.ru;
+        promptTtsSlot.appendChild(createRussianListenButton(item.ru));
+        mcqModeEl.classList.add('hidden');
+        writeModeEl.classList.remove('hidden');
+        cyrHelper.classList.add('hidden');
+        freeLabel.textContent = 'Перевод на финский • Kirjoita sana suomeksi (yksi merkitys riittää):';
+        freeInput.placeholder = 'Suomeksi / По-фински...';
+        freeInput.value = '';
+        freeInput.disabled = false;
+        clearBtn.textContent = 'Очистить';
+        setTimeout(() => freeInput.focus(), 60);
+
+        if (autoRussianSpeech) {
+            setTimeout(() => speakRussian(item.ru, { retryOnGesture: true }), 140);
+        }
+    } else {
+        pillEl.textContent = '🔴 Сложно • Venäjäksi';
+        pillEl.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-fuchsia-950 text-fuchsia-200 border border-fuchsia-500/50';
+        promptEl.textContent = 'Напишите слово по-русски • Kirjoita sana venäjäksi:';
+        wordEl.textContent = item.fi;
+        mcqModeEl.classList.add('hidden');
+        writeModeEl.classList.remove('hidden');
+        cyrHelper.classList.remove('hidden');
+        freeLabel.textContent = 'Слово по-русски (кириллица) • Kirjoita sana venäjäksi:';
+        freeInput.placeholder = 'По-русски / Venäjäksi...';
+        freeInput.value = '';
+        freeInput.disabled = false;
+        clearBtn.textContent = 'Очистить';
+        setTimeout(() => freeInput.focus(), 60);
+    }
+
+    document.getElementById('quiz-inline-hint').classList.add('hidden');
+    document.getElementById('quiz-feedback').classList.add('hidden');
+    document.getElementById('btn-quiz-check').classList.remove('hidden');
+    clearBtn.classList.remove('hidden');
+    document.getElementById('btn-quiz-continue').classList.add('hidden');
+
+    document.getElementById('quiz-modal').classList.remove('hidden');
+}
+
+function renderQuizMcq() {
+    if (!currentQuiz || currentQuiz.mode !== 'mcq') return;
+    const container = document.getElementById('quiz-mcq-options');
+    container.innerHTML = '';
+
+    currentQuiz.mcqOptions.forEach((opt, idx) => {
+        const row = document.createElement('div');
+        const isSelected = currentQuiz.selectedOption === opt;
+        let rowCls = 'w-full px-3.5 py-2.5 rounded-xl border font-bold text-base transition flex items-center justify-between gap-2 ';
+        if (currentQuiz.answered) {
+            if (opt === currentQuiz.item.ru) {
+                rowCls += 'bg-emerald-900/80 border-emerald-400 text-emerald-100';
+            } else if (isSelected) {
+                rowCls += 'bg-rose-900/80 border-rose-400 text-rose-100';
+            } else {
+                rowCls += 'bg-slate-800/50 border-slate-700 text-slate-400';
+            }
+        } else if (isSelected) {
+            rowCls += 'bg-amber-500 border-amber-200 text-slate-950 shadow-lg';
+        } else {
+            rowCls += 'bg-slate-800 hover:bg-slate-700 border-slate-600 text-white';
+        }
+        row.className = rowCls;
+
+        const selectBtn = document.createElement('button');
+        selectBtn.type = 'button';
+        selectBtn.className = 'flex-1 text-left cursor-pointer';
+        selectBtn.innerHTML = `<span class="opacity-70 mr-2">${idx + 1}.</span><span>${opt}</span>`;
+        if (!currentQuiz.answered) {
+            selectBtn.onclick = () => {
+                currentQuiz.selectedOption = opt;
+                renderQuizMcq();
+                if (autoRussianSpeech) {
+                    speakRussian(opt, { retryOnGesture: true });
+                }
+            };
+        }
+
+        const listenBtn = createRussianListenButton(opt);
+        row.appendChild(selectBtn);
+        row.appendChild(listenBtn);
+        container.appendChild(row);
+    });
+}
+
+function mountFeedbackRussianAudio(ruWord, isRight) {
+    const slot = document.getElementById('quiz-feedback-tts-slot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    slot.appendChild(createRussianListenButton(ruWord));
+    if (autoRussianSpeech) {
+        setTimeout(() => speakRussian(ruWord, { force: isRight, retryOnGesture: true }), 140);
+    }
+}
+
+function checkQuizAnswer() {
+    if (!currentQuiz || currentQuiz.answered) return;
+
+    const { item, mode } = currentQuiz;
+    let isCorrect = false;
+    let displayUserAnswer = '';
+    let expectedText = mode === 'write_fi' ? item.fi : item.ru;
+
+    if (mode === 'mcq') {
+        if (!currentQuiz.selectedOption) {
+            showToast('Выберите вариант! • Valitse vaihtoehto!', 'warn');
+            return;
+        }
+        displayUserAnswer = currentQuiz.selectedOption;
+        isCorrect = isRussianAnswerMatch(displayUserAnswer, item.ru);
+    } else {
+        const freeInput = document.getElementById('quiz-free-input');
+        const rawText = freeInput.value.trim();
+        if (!rawText) {
+            showToast('Введите ответ! • Kirjoita vastaus!', 'warn');
+            freeInput.focus();
+            return;
+        }
+        freeInput.disabled = true;
+        displayUserAnswer = rawText;
+        isCorrect = mode === 'write_fi'
+            ? isFinnishAnswerMatch(rawText, item.fi)
+            : isRussianAnswerMatch(rawText, item.ru);
+    }
+
+    currentQuiz.answered = true;
+
+    const feedbackEl = document.getElementById('quiz-feedback');
+    feedbackEl.classList.remove('hidden', 'bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100', 'bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+
+    if (currentQuiz.isBoss) {
+        const bx = boss.col * TILE_SIZE + boss.width / 2;
+        const by = boss.row * TILE_SIZE + boss.height / 2;
+
+        if (isCorrect) {
+            sound.playSuccess();
+            boss.hp = Math.max(0, boss.hp - 1);
+            player.stats.solvedCount++;
+            player.stats.streak++;
+            const bossStrikeBonus = 350;
+            player.money += bossStrikeBonus;
+            spawnParticles(bx, by, '#f43f5e', 28, 160);
+
+            if (boss.hp <= 0) {
+                boss.defeated = true;
+                player.money += boss.reward;
+                addFloatingText(bx, by - 20, `БОСС ПОВЕРЖЕН! +${boss.reward} ₽`, '#34d399');
+                feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+                feedbackEl.innerHTML = `
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">🏆 БОСС ПОВЕРЖЕН! (+${boss.reward + bossStrikeBonus} ₽)</div>
+                    <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white flex flex-wrap items-center justify-between gap-2">
+                        <span>${item.ru} = <span class="text-emerald-300 font-bold">${item.fi}</span></span>
+                        <span id="quiz-feedback-tts-slot"></span>
+                    </div>
+                `;
+            } else {
+                addFloatingText(bx, by - 15, `Попадание! +${bossStrikeBonus} ₽ (${boss.hp} HP)`, '#fbbf24');
+                feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+                feedbackEl.innerHTML = `
+                    <div class="font-extrabold text-emerald-300 text-base mb-1">⚔️ Верно! +${bossStrikeBonus} ₽ (HP босса: ${boss.hp}/${boss.maxHp})</div>
+                    <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white flex flex-wrap items-center justify-between gap-2">
+                        <span>${item.ru} = <span class="text-emerald-300 font-bold">${item.fi}</span></span>
+                        <span id="quiz-feedback-tts-slot"></span>
+                    </div>
+                `;
+            }
+        } else {
+            sound.playError();
+            player.stats.streak = 0;
+            player.hull = Math.max(0, player.hull - 35);
+            player.vy = -210;
+            spawnParticles(player.x + 16, player.y + 16, '#f43f5e', 18, 120);
+            addFloatingText(player.x + 16, player.y - 10, 'Контрудар босса! -35 HP', '#fb7185');
+
+            feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+            feedbackEl.innerHTML = `
+                <div class="font-extrabold text-rose-300 text-base mb-1">💥 Неверно! Удар босса (-35 HP).</div>
+                <div class="text-xs text-rose-200 mb-1">Ваш ответ: <span class="mono line-through text-rose-300">${displayUserAnswer}</span></div>
+                <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white flex flex-wrap items-center justify-between gap-2">
+                    <span>Ответ: <span class="text-amber-300 font-bold">${expectedText}</span> (${item.ru} — ${item.fi})</span>
+                    <span id="quiz-feedback-tts-slot"></span>
+                </div>
+            `;
+        }
+    } else {
+        grid[currentQuiz.row][currentQuiz.col] = BLOCKS.EMPTY.id;
+        const wx = currentQuiz.col * TILE_SIZE + TILE_SIZE / 2;
+        const wy = currentQuiz.row * TILE_SIZE + TILE_SIZE / 2;
+
+        if (isCorrect) {
+            sound.playSuccess();
+            player.stats.solvedCount++;
+            player.stats.streak++;
+            const tierBonus = mode === 'write_ru' ? 150 : (mode === 'write_fi' ? 60 : 0);
+            const streakBonus = Math.min(player.stats.streak * 10, 100) + tierBonus;
+            player.money += streakBonus;
+
+            let cargoMsg = '';
+            if (player.cargo.length < getMaxCargo()) {
+                player.cargo.push(currentQuiz.block.id);
+                cargoMsg = `${currentQuiz.block.name} — в трюме!`;
+            } else {
+                cargoMsg = `Трюм полон, бонус +${streakBonus} ₽!`;
+            }
+
+            spawnParticles(wx, wy, currentQuiz.block.oreColor, 20, 135);
+            addFloatingText(wx, wy - 10, `+${currentQuiz.block.name}!`, '#34d399');
+
+            feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+            feedbackEl.innerHTML = `
+                <div class="font-extrabold text-emerald-300 text-base mb-1">✅ Верно! (+${streakBonus} ₽)</div>
+                <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1 flex flex-wrap items-center justify-between gap-2">
+                    <span><span class="text-emerald-300 font-bold">${item.ru}</span> — ${item.fi}</span>
+                    <span id="quiz-feedback-tts-slot"></span>
+                </div>
+                <div class="text-xs text-emerald-200">${cargoMsg}</div>
+            `;
+        } else {
+            sound.playError();
+            player.stats.streak = 0;
+            spawnParticles(wx, wy, '#64748b', 14, 90);
+            addFloatingText(wx, wy - 10, 'Руда рассыпалась!', '#fb7185');
+
+            feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+            feedbackEl.innerHTML = `
+                <div class="font-extrabold text-rose-300 text-base mb-1">❌ Неверно! Руда рассыпалась.</div>
+                <div class="text-xs text-rose-200 mb-1">Ваш ответ: <span class="mono line-through text-rose-300">${displayUserAnswer}</span></div>
+                <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white flex flex-wrap items-center justify-between gap-2">
+                    <span>Ответ: <span class="text-amber-300 font-bold">${expectedText}</span> (${item.ru} — ${item.fi})</span>
+                    <span id="quiz-feedback-tts-slot"></span>
+                </div>
+            `;
+        }
+    }
+
+    mountFeedbackRussianAudio(item.ru, isCorrect);
+
+    document.getElementById('btn-quiz-check').classList.add('hidden');
+    document.getElementById('btn-quiz-clear').classList.add('hidden');
+    document.getElementById('btn-quiz-continue').classList.remove('hidden');
+    if (mode === 'mcq') {
+        renderQuizMcq();
+    }
+    updateHUD();
+    saveGameState();
+}
+
+function closeQuizModal() {
+    if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
+    const wasBossWin = currentQuiz && currentQuiz.isBoss && boss.defeated;
+    document.getElementById('quiz-modal').classList.add('hidden');
+    currentQuiz = null;
+    isPaused = false;
+
+    if (player.hull <= 0) {
+        triggerGameOver('Корпус разрушен!', 'Ядерный босс уничтожил капсулу.');
+        return;
+    }
+
+    if (wasBossWin) {
+        gameOver = true;
+        isPaused = true;
+        saveGameState();
+        document.getElementById('gameover-icon').textContent = '🏆';
+        document.getElementById('gameover-title').textContent = 'Шахта покорена!';
+        document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-emerald-400';
+        document.getElementById('gameover-desc').textContent = `Босс побеждён! Награда: ${boss.reward} ₽.`;
+        document.getElementById('go-depth').textContent = `${player.stats.maxDepth} м`;
+        document.getElementById('go-solved').textContent = player.stats.solvedCount;
+        document.getElementById('gameover-modal').classList.remove('hidden');
+    } else {
+        saveGameState();
+    }
+}
+
+/**
+ * ============================================================================
+ * 7. ASEMAT (MYYNTI, HUOLTO, PÄIVITYKSET)
+ * ============================================================================
+ */
+function openStationModal(station) {
+    isPaused = true;
+    keys = {};
+    resetJoystick();
+    const modal = document.getElementById('station-modal');
+    document.getElementById('station-modal-icon').textContent = station.icon;
+    document.getElementById('station-modal-title').textContent = station.name;
+    document.getElementById('station-modal-subtitle').textContent = station.subtitle;
+    document.getElementById('station-money-display').textContent = player.money;
+
+    const body = document.getElementById('station-modal-body');
+    body.innerHTML = '';
+
+    if (station.id === 'sell') {
+        if (player.cargo.length === 0) {
+            body.innerHTML = `
+                <div class="bg-slate-800/70 rounded-xl p-6 text-center text-slate-400 border border-slate-700">
+                    <div class="text-3xl mb-2">📦</div>
+                    <p class="font-semibold text-slate-200">Трюм пуст!</p>
+                    <p class="text-xs mt-1">Добывайте руду под землёй и решайте задания.</p>
+                </div>
+            `;
+        } else {
+            const counts = {};
+            let totalValue = 0;
+            player.cargo.forEach(id => {
+                counts[id] = (counts[id] || 0) + 1;
+                totalValue += BLOCK_BY_ID[id].value;
+            });
+
+            let listHtml = '<div class="space-y-2">';
+            Object.entries(counts).forEach(([id, count]) => {
+                const b = BLOCK_BY_ID[id];
+                listHtml += `
+                    <div class="flex items-center justify-between bg-slate-800 px-3.5 py-2.5 rounded-xl border border-slate-700">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xl">${b.icon}</span>
+                            <div>
+                                <div class="font-bold text-sm text-white">${b.name}</div>
+                                <div class="text-xs text-slate-400">${count} шт. × ${b.value} ₽</div>
+                            </div>
+                        </div>
+                        <div class="mono font-bold text-emerald-400">${count * b.value} ₽</div>
+                    </div>
+                `;
+            });
+            listHtml += '</div>';
+
+            body.innerHTML = `
+                ${listHtml}
+                <button id="btn-sell-all" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl shadow-lg text-base transition">
+                    Продать всю руду (+${totalValue} ₽) 💰
+                </button>
+            `;
+
+            document.getElementById('btn-sell-all').onclick = () => {
+                sound.playCash();
+                player.money += totalValue;
+                player.cargo = [];
+                updateHUD();
+                saveGameState();
+                showToast(`Продано на ${totalValue} ₽!`, 'success');
+                openStationModal(station);
+            };
+        }
+    } else if (station.id === 'fuel') {
+        const missingFuel = Math.ceil(getMaxFuel() - player.fuel);
+        const fuelCost = Math.max(0, Math.ceil(missingFuel * 0.4));
+        const missingHull = Math.ceil(getMaxHull() - player.hull);
+        const hullCost = Math.max(0, Math.ceil(missingHull * 0.6));
+
+        body.innerHTML = `
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
+                <div>
+                    <div class="font-bold text-amber-400 text-base">⛽ Заправить топливо</div>
+                    <div class="text-xs text-slate-300">Текущее: ${Math.floor(player.fuel)} / ${getMaxFuel()} л</div>
+                </div>
+                <button id="btn-buy-fuel" class="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-extrabold px-4 py-2 rounded-xl text-sm transition" ${missingFuel <= 0 || player.money < fuelCost ? 'disabled' : ''}>
+                    ${missingFuel <= 0 ? 'Полный бак' : `Заправить (${fuelCost} ₽)`}
+                </button>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between">
+                <div>
+                    <div class="font-bold text-rose-400 text-base">🛡️ Ремонт корпуса</div>
+                    <div class="text-xs text-slate-300">Прочность: ${Math.floor(player.hull)} / ${getMaxHull()} HP</div>
+                </div>
+                <button id="btn-buy-repair" class="bg-rose-500 hover:bg-rose-400 disabled:bg-slate-700 disabled:text-slate-500 text-white font-extrabold px-4 py-2 rounded-xl text-sm transition" ${missingHull <= 0 || player.money < hullCost ? 'disabled' : ''}>
+                    ${missingHull <= 0 ? 'Целый' : `Починить (${hullCost} ₽)`}
+                </button>
+            </div>
+        `;
+
+        const btnFuel = document.getElementById('btn-buy-fuel');
+        if (btnFuel) {
+            btnFuel.onclick = () => {
+                if (player.money >= fuelCost && missingFuel > 0) {
+                    sound.playCash();
+                    player.money -= fuelCost;
+                    player.fuel = getMaxFuel();
+                    updateHUD();
+                    saveGameState();
+                    showToast('Бак заправлен!', 'success');
+                    openStationModal(station);
+                }
+            };
+        }
+        const btnRepair = document.getElementById('btn-buy-repair');
+        if (btnRepair) {
+            btnRepair.onclick = () => {
+                if (player.money >= hullCost && missingHull > 0) {
+                    sound.playCash();
+                    player.money -= hullCost;
+                    player.hull = getMaxHull();
+                    updateHUD();
+                    saveGameState();
+                    showToast('Корпус отремонтирован!', 'success');
+                    openStationModal(station);
+                }
+            };
+        }
+    } else if (station.id === 'upgrade') {
+        const categories = [
+            { key: 'drill', label: '⛏️ Бур', list: UPGRADES.drill },
+            { key: 'fuel', label: '⛽ Бак', list: UPGRADES.fuel },
+            { key: 'cargo', label: '📦 Трюм', list: UPGRADES.cargo },
+            { key: 'hull', label: '🛡️ Корпус', list: UPGRADES.hull }
+        ];
+
+        categories.forEach(cat => {
+            const curLvl = player.upgrades[cat.key];
+            const curItem = cat.list[curLvl - 1];
+            const nextItem = cat.list[curLvl];
+
+            const card = document.createElement('div');
+            card.className = 'bg-slate-800 p-3.5 rounded-xl border border-slate-700 flex items-center justify-between gap-3';
+            card.innerHTML = `
+                <div>
+                    <div class="text-xs font-bold text-indigo-400 uppercase">${cat.label}</div>
+                    <div class="font-bold text-white text-sm">${curItem.name}</div>
+                    ${nextItem ? `<div class="text-xs text-slate-400 mt-0.5">Далее: <span class="text-slate-200">${nextItem.name}</span></div>` : `<div class="text-xs text-emerald-400 mt-0.5">Максимум!</div>`}
+                </div>
+                <div>
+                    ${nextItem ? `
+                        <button data-upg="${cat.key}" class="upg-btn bg-indigo-500 hover:bg-indigo-400 disabled:bg-slate-700 disabled:text-slate-500 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition" ${player.money < nextItem.cost ? 'disabled' : ''}>
+                            Улучшить (${nextItem.cost} ₽)
+                        </button>
+                    ` : `<span class="bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 rounded-lg text-xs font-bold">MAX</span>`}
+                </div>
+            `;
+            body.appendChild(card);
+        });
+
+        body.querySelectorAll('.upg-btn').forEach(btn => {
+            btn.onclick = () => {
+                const key = btn.getAttribute('data-upg');
+                const curLvl = player.upgrades[key];
+                const nextItem = UPGRADES[key][curLvl];
+                if (nextItem && player.money >= nextItem.cost) {
+                    sound.playCash();
+                    player.money -= nextItem.cost;
+                    player.upgrades[key]++;
+                    if (key === 'fuel') player.fuel = getMaxFuel();
+                    if (key === 'hull') player.hull = getMaxHull();
+                    updateHUD();
+                    saveGameState();
+                    showToast(`Улучшено: ${nextItem.name}!`, 'success');
+                    openStationModal(station);
+                }
+            };
+        });
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeStationModal() {
+    document.getElementById('station-modal').classList.add('hidden');
+    isPaused = false;
+    saveGameState();
+}
+
+/**
+ * ============================================================================
+ * 8. FYSIIKKA, LIIKE, PORAUS JA BOSSI-KOHTAAMINEN
+ * ============================================================================
+ */
+function getTileAt(col, row) {
+    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return BLOCKS.BEDROCK;
+    return BLOCK_BY_ID[grid[row][col]] || BLOCKS.EMPTY;
+}
+
+function checkCollision(nx, ny) {
+    const margin = 5;
+    const left = Math.floor((nx + margin) / TILE_SIZE);
+    const right = Math.floor((nx + player.width - margin) / TILE_SIZE);
+    const top = Math.floor((ny + margin) / TILE_SIZE);
+    const bottom = Math.floor((ny + player.height - 2) / TILE_SIZE);
+
+    for (let r = top; r <= bottom; r++) {
+        for (let c = left; c <= right; c++) {
+            if (getTileAt(c, r).solid) return true;
+        }
+    }
+    return false;
+}
+
+function checkBossCollision(nx, ny) {
+    if (boss.defeated) return false;
+    const bx = boss.col * TILE_SIZE;
+    const by = boss.row * TILE_SIZE;
+    return (
+        nx < bx + boss.width &&
+        nx + player.width > bx &&
+        ny < by + boss.height &&
+        ny + player.height > by
+    );
+}
+
+function isGrounded() {
+    const margin = 5;
+    const left = Math.floor((player.x + margin) / TILE_SIZE);
+    const right = Math.floor((player.x + player.width - margin) / TILE_SIZE);
+    const bottom = Math.floor((player.y + player.height + 2) / TILE_SIZE);
+
+    for (let c = left; c <= right; c++) {
+        if (getTileAt(c, bottom).solid) return true;
+    }
+    return false;
+}
+
+function triggerGameOver(reasonTitle, reasonDesc) {
+    gameOver = true;
+    isPaused = true;
+    resetJoystick();
+    saveGameState();
+    document.getElementById('gameover-icon').textContent = '💥';
+    document.getElementById('gameover-title').className = 'text-2xl font-extrabold text-rose-400';
+    document.getElementById('gameover-title').textContent = reasonTitle;
+    document.getElementById('gameover-desc').textContent = reasonDesc;
+    document.getElementById('go-depth').textContent = `${player.stats.maxDepth} m`;
+    document.getElementById('go-solved').textContent = player.stats.solvedCount;
+    document.getElementById('gameover-modal').classList.remove('hidden');
+}
+
+function update(dt) {
+    if (isPaused || gameOver) return;
+
+    saveTimer += dt;
+    if (saveTimer >= 3) {
+        saveTimer = 0;
+        saveGameState();
+    }
+
+    const leftPressed = keys['ArrowLeft'] || keys['KeyA'] || joystick.x < -0.28;
+    const rightPressed = keys['ArrowRight'] || keys['KeyD'] || joystick.x > 0.28;
+    const upPressed = keys['ArrowUp'] || keys['KeyW'] || joystick.y < -0.32;
+    const downPressed = keys['ArrowDown'] || keys['KeyS'] || joystick.y > 0.35;
+
+    const analogStrengthX = Math.max(
+        (keys['ArrowLeft'] || keys['KeyA'] || keys['ArrowRight'] || keys['KeyD']) ? 1 : 0,
+        Math.min(1, Math.abs(joystick.x))
+    );
+
+    const grounded = isGrounded();
+    const moveAccel = grounded ? 680 : 420;
+    const maxVx = 210 * (analogStrengthX > 0 ? Math.max(0.45, analogStrengthX) : 1);
+    const gravity = 460;
+    const thrustAccel = 740 * (upPressed && joystick.y < -0.32 ? Math.max(0.65, Math.min(1, -joystick.y)) : 1);
+
+    if (!boss.defeated) {
+        const minBossCol = CHAMBER_LEFT_COL + 1;
+        const maxBossCol = CHAMBER_RIGHT_COL - 3.5;
+        const t = performance.now() * 0.0012;
+        boss.col = minBossCol + ((Math.sin(t) + 1) / 2) * (maxBossCol - minBossCol);
+        boss.row = CHAMBER_FLOOR_ROW - 3;
+    }
+
+    if (leftPressed || rightPressed || upPressed || player.drilling.active) {
+        let burnRate = upPressed ? 1.8 : 0.75;
+        if (player.drilling.active) {
+            const drillingBlock = getTileAt(player.drilling.targetCol, player.drilling.targetRow);
+            burnRate = 0.95 * (drillingBlock.fuelMult || 1.0);
+        }
+        player.fuel = Math.max(0, player.fuel - burnRate * dt);
+        if (player.fuel <= 0) {
+            triggerGameOver('Закончилось топливо!', 'Двигатель заглох под землёй.');
+            return;
+        }
+    }
+
+    if (player.drilling.active) {
+        const c = player.drilling.targetCol;
+        const r = player.drilling.targetRow;
+        const block = getTileAt(c, r);
+
+        if (!block.solid || block.unbreakable) {
+            player.drilling.active = false;
+            player.drilling.progress = 0;
+        } else {
+            sound.playDrill();
+            player.drilling.progress += dt * getDrillSpeed();
+
+            const targetCenterX = c * TILE_SIZE + TILE_SIZE / 2;
+            const targetCenterY = r * TILE_SIZE + TILE_SIZE / 2;
+            const desiredX = targetCenterX - player.width / 2;
+            const desiredY = targetCenterY - player.height / 2;
+
+            const playerRow = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+            if (r > playerRow) {
+                player.x += (desiredX - player.x) * Math.min(1, 10 * dt);
+                const maxStepY = r * TILE_SIZE - player.height + 6;
+                player.y = Math.min(maxStepY, player.y + 28 * dt);
+            } else {
+                player.y += (desiredY - player.y) * Math.min(1, 10 * dt);
+                const dir = c > Math.floor((player.x + player.width / 2) / TILE_SIZE) ? 1 : -1;
+                const edgeX = dir === 1 ? c * TILE_SIZE - player.width + 4 : (c + 1) * TILE_SIZE - 4;
+                player.x += (edgeX - player.x) * Math.min(1, 10 * dt);
+            }
+
+            if (Math.random() < 0.5) {
+                spawnParticles(targetCenterX, targetCenterY, block.oreColor || block.color, 2, 70);
+            }
+
+            if (upPressed) {
+                player.drilling.active = false;
+                player.drilling.progress = 0;
+            } else if (player.drilling.progress >= player.drilling.duration) {
+                player.drilling.active = false;
+                player.drilling.progress = 0;
+
+                if (block.isOre) {
+                    triggerQuiz({ isBoss: false, col: c, row: r, block });
+                    return;
+                } else {
+                    grid[r][c] = BLOCKS.EMPTY.id;
+                    player.x = desiredX;
+                    player.y = desiredY;
+                    player.vx = 0;
+                    player.vy = 0;
+                    spawnParticles(targetCenterX, targetCenterY, block.color, 12, 95);
+                    saveGameState();
+                }
+            }
+        }
+    } else {
+        if (leftPressed) {
+            player.vx -= moveAccel * dt;
+            player.facing = -1;
+        } else if (rightPressed) {
+            player.vx += moveAccel * dt;
+            player.facing = 1;
+        } else {
+            player.vx *= grounded ? Math.pow(0.001, dt) : Math.pow(0.15, dt);
+            if (Math.abs(player.vx) < 5) player.vx = 0;
+        }
+        player.vx = Math.max(-maxVx, Math.min(maxVx, player.vx));
+
+        if (upPressed) {
+            player.vy -= thrustAccel * dt;
+            sound.playThrust();
+            if (Math.random() < 0.7) {
+                spawnParticles(
+                    player.x + player.width / 2 + (Math.random() - 0.5) * 10,
+                    player.y + player.height,
+                    Math.random() < 0.5 ? '#f59e0b' : '#ef4444',
+                    1,
+                    60
+                );
+            }
+        } else {
+            player.vy += gravity * dt;
+        }
+        player.vy = Math.max(-290, Math.min(480, player.vy));
+
+        let nextX = player.x + player.vx * dt;
+        nextX = Math.max(0, Math.min(GRID_COLS * TILE_SIZE - player.width, nextX));
+
+        if (checkBossCollision(nextX, player.y)) {
+            if (getDrillPower() < 3) {
+                player.vx = -player.facing * 180;
+                showToast('Нужен Алмазный бур (Ур. 3)!', 'warn');
+            } else {
+                player.vx = -player.facing * 140;
+                triggerQuiz({ isBoss: true });
+                return;
+            }
+        }
+
+        if (!checkCollision(nextX, player.y)) {
+            player.x = nextX;
+        } else {
+            if (grounded && (leftPressed || rightPressed)) {
+                const dir = leftPressed ? -1 : 1;
+                const checkCol = Math.floor((player.x + player.width / 2 + dir * (player.width / 2 + 6)) / TILE_SIZE);
+                const checkRow = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+                tryStartDrill(checkCol, checkRow);
+            }
+            player.vx = 0;
+        }
+
+        let nextY = player.y + player.vy * dt;
+        nextY = Math.max(0, Math.min(CHAMBER_FLOOR_ROW * TILE_SIZE - player.height, nextY));
+
+        if (checkBossCollision(player.x, nextY)) {
+            if (getDrillPower() < 3) {
+                player.vy = -200;
+                showToast('Нужен Алмазный бур (Ур. 3)!', 'warn');
+            } else {
+                player.vy = -170;
+                triggerQuiz({ isBoss: true });
+                return;
+            }
+        }
+
+        if (!checkCollision(player.x, nextY)) {
+            player.y = nextY;
+        } else {
+            if (player.vy > 340) {
+                const dmg = Math.floor((player.vy - 320) * 0.25);
+                player.hull = Math.max(0, player.hull - dmg);
+                sound.playError();
+                addFloatingText(player.x + 16, player.y, `-${dmg} HP`, '#fb7185');
+                if (player.hull <= 0) {
+                    triggerGameOver('Корпус разрушен!', 'Жёсткая посадка повредила капсулу.');
+                    return;
+                }
+            }
+
+            if (downPressed && player.vy >= 0) {
+                const checkCol = Math.floor((player.x + player.width / 2) / TILE_SIZE);
+                const checkRow = Math.floor((player.y + player.height + 6) / TILE_SIZE);
+                tryStartDrill(checkCol, checkRow);
+            }
+            player.vy = 0;
+        }
+    }
+
+    const currentDepth = Math.max(0, Math.floor((player.y + player.height - SURFACE_ROW * TILE_SIZE) / TILE_SIZE * 5));
+    if (currentDepth > player.stats.maxDepth) {
+        player.stats.maxDepth = currentDepth;
+    }
+
+    checkStationProximity();
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 120 * dt;
+        p.life -= dt;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.y += ft.vy * dt;
+        ft.life -= dt;
+        if (ft.life <= 0) floatingTexts.splice(i, 1);
+    }
+
+    updateHUD();
+}
+
+function tryStartDrill(col, row) {
+    if (col < 0 || col >= GRID_COLS || row < SURFACE_ROW || row >= CHAMBER_FLOOR_ROW) return;
+    const block = getTileAt(col, row);
+    if (!block.solid || block.unbreakable) return;
+
+    if (block.hardness > getDrillPower()) {
+        if (Math.random() < 0.2) {
+            showToast(`Слишком твёрдо (${block.name})! Улучши бур в Мастерской.`, 'warn');
+        }
+        return;
+    }
+
+    if (block.isOre && player.cargo.length >= getMaxCargo()) {
+        showToast('Трюм полон — бонусные рубли всё равно начислятся!', 'warn');
+    }
+
+    player.drilling.active = true;
+    player.drilling.targetCol = col;
+    player.drilling.targetRow = row;
+    player.drilling.progress = 0;
+    player.drilling.duration = block.drillTime || (0.45 * block.hardness);
+}
+
+function checkStationProximity() {
+    const playerCol = (player.x + player.width / 2) / TILE_SIZE;
+    const playerRow = (player.y + player.height) / TILE_SIZE;
+
+    const promptEl = document.getElementById('station-prompt');
+    const mobileBtn = document.getElementById('mobile-action-btn');
+
+    if (Math.abs(playerRow - SURFACE_ROW) < 1.2) {
+        const found = STATIONS.find(s => playerCol >= s.colStart && playerCol <= s.colEnd + 1);
+        if (found) {
+            activeStation = found;
+            document.getElementById('station-prompt-icon').textContent = found.icon;
+            document.getElementById('station-prompt-text').textContent = `${found.name} (Enter)`;
+            promptEl.classList.remove('hidden');
+            mobileBtn.textContent = found.icon;
+            mobileBtn.classList.remove('hidden');
+            return;
+        }
+    }
+
+    activeStation = null;
+    promptEl.classList.add('hidden');
+    mobileBtn.classList.add('hidden');
+}
+
+function updateHUD() {
+    document.getElementById('hud-money').textContent = player.money;
+    const currentDepth = Math.max(0, Math.floor((player.y + player.height - SURFACE_ROW * TILE_SIZE) / TILE_SIZE * 5));
+    document.getElementById('hud-depth').textContent = `${currentDepth} м`;
+    document.getElementById('hud-streak').textContent = `${player.stats.streak} 🔥`;
+
+    const maxF = getMaxFuel();
+    document.getElementById('hud-fuel-text').textContent = `${Math.ceil(player.fuel)}/${maxF}`;
+    document.getElementById('hud-fuel-bar').style.width = `${(player.fuel / maxF) * 100}%`;
+
+    const maxC = getMaxCargo();
+    document.getElementById('hud-cargo-text').textContent = `${player.cargo.length}/${maxC}`;
+    document.getElementById('hud-cargo-bar').style.width = `${(player.cargo.length / maxC) * 100}%`;
+
+    const maxH = getMaxHull();
+    document.getElementById('hud-hull-text').textContent = `${Math.ceil(player.hull)}/${maxH}`;
+    document.getElementById('hud-hull-bar').style.width = `${(player.hull / maxH) * 100}%`;
+}
+
+/**
+ * ============================================================================
+ * 9. PIIRTÄMINEN (CANVAS RENDERING — MYÖS 1440P / 4K LEVEÄT NÄYTÖT)
+ * ============================================================================
+ */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    canvas.width = Math.max(320, parent.clientWidth);
+    canvas.height = Math.max(240, parent.clientHeight);
+}
+window.addEventListener('resize', resizeCanvas);
+
+function draw() {
+    if (!Array.isArray(grid) || grid.length === 0) return;
+    const w = canvas.width;
+    const h = canvas.height;
+
+    const worldW = GRID_COLS * TILE_SIZE;
+    const worldH = GRID_ROWS * TILE_SIZE;
+
+    let camX;
+    if (w >= worldW) {
+        camX = -(w - worldW) / 2;
+    } else {
+        camX = player.x + player.width / 2 - w / 2;
+        camX = Math.max(0, Math.min(worldW - w, camX));
+    }
+
+    let camY = player.y + player.height / 2 - h / 2;
+    camY = Math.max(0, Math.min(Math.max(0, worldH - h), camY));
+
+    ctx.fillStyle = '#070b14';
+    ctx.fillRect(0, 0, w, h);
+
+    const worldLeftScreen = -camX;
+    const worldRightScreen = worldW - camX;
+    const skyY = SURFACE_ROW * TILE_SIZE - camY;
+
+    if (worldLeftScreen > 0 || worldRightScreen < w) {
+        ctx.fillStyle = '#0d1322';
+        if (worldLeftScreen > 0) {
+            ctx.fillRect(0, 0, worldLeftScreen, h);
+        }
+        if (worldRightScreen < w) {
+            ctx.fillRect(worldRightScreen, 0, w - worldRightScreen, h);
+        }
+
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2;
+        if (worldLeftScreen > 0) {
+            ctx.beginPath();
+            ctx.moveTo(worldLeftScreen, 0);
+            ctx.lineTo(worldLeftScreen, h);
+            ctx.stroke();
+        }
+        if (worldRightScreen < w) {
+            ctx.beginPath();
+            ctx.moveTo(worldRightScreen, 0);
+            ctx.lineTo(worldRightScreen, h);
+            ctx.stroke();
+        }
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(Math.max(0, worldLeftScreen), 0, Math.min(w, worldW), h);
+    ctx.clip();
+
+    const skyGrad = ctx.createLinearGradient(0, Math.min(0, skyY - 250), 0, Math.max(100, skyY + 60));
+    skyGrad.addColorStop(0, '#0f172a');
+    skyGrad.addColorStop(0.5, '#1e3a8a');
+    skyGrad.addColorStop(1, '#38bdf8');
+    ctx.fillStyle = '#090d16';
+    ctx.fillRect(worldLeftScreen, 0, worldW, h);
+
+    if (skyY > 0) {
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(worldLeftScreen, 0, worldW, Math.min(h, skyY));
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(worldLeftScreen, skyY);
+        for (let mx = 0; mx <= worldW + 120; mx += 120) {
+            const mh = 45 + Math.sin((mx + camX * 0.3) * 0.01) * 30;
+            ctx.lineTo(worldLeftScreen + mx, skyY - mh);
+        }
+        ctx.lineTo(worldLeftScreen + worldW, skyY);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    ctx.translate(-camX, -camY);
+
+    STATIONS.forEach(st => {
+        const sx = st.colStart * TILE_SIZE;
+        const sw = (st.colEnd - st.colStart + 1) * TILE_SIZE;
+        const sh = TILE_SIZE * 1.45;
+        const sy = SURFACE_ROW * TILE_SIZE - sh;
+
+        ctx.fillStyle = '#1e293b';
+        ctx.strokeStyle = st.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(sx + 4, sy, sw - 8, sh, [8, 8, 0, 0]);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = st.roofColor;
+        ctx.beginPath();
+        ctx.roundRect(sx, sy - 10, sw, 14, 6);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${st.icon} ${st.name}`, sx + sw / 2, sy + 24);
+
+        ctx.fillStyle = st.color + '44';
+        ctx.fillRect(sx + 8, SURFACE_ROW * TILE_SIZE - 5, sw - 16, 5);
+    });
+
+    const startCol = Math.max(0, Math.floor(camX / TILE_SIZE));
+    const endCol = Math.min(GRID_COLS - 1, Math.ceil((camX + w) / TILE_SIZE));
+    const startRow = Math.max(0, Math.floor(camY / TILE_SIZE));
+    const endRow = Math.min(GRID_ROWS - 1, Math.ceil((camY + h) / TILE_SIZE));
+
+    for (let r = startRow; r <= endRow; r++) {
+        for (let c = startCol; c <= endCol; c++) {
+            const id = grid[r][c];
+            if (id === BLOCKS.EMPTY.id) {
+                if (r >= SURFACE_ROW) {
+                    const inBossChamber = r >= CHAMBER_TOP_ROW && r < CHAMBER_FLOOR_ROW && c >= CHAMBER_LEFT_COL && c <= CHAMBER_RIGHT_COL;
+                    ctx.fillStyle = inBossChamber ? '#1e0b16' : (r > CHAMBER_TOP_ROW - 12 ? '#180d14' : '#111622');
+                    ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+                continue;
+            }
+
+            const block = BLOCK_BY_ID[id] || BLOCKS.DIRT;
+            const bx = c * TILE_SIZE;
+            const by = r * TILE_SIZE;
+
+            ctx.fillStyle = block.color;
+            ctx.fillRect(bx, by, TILE_SIZE, TILE_SIZE);
+
+            if (r === SURFACE_ROW) {
+                ctx.fillStyle = '#16a34a';
+                ctx.fillRect(bx, by, TILE_SIZE, 6);
+            }
+
+            if (block.id === BLOCKS.BEDROCK.id) {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(bx + 4, by + 4, TILE_SIZE - 8, 6);
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(bx + 1, by + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+                continue;
+            }
+
+            ctx.strokeStyle = block.border || 'rgba(0,0,0,0.25)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(bx + 0.5, by + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
+
+            if (block.isOre) {
+                ctx.save();
+                ctx.shadowColor = block.glow;
+                ctx.shadowBlur = (block.id === BLOCKS.NOBELIUM.id || block.id === BLOCKS.SEABORGIUM.id) ? 14 : 8;
+                ctx.fillStyle = block.oreColor;
+
+                const offsets = [
+                    { ox: 12, oy: 14, rad: 5 },
+                    { ox: 28, oy: 18, rad: 6 },
+                    { ox: 19, oy: 30, rad: 5.5 }
+                ];
+                offsets.forEach(o => {
+                    ctx.beginPath();
+                    ctx.arc(bx + o.ox, by + o.oy, o.rad, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                if (block.requiresRussianWrite) {
+                    ctx.strokeStyle = '#fdf4ff';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(bx + 5, by + 5, TILE_SIZE - 10, TILE_SIZE - 10);
+                }
+                ctx.restore();
+            } else if (block.id === BLOCKS.ROCK.id || block.id === BLOCKS.HARD_ROCK.id) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.beginPath();
+                ctx.moveTo(bx + 8, by + 10);
+                ctx.lineTo(bx + 20, by + 22);
+                ctx.lineTo(bx + 34, by + 16);
+                ctx.stroke();
+            }
+        }
+    }
+
+    if (!boss.defeated) {
+        drawBoss(ctx);
+    }
+
+    if (player.drilling.active) {
+        const dx = player.drilling.targetCol * TILE_SIZE;
+        const dy = player.drilling.targetRow * TILE_SIZE;
+        const pct = Math.min(1, player.drilling.progress / player.drilling.duration);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.fillRect(dx + 4, dy + TILE_SIZE - 10, TILE_SIZE - 8, 6);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(dx + 4, dy + TILE_SIZE - 10, (TILE_SIZE - 8) * pct, 6);
+    }
+
+    drawPlayerPod(ctx);
+
+    particles.forEach(p => {
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    floatingTexts.forEach(ft => {
+        ctx.globalAlpha = Math.min(1, ft.life);
+        ctx.font = 'bold 13px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#000000';
+        ctx.fillText(ft.text, ft.x + 1, ft.y + 1);
+        ctx.fillStyle = ft.color;
+        ctx.fillText(ft.text, ft.x, ft.y);
+    });
+    ctx.globalAlpha = 1;
+
+    ctx.restore();
+}
+
+function drawBoss(ctx) {
+    const bx = boss.col * TILE_SIZE;
+    const by = boss.row * TILE_SIZE;
+    const pulse = Math.sin(performance.now() * 0.006) * 3;
+
+    ctx.save();
+    ctx.translate(bx + boss.width / 2, by + boss.height / 2 + pulse * 0.35);
+
+    ctx.shadowColor = '#f43f5e';
+    ctx.shadowBlur = 22;
+
+    ctx.fillStyle = '#31102f';
+    ctx.strokeStyle = '#f43f5e';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.roundRect(-boss.width / 2, -boss.height / 2, boss.width, boss.height, 16);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = '#fb7185';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-boss.width / 2 + 10, -boss.height / 2 + 10, boss.width - 20, boss.height - 20);
+
+    ctx.fillStyle = '#fda4af';
+    ctx.beginPath();
+    ctx.arc(-26, -8, 10, 0, Math.PI * 2);
+    ctx.arc(26, -8, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#e11d48';
+    ctx.beginPath();
+    ctx.arc(-26, -8, 4.5, 0, Math.PI * 2);
+    ctx.arc(26, -8, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.font = 'bold 13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fda4af';
+    ctx.fillText(`👾 ${boss.name} (${boss.hp}/${boss.maxHp} HP)`, 0, -boss.height / 2 - 20);
+
+    const barW = 110;
+    const barH = 8;
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(-barW / 2, -boss.height / 2 - 13, barW, barH);
+    ctx.fillStyle = '#f43f5e';
+    ctx.fillRect(-barW / 2, -boss.height / 2 - 13, barW * (boss.hp / boss.maxHp), barH);
+
+    ctx.restore();
+}
+
+function drawPlayerPod(ctx) {
+    const px = player.x;
+    const py = player.y;
+    const pw = player.width;
+    const ph = player.height;
+
+    ctx.save();
+    ctx.translate(px + pw / 2, py + ph / 2);
+
+    if (player.drilling.active) {
+        ctx.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+    }
+
+    ctx.fillStyle = '#1e293b';
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(-pw / 2 + 2, ph / 2 - 8, pw - 4, 8, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#f59e0b';
+    ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-pw / 2 + 3, -ph / 2 + 4, pw - 6, ph - 11, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.roundRect(player.facing === 1 ? 0 : -11, -ph / 2 + 7, 11, 9, 4);
+    ctx.fill();
+
+    ctx.fillStyle = '#cbd5e1';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.2;
+
+    if (player.drilling.active && player.drilling.targetRow > Math.floor((py + ph / 2) / TILE_SIZE)) {
+        ctx.beginPath();
+        ctx.moveTo(-7, ph / 2 - 2);
+        ctx.lineTo(7, ph / 2 - 2);
+        ctx.lineTo(0, ph / 2 + 9);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    } else {
+        const dir = player.facing;
+        ctx.beginPath();
+        ctx.moveTo(dir * (pw / 2 - 3), -4);
+        ctx.lineTo(dir * (pw / 2 - 3), 8);
+        ctx.lineTo(dir * (pw / 2 + 8), 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+/**
+ * ============================================================================
+ * 10. OHJAIMET (WASD + NUOLINÄPPÄIMET + ANALOGINEN TATTI) JA PÄÄSILMUKKA
+ * ============================================================================
+ */
+const joystick = { active: false, x: 0, y: 0, pointerId: null };
+const joystickZone = document.getElementById('joystick-zone');
+const joystickKnob = document.getElementById('joystick-knob');
+const JOYSTICK_MAX_RADIUS = 34;
+
+function resetJoystick() {
+    joystick.active = false;
+    joystick.x = 0;
+    joystick.y = 0;
+    joystick.pointerId = null;
+    if (joystickKnob) {
+        joystickKnob.style.transform = 'translate(0px, 0px)';
+    }
+}
+
+function updateJoystickFromClient(clientX, clientY) {
+    const rect = joystickZone.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = clientX - cx;
+    let dy = clientY - cy;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > JOYSTICK_MAX_RADIUS) {
+        dx = (dx / dist) * JOYSTICK_MAX_RADIUS;
+        dy = (dy / dist) * JOYSTICK_MAX_RADIUS;
+    }
+
+    joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+    joystick.x = dx / JOYSTICK_MAX_RADIUS;
+    joystick.y = dy / JOYSTICK_MAX_RADIUS;
+}
+
+if (joystickZone) {
+    joystickZone.addEventListener('pointerdown', e => {
+        if (isPaused || gameOver) return;
+        e.preventDefault();
+        joystickZone.setPointerCapture(e.pointerId);
+        joystick.active = true;
+        joystick.pointerId = e.pointerId;
+        updateJoystickFromClient(e.clientX, e.clientY);
+    });
+
+    joystickZone.addEventListener('pointermove', e => {
+        if (!joystick.active || e.pointerId !== joystick.pointerId) return;
+        e.preventDefault();
+        updateJoystickFromClient(e.clientX, e.clientY);
+    });
+
+    const endStick = e => {
+        if (e.pointerId === joystick.pointerId) {
+            resetJoystick();
+        }
+    };
+    joystickZone.addEventListener('pointerup', endStick);
+    joystickZone.addEventListener('pointercancel', endStick);
+}
+
+window.addEventListener('keydown', e => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        if (!isPaused) e.preventDefault();
+    }
+    keys[e.code] = true;
+
+    if (currentQuiz && !currentQuiz.answered) {
+        if (e.code === 'Enter') {
+            e.preventDefault();
+            checkQuizAnswer();
+            return;
+        }
+        if (currentQuiz.mode === 'mcq' && ['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code)) {
+            const idx = parseInt(e.code.replace('Digit', ''), 10) - 1;
+            if (currentQuiz.mcqOptions && currentQuiz.mcqOptions[idx]) {
+                e.preventDefault();
+                currentQuiz.selectedOption = currentQuiz.mcqOptions[idx];
+                renderQuizMcq();
+                if (autoRussianSpeech) {
+                    speakRussian(currentQuiz.selectedOption, { retryOnGesture: true });
+                }
+            }
+            return;
+        }
+    }
+
+    if ((e.code === 'Enter' || e.code === 'Space') && !isPaused && activeStation) {
+        openStationModal(activeStation);
+    }
+    if (e.code === 'Escape') {
+        if (!document.getElementById('station-modal').classList.contains('hidden')) closeStationModal();
+        if (!document.getElementById('help-modal').classList.contains('hidden')) {
+            document.getElementById('help-modal').classList.add('hidden');
+            isPaused = false;
+        }
+    }
+});
+
+window.addEventListener('keyup', e => {
+    keys[e.code] = false;
+});
+
+window.addEventListener('pagehide', saveGameState);
+window.addEventListener('beforeunload', saveGameState);
+
+document.getElementById('mobile-action-btn').onclick = () => {
+    if (activeStation && !isPaused) openStationModal(activeStation);
+};
+
+document.getElementById('btn-enter-station').onclick = () => {
+    if (activeStation && !isPaused) openStationModal(activeStation);
+};
+document.getElementById('btn-close-station').onclick = closeStationModal;
+document.getElementById('btn-close-station-bottom').onclick = closeStationModal;
+
+document.getElementById('btn-rule-help').onclick = () => {
+    isPaused = true;
+    resetJoystick();
+    document.getElementById('help-modal').classList.remove('hidden');
+};
+document.getElementById('btn-close-help').onclick = () => {
+    document.getElementById('help-modal').classList.add('hidden');
+    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden') && !gameOver) isPaused = false;
+};
+document.getElementById('btn-close-help-bottom').onclick = () => {
+    document.getElementById('help-modal').classList.add('hidden');
+    if (!currentQuiz && document.getElementById('station-modal').classList.contains('hidden') && !gameOver) isPaused = false;
+};
+
+document.getElementById('btn-auto-tts').onclick = () => {
+    autoRussianSpeech = !autoRussianSpeech;
+    updateAutoSpeechButton();
+    saveGameState();
+    showToast(autoRussianSpeech ? 'Автозвук ВКЛ' : 'Автозвук ВЫКЛ', 'info');
+};
+
+document.getElementById('btn-mute').onclick = (e) => {
+    const muted = sound.toggleMute();
+    e.target.textContent = muted ? '🔇' : '🔊';
+};
+
+document.getElementById('btn-new-game-top').onclick = () => {
+    startNewGame(true);
+};
+
+document.getElementById('quiz-rule-hint-btn').onclick = () => {
+    document.getElementById('quiz-inline-hint').classList.toggle('hidden');
+};
+
+document.getElementById('btn-quiz-clear').onclick = () => {
+    if (!currentQuiz || currentQuiz.answered) return;
+    if (currentQuiz.mode === 'mcq') {
+        currentQuiz.selectedOption = null;
+        renderQuizMcq();
+    } else {
+        const inp = document.getElementById('quiz-free-input');
+        inp.value = '';
+        inp.focus();
+    }
+};
+
+document.getElementById('btn-quiz-check').onclick = checkQuizAnswer;
+document.getElementById('btn-quiz-continue').onclick = closeQuizModal;
+
+document.getElementById('btn-rescue').onclick = () => {
+    player.money = Math.max(0, player.money - 50);
+    player.x = 17 * TILE_SIZE;
+    player.y = (SURFACE_ROW - 1) * TILE_SIZE;
+    player.vx = 0;
+    player.vy = 0;
+    player.fuel = Math.max(25, getMaxFuel() * 0.35);
+    player.hull = Math.max(30, getMaxHull() * 0.5);
+    gameOver = false;
+    isPaused = false;
+    document.getElementById('gameover-modal').classList.add('hidden');
+    updateHUD();
+    saveGameState();
+    showToast('Капсула эвакуирована на поверхность!', 'info');
+};
+
+document.getElementById('btn-new-game').onclick = () => startNewGame(true);
+
+let lastTimestamp = 0;
+let initializedApp = false;
+
+function initAppOnce() {
+    if (initializedApp) return;
+    initializedApp = true;
+    resizeCanvas();
+    const loaded = loadGameState();
+    if (loaded) {
+        showToast('Сохранение загружено!', 'success');
+    } else {
+        startNewGame(false);
+        showToast('Добро пожаловать в шахту! • Tervetuloa kaivokseen!', 'info');
+    }
+    requestAnimationFrame(gameLoop);
+}
+
+function gameLoop(timestamp) {
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000);
+    lastTimestamp = timestamp;
+
+    try {
+        update(dt);
+        draw();
+    } catch (err) {
+        // Estetään yksittäisen ruudun virhettä kaatamasta silmukkaa
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+window.addEventListener('DOMContentLoaded', initAppOnce);
+window.addEventListener('load', initAppOnce);
+</script>
+</body>
+</html>
