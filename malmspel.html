@@ -201,6 +201,7 @@
                             Han sa, att
                         </span>
                         <div id="quiz-selected-words" class="flex flex-wrap items-center gap-2"></div>
+                        <span id="quiz-suffix-bank" class="hidden bg-indigo-900/60 text-indigo-200 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base"></span>
                     </div>
                 </div>
 
@@ -210,7 +211,7 @@
                 </div>
             </div>
 
-            <!-- Lauseen rakennusalue: VAPAA KIRJOITUSTILA (Nobelium & Bossi) -->
+            <!-- Lauseen rakennusalue: VAPAA KIRJOITUSTILA (Nobelium, Seaborgium & Bossi) -->
             <div id="quiz-free-mode" class="hidden flex-col gap-2">
                 <label for="quiz-free-input" id="quiz-free-label" class="text-xs font-semibold text-fuchsia-300">
                     Skriv bisatsens fortsättning själv (kirjoita sivulauseen loppuosa itse — ei valmiita sanoja!):
@@ -229,6 +230,7 @@
                         placeholder="Skriv här på svenska (KonSuKieLiPre)..."
                         class="flex-1 bg-slate-900 text-white placeholder-slate-500 border border-slate-700 focus:border-amber-400 focus:outline-none rounded-lg px-3.5 py-2 text-sm sm:text-base font-medium"
                     />
+                    <span id="quiz-suffix-free" class="hidden bg-indigo-900/70 text-indigo-200 border border-indigo-500/40 px-3 py-2 rounded-lg font-bold text-sm sm:text-base shrink-0"></span>
                 </div>
                 <p class="text-[11px] text-slate-400">
                     Tips: Muista sivulauseen sanajärjestys (<em>subjekti + inte/aldrig + alltid/ofta/nu/redan + verb</em>). Paina <kbd class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600 text-slate-200">Enter</kbd> tarkistaaksesi.
@@ -274,7 +276,7 @@
             <div id="station-modal-body" class="flex flex-col gap-3"></div>
 
             <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
-                <div class="text-sm font-bold text-emerald-400">Kassa: SEK<span id="station-money-display">150</span></div>
+                <div class="text-sm font-bold text-emerald-400">Kassa: SEK <span id="station-money-display">150</span></div>
                 <button id="btn-close-station-bottom" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-xl text-sm">Stäng / Sulje (Esc)</button>
             </div>
         </div>
@@ -303,18 +305,18 @@
                         <span class="text-purple-300">Pre</span>dikat (böjt verb)
                     </p>
                     <p class="text-slate-300 text-xs sm:text-sm">
-                        I en bisats på svenska placeras <em>inte</em> och satsadverbialen <strong>FÖRE</strong> det böjda verbet (predikatet) — till skillnad från huvudsatsen!
+                        Ruotsin sivulauseessa kieltosana, esimerkiksi <em>inte</em> ja <strong>liikkuvat määreet</strong> laitetaan ennen predikaattiverbiä. Juuri toisin, kuin päälauseessa!
                     </p>
                     <div class="mt-3 bg-slate-900/90 p-3 rounded-lg border border-slate-700 font-mono text-xs space-y-1.5">
-                        <div class="text-slate-400">Huvudsats: Han <span class="text-purple-300">kommer</span> <span class="text-rose-400">inte</span> <span class="text-amber-300">alltid</span> idag.</div>
-                        <div class="text-emerald-300">Bisats: ... <span class="text-sky-300">att</span> <span class="text-emerald-300">han</span> <span class="text-rose-400 font-bold underline">inte</span> <span class="text-amber-300 font-bold underline">alltid</span> <span class="text-purple-300 font-bold">kommer</span> idag.</div>
+                        <div class="text-slate-400">Päälause: Han <span class="text-purple-300">kommer</span> <span class="text-rose-400">inte</span> <span class="text-amber-300">alltid</span> idag.</div>
+                        <div class="text-emerald-300">Sivulause: ... <span class="text-sky-300">att</span> <span class="text-emerald-300">han</span> <span class="text-rose-400 font-bold underline">inte</span> <span class="text-amber-300 font-bold underline">alltid</span> <span class="text-purple-300 font-bold">kommer</span> idag.</div>
                     </div>
                 </div>
 
                 <div class="bg-fuchsia-950/40 border border-fuchsia-500/40 rounded-xl p-4">
-                    <h3 class="font-extrabold text-fuchsia-300 text-sm mb-1">⚛️ Nobelium (No) & Djupets Kärnboss</h3>
+                    <h3 class="font-extrabold text-fuchsia-300 text-sm mb-1">⚛️ Nobelium (No), Seaborgium (Sg) & Djupets Kärnboss</h3>
                     <p class="text-xs sm:text-sm text-slate-200">
-                         <strong>Nobelium</strong> och <strong>Djupets Kärnboss</strong> (630 m) kräver <strong>fri skrivning</strong> — du skriver bisatsen själv utan ordlista!
+                         De djupaste grundämnena (<strong>Nobelium</strong>, <strong>Seaborgium</strong>) och <strong>Djupets Kärnboss</strong> (860 m) kräver <strong>fri skrivning</strong> — du skriver bisatsen själv utan ordlista! Bossen kräver 5 träffar och Diamantborr (nivå 3).
                     </p>
                 </div>
 
@@ -518,7 +520,7 @@ const sound = new SoundEngine();
 
 /**
  * ============================================================================
- * 2. LAAJA RUOTSIN SIVULAUSEEN KONSUKIELIPRE-TEHTÄVÄPANKKI (50 LAUSETTA)
+ * 2. LAAJA RUOTSIN SIVULAUSEEN KONSUKIELIPRE-TEHTÄVÄPANKKI
  * ============================================================================
  */
 const RULE_SENTENCES = [
@@ -628,7 +630,8 @@ const RULE_SENTENCES = [
         fi: "Vaikka sää ei ole aina lämmin, pidän kesästä.",
         prefix: "Fastän",
         words: ["vädret", "inte", "alltid", "är", "varmt"],
-        explanation: "KonSuKieLiPre: Fastän (Kon) + vädret (Su) + inte (Kie) + alltid (Li) + är (Pre) + varmt."
+        suffix: ", tycker jag om sommaren.",
+        explanation: "KonSuKieLiPre: Fastän (Kon) + vädret (Su) + inte (Kie) + alltid (Li) + är (Pre) + varmt. (Päälause: tycker jag om sommaren)"
     },
     {
         fi: "Luulen, että he eivät ole vielä lukeneet viestiä.",
@@ -640,13 +643,14 @@ const RULE_SENTENCES = [
         fi: "Se on kirja, jota en ole koskaan lukenut.",
         prefix: "Det är en bok, som",
         words: ["jag", "aldrig", "har", "läst"],
-        explanation: "KonSuKieLiPre: som (Kon) + jag (Su) + aldrig (Li) + tidigare (Li) + har (Pre) + läst."
+        explanation: "KonSuKieLiPre: som (Kon) + jag (Su) + aldrig (Li) + har (Pre) + läst."
     },
     {
         fi: "Jos et heti lähde, myöhästyt junasta.",
         prefix: "Om",
         words: ["du", "inte", "genast", "går"],
-        explanation: "KonSuKieLiPre: Om (Kon) + du (Su) + inte (Kie) + genast (Li) + går (Pre)."
+        suffix: ", missar du tåget.",
+        explanation: "KonSuKieLiPre: Om (Kon) + du (Su) + inte (Kie) + genast (Li) + går (Pre). (Päälause: missar du tåget)"
     },
     {
         fi: "Hän kertoi, että hänen siskonsa harvoin käy Suomessa.",
@@ -676,19 +680,22 @@ const RULE_SENTENCES = [
         fi: "Koska he eivät asu Tukholmassa, he kaipaavat merta.",
         prefix: "Eftersom",
         words: ["de", "inte", "bor", "i Stockholm"],
-        explanation: "KonSuKieLiPre: Eftersom (Kon) + de (Su) + inte (Kie) + bor (Pre) + i Stockholm."
+        suffix: ", saknar de havet.",
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + de (Su) + inte (Kie) + bor (Pre) + i Stockholm. (Päälause: saknar de havet)"
     },
     {
         fi: "Jos et osta lippua nyt, et pääse sisään.",
         prefix: "Om",
-        words: ["du", "inte", "köper", "biljetten", "nu,"],
-        explanation: "KonSuKieLiPre: Om (Kon) + du (Su) + inte (Kie) + köper (Pre) + biljetten nu."
+        words: ["du", "inte", "köper", "biljetten", "nu"],
+        suffix: ", kommer du inte in.",
+        explanation: "KonSuKieLiPre: Om (Kon) + du (Su) + inte (Kie) + köper (Pre) + biljetten nu. (Päälause: kommer du inte in)"
     },
     {
         fi: "Vaikka hän ei koskaan harjoittele, hän voittaa aina.",
         prefix: "Fastän",
-        words: ["han", "aldrig", "tränar,"],
-        explanation: "KonSuKieLiPre: Fastän (Kon) + han (Su) + aldrig (Kie/Li) + tränar (Pre)."
+        words: ["han", "aldrig", "tränar"],
+        suffix: ", vinner han alltid.",
+        explanation: "KonSuKieLiPre: Fastän (Kon) + han (Su) + aldrig (Kie/Li) + tränar (Pre). (Päälause: vinner han alltid)"
     },
     {
         fi: "Hän kysyi, miksi me emme usein käy täällä.",
@@ -711,20 +718,152 @@ const RULE_SENTENCES = [
     {
         fi: "Sillä aikaa kun me emme katsoneet, kissa söi kalan.",
         prefix: "Medan",
-        words: ["vi", "inte", "tittade,"],
-        explanation: "KonSuKieLiPre: Medan (Kon) + vi (Su) + inte (Kie) + tittade (Pre)."
+        words: ["vi", "inte", "tittade"],
+        suffix: ", åt katten fisken.",
+        explanation: "KonSuKieLiPre: Medan (Kon) + vi (Su) + inte (Kie) + tittade (Pre). (Päälause: åt katten fisken)"
     },
     {
         fi: "Ennen kuin lähdet, sinun täytyy sammuttaa valot.",
         prefix: "Innan",
-        words: ["du", "går,"],
-        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + går (Pre)."
+        words: ["du", "går"],
+        suffix: ", måste du släcka lamporna.",
+        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + går (Pre). (Päälause: måste du släcka lamporna)"
     },
     {
         fi: "Olen iloinen, koska myös sinä tulet juhliin.",
         prefix: "Jag är glad, eftersom",
         words: ["du", "också", "kommer", "på festen"],
         explanation: "KonSuKieLiPre: eftersom (Kon) + du (Su) + också (Li) + kommer (Pre) + på festen."
+    },
+{
+        fi: "Kun hän ei ole kotona, kuuntelen rauhallista musiikkia.",
+        prefix: "När",
+        words: ["han", "inte", "är", "hemma"],
+        suffix: ", lyssnar jag på lugn musik.",
+        explanation: "KonSuKieLiPre: När (Kon) + han (Su) + inte (Kie) + är (Pre) + hemma. (Päälause: lyssnar jag på lugn musik)"
+    },
+    {
+        fi: "Tiedän, että hän aina vastaa viesteihin nopeasti.",
+        prefix: "Jag vet, att",
+        words: ["han", "alltid", "svarar", "på meddelanden", "snabbt"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + alltid (Li) + svarar (Pre) + på meddelanden snabbt."
+    },
+    {
+        fi: "Jos emme löydä avainta, soitamme talonmiehelle.",
+        prefix: "Om",
+        words: ["vi", "inte", "hittar", "nyckeln"],
+        suffix: ", ringer vi fastighetsskötaren.",
+        explanation: "KonSuKieLiPre: Om (Kon) + vi (Su) + inte (Kie) + hittar (Pre) + nyckeln. (Päälause: ringer vi fastighetsskötaren)"
+    },
+    {
+        fi: "Hän oli väsynyt, koska hän ei ollut nukkunut hyvin.",
+        prefix: "Han var trött, eftersom",
+        words: ["han", "inte", "hade", "sovit", "bra"],
+        explanation: "KonSuKieLiPre: eftersom (Kon) + han (Su) + inte (Kie) + hade (Pre) + sovit bra."
+    },
+    {
+        fi: "Vaikka hän ei pidä talvesta, hän hiihtää mielellään.",
+        prefix: "Fastän",
+        words: ["han", "inte", "tycker om", "vintern"],
+        suffix: ", åker han gärna skidor.",
+        explanation: "KonSuKieLiPre: Fastän (Kon) + han (Su) + inte (Kie) + tycker om (Pre) + vintern. (Päälause: åker han gärna skidor)"
+    },
+    {
+        fi: "Huomasin, että he jo odottivat meitä asemalla.",
+        prefix: "Jag märkte, att",
+        words: ["de", "redan", "väntade", "på oss", "på stationen"],
+        explanation: "KonSuKieLiPre: att (Kon) + de (Su) + redan (Li) + väntade (Pre) + på oss på stationen."
+    },
+    {
+        fi: "Koska emme halua jonottaa, menemme aikaisin.",
+        prefix: "Eftersom",
+        words: ["vi", "inte", "vill", "stå i kö"],
+        suffix: ", går vi tidigt.",
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + vi (Su) + inte (Kie) + vill (Pre) + stå i kö. (Päälause: går vi tidigt)"
+    },
+    {
+        fi: "Hän sanoi, että hän myös osaa puhua ranskaa.",
+        prefix: "Hon sa, att",
+        words: ["hon", "också", "kan", "tala", "franska"],
+        explanation: "KonSuKieLiPre: att (Kon) + hon (Su) + också (Li) + kan (Pre) + tala franska."
+    },
+    {
+        fi: "Ennen kuin aloitat kokeen, lue ohjeet huolellisesti.",
+        prefix: "Innan",
+        words: ["du", "börjar", "provet"],
+        suffix: ", läs instruktionerna noggrant.",
+        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + börjar (Pre) + provet. (Päälause: läs instruktionerna noggrant)"
+    },
+    {
+        fi: "Kysyin häneltä, miksi hän ei usein syö lihaa.",
+        prefix: "Jag frågade henne, varför",
+        words: ["hon", "inte", "ofta", "äter", "kött"],
+        explanation: "KonSuKieLiPre: varför (Kon) + hon (Su) + inte (Kie) + ofta (Li) + äter (Pre) + kött."
+    },
+    {
+        fi: "Vaikka meillä ei ole kiire, lähdemme kohta.",
+        prefix: "Trots att",
+        words: ["vi", "inte", "har", "bråttom"],
+        suffix: ", går vi snart.",
+        explanation: "KonSuKieLiPre: Trots att (Kon) + vi (Su) + inte (Kie) + har (Pre) + bråttom. (Päälause: går vi snart)"
+    },
+    {
+        fi: "Hän kertoi, että bussi nyt saapuu laiturille.",
+        prefix: "Han berättade, att",
+        words: ["bussen", "nu", "kommer", "till perrongen"],
+        explanation: "KonSuKieLiPre: att (Kon) + bussen (Su) + nu (Li) + kommer (Pre) + till perrongen."
+    },
+    {
+        fi: "Sillä aikaa kun hän ei ollut paikalla, siivosimme keittiön.",
+        prefix: "Medan",
+        words: ["han", "inte", "var", "på plats"],
+        suffix: ", städade vi köket.",
+        explanation: "KonSuKieLiPre: Medan (Kon) + han (Su) + inte (Kie) + var (Pre) + på plats. (Päälause: städade vi köket)"
+    },
+    {
+        fi: "Olen varma, että he koskaan eivät unohda tätä päivää.",
+        prefix: "Jag är säker på, att",
+        words: ["de", "aldrig", "kommer att glömma", "den här dagen"],
+        explanation: "KonSuKieLiPre: att (Kon) + de (Su) + aldrig (Li) + kommer att glömma (Pre) + den här dagen."
+    },
+    {
+        fi: "Jos hän ei tänään ehdi soittaa, hän soittaa huomenna.",
+        prefix: "Om",
+        words: ["han", "inte", "idag", "hinner", "ringa"],
+        suffix: ", ringer han imorgon.",
+        explanation: "KonSuKieLiPre: Om (Kon) + han (Su) + inte (Kie) + idag (Li) + hinner (Pre) + ringa. (Päälause: ringer han imorgon)"
+    },
+    {
+        fi: "Hän ei tullut mukaan, koska hän ei vielä tuntenut ketään.",
+        prefix: "Hon följde inte med, eftersom",
+        words: ["hon", "inte", "ännu", "kände", "någon"],
+        explanation: "KonSuKieLiPre: eftersom (Kon) + hon (Su) + inte (Kie) + ännu (Li) + kände (Pre) + någon."
+    },
+    {
+        fi: "Kun kesäloma alkaa, matkustamme pohjoiseen.",
+        prefix: "När",
+        words: ["sommarlovet", "börjar"],
+        suffix: ", reser vi norrut.",
+        explanation: "KonSuKieLiPre: När (Kon) + sommarlovet (Su) + börjar (Pre). (Päälause: reser vi norrut)"
+    },
+    {
+        fi: "Toivon, että sinä aina muistat lukita oven.",
+        prefix: "Jag hoppas, att",
+        words: ["du", "alltid", "kommer ihåg", "att låsa dörren"],
+        explanation: "KonSuKieLiPre: att (Kon) + du (Su) + alltid (Li) + kommer ihåg (Pre) + att låsa dörren."
+    },
+    {
+        fi: "Koska he eivät usein käy elokuvissa, tämä oli erityistä.",
+        prefix: "Eftersom",
+        words: ["de", "inte", "ofta", "går", "på bio"],
+        suffix: ", var det här speciellt.",
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + de (Su) + inte (Kie) + ofta (Li) + går (Pre) + på bio. (Päälause: var det här speciellt)"
+    },
+    {
+        fi: "Hän sanoi, että hän myös haluaa oppia suomea.",
+        prefix: "Han sa, att",
+        words: ["han", "också", "vill", "lära sig", "finska"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + också (Li) + vill (Pre) + lära sig finska."
     },
     {
         fi: "Hän luulee, että me emme voi auttaa häntä.",
@@ -753,8 +892,9 @@ const RULE_SENTENCES = [
     {
         fi: "Koska et halua syödä nyt, säästän ruoan.",
         prefix: "Eftersom",
-        words: ["du", "inte", "vill", "äta", "nu,"],
-        explanation: "KonSuKieLiPre: Eftersom (Kon) + du (Su) + inte (Kie) + vill (Pre) + äta nu."
+        words: ["du", "inte", "vill", "äta", "nu"],
+        suffix: ", sparar jag maten.",
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + du (Su) + inte (Kie) + vill (Pre) + äta nu. (Päälause: sparar jag maten)"
     },
     {
         fi: "Epäilen, että hän ei ole vielä saapunut.",
@@ -765,8 +905,9 @@ const RULE_SENTENCES = [
     {
         fi: "Kun me emme ole koulussa, pelaamme jalkapalloa.",
         prefix: "När",
-        words: ["vi", "inte", "är", "i skolan,"],
-        explanation: "KonSuKieLiPre: När (Kon) + vi (Su) + inte (Kie) + är (Pre) + i skolan."
+        words: ["vi", "inte", "är", "i skolan"],
+        suffix: ", spelar vi fotboll.",
+        explanation: "KonSuKieLiPre: När (Kon) + vi (Su) + inte (Kie) + är (Pre) + i skolan. (Päälause: spelar vi fotboll)"
     },
     {
         fi: "Hän osti takin, vaikka se ei ollut halpa.",
@@ -807,8 +948,9 @@ const RULE_SENTENCES = [
     {
         fi: "Vaikka meillä ei ole paljon rahaa, olemme onnellisia.",
         prefix: "Trots att",
-        words: ["vi", "inte", "har", "mycket pengar,"],
-        explanation: "KonSuKieLiPre: Trots att (Kon) + vi (Su) + inte (Kie) + har (Pre) + mycket pengar."
+        words: ["vi", "inte", "har", "mycket pengar"],
+        suffix: ", är vi lyckliga.",
+        explanation: "KonSuKieLiPre: Trots att (Kon) + vi (Su) + inte (Kie) + har (Pre) + mycket pengar. (Päälause: är vi lyckliga)"
     },
     {
         fi: "Opettaja huomasi, että oppilaat eivät olleet tehneet läksyjä.",
@@ -819,8 +961,9 @@ const RULE_SENTENCES = [
     {
         fi: "Jos hän ei soita tänään, lähetän hänelle sähköpostia.",
         prefix: "Om",
-        words: ["han", "inte", "ringer", "idag,"],
-        explanation: "KonSuKieLiPre: Om (Kon) + han (Su) + inte (Kie) + ringer (Pre) + idag."
+        words: ["han", "inte", "ringer", "idag"],
+        suffix: ", skickar jag ett mejl till honom.",
+        explanation: "KonSuKieLiPre: Om (Kon) + han (Su) + inte (Kie) + ringer (Pre) + idag. (Päälause: skickar jag ett mejl till honom)"
     },
     {
         fi: "Hän ei tullut kouluun, koska hän oli yhä sairas.",
@@ -843,8 +986,9 @@ const RULE_SENTENCES = [
     {
         fi: "Koska me emme tiedä vastausta, kysymme opettajalta.",
         prefix: "Eftersom",
-        words: ["vi", "inte", "vet", "svaret,"],
-        explanation: "KonSuKieLiPre: Eftersom (Kon) + vi (Su) + inte (Kie) + vet (Pre) + svaret."
+        words: ["vi", "inte", "vet", "svaret"],
+        suffix: ", frågar vi läraren.",
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + vi (Su) + inte (Kie) + vet (Pre) + svaret. (Päälause: frågar vi läraren)"
     },
     {
         fi: "Hän lupasi, että hän soittaa minulle huomenna.",
@@ -855,8 +999,9 @@ const RULE_SENTENCES = [
     {
         fi: "Kun tulet kotiin, voimme juoda teetä.",
         prefix: "När",
-        words: ["du", "kommer", "hem,"],
-        explanation: "KonSuKieLiPre: När (Kon) + du (Su) + kommer (Pre) + hem."
+        words: ["du", "kommer", "hem"],
+        suffix: ", kan vi dricka te.",
+        explanation: "KonSuKieLiPre: När (Kon) + du (Su) + kommer (Pre) + hem. (Päälause: kan vi dricka te)"
     },
     {
         fi: "En usko, että hän ei koskaan matkusta junalla.",
@@ -879,8 +1024,9 @@ const RULE_SENTENCES = [
     {
         fi: "Vaikka hän on kiireinen, hän auttaa aina ystäviään.",
         prefix: "Fastän",
-        words: ["hon", "är", "upptagen,"],
-        explanation: "KonSuKieLiPre: Fastän (Kon) + hon (Su) + är (Pre) + upptagen."
+        words: ["hon", "är", "upptagen"],
+        suffix: ", hjälper hon alltid sina vänner.",
+        explanation: "KonSuKieLiPre: Fastän (Kon) + hon (Su) + är (Pre) + upptagen. (Päälause: hjälper hon alltid sina vänner)"
     },
     {
         fi: "Hän ihmetteli, miksi he eivät olleet paikalla.",
@@ -903,8 +1049,9 @@ const RULE_SENTENCES = [
     {
         fi: "Kun he eivät nähneet meitä, he kävelivät ohi.",
         prefix: "När",
-        words: ["de", "inte", "såg", "oss,"],
-        explanation: "KonSuKieLiPre: När (Kon) + de (Su) + inte (Kie) + såg (Pre) + oss."
+        words: ["de", "inte", "såg", "oss"],
+        suffix: ", gick de förbi.",
+        explanation: "KonSuKieLiPre: När (Kon) + de (Su) + inte (Kie) + såg (Pre) + oss. (Päälause: gick de förbi)"
     },
     {
         fi: "Olen varma, että sinä opit ruotsia nopeasti.",
@@ -915,8 +1062,9 @@ const RULE_SENTENCES = [
     {
         fi: "Koska hän ei usein katso televisiota, hän lukee paljon.",
         prefix: "Eftersom",
-        words: ["han", "inte", "ofta", "tittar", "på tv,"],
-        explanation: "KonSuKieLiPre: Eftersom (Kon) + han (Su) + inte (Kie) + ofta (Li) + tittar (Pre) + på tv."
+        words: ["han", "inte", "ofta", "tittar", "på tv"],
+        suffix: ", läser han mycket.",
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + han (Su) + inte (Kie) + ofta (Li) + tittar (Pre) + på tv. (Päälause: läser han mycket)"
     },
     {
         fi: "Hän sanoi, että he myös asuvat tässä kaupungissa.",
@@ -927,8 +1075,9 @@ const RULE_SENTENCES = [
     {
         fi: "Ennen kuin syöt, pese kätesi saippualla.",
         prefix: "Innan",
-        words: ["du", "äter,"],
-        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + äter (Pre)."
+        words: ["du", "äter"],
+        suffix: ", tvätta händerna med tvål.",
+        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + äter (Pre). (Päälause: tvätta händerna med tvål)"
     },
     {
         fi: "Hän ei tiennyt, että kauppa oli jo kiinni.",
@@ -939,45 +1088,178 @@ const RULE_SENTENCES = [
     {
         fi: "Jos me emme harjoittele, emme voita ottelua.",
         prefix: "Om",
-        words: ["vi", "inte", "tränar,"],
-        explanation: "KonSuKieLiPre: Om (Kon) + vi (Su) + inte (Kie) + tränar (Pre)."
+        words: ["vi", "inte", "tränar"],
+        suffix: ", vinner vi inte matchen.",
+        explanation: "KonSuKieLiPre: Om (Kon) + vi (Su) + inte (Kie) + tränar (Pre). (Päälause: vinner vi inte matchen)"
     },
     {
         fi: "Vaikka sää on kylmä, menemme lenkille.",
         prefix: "Trots att",
-        words: ["vädret", "är", "kallt,"],
-        explanation: "KonSuKieLiPre: Trots att (Kon) + vädret (Su) + är (Pre) + kallt."
+        words: ["vädret", "är", "kallt"],
+        suffix: ", går vi ut och springer.",
+        explanation: "KonSuKieLiPre: Trots att (Kon) + vädret (Su) + är (Pre) + kallt. (Päälause: går vi ut och springer)"
     },
     {
         fi: "Hän toivoi, että hän nyt löytäisi avaimensa.",
         prefix: "Hon hoppades, att",
         words: ["hon", "nu", "skulle hitta", "sina nycklar"],
         explanation: "KonSuKieLiPre: att (Kon) + hon (Su) + nu (Li) + skulle hitta (Pre) + sina nycklar."
-    }
+    },
+{
+        fi: "Hän sanoi, että pelaaja ei koskaan muista tankata ajoissa.",
+        prefix: "Han sa, att",
+        words: ["spelaren", "aldrig", "kommer ihåg", "att tanka", "i tid"],
+        explanation: "KonSuKieLiPre: att (Kon) + spelaren (Su) + aldrig (Li) + kommer ihåg (Pre) + att tanka i tid."
+    },
+    {
+        fi: "Kun lasti on täynnä, on aika nousta pintaan.",
+        prefix: "När",
+        words: ["lasten", "är", "full"],
+        suffix: ", är det dags att åka upp till ytan.",
+        explanation: "KonSuKieLiPre: När (Kon) + lasten (Su) + är (Pre) + full. (Päälause: är det dags att åka upp till ytan)"
+    },
+    {
+        fi: "Tiedän, että hän ei usein tarkista bensamittaria.",
+        prefix: "Jag vet, att",
+        words: ["han", "inte", "ofta", "kollar", "bensinnivån"],
+        explanation: "KonSuKieLiPre: att (Kon) + han (Su) + inte (Kie) + ofta (Li) + kollar (Pre) + bensinnivån."
+    },
+    {
+        fi: "Jos et päivitä poraa, graniitti pysäyttää sinut.",
+        prefix: "Om",
+        words: ["du", "inte", "uppgraderar", "borren"],
+        suffix: ", stoppar graniten dig.",
+        explanation: "KonSuKieLiPre: Om (Kon) + du (Su) + inte (Kie) + uppgraderar (Pre) + borren. (Päälause: stoppar graniten dig)"
+    },
+    {
+        fi: "Hän ihmetteli, miksi malmi aina löytyy juuri silloin, kun ruuma on täysi.",
+        prefix: "Hon undrade, varför",
+        words: ["malmen", "alltid", "dyker upp", "just när", "lastutrymmet är fullt"],
+        explanation: "KonSuKieLiPre: varför (Kon) + malmen (Su) + alltid (Li) + dyker upp (Pre) + just när lastutrymmet är fullt."
+    },
+    {
+        fi: "Vaikka kaivos näyttää loputtomalta, pohjalla odottaa pomo.",
+        prefix: "Fastän",
+        words: ["gruvan", "ser", "ändlös", "ut"],
+        suffix: ", väntar en boss längst ner.",
+        explanation: "KonSuKieLiPre: Fastän (Kon) + gruvan (Su) + ser (Pre) + ändlös ut. (Päälause: väntar en boss längst ner)"
+    },
+    {
+        fi: "Huomasin, että peli jo tallensi edistymiseni.",
+        prefix: "Jag märkte, att",
+        words: ["spelet", "redan", "hade sparat", "mina framsteg"],
+        explanation: "KonSuKieLiPre: att (Kon) + spelet (Su) + redan (Li) + hade sparat (Pre) + mina framsteg."
+    },
+    {
+        fi: "Koska hän ei vielä osaa sanajärjestystä, malmi murenee.",
+        prefix: "Eftersom",
+        words: ["han", "inte", "ännu", "kan", "ordföljden"],
+        suffix: ", smular malmen sönder.",
+        explanation: "KonSuKieLiPre: Eftersom (Kon) + han (Su) + inte (Kie) + ännu (Li) + kan (Pre) + ordföljden. (Päälause: smular malmen sönder)"
+    },
+    {
+        fi: "Hän sanoi, että myös kielioppi voi olla koukuttavaa.",
+        prefix: "Hon sa, att",
+        words: ["även", "grammatiken", "kan", "vara", "beroendeframkallande"],
+        explanation: "KonSuKieLiPre: att (Kon) + även grammatiken (Su) + kan (Pre) + vara beroendeframkallande."
+    },
+    {
+        fi: "Ennen kuin syöksyt syvyyksiin, varmista että runko on ehjä.",
+        prefix: "Innan",
+        words: ["du", "störtar ner", "i djupet"],
+        suffix: ", se till att skrovet är helt.",
+        explanation: "KonSuKieLiPre: Innan (Kon) + du (Su) + störtar ner (Pre) + i djupet. (Päälause: se till att skrovet är helt)"
+    },
+    {
+        fi: "Kysyin häneltä, miksi hän ei koskaan käytä pelistä löytyvää lunttilappua.",
+        prefix: "Jag frågade honom, varför",
+        words: ["han", "aldrig", "använder", "fusklappen i spelet"],
+        explanation: "KonSuKieLiPre: varför (Kon) + han (Su) + aldrig (Li) + använder (Pre) + fusklappen i spelet."
+    },
+    {
+        fi: "Vaikka ruudulla näkyy vain pikseleitä, syvyys tuntuu todelliselta.",
+        prefix: "Trots att",
+        words: ["det", "bara", "syns", "pixlar", "på skärmen"],
+        suffix: ", känns djupet verkligt.",
+        explanation: "KonSuKieLiPre: Trots att (Kon) + det (Su) + bara (Li) + syns (Pre) + pixlar på skärmen. (Päälause: känns djupet verkligt)"
+    },
+    {
+        fi: "Hän kertoi, että nobelium nyt vaatii vapaata kirjoitusta.",
+        prefix: "Han berättade, att",
+        words: ["nobelium", "nu", "kräver", "fri skrivning"],
+        explanation: "KonSuKieLiPre: att (Kon) + nobelium (Su) + nu (Li) + kräver (Pre) + fri skrivning."
+    },
+    {
+        fi: "Sillä aikaa kun hän ei katso, kivi kätkee uuden tehtävän.",
+        prefix: "Medan",
+        words: ["han", "inte", "tittar"],
+        suffix: ", döljer stenen en ny uppgift.",
+        explanation: "KonSuKieLiPre: Medan (Kon) + han (Su) + inte (Kie) + tittar (Pre). (Päälause: döljer stenen en ny uppgift)"
+    },
+    {
+        fi: "Olen varma, että sinä aina löydät oikean paikan verbille.",
+        prefix: "Jag är säker på, att",
+        words: ["du", "alltid", "hittar", "rätt plats", "för verbet"],
+        explanation: "KonSuKieLiPre: att (Kon) + du (Su) + alltid (Li) + hittar (Pre) + rätt plats för verbet."
+    },
+    {
+        fi: "Jos et tänään voita pomoja, yrität huomenna.",
+        prefix: "Om",
+        words: ["du", "inte", "idag", "besegrar", "chefen"],
+        suffix: ", försöker du imorgon.",
+        explanation: "KonSuKieLiPre: Om (Kon) + du (Su) + inte (Kie) + idag (Li) + besegrar (Pre) + chefen. (Päälause: försöker du imorgon)"
+    },
+    {
+        fi: "Hän ei lentänyt ylös, koska hänellä ei ollut enää bensaa.",
+        prefix: "Han flög inte upp, eftersom",
+        words: ["han", "inte", "hade", "någon bensin", "kvar"],
+        explanation: "KonSuKieLiPre: eftersom (Kon) + han (Su) + inte (Kie) + hade (Pre) + någon bensin kvar."
+    },
+    {
+        fi: "Kun painat enteriä, tehtävä tarkistetaan heti.",
+        prefix: "När",
+        words: ["du", "trycker", "på enter"],
+        suffix: ", kontrolleras uppgiften direkt.",
+        explanation: "KonSuKieLiPre: När (Kon) + du (Su) + trycker (Pre) + på enter. (Päälause: kontrolleras uppgiften direkt)"
+    },
+    {
+        fi: "Toivon, että pelaaja myös muistaa myydä malmit ennen uutta kierrosta.",
+        prefix: "Jag hoppas, att",
+        words: ["spelaren", "också", "kommer ihåg", "att sälja", "malmen"],
+        explanation: "KonSuKieLiPre: att (Kon) + spelaren (Su) + också (Li) + kommer ihåg (Pre) + att sälja malmen."
+    },
 ];
 
 /**
  * ============================================================================
- * 3. PELIN VAKIOT, MAAPERÄTYYPIT (SIS. Nobelium) JA PÄIVITYKSET
+ * 3. PELIN VAKIOT, MAAPERÄTYYPIT (13 ALKUAIINETTA) JA PÄIVITYKSET
  * ============================================================================
  */
 const TILE_SIZE = 44;
 const GRID_COLS = 36;
-const GRID_ROWS = 130;
+const GRID_ROWS = 180; // Syvempi kaivos -> bossi ei löydy liian nopeasti
 const SURFACE_ROW = 6;
-const STORAGE_KEY = 'malmspel_konsukielipre_save_v1';
+const STORAGE_KEY = 'malmspel_konsukielipre_save_v2';
 
 const BLOCKS = {
     EMPTY: { id: 0, name: 'Tomt / Tyhjä', solid: false },
-    DIRT:  { id: 1, name: 'Jord / Multa', solid: true, color: '#5c3a21', border: '#462b18', hardness: 1, isOre: false },
-    ROCK:  { id: 2, name: 'Berg / Kallio', solid: true, color: '#475569', border: '#334155', hardness: 2, isOre: false },
-    HARD_ROCK: { id: 3, name: 'Granit / Graniitti', solid: true, color: '#1e293b', border: '#0f172a', hardness: 3, isOre: false },
-    COPPER: { id: 4, name: 'Kopparmalm (Kupari)', solid: true, color: '#5c3a21', oreColor: '#f97316', glow: '#fdba74', value: 40, hardness: 1, isOre: true, icon: '🟠' },
-    SILVER: { id: 5, name: 'Silverådra (Hopea)', solid: true, color: '#52341e', oreColor: '#e2e8f0', glow: '#ffffff', value: 90, hardness: 1, isOre: true, icon: '⚪' },
-    GOLD:   { id: 6, name: 'Guldkorn (Kulta)', solid: true, color: '#4a2e1b', oreColor: '#eab308', glow: '#fef08a', value: 180, hardness: 1, isOre: true, icon: '🟡' },
-    RUBY:   { id: 7, name: 'Rubinkristall (Rubiini)', solid: true, color: '#422818', oreColor: '#f43f5e', glow: '#fda4af', value: 320, hardness: 2, isOre: true, icon: '🔴' },
-    DIAMOND:{ id: 8, name: 'Diamant (Timantti)', solid: true, color: '#3a2214', oreColor: '#38bdf8', glow: '#bae6fd', value: 550, hardness: 2, isOre: true, icon: '💎' },
-    UNOBTAINIUM: { id: 9, name: 'Svenskium-kristall', solid: true, color: '#2e1a10', oreColor: '#c084fc', glow: '#f3e8ff', value: 1000, hardness: 3, isOre: true, icon: '🔮' },
+    DIRT:  { id: 1, name: 'Jord / Multa', solid: true, color: '#5c3a21', border: '#462b18', hardness: 1, drillTime: 0.40, fuelMult: 1.0, isOre: false },
+    ROCK:  { id: 2, name: 'Berg / Kallio', solid: true, color: '#475569', border: '#334155', hardness: 2, drillTime: 0.95, fuelMult: 1.8, isOre: false },
+    HARD_ROCK: { id: 3, name: 'Granit / Graniitti', solid: true, color: '#1e293b', border: '#0f172a', hardness: 3, drillTime: 1.85, fuelMult: 3.1, isOre: false },
+    BEDROCK: { id: 17, name: 'Urberg / Peruskallio', solid: true, unbreakable: true, color: '#090d16', border: '#1e293b', hardness: 99, drillTime: 999, fuelMult: 0, isOre: false },
+
+    // Alkuaineet (matalalta syvälle)
+    ZINC:        { id: 11, name: 'Zinkmalm (Zn)', solid: true, color: '#5c3a21', oreColor: '#94a3b8', glow: '#cbd5e1', value: 30, hardness: 1, drillTime: 0.45, fuelMult: 1.1, isOre: true, icon: '🩶' },
+    COPPER:      { id: 4,  name: 'Kopparmalm (Cu)', solid: true, color: '#5c3a21', oreColor: '#f97316', glow: '#fdba74', value: 45, hardness: 1, drillTime: 0.50, fuelMult: 1.2, isOre: true, icon: '🟠' },
+    TIN:         { id: 12, name: 'Tennmalm (Sn)', solid: true, color: '#57361e', oreColor: '#a8a29e', glow: '#e7e5e4', value: 65, hardness: 1, drillTime: 0.55, fuelMult: 1.3, isOre: true, icon: '🔘' },
+    SILVER:      { id: 5,  name: 'Silverådra (Ag)', solid: true, color: '#52341e', oreColor: '#e2e8f0', glow: '#ffffff', value: 95, hardness: 1, drillTime: 0.65, fuelMult: 1.4, isOre: true, icon: '⚪' },
+    COBALT:      { id: 13, name: 'Koboltmalm (Co)', solid: true, color: '#475569', oreColor: '#2563eb', glow: '#93c5fd', value: 140, hardness: 2, drillTime: 1.05, fuelMult: 2.0, isOre: true, icon: '🔵' },
+    GOLD:        { id: 6,  name: 'Guldkorn (Au)', solid: true, color: '#4a2e1b', oreColor: '#eab308', glow: '#fef08a', value: 190, hardness: 1, drillTime: 0.80, fuelMult: 1.6, isOre: true, icon: '🟡' },
+    RUBY:        { id: 7,  name: 'Rubinkristall (Cr)', solid: true, color: '#422818', oreColor: '#f43f5e', glow: '#fda4af', value: 320, hardness: 2, drillTime: 1.25, fuelMult: 2.3, isOre: true, icon: '🔴' },
+    PLATINUM:    { id: 14, name: 'Platina (Pt)', solid: true, color: '#334155', oreColor: '#cbd5e1', glow: '#f8fafc', value: 460, hardness: 2, drillTime: 1.45, fuelMult: 2.6, isOre: true, icon: '💠' },
+    DIAMOND:     { id: 8,  name: 'Diamant (C)', solid: true, color: '#3a2214', oreColor: '#38bdf8', glow: '#bae6fd', value: 600, hardness: 2, drillTime: 1.65, fuelMult: 2.8, isOre: true, icon: '💎' },
+    URANIUM:     { id: 15, name: 'Uranmalm (U)', solid: true, color: '#1f2937', oreColor: '#84cc16', glow: '#bef264', value: 820, hardness: 3, drillTime: 2.15, fuelMult: 3.5, isOre: true, icon: '☢️' },
+    UNOBTAINIUM: { id: 9,  name: 'Svenskium (Sv)', solid: true, color: '#2e1a10', oreColor: '#c084fc', glow: '#f3e8ff', value: 1100, hardness: 3, drillTime: 2.35, fuelMult: 3.8, isOre: true, icon: '🔮' },
     NOBELIUM: {
         id: 10,
         name: 'Nobelium (No)',
@@ -985,11 +1267,28 @@ const BLOCKS = {
         color: '#231336',
         oreColor: '#e879f9',
         glow: '#f0abfc',
-        value: 1800,
+        value: 1750,
         hardness: 3,
+        drillTime: 2.65,
+        fuelMult: 4.2,
         isOre: true,
         requiresFreeText: true,
         icon: '⚛️'
+    },
+    SEABORGIUM: {
+        id: 16,
+        name: 'Seaborgium (Sg)',
+        solid: true,
+        color: '#1b1035',
+        oreColor: '#22d3ee',
+        glow: '#a5f3fc',
+        value: 2400,
+        hardness: 3,
+        drillTime: 2.95,
+        fuelMult: 4.6,
+        isOre: true,
+        requiresFreeText: true,
+        icon: '🌌'
     }
 };
 
@@ -1031,14 +1330,14 @@ const STATIONS = [
 const UPGRADES = {
     drill: [
         { level: 1, name: 'Basborr (Nivå 1)', desc: 'Poraa multaa ja perusmalmeja', power: 1, speed: 1.0, cost: 0 },
-        { level: 2, name: 'Stålborr (Nivå 2)', desc: 'Poraa myös kalliota ja rubiineja', power: 2, speed: 1.35, cost: 1000 },
-        { level: 3, name: 'Diamantborr (Nivå 3)', desc: 'Murskaa graniitin ja nobeliumin!', power: 3, speed: 1.75, cost: 10000 }
+        { level: 2, name: 'Stålborr (Nivå 2)', desc: 'Poraa myös kalliota, kobolttia, platinaa ja rubiineja', power: 2, speed: 1.35, cost: 1000 },
+        { level: 3, name: 'Diamantborr (Nivå 3)', desc: 'Murskaa graniitin, uraanin, nobeliumin ja seaborgiumin!', power: 3, speed: 1.75, cost: 10000 }
     ],
     fuel: [
         { level: 1, name: 'Liten tank (100 L)', cap: 100, cost: 0 },
         { level: 2, name: 'Mellantank (180 L)', cap: 180, cost: 1000 },
         { level: 3, name: 'Stor tank (300 L)', cap: 300, cost: 5000 },
-        { level: 4, name: 'Fusionstank (500 L)', cap: 500, cost: 10000 }
+        { level: 4, name: 'Fusionstank (520 L)', cap: 520, cost: 10000 }
     ],
     cargo: [
         { level: 1, name: 'Litet lastutrymme (6)', cap: 6, cost: 0 },
@@ -1048,8 +1347,8 @@ const UPGRADES = {
     ],
     hull: [
         { level: 1, name: 'Plåtskrov (100 HP)', cap: 100, cost: 0 },
-        { level: 2, name: 'Förstärkt skrov (175 HP)', cap: 175, cost: 2000 },
-        { level: 3, name: 'Titanskrov (280 HP)', cap: 280, cost: 5050 }
+        { level: 2, name: 'Förstärkt skrov (180 HP)', cap: 180, cost: 2000 },
+        { level: 3, name: 'Titanskrov (300 HP)', cap: 300, cost: 5050 }
     ]
 };
 
@@ -1067,16 +1366,22 @@ let isPaused = false;
 let gameOver = false;
 let saveTimer = 0;
 
+// Tilava pohjaluola: lattia on kiinteä BEDROCK rivillä GRID_ROWS - 2 (rivi 178)
+const CHAMBER_FLOOR_ROW = GRID_ROWS - 2;
+const CHAMBER_TOP_ROW = GRID_ROWS - 11;
+const CHAMBER_LEFT_COL = 7;
+const CHAMBER_RIGHT_COL = 28;
+
 let boss = {
     name: 'Djupets Kärnboss',
-    col: 17,
-    row: GRID_ROWS - 4,
-    width: TILE_SIZE * 3,
-    height: TILE_SIZE * 2.4,
-    hp: 3,
-    maxHp: 3,
+    col: 16,
+    row: CHAMBER_FLOOR_ROW - 3,
+    width: TILE_SIZE * 3.4,
+    height: TILE_SIZE * 2.8,
+    hp: 5,
+    maxHp: 5,
     defeated: false,
-    reward: 4000
+    reward: 6500
 };
 
 let player = {
@@ -1118,7 +1423,7 @@ function getDrillSpeed() { return UPGRADES.drill[player.upgrades.drill - 1].spee
 function saveGameState() {
     try {
         const payload = {
-            version: 1,
+            version: 2,
             savedAt: Date.now(),
             muted: sound.muted,
             gameOver,
@@ -1144,9 +1449,7 @@ function saveGameState() {
             usedSentenceIndices: Array.from(usedSentenceIndices)
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch (err) {
-        // Ohitetaan virheet esim. yksityisen selaustilan kiintiörajoissa
-    }
+    } catch (err) {}
 }
 
 function clearSavedGameState() {
@@ -1234,73 +1537,116 @@ function loadGameState() {
 function generateWorld() {
     grid = [];
     let nobeliumSpawned = 0;
+    let seaborgiumSpawned = 0;
 
     for (let r = 0; r < GRID_ROWS; r++) {
         const row = [];
         for (let c = 0; c < GRID_COLS; c++) {
+            // Taivas
             if (r < SURFACE_ROW) {
                 row.push(BLOCKS.EMPTY.id);
-            } else if (r === SURFACE_ROW) {
+                continue;
+            }
+            // Pinnan ruohokerros
+            if (r === SURFACE_ROW) {
                 row.push(BLOCKS.DIRT.id);
+                continue;
+            }
+            // Kiinteä, poraamaton peruskalliopohja kaivoksen pohjalla (estää bossin alle uppoamisen)
+            if (r >= CHAMBER_FLOOR_ROW) {
+                row.push(BLOCKS.BEDROCK.id);
+                continue;
+            }
+
+            // Tilava pohjaluola bossille (rivit 169..177, sarakkeet 7..28)
+            if (r >= CHAMBER_TOP_ROW && r < CHAMBER_FLOOR_ROW && c >= CHAMBER_LEFT_COL && c <= CHAMBER_RIGHT_COL) {
+                row.push(BLOCKS.EMPTY.id);
+                continue;
+            }
+
+            // Vahva graniittisuoja luolan katossa ja sivuilla, jotta luolaan pitää oikeasti murtautua
+            if (
+                (r >= CHAMBER_TOP_ROW - 2 && r < CHAMBER_TOP_ROW && c >= CHAMBER_LEFT_COL - 2 && c <= CHAMBER_RIGHT_COL + 2) ||
+                (r >= CHAMBER_TOP_ROW && r < CHAMBER_FLOOR_ROW && (c === CHAMBER_LEFT_COL - 1 || c === CHAMBER_LEFT_COL - 2 || c === CHAMBER_RIGHT_COL + 1 || c === CHAMBER_RIGHT_COL + 2))
+            ) {
+                row.push(BLOCKS.HARD_ROCK.id);
+                continue;
+            }
+
+            const depth = r - SURFACE_ROW;
+            const rand = Math.random();
+
+            // Harvinaiset syvän kaivoksen alkuaineet
+            if (depth >= 120 && rand < 0.035) {
+                row.push(BLOCKS.SEABORGIUM.id);
+                seaborgiumSpawned++;
+                continue;
+            }
+            if (depth >= 95 && rand < 0.045) {
+                row.push(BLOCKS.NOBELIUM.id);
+                nobeliumSpawned++;
+                continue;
+            }
+
+            // Satunnaiset pienet taskut ja kiviainekset
+            if (depth > 10 && depth < 140 && rand < 0.032) {
+                row.push(BLOCKS.EMPTY.id);
+                continue;
+            }
+            if (depth > 14 && rand < 0.14) {
+                row.push(BLOCKS.ROCK.id);
+                continue;
+            }
+            if (depth > 55 && rand < 0.24) {
+                row.push(BLOCKS.HARD_ROCK.id);
+                continue;
+            }
+
+            // Syvyyskerrokset 13 alkuaineelle
+            if (depth < 28) {
+                if (rand < 0.09) row.push(BLOCKS.ZINC.id);
+                else if (rand < 0.17) row.push(BLOCKS.COPPER.id);
+                else if (rand < 0.23) row.push(BLOCKS.TIN.id);
+                else if (rand < 0.27) row.push(BLOCKS.SILVER.id);
+                else row.push(BLOCKS.DIRT.id);
+            } else if (depth < 62) {
+                if (rand < 0.06) row.push(BLOCKS.TIN.id);
+                else if (rand < 0.13) row.push(BLOCKS.SILVER.id);
+                else if (rand < 0.20) row.push(BLOCKS.COBALT.id);
+                else if (rand < 0.27) row.push(BLOCKS.GOLD.id);
+                else row.push(BLOCKS.DIRT.id);
+            } else if (depth < 105) {
+                if (rand < 0.06) row.push(BLOCKS.GOLD.id);
+                else if (rand < 0.13) row.push(BLOCKS.RUBY.id);
+                else if (rand < 0.20) row.push(BLOCKS.PLATINUM.id);
+                else if (rand < 0.27) row.push(BLOCKS.DIAMOND.id);
+                else row.push(BLOCKS.DIRT.id);
             } else {
-                const depth = r - SURFACE_ROW;
-                const rand = Math.random();
-
-                if (r >= boss.row - 2 && c >= boss.col - 1 && c <= boss.col + 3) {
-                    row.push(BLOCKS.EMPTY.id);
-                    continue;
-                }
-
-                if (depth >= 70 && rand < 0.045) {
-                    row.push(BLOCKS.NOBELIUM.id);
-                    nobeliumSpawned++;
-                    continue;
-                }
-
-                if (depth > 8 && rand < 0.05) {
-                    row.push(BLOCKS.EMPTY.id);
-                    continue;
-                }
-                if (depth > 12 && rand < 0.14) {
-                    row.push(BLOCKS.ROCK.id);
-                    continue;
-                }
-                if (depth > 45 && rand < 0.22) {
-                    row.push(BLOCKS.HARD_ROCK.id);
-                    continue;
-                }
-
-                if (depth < 22) {
-                    if (rand < 0.14) row.push(BLOCKS.COPPER.id);
-                    else if (rand < 0.21) row.push(BLOCKS.SILVER.id);
-                    else row.push(BLOCKS.DIRT.id);
-                } else if (depth < 48) {
-                    if (rand < 0.08) row.push(BLOCKS.COPPER.id);
-                    else if (rand < 0.17) row.push(BLOCKS.SILVER.id);
-                    else if (rand < 0.25) row.push(BLOCKS.GOLD.id);
-                    else row.push(BLOCKS.DIRT.id);
-                } else if (depth < 82) {
-                    if (rand < 0.09) row.push(BLOCKS.GOLD.id);
-                    else if (rand < 0.19) row.push(BLOCKS.RUBY.id);
-                    else if (rand < 0.25) row.push(BLOCKS.DIAMOND.id);
-                    else row.push(BLOCKS.DIRT.id);
-                } else {
-                    if (rand < 0.08) row.push(BLOCKS.RUBY.id);
-                    else if (rand < 0.18) row.push(BLOCKS.DIAMOND.id);
-                    else if (rand < 0.26) row.push(BLOCKS.UNOBTAINIUM.id);
-                    else row.push(BLOCKS.DIRT.id);
-                }
+                if (rand < 0.07) row.push(BLOCKS.DIAMOND.id);
+                else if (rand < 0.15) row.push(BLOCKS.URANIUM.id);
+                else if (rand < 0.24) row.push(BLOCKS.UNOBTAINIUM.id);
+                else row.push(BLOCKS.DIRT.id);
             }
         }
         grid.push(row);
     }
 
-    if (nobeliumSpawned < 3) {
+    // Varmistetaan vähimmäismäärä Nobeliumia ja Seaborgiumia
+    if (nobeliumSpawned < 4) {
         for (let k = 0; k < 4; k++) {
-            const rr = GRID_ROWS - 12 - k * 5;
-            const cc = 6 + k * 7;
-            if (rr > SURFACE_ROW + 70 && cc < GRID_COLS) {
+            const rr = CHAMBER_TOP_ROW - 8 - k * 6;
+            const cc = 5 + k * 7;
+            if (rr > SURFACE_ROW + 95 && cc < GRID_COLS) {
                 grid[rr][cc] = BLOCKS.NOBELIUM.id;
+            }
+        }
+    }
+    if (seaborgiumSpawned < 3) {
+        for (let k = 0; k < 3; k++) {
+            const rr = CHAMBER_TOP_ROW - 5 - k * 5;
+            const cc = 8 + k * 9;
+            if (rr > SURFACE_ROW + 120 && cc < GRID_COLS) {
+                grid[rr][cc] = BLOCKS.SEABORGIUM.id;
             }
         }
     }
@@ -1310,6 +1656,8 @@ function startNewGame(notify = true) {
     clearSavedGameState();
     boss.hp = boss.maxHp;
     boss.defeated = false;
+    boss.col = 16;
+    boss.row = CHAMBER_FLOOR_ROW - 3;
     generateWorld();
     player = {
         x: 12 * TILE_SIZE,
@@ -1410,17 +1758,26 @@ function triggerQuiz(options) {
     resetJoystick();
     sound.playOreFound();
 
-    if (usedSentenceIndices.size >= RULE_SENTENCES.length) {
-        usedSentenceIndices.clear();
+    const isFreeText = !!(options.isBoss || (options.block && options.block.requiresFreeText));
+
+    // Bossilla suositaan hieman pidempiä / vaativampia lauseita
+    let candidateIndices = [];
+    for (let i = 0; i < RULE_SENTENCES.length; i++) {
+        if (!usedSentenceIndices.has(i)) {
+            if (!options.isBoss || RULE_SENTENCES[i].words.length >= 4) {
+                candidateIndices.push(i);
+            }
+        }
     }
-    let idx;
-    do {
-        idx = Math.floor(Math.random() * RULE_SENTENCES.length);
-    } while (usedSentenceIndices.has(idx));
+    if (candidateIndices.length === 0) {
+        usedSentenceIndices.clear();
+        for (let i = 0; i < RULE_SENTENCES.length; i++) candidateIndices.push(i);
+    }
+
+    const idx = candidateIndices[Math.floor(Math.random() * candidateIndices.length)];
     usedSentenceIndices.add(idx);
 
     const sentence = RULE_SENTENCES[idx];
-    const isFreeText = !!(options.isBoss || (options.block && options.block.requiresFreeText));
 
     let shuffled = [...sentence.words];
     for (let attempt = 0; attempt < 10; attempt++) {
@@ -1462,7 +1819,7 @@ function triggerQuiz(options) {
         badge.textContent = options.block.icon;
         badge.style.backgroundColor = options.block.oreColor + '33';
         tagEl.textContent = isFreeText
-            ? '⚛️ Världens starkaste grundämne — Fri skrivning!'
+            ? '⚛️ Sällsynt supertungt grundämne — Fri skrivning!'
             : 'Malmfyndighet hittad! (Malmiesiintymä)';
         tagEl.className = isFreeText
             ? 'text-xs uppercase tracking-wider font-extrabold text-fuchsia-400'
@@ -1472,11 +1829,21 @@ function triggerQuiz(options) {
 
     document.getElementById('quiz-finnish').textContent = `"${sentence.fi}"`;
 
+    const suffixText = sentence.suffix || '';
+    const suffixFreeEl = document.getElementById('quiz-suffix-free');
+    const suffixBankEl = document.getElementById('quiz-suffix-bank');
+
     if (isFreeText) {
         pillEl.classList.remove('hidden');
         bankModeEl.classList.add('hidden');
         freeModeEl.classList.remove('hidden');
         document.getElementById('quiz-prefix-free').textContent = sentence.prefix;
+        if (suffixText) {
+            suffixFreeEl.textContent = suffixText;
+            suffixFreeEl.classList.remove('hidden');
+        } else {
+            suffixFreeEl.classList.add('hidden');
+        }
         freeInput.value = '';
         freeInput.disabled = false;
         clearBtn.textContent = 'Rensa text';
@@ -1486,6 +1853,12 @@ function triggerQuiz(options) {
         bankModeEl.classList.remove('hidden');
         freeModeEl.classList.add('hidden');
         document.getElementById('quiz-prefix-bank').textContent = sentence.prefix;
+        if (suffixText) {
+            suffixBankEl.textContent = suffixText;
+            suffixBankEl.classList.remove('hidden');
+        } else {
+            suffixBankEl.classList.add('hidden');
+        }
         clearBtn.textContent = 'Rensa / Tyhjennä';
         renderQuizWords();
     }
@@ -1578,17 +1951,17 @@ function checkQuizAnswer() {
     feedbackEl.classList.remove('hidden', 'bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100', 'bg-rose-950/90', 'border-rose-500', 'text-rose-100');
 
     if (currentQuiz.isBoss) {
-        const bx = (boss.col + 1.5) * TILE_SIZE;
-        const by = (boss.row + 1.2) * TILE_SIZE;
+        const bx = boss.col * TILE_SIZE + boss.width / 2;
+        const by = boss.row * TILE_SIZE + boss.height / 2;
 
         if (isCorrect) {
             sound.playSuccess();
             boss.hp = Math.max(0, boss.hp - 1);
             player.stats.solvedCount++;
             player.stats.streak++;
-            const bossStrikeBonus = 250;
+            const bossStrikeBonus = 350;
             player.money += bossStrikeBonus;
-            spawnParticles(bx, by, '#f43f5e', 24, 150);
+            spawnParticles(bx, by, '#f43f5e', 28, 160);
 
             if (boss.hp <= 0) {
                 boss.defeated = true;
@@ -1598,9 +1971,9 @@ function checkQuizAnswer() {
                 feedbackEl.innerHTML = `
                     <div class="font-extrabold text-emerald-300 text-base mb-1">🏆 DJUPETS KÄRNBOSS BESEGRAD! (+${boss.reward + bossStrikeBonus} SEK)</div>
                     <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
-                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
+                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>${currentQuiz.sentence.suffix || ""}
                     </div>
-                    <div class="text-xs text-emerald-200">Snyggt jobbat! Du bemästrar svensk bisatsordföljd (KonSuKieLiPre) på fri hand!</div>
+                    <div class="text-xs text-emerald-200">Fantastiskt! Du bemästrar svensk bisatsordföljd (KonSuKieLiPre) på fri hand!</div>
                 `;
             } else {
                 addFloatingText(bx, by - 15, `Fullträff! +${bossStrikeBonus} SEK (${boss.hp} HP kvar)`, '#fbbf24');
@@ -1608,26 +1981,26 @@ function checkQuizAnswer() {
                 feedbackEl.innerHTML = `
                     <div class="font-extrabold text-emerald-300 text-base mb-1">⚔️ Fullträff med fri skrivning! +${bossStrikeBonus} SEK (Bossen har ${boss.hp}/${boss.maxHp} HP kvar)</div>
                     <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
-                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
+                        ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>${currentQuiz.sentence.suffix || ""}
                     </div>
-                    <div class="text-xs text-emerald-200">Borra mot bossen igen för nästa attack!</div>
+                    <div class="text-xs text-emerald-200">Akta bossens chockvåg i grottan och slå till igen!</div>
                 `;
             }
         } else {
             sound.playError();
             player.stats.streak = 0;
-            player.hull = Math.max(0, player.hull - 25);
-            player.vy = -180;
-            spawnParticles(player.x + 16, player.y + 16, '#f43f5e', 16, 110);
-            addFloatingText(player.x + 16, player.y - 10, 'Bossen slog tillbaka! -25 HP', '#fb7185');
+            player.hull = Math.max(0, player.hull - 35);
+            player.vy = -210;
+            spawnParticles(player.x + 16, player.y + 16, '#f43f5e', 18, 120);
+            addFloatingText(player.x + 16, player.y - 10, 'Bossen slog tillbaka! -35 HP', '#fb7185');
 
             feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
             feedbackEl.innerHTML = `
-                <div class="font-extrabold text-rose-300 text-base mb-1">💥 Bossen blockerade! Skrovet tog skada (-25 HP).</div>
+                <div class="font-extrabold text-rose-300 text-base mb-1">💥 Bossen blockerade! Skrovet tog hård skada (-35 HP).</div>
                 <div class="text-xs text-rose-200 mb-1">Ditt svar: <span class="mono line-through text-rose-300">${displayUserAnswer}</span></div>
                 <div class="text-xs text-emerald-200 mb-1">Korrekt bisats:</div>
                 <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white mb-2">
-                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${expectedFull}</span>
+                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${expectedFull}</span>${currentQuiz.sentence.suffix || ""}
                 </div>
                 <div class="text-xs text-slate-200 bg-slate-900/60 p-2 rounded border border-slate-700">
                     💡 <strong>Förklaring:</strong> ${currentQuiz.sentence.explanation}
@@ -1643,7 +2016,7 @@ function checkQuizAnswer() {
             sound.playSuccess();
             player.stats.solvedCount++;
             player.stats.streak++;
-            const baseBonus = currentQuiz.isFreeText ? 120 : 0;
+            const baseBonus = currentQuiz.isFreeText ? 150 : 0;
             const streakBonus = Math.min(player.stats.streak * 10, 100) + baseBonus;
             player.money += streakBonus;
 
@@ -1662,7 +2035,7 @@ function checkQuizAnswer() {
             feedbackEl.innerHTML = `
                 <div class="font-extrabold text-emerald-300 text-base mb-1">✅ Rätt! Bra jobbat med KonSuKieLiPre! (+${streakBonus} SEK)</div>
                 <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1.5">
-                    ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>
+                    ${currentQuiz.sentence.prefix} <span class="text-emerald-300 font-bold">${expectedFull}</span>${currentQuiz.sentence.suffix || ""}
                 </div>
                 <div class="text-xs text-emerald-200">${cargoMsg}</div>
             `;
@@ -1678,7 +2051,7 @@ function checkQuizAnswer() {
                 ${currentQuiz.isFreeText ? `<div class="text-xs text-rose-200 mb-1">Ditt svar: <span class="mono line-through text-rose-300">${displayUserAnswer}</span></div>` : ''}
                 <div class="text-xs text-rose-200 mb-1">Korrekt KonSuKieLiPre-ordföljd:</div>
                 <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white mb-2">
-                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${expectedFull}</span>
+                    ${currentQuiz.sentence.prefix} <span class="text-amber-300 font-bold">${expectedFull}</span>${currentQuiz.sentence.suffix || ""}
                 </div>
                 <div class="text-xs text-slate-200 bg-slate-900/60 p-2 rounded border border-slate-700">
                     💡 <strong>Förklaring:</strong> ${currentQuiz.sentence.explanation}
@@ -1748,7 +2121,7 @@ function openStationModal(station) {
                 <div class="bg-slate-800/70 rounded-xl p-6 text-center text-slate-400 border border-slate-700">
                     <div class="text-3xl mb-2">📦</div>
                     <p class="font-semibold text-slate-200">Lastutrymmet är tomt! (Ruuma on tyhjä)</p>
-                    <p class="text-xs mt-1">Borra malm eller Nobelium under jord och lös KonSuKieLiPre-uppgifter.</p>
+                    <p class="text-xs mt-1">Borra malm eller grundämnen under jord och lös KonSuKieLiPre-uppgifter.</p>
                 </div>
             `;
         } else {
@@ -1807,7 +2180,7 @@ function openStationModal(station) {
                     <div class="text-xs text-slate-300">Nuvarande: ${Math.floor(player.fuel)} / ${getMaxFuel()} L</div>
                 </div>
                 <button id="btn-buy-fuel" class="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-extrabold px-4 py-2 rounded-xl text-sm transition" ${missingFuel <= 0 || player.money < fuelCost ? 'disabled' : ''}>
-                    ${missingFuel <= 0 ? 'Fulltankad' : `Tanka (${fuelCost}) SEK`}
+                    ${missingFuel <= 0 ? 'Fulltankad' : `Tanka (${fuelCost} SEK)`}
                 </button>
             </div>
 
@@ -1917,12 +2290,12 @@ function closeStationModal() {
  * ============================================================================
  */
 function getTileAt(col, row) {
-    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return BLOCKS.HARD_ROCK;
+    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return BLOCKS.BEDROCK;
     return BLOCK_BY_ID[grid[row][col]] || BLOCKS.EMPTY;
 }
 
 function checkCollision(nx, ny) {
-    const margin = 4;
+    const margin = 5;
     const left = Math.floor((nx + margin) / TILE_SIZE);
     const right = Math.floor((nx + player.width - margin) / TILE_SIZE);
     const top = Math.floor((ny + margin) / TILE_SIZE);
@@ -1999,8 +2372,22 @@ function update(dt) {
     const gravity = 460;
     const thrustAccel = 740 * (upPressed && joystick.y < -0.32 ? Math.max(0.65, Math.min(1, -joystick.y)) : 1);
 
+    // Bossi liikkuu edestakaisin tilavassa pohjaluolassaan
+    if (!boss.defeated) {
+        const minBossCol = CHAMBER_LEFT_COL + 1;
+        const maxBossCol = CHAMBER_RIGHT_COL - 3.5;
+        const t = performance.now() * 0.0012;
+        boss.col = minBossCol + ((Math.sin(t) + 1) / 2) * (maxBossCol - minBossCol);
+        boss.row = CHAMBER_FLOOR_ROW - 3;
+    }
+
+    // Polttoaineen kulutus: poraaminen kuluttaa enemmän kiven kovuuden ja harvinaisuuden mukaan
     if (leftPressed || rightPressed || upPressed || player.drilling.active) {
-        const burnRate = upPressed ? 1.8 : 0.75;
+        let burnRate = upPressed ? 1.8 : 0.75;
+        if (player.drilling.active) {
+            const drillingBlock = getTileAt(player.drilling.targetCol, player.drilling.targetRow);
+            burnRate = 0.95 * (drillingBlock.fuelMult || 1.0);
+        }
         player.fuel = Math.max(0, player.fuel - burnRate * dt);
         if (player.fuel <= 0) {
             triggerGameOver('Slut på bensin!', 'Motorn stannade djupt under jord.');
@@ -2009,36 +2396,62 @@ function update(dt) {
     }
 
     if (player.drilling.active) {
-        sound.playDrill();
-        player.drilling.progress += dt * getDrillSpeed();
+        const c = player.drilling.targetCol;
+        const r = player.drilling.targetRow;
+        const block = getTileAt(c, r);
 
-        const targetX = player.drilling.targetCol * TILE_SIZE + TILE_SIZE / 2;
-        const targetY = player.drilling.targetRow * TILE_SIZE + TILE_SIZE / 2;
-
-        player.x += (targetX - player.width / 2 - player.x) * 8 * dt;
-        player.y += (targetY - player.height / 2 - player.y) * 8 * dt;
-
-        const block = getTileAt(player.drilling.targetCol, player.drilling.targetRow);
-        if (Math.random() < 0.5) {
-            spawnParticles(targetX, targetY, block.oreColor || block.color, 2, 70);
-        }
-
-        if (upPressed) {
+        // Jos kohdelaatasta on tullut tyhjä tai se on poraamaton, keskeytä siististi
+        if (!block.solid || block.unbreakable) {
             player.drilling.active = false;
             player.drilling.progress = 0;
-        } else if (player.drilling.progress >= player.drilling.duration) {
-            const c = player.drilling.targetCol;
-            const r = player.drilling.targetRow;
-            player.drilling.active = false;
-            player.drilling.progress = 0;
+        } else {
+            sound.playDrill();
+            player.drilling.progress += dt * getDrillSpeed();
 
-            if (block.isOre) {
-                triggerQuiz({ isBoss: false, col: c, row: r, block });
-                return;
+            const targetCenterX = c * TILE_SIZE + TILE_SIZE / 2;
+            const targetCenterY = r * TILE_SIZE + TILE_SIZE / 2;
+            const desiredX = targetCenterX - player.width / 2;
+            const desiredY = targetCenterY - player.height / 2;
+
+            // Liikutetaan alusta pehmeästi kohti porattavaa ruutua ilman seinien läpi teleporttaamista
+            const playerRow = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+            if (r > playerRow) {
+                // Alaspäin poratessa keskitetään X-akseli ruudun keskelle ja painaudutaan alas
+                player.x += (desiredX - player.x) * Math.min(1, 10 * dt);
+                const maxStepY = r * TILE_SIZE - player.height + 6;
+                player.y = Math.min(maxStepY, player.y + 28 * dt);
             } else {
-                grid[r][c] = BLOCKS.EMPTY.id;
-                spawnParticles(targetX, targetY, block.color, 12, 95);
-                saveGameState();
+                // Sivulle poratessa pidetään alus ruudun korkeudella ja nojataan seinään
+                player.y += (desiredY - player.y) * Math.min(1, 10 * dt);
+                const dir = c > Math.floor((player.x + player.width / 2) / TILE_SIZE) ? 1 : -1;
+                const edgeX = dir === 1 ? c * TILE_SIZE - player.width + 4 : (c + 1) * TILE_SIZE - 4;
+                player.x += (edgeX - player.x) * Math.min(1, 10 * dt);
+            }
+
+            if (Math.random() < 0.5) {
+                spawnParticles(targetCenterX, targetCenterY, block.oreColor || block.color, 2, 70);
+            }
+
+            if (upPressed) {
+                player.drilling.active = false;
+                player.drilling.progress = 0;
+            } else if (player.drilling.progress >= player.drilling.duration) {
+                player.drilling.active = false;
+                player.drilling.progress = 0;
+
+                if (block.isOre) {
+                    triggerQuiz({ isBoss: false, col: c, row: r, block });
+                    return;
+                } else {
+                    grid[r][c] = BLOCKS.EMPTY.id;
+                    // Asetetaan alus puhtaasti avatun ruudun kohdalle
+                    player.x = desiredX;
+                    player.y = desiredY;
+                    player.vx = 0;
+                    player.vy = 0;
+                    spawnParticles(targetCenterX, targetCenterY, block.color, 12, 95);
+                    saveGameState();
+                }
             }
         }
     } else {
@@ -2075,9 +2488,14 @@ function update(dt) {
         nextX = Math.max(0, Math.min(GRID_COLS * TILE_SIZE - player.width, nextX));
 
         if (checkBossCollision(nextX, player.y)) {
-            player.vx = -player.facing * 140;
-            triggerQuiz({ isBoss: true });
-            return;
+            if (getDrillPower() < 3) {
+                player.vx = -player.facing * 180;
+                showToast('Kärnbossens pansar kräver Diamantborr (Nivå 3)!', 'warn');
+            } else {
+                player.vx = -player.facing * 140;
+                triggerQuiz({ isBoss: true });
+                return;
+            }
         }
 
         if (!checkCollision(nextX, player.y)) {
@@ -2085,7 +2503,7 @@ function update(dt) {
         } else {
             if (grounded && (leftPressed || rightPressed)) {
                 const dir = leftPressed ? -1 : 1;
-                const checkCol = Math.floor((player.x + player.width / 2 + dir * (TILE_SIZE * 0.6)) / TILE_SIZE);
+                const checkCol = Math.floor((player.x + player.width / 2 + dir * (player.width / 2 + 6)) / TILE_SIZE);
                 const checkRow = Math.floor((player.y + player.height / 2) / TILE_SIZE);
                 tryStartDrill(checkCol, checkRow);
             }
@@ -2093,12 +2511,17 @@ function update(dt) {
         }
 
         let nextY = player.y + player.vy * dt;
-        nextY = Math.max(0, Math.min(GRID_ROWS * TILE_SIZE - player.height, nextY));
+        nextY = Math.max(0, Math.min(CHAMBER_FLOOR_ROW * TILE_SIZE - player.height, nextY));
 
         if (checkBossCollision(player.x, nextY)) {
-            player.vy = -170;
-            triggerQuiz({ isBoss: true });
-            return;
+            if (getDrillPower() < 3) {
+                player.vy = -200;
+                showToast('Kärnbossens pansar kräver Diamantborr (Nivå 3)!', 'warn');
+            } else {
+                player.vy = -170;
+                triggerQuiz({ isBoss: true });
+                return;
+            }
         }
 
         if (!checkCollision(player.x, nextY)) {
@@ -2151,12 +2574,12 @@ function update(dt) {
 }
 
 function tryStartDrill(col, row) {
-    if (col < 0 || col >= GRID_COLS || row < SURFACE_ROW || row >= GRID_ROWS) return;
+    if (col < 0 || col >= GRID_COLS || row < SURFACE_ROW || row >= CHAMBER_FLOOR_ROW) return;
     const block = getTileAt(col, row);
-    if (!block.solid) return;
+    if (!block.solid || block.unbreakable) return;
 
     if (block.hardness > getDrillPower()) {
-        if (Math.random() < 0.15) {
+        if (Math.random() < 0.2) {
             showToast(`För hårt (${block.name})! Uppgradera borren på Borrverkstad.`, 'warn');
         }
         return;
@@ -2170,7 +2593,7 @@ function tryStartDrill(col, row) {
     player.drilling.targetCol = col;
     player.drilling.targetRow = row;
     player.drilling.progress = 0;
-    player.drilling.duration = 0.42 * block.hardness;
+    player.drilling.duration = block.drillTime || (0.45 * block.hardness);
 }
 
 function checkStationProximity() {
@@ -2219,7 +2642,7 @@ function updateHUD() {
 
 /**
  * ============================================================================
- * 9. PIIRTÄMINEN (CANVAS RENDERING)
+ * 9. PIIRTÄMINEN (CANVAS RENDERING — MYÖS 1440P / 4K LEVEÄT NÄYTÖT)
  * ============================================================================
  */
 const canvas = document.getElementById('gameCanvas');
@@ -2239,36 +2662,82 @@ function draw() {
     const worldW = GRID_COLS * TILE_SIZE;
     const worldH = GRID_ROWS * TILE_SIZE;
 
-    let camX = player.x + player.width / 2 - w / 2;
+    // Jos näyttö on leveämpi kuin kaivos (esim. 1440p / 4K), keskitetään kaivos vaakasuunnassa
+    let camX;
+    if (w >= worldW) {
+        camX = -(w - worldW) / 2;
+    } else {
+        camX = player.x + player.width / 2 - w / 2;
+        camX = Math.max(0, Math.min(worldW - w, camX));
+    }
+
     let camY = player.y + player.height / 2 - h / 2;
-    camX = Math.max(0, Math.min(Math.max(0, worldW - w), camX));
     camY = Math.max(0, Math.min(Math.max(0, worldH - h), camY));
 
+    // Koko ruudun ulkopuolinen peruskalliotausta (näkyy 1440p/4K-näyttöjen reunoilla siististi)
+    ctx.fillStyle = '#070b14';
+    ctx.fillRect(0, 0, w, h);
+
+    const worldLeftScreen = -camX;
+    const worldRightScreen = worldW - camX;
     const skyY = SURFACE_ROW * TILE_SIZE - camY;
+
+    // Piirretään ulkopuoliset reunakalliot 1440p/4K-leveillä näytöillä
+    if (worldLeftScreen > 0 || worldRightScreen < w) {
+        ctx.fillStyle = '#0d1322';
+        if (worldLeftScreen > 0) {
+            ctx.fillRect(0, 0, worldLeftScreen, h);
+        }
+        if (worldRightScreen < w) {
+            ctx.fillRect(worldRightScreen, 0, w - worldRightScreen, h);
+        }
+
+        // Reunakallion tekstuuri ja rajaviivat
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2;
+        if (worldLeftScreen > 0) {
+            ctx.beginPath();
+            ctx.moveTo(worldLeftScreen, 0);
+            ctx.lineTo(worldLeftScreen, h);
+            ctx.stroke();
+        }
+        if (worldRightScreen < w) {
+            ctx.beginPath();
+            ctx.moveTo(worldRightScreen, 0);
+            ctx.lineTo(worldRightScreen, h);
+            ctx.stroke();
+        }
+    }
+
+    // Rajataan pelimaailman piirto kaivoksen leveydelle
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(Math.max(0, worldLeftScreen), 0, Math.min(w, worldW), h);
+    ctx.clip();
+
     const skyGrad = ctx.createLinearGradient(0, Math.min(0, skyY - 250), 0, Math.max(100, skyY + 60));
     skyGrad.addColorStop(0, '#0f172a');
     skyGrad.addColorStop(0.5, '#1e3a8a');
     skyGrad.addColorStop(1, '#38bdf8');
     ctx.fillStyle = '#090d16';
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(worldLeftScreen, 0, worldW, h);
 
     if (skyY > 0) {
         ctx.fillStyle = skyGrad;
-        ctx.fillRect(0, 0, w, Math.min(h, skyY));
+        ctx.fillRect(worldLeftScreen, 0, worldW, Math.min(h, skyY));
 
         ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
         ctx.beginPath();
-        ctx.moveTo(0, skyY);
-        for (let mx = 0; mx <= w + 120; mx += 120) {
+        ctx.moveTo(worldLeftScreen, skyY);
+        for (let mx = 0; mx <= worldW + 120; mx += 120) {
             const mh = 45 + Math.sin((mx + camX * 0.3) * 0.01) * 30;
-            ctx.lineTo(mx, skyY - mh);
+            ctx.lineTo(worldLeftScreen + mx, skyY - mh);
         }
-        ctx.lineTo(w, skyY);
+        ctx.lineTo(worldLeftScreen + worldW, skyY);
         ctx.closePath();
         ctx.fill();
     }
 
-    ctx.save();
     ctx.translate(-camX, -camY);
 
     STATIONS.forEach(st => {
@@ -2309,7 +2778,8 @@ function draw() {
             const id = grid[r][c];
             if (id === BLOCKS.EMPTY.id) {
                 if (r >= SURFACE_ROW) {
-                    ctx.fillStyle = r > GRID_ROWS - 10 ? '#1b0d14' : '#111622';
+                    const inBossChamber = r >= CHAMBER_TOP_ROW && r < CHAMBER_FLOOR_ROW && c >= CHAMBER_LEFT_COL && c <= CHAMBER_RIGHT_COL;
+                    ctx.fillStyle = inBossChamber ? '#1e0b16' : (r > CHAMBER_TOP_ROW - 12 ? '#180d14' : '#111622');
                     ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 }
                 continue;
@@ -2327,6 +2797,16 @@ function draw() {
                 ctx.fillRect(bx, by, TILE_SIZE, 6);
             }
 
+            // Kiinteä peruskalliopohja (BEDROCK) saa varoitus-/peruskalliokuvioinnin
+            if (block.id === BLOCKS.BEDROCK.id) {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(bx + 4, by + 4, TILE_SIZE - 8, 6);
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(bx + 1, by + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+                continue;
+            }
+
             ctx.strokeStyle = block.border || 'rgba(0,0,0,0.25)';
             ctx.lineWidth = 1;
             ctx.strokeRect(bx + 0.5, by + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
@@ -2334,7 +2814,7 @@ function draw() {
             if (block.isOre) {
                 ctx.save();
                 ctx.shadowColor = block.glow;
-                ctx.shadowBlur = block.id === BLOCKS.NOBELIUM.id ? 14 : 8;
+                ctx.shadowBlur = (block.id === BLOCKS.NOBELIUM.id || block.id === BLOCKS.SEABORGIUM.id) ? 14 : 8;
                 ctx.fillStyle = block.oreColor;
 
                 const offsets = [
@@ -2348,7 +2828,7 @@ function draw() {
                     ctx.fill();
                 });
 
-                if (block.id === BLOCKS.NOBELIUM.id) {
+                if (block.requiresFreeText) {
                     ctx.strokeStyle = '#fdf4ff';
                     ctx.lineWidth = 1.5;
                     ctx.strokeRect(bx + 5, by + 5, TILE_SIZE - 10, TILE_SIZE - 10);
@@ -2410,44 +2890,49 @@ function drawBoss(ctx) {
     const pulse = Math.sin(performance.now() * 0.006) * 3;
 
     ctx.save();
-    ctx.translate(bx + boss.width / 2, by + boss.height / 2 + pulse * 0.4);
+    ctx.translate(bx + boss.width / 2, by + boss.height / 2 + pulse * 0.35);
 
     ctx.shadowColor = '#f43f5e';
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 22;
 
     ctx.fillStyle = '#31102f';
     ctx.strokeStyle = '#f43f5e';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
-    ctx.roundRect(-boss.width / 2, -boss.height / 2, boss.width, boss.height, 14);
+    ctx.roundRect(-boss.width / 2, -boss.height / 2, boss.width, boss.height, 16);
     ctx.fill();
     ctx.stroke();
 
     ctx.shadowBlur = 0;
 
+    // Panssari-korostukset
+    ctx.strokeStyle = '#fb7185';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-boss.width / 2 + 10, -boss.height / 2 + 10, boss.width - 20, boss.height - 20);
+
     ctx.fillStyle = '#fda4af';
     ctx.beginPath();
-    ctx.arc(-22, -6, 9, 0, Math.PI * 2);
-    ctx.arc(22, -6, 9, 0, Math.PI * 2);
+    ctx.arc(-26, -8, 10, 0, Math.PI * 2);
+    ctx.arc(26, -8, 10, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#e11d48';
     ctx.beginPath();
-    ctx.arc(-22, -6, 4, 0, Math.PI * 2);
-    ctx.arc(22, -6, 4, 0, Math.PI * 2);
+    ctx.arc(-26, -8, 4.5, 0, Math.PI * 2);
+    ctx.arc(26, -8, 4.5, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = 'bold 12px Inter, sans-serif';
+    ctx.font = 'bold 13px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fda4af';
-    ctx.fillText(`👾 ${boss.name}`, 0, -boss.height / 2 - 18);
+    ctx.fillText(`👾 ${boss.name} (${boss.hp}/${boss.maxHp} HP)`, 0, -boss.height / 2 - 20);
 
-    const barW = 90;
-    const barH = 7;
+    const barW = 110;
+    const barH = 8;
     ctx.fillStyle = '#0f172a';
-    ctx.fillRect(-barW / 2, -boss.height / 2 - 12, barW, barH);
+    ctx.fillRect(-barW / 2, -boss.height / 2 - 13, barW, barH);
     ctx.fillStyle = '#f43f5e';
-    ctx.fillRect(-barW / 2, -boss.height / 2 - 12, barW * (boss.hp / boss.maxHp), barH);
+    ctx.fillRect(-barW / 2, -boss.height / 2 - 13, barW * (boss.hp / boss.maxHp), barH);
 
     ctx.restore();
 }
@@ -2696,11 +3181,10 @@ window.onload = function () {
         showToast('Tallennettu peli ladattu! (Sparat spel laddat)', 'success');
     } else {
         startNewGame(false);
-        showToast('Välkommen till gruvan! Leta efter Nobelium (No) & Djupets kärnboss!', 'info');
+        showToast('Välkommen till gruvan! Leta efter Nobelium, Seaborgium & Djupets kärnboss!', 'info');
     }
     requestAnimationFrame(gameLoop);
 };
 </script>
 </body>
 </html>
-```[cite: 1]
