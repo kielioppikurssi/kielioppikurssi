@@ -127,10 +127,11 @@
 
         <!-- Oikea: Toimintonapit -->
         <div class="flex items-center gap-1.5 sm:gap-2">
-            <button id="btn-learned-vocab" class="bg-teal-700/80 hover:bg-teal-600 active:bg-teal-800 text-teal-100 border border-teal-400/50 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="Osatut sanat / Выученные слова">
-                <span>📖</span>
+            <button id="btn-learned-vocab" class="bg-teal-700/80 hover:bg-teal-600 active:bg-teal-800 text-teal-100 border border-teal-400/50 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="Sanamökki: Osatut & failatut sanat / Словарь">
+                <span>🏡</span>
                 <span class="hidden sm:inline">Sanasto</span>
-                <span id="hud-vocab-count" class="mono bg-teal-950/80 text-teal-200 px-1.5 py-0.2 rounded text-xs">0</span>
+                <span id="hud-vocab-count" class="mono bg-teal-950/80 text-teal-200 px-1.5 py-0.2 rounded text-xs" title="Osatut sanat">0</span>
+                <span id="hud-failed-count" class="hidden mono bg-rose-950/90 text-rose-200 border border-rose-500/50 px-1.5 py-0.2 rounded text-xs" title="Failatut sanat kertaukseen">0!</span>
             </button>
             <button id="btn-auto-tts" class="bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-500/40 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="Автоозвучка русских слов при открытии заданий / Automaattinen venäjän ääni">
                 <span id="auto-tts-icon">🗣️</span><span id="auto-tts-label" class="hidden md:inline">Автозвук: ВКЛ</span>
@@ -205,6 +206,15 @@
             <div id="quiz-already-known-banner" class="hidden bg-teal-950/85 border border-teal-400/60 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-teal-100 flex items-center gap-2.5 shadow">
                 <span class="text-lg">✨</span>
                 <span id="quiz-already-known-text" class="font-semibold">Hei! Olet osannut tämän sanan jo aiemmin.</span>
+            </div>
+
+            <!-- Huomautus jos sana on failattu aiemmin -->
+            <div id="quiz-previously-failed-banner" class="hidden bg-rose-950/85 border border-rose-400/60 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-rose-100 flex items-center justify-between gap-2.5 shadow">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-lg">🎯</span>
+                    <span id="quiz-previously-failed-text" class="font-semibold">Tämä sana meni viimeksi ohi — nyt revanssi!</span>
+                </div>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-rose-900/90 text-rose-200 border border-rose-500/40 shrink-0">Kertaus</span>
             </div>
 
             <!-- Pika-lunttilappu -->
@@ -309,35 +319,118 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- MODAALI 2B: OIKEIN MENNEIDEN SANOJEN SANASTOLISTA (SANAMÖKKI & NAPPI)  -->
+    <!-- MODAALI 2B: SANAMÖKKI (OSATUT, FAILATUT JA KERTAUSMOODI)              -->
     <!-- ===================================================================== -->
     <div id="vocab-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-[60] flex items-center justify-center p-3 sm:p-6">
-        <div class="bg-slate-900 border-2 border-teal-500/50 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh]">
+        <div class="bg-slate-900 border-2 border-teal-500/50 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-3.5 max-h-[92vh]">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
                 <div class="flex items-center gap-3">
                     <span class="text-3xl">🏡</span>
                     <div>
                         <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
-                            <span>Osatut sanat • Выученный словарь</span>
+                            <span>Sanamökki • Словарь шахтёра</span>
                         </h2>
                         <p id="vocab-modal-subtitle" class="text-xs text-teal-300">
-                            Kertynyt sanasto oikeista vastauksista: 0 sanaa
+                            Osatut: 0 • Failatut kertaukseen: 0
                         </p>
                     </div>
                 </div>
                 <button id="btn-close-vocab" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold flex items-center justify-center">✕</button>
             </div>
 
-            <!-- Haku ja suodatus -->
-            <div class="flex flex-col sm:flex-row gap-2">
+            <!-- Välilehdet & Pikatreeni-nappi -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+                    <button id="tab-vocab-failed" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-rose-600 text-white shadow">
+                        <span>❌ Failatut</span>
+                        <span id="tab-failed-badge" class="mono bg-black/30 px-1.5 py-0.2 rounded text-xs">0</span>
+                    </button>
+                    <button id="tab-vocab-learned" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                        <span>✅ Osatut</span>
+                        <span id="tab-learned-badge" class="mono bg-slate-800 px-1.5 py-0.2 rounded text-xs">0</span>
+                    </button>
+                    <button id="tab-vocab-all" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                        <span>📚 Kaikki</span>
+                        <span id="tab-all-badge" class="mono bg-slate-800 px-1.5 py-0.2 rounded text-xs">0</span>
+                    </button>
+                </div>
+
+                <button id="btn-start-cabin-drill" type="button" class="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-extrabold px-3.5 py-2 rounded-xl text-xs sm:text-sm shadow transition flex items-center gap-1.5">
+                    <span>🎯</span>
+                    <span>Kertaa failatut</span>
+                </button>
+            </div>
+
+            <!-- Kertausnäkymä Sanamökissä (piilossa kun selataan listaa) -->
+            <div id="cabin-drill-panel" class="hidden bg-slate-950/90 border-2 border-amber-500/50 rounded-2xl p-4 sm:p-5 flex-col gap-3.5 shadow-inner">
+                <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">🎯</span>
+                        <div>
+                            <div id="cabin-drill-progress" class="text-xs font-extrabold uppercase tracking-wider text-amber-400">Kertaus 1 / 1</div>
+                            <div id="cabin-drill-mode-info" class="text-[11px] text-slate-400">Vaihe 1: Monivalinta (helppo alku)</div>
+                        </div>
+                    </div>
+                    <button id="btn-exit-cabin-drill" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 px-2.5 py-1.5 rounded-lg font-semibold">
+                        ← Takaisin listaan
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 rounded-xl p-3.5 border border-slate-800">
+                    <div id="cabin-drill-prompt-label" class="text-xs text-slate-400 font-semibold uppercase mb-1">Valitse oikea venäjänkielinen sana:</div>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <div id="cabin-drill-question" class="text-xl sm:text-2xl font-extrabold text-white"></div>
+                        <div id="cabin-drill-tts-slot"></div>
+                    </div>
+                    <div id="cabin-drill-meta" class="text-xs text-slate-400 mt-1"></div>
+                </div>
+
+                <!-- Monivalintavaihtoehdot kertauksessa -->
+                <div id="cabin-drill-mcq" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+
+                <!-- Kirjoituskenttä kertauksessa -->
+                <div id="cabin-drill-write" class="hidden flex-col gap-2">
+                    <input
+                        id="cabin-drill-input"
+                        type="text"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        placeholder="Kirjoita vastaus..."
+                        class="w-full bg-slate-900 text-white placeholder-slate-500 border border-slate-700 focus:border-amber-400 focus:outline-none rounded-xl px-3.5 py-2.5 text-base font-semibold"
+                    />
+                    <div id="cabin-cyrillic-helper" class="hidden flex-wrap items-center gap-1 pt-1"></div>
+                </div>
+
+                <div id="cabin-drill-feedback" class="hidden rounded-xl p-3 border text-xs sm:text-sm"></div>
+
+                <div class="flex items-center justify-end gap-2 pt-1">
+                    <button id="btn-cabin-drill-check" type="button" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-5 py-2 rounded-xl text-sm transition">
+                        Tarkista ✓
+                    </button>
+                    <button id="btn-cabin-drill-next" type="button" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-5 py-2 rounded-xl text-sm transition">
+                        Seuraava sana ▶
+                    </button>
+                </div>
+            </div>
+
+            <!-- Haku ja suodatus (listanäkymässä) -->
+            <div id="vocab-filter-bar" class="flex flex-col sm:flex-row gap-2">
                 <input
                     id="vocab-search-input"
                     type="text"
-                    placeholder="Hae sanasta (venäjä / suomi / aihe)... • Поиск слова..."
+                    placeholder="Hae sanasta (venäjä / suomi)... • Поиск..."
                     class="flex-1 bg-slate-800 text-white placeholder-slate-400 border border-slate-700 focus:border-teal-400 focus:outline-none rounded-xl px-3.5 py-2 text-sm"
                 />
-                <button id="btn-vocab-speak-all" type="button" class="bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-500/40 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition">
-                    🔊 Kuuntele 1. osuma
+                <select
+                    id="vocab-cat-select"
+                    class="bg-slate-800 text-slate-200 border border-slate-700 focus:border-teal-400 focus:outline-none rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold"
+                >
+                    <option value="">Kaikki aiheet</option>
+                </select>
+                <button id="btn-vocab-speak-all" type="button" class="bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-500/40 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition shrink-0">
+                    🔊 Kuuntele 1.
                 </button>
             </div>
 
@@ -345,8 +438,8 @@
             <div id="vocab-list-container" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
 
             <div class="pt-2 border-t border-slate-800 flex justify-between items-center gap-2">
-                <span class="text-xs text-slate-400">Avaa myös sanamökistä maan pinnalla tai tehtävän aikana!</span>
-                <button id="btn-close-vocab-bottom" type="button" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-5 py-2 rounded-xl text-sm transition">
+                <span class="text-xs text-slate-400">Failatut sanat painottuvat myös kaivoksen malmeissa, kunnes osaat ne!</span>
+                <button id="btn-close-vocab-bottom" type="button" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-5 py-2 rounded-xl text-sm transition shrink-0">
                     Sulje • Закрыть
                 </button>
             </div>
@@ -1492,8 +1585,12 @@ let gameOver = false;
 let activeStation = null;
 let currentQuiz = null;
 let usedSentenceIndices = new Set();
-// Tallentaa oikein osatut sanat: { key, ru, fi, cat, count, lastLearnedAt }
+// Tallentaa oikein osatut sanat: { key, ru, fi, cat, count, lastLearnedAt, masteredAfterFail }
 let learnedWords = [];
+// Tallentaa failatut sanat: { key, ru, fi, cat, failCount, lastFailedAt, lastWrongAnswer, lastMode, lastOreName }
+let failedWords = [];
+let currentVocabTab = 'failed'; // 'failed' | 'learned' | 'all'
+let cabinDrillState = null;
 let saveTimer = 0;
 
 const boss = {
@@ -1535,20 +1632,39 @@ function getWordKey(ruWord) {
     return normalizeAnswer(ruWord);
 }
 
+function getModeLabelFi(mode) {
+    if (mode === 'write_ru') return 'Venäjäksi kirjoitus';
+    if (mode === 'write_fi') return 'Suomeksi kirjoitus';
+    if (mode === 'boss') return 'Pomotaistelu';
+    return 'Monivalinta';
+}
+
 function findLearnedWord(ruWord) {
     const key = getWordKey(ruWord);
     return learnedWords.find(w => w.key === key) || null;
 }
 
+function findFailedWord(ruWord) {
+    const key = getWordKey(ruWord);
+    return failedWords.find(w => w.key === key) || null;
+}
+
 function recordLearnedWord(item) {
     if (!item || !item.ru) return;
     const key = getWordKey(item.ru);
+    const failedIdx = failedWords.findIndex(w => w.key === key);
+    const wasFailedBefore = failedIdx !== -1;
+    if (wasFailedBefore) {
+        failedWords.splice(failedIdx, 1);
+    }
+
     const existing = learnedWords.find(w => w.key === key);
     if (existing) {
         existing.count = (existing.count || 1) + 1;
         existing.fi = item.fi || existing.fi;
         existing.cat = item.cat || existing.cat;
         existing.lastLearnedAt = Date.now();
+        if (wasFailedBefore) existing.masteredAfterFail = true;
     } else {
         learnedWords.unshift({
             key,
@@ -1556,30 +1672,133 @@ function recordLearnedWord(item) {
             fi: item.fi || '',
             cat: item.cat || '',
             count: 1,
-            lastLearnedAt: Date.now()
+            lastLearnedAt: Date.now(),
+            masteredAfterFail: wasFailedBefore
+        });
+    }
+    updateVocabCountBadges();
+}
+
+function recordFailedWord(item, meta = {}) {
+    if (!item || !item.ru) return;
+    const key = getWordKey(item.ru);
+    const existing = failedWords.find(w => w.key === key);
+    if (existing) {
+        existing.failCount = (existing.failCount || 1) + 1;
+        existing.fi = item.fi || existing.fi;
+        existing.cat = item.cat || existing.cat;
+        existing.lastFailedAt = Date.now();
+        if (meta.wrongAnswer) existing.lastWrongAnswer = meta.wrongAnswer;
+        if (meta.mode) existing.lastMode = meta.mode;
+        if (meta.oreName) existing.lastOreName = meta.oreName;
+    } else {
+        failedWords.unshift({
+            key,
+            ru: item.ru,
+            fi: item.fi || '',
+            cat: item.cat || '',
+            failCount: 1,
+            lastFailedAt: Date.now(),
+            lastWrongAnswer: meta.wrongAnswer || '',
+            lastMode: meta.mode || 'mcq',
+            lastOreName: meta.oreName || ''
         });
     }
     updateVocabCountBadges();
 }
 
 function updateVocabCountBadges() {
-    const count = learnedWords.length;
+    const learnedCount = learnedWords.length;
+    const failedCount = failedWords.length;
+    const allCount = learnedCount + failedCount;
+
     const hudBadge = document.getElementById('hud-vocab-count');
+    const hudFailedBadge = document.getElementById('hud-failed-count');
     const quizBadge = document.getElementById('quiz-vocab-badge-count');
     const subEl = document.getElementById('vocab-modal-subtitle');
-    if (hudBadge) hudBadge.textContent = String(count);
-    if (quizBadge) quizBadge.textContent = String(count);
+    const tabFailed = document.getElementById('tab-failed-badge');
+    const tabLearned = document.getElementById('tab-learned-badge');
+    const tabAll = document.getElementById('tab-all-badge');
+    const drillBtn = document.getElementById('btn-start-cabin-drill');
+
+    if (hudBadge) hudBadge.textContent = String(learnedCount);
+    if (hudFailedBadge) {
+        hudFailedBadge.textContent = `${failedCount}!`;
+        if (failedCount > 0) hudFailedBadge.classList.remove('hidden');
+        else hudFailedBadge.classList.add('hidden');
+    }
+    if (quizBadge) quizBadge.textContent = String(allCount);
+    if (tabFailed) tabFailed.textContent = String(failedCount);
+    if (tabLearned) tabLearned.textContent = String(learnedCount);
+    if (tabAll) tabAll.textContent = String(allCount);
+    if (drillBtn) {
+        drillBtn.disabled = failedCount === 0;
+        drillBtn.innerHTML = failedCount > 0
+            ? `<span>🎯</span><span>Kertaa failatut (${failedCount})</span>`
+            : `<span>🎯</span><span>Ei kerrattavia</span>`;
+    }
     if (subEl) {
-        subEl.textContent = `Kertynyt sanasto oikeista vastauksista: ${count} ${count === 1 ? 'sana' : 'sanaa'} • Выучено слов: ${count}`;
+        subEl.textContent = `Osatut: ${learnedCount} • Failatut kertaukseen: ${failedCount} • Выучено / Повторить`;
     }
 }
 
-function openVocabModal() {
+function populateVocabCategories() {
+    const select = document.getElementById('vocab-cat-select');
+    if (!select) return;
+    const prev = select.value;
+    const cats = new Set();
+    learnedWords.forEach(w => { if (w.cat) cats.add(w.cat); });
+    failedWords.forEach(w => { if (w.cat) cats.add(w.cat); });
+    select.innerHTML = '<option value="">Kaikki aiheet</option>';
+    Array.from(cats).sort().forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        select.appendChild(opt);
+    });
+    if (prev && cats.has(prev)) select.value = prev;
+}
+
+function setVocabTab(tabName) {
+    currentVocabTab = tabName;
+    const tabs = {
+        failed: document.getElementById('tab-vocab-failed'),
+        learned: document.getElementById('tab-vocab-learned'),
+        all: document.getElementById('tab-vocab-all')
+    };
+    const activeStyles = {
+        failed: 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-rose-600 text-white shadow',
+        learned: 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-teal-600 text-white shadow',
+        all: 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow'
+    };
+    const inactiveStyle = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white';
+
+    Object.entries(tabs).forEach(([key, el]) => {
+        if (!el) return;
+        el.className = key === tabName ? activeStyles[key] : inactiveStyle;
+    });
+
+    const searchVal = document.getElementById('vocab-search-input')?.value || '';
+    renderVocabList(searchVal);
+}
+
+function openVocabModal(preferredTab = null) {
     const modal = document.getElementById('vocab-modal');
     const searchInput = document.getElementById('vocab-search-input');
+    exitCabinDrill(false);
     if (searchInput) searchInput.value = '';
-    renderVocabList('');
+    populateVocabCategories();
     updateVocabCountBadges();
+
+    if (preferredTab) {
+        currentVocabTab = preferredTab;
+    } else if (failedWords.length > 0) {
+        currentVocabTab = 'failed';
+    } else {
+        currentVocabTab = 'learned';
+    }
+    setVocabTab(currentVocabTab);
+
     modal.classList.remove('hidden');
     if (searchInput) {
         setTimeout(() => searchInput.focus(), 50);
@@ -1587,15 +1806,28 @@ function openVocabModal() {
 }
 
 function closeVocabModal() {
+    exitCabinDrill(false);
     document.getElementById('vocab-modal').classList.add('hidden');
 }
 
-function renderVocabList(filterQuery = '') {
-    const container = document.getElementById('vocab-list-container');
-    if (!container) return;
+function getFilteredVocabEntries(filterQuery = '') {
     const q = normalizeAnswer(filterQuery);
+    const catFilter = document.getElementById('vocab-cat-select')?.value || '';
 
-    const filtered = learnedWords.filter(entry => {
+    let combined = [];
+    if (currentVocabTab === 'failed') {
+        combined = failedWords.map(w => ({ ...w, _status: 'failed' }));
+    } else if (currentVocabTab === 'learned') {
+        combined = learnedWords.map(w => ({ ...w, _status: 'learned' }));
+    } else {
+        combined = [
+            ...failedWords.map(w => ({ ...w, _status: 'failed' })),
+            ...learnedWords.map(w => ({ ...w, _status: 'learned' }))
+        ];
+    }
+
+    return combined.filter(entry => {
+        if (catFilter && entry.cat !== catFilter) return false;
         if (!q) return true;
         return (
             normalizeAnswer(entry.ru).includes(q) ||
@@ -1603,15 +1835,43 @@ function renderVocabList(filterQuery = '') {
             normalizeAnswer(entry.cat).includes(q)
         );
     });
+}
 
+function renderVocabList(filterQuery = '') {
+    const container = document.getElementById('vocab-list-container');
+    if (!container) return;
+
+    const filtered = getFilteredVocabEntries(filterQuery);
     container.innerHTML = '';
 
-    if (learnedWords.length === 0) {
+    if (currentVocabTab === 'failed' && failedWords.length === 0) {
+        container.innerHTML = `
+            <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-6 text-center text-slate-300 space-y-1.5">
+                <div class="text-3xl">🌟</div>
+                <p class="font-bold text-white">Ei failattuja sanoja kertauslaarissa!</p>
+                <p class="text-xs text-slate-400">Jos kaivoksessa jokin sana menee pieleen, se ilmestyy automaattisesti tänne kerrattavaksi.</p>
+            </div>
+        `;
+        return;
+    }
+
+    if (currentVocabTab === 'learned' && learnedWords.length === 0) {
         container.innerHTML = `
             <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-6 text-center text-slate-300 space-y-1.5">
                 <div class="text-3xl">🌱</div>
-                <p class="font-bold text-white">Sanalista on vielä tyhjä</p>
-                <p class="text-xs text-slate-400">Vastaa malmi- ja pomotehtäviin oikein, niin sanat kertyvät tähän ja omaan Sanamökkiisi maan pinnalle!</p>
+                <p class="font-bold text-white">Osattujen sanojen lista on vielä tyhjä</p>
+                <p class="text-xs text-slate-400">Vastaa malmi- ja pomotehtäviin oikein (tai treenaa failatut sanat kuntoon), niin sanat kertyvät tähän!</p>
+            </div>
+        `;
+        return;
+    }
+
+    if (currentVocabTab === 'all' && learnedWords.length === 0 && failedWords.length === 0) {
+        container.innerHTML = `
+            <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-6 text-center text-slate-300 space-y-1.5">
+                <div class="text-3xl">🏡</div>
+                <p class="font-bold text-white">Sanamökki on vielä tyhjä</p>
+                <p class="text-xs text-slate-400">Lähde kaivokseen louhimaan malmeja — sekä onnistuneet että failatut sanat tallentuvat tänne.</p>
             </div>
         `;
         return;
@@ -1620,36 +1880,349 @@ function renderVocabList(filterQuery = '') {
     if (filtered.length === 0) {
         container.innerHTML = `
             <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-5 text-center text-slate-400 text-sm">
-                Haulla <span class="text-white font-bold">"${filterQuery}"</span> ei löytynyt osumia.
+                Valituilla suodattimilla ei löytynyt sanoja.
             </div>
         `;
         return;
     }
 
     filtered.forEach((entry, idx) => {
+        const isFailed = entry._status === 'failed';
         const card = document.createElement('div');
-        card.className = 'bg-slate-800/90 hover:bg-slate-800 border border-slate-700/90 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3 transition';
+        card.className = isFailed
+            ? 'bg-rose-950/35 hover:bg-rose-950/55 border border-rose-500/40 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3 transition'
+            : 'bg-slate-800/90 hover:bg-slate-800 border border-slate-700/90 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3 transition';
 
         const left = document.createElement('div');
         left.className = 'min-w-0 flex-1';
-        left.innerHTML = `
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-mono text-slate-500">#${idx + 1}</span>
-                <span class="font-extrabold text-base text-teal-300">${entry.ru}</span>
-                <span class="text-slate-400">—</span>
-                <span class="font-semibold text-sm text-white">${entry.fi}</span>
-                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-950 text-teal-200 border border-teal-500/40">
-                    osattu ${entry.count || 1}×
-                </span>
-            </div>
-            <div class="text-[11px] text-slate-400 mt-0.5">Aihe: ${entry.cat || 'yleinen'}</div>
-        `;
 
-        const listenBtn = createRussianListenButton(entry.ru);
+        if (isFailed) {
+            const wrongInfo = entry.lastWrongAnswer
+                ? ` • Viimeksi vastasit: <span class="line-through text-rose-300">${entry.lastWrongAnswer}</span>`
+                : '';
+            const modeInfo = entry.lastMode ? ` • Tyyppi: ${getModeLabelFi(entry.lastMode)}` : '';
+            left.innerHTML = `
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-mono text-rose-400/80">#${idx + 1}</span>
+                    <span class="font-extrabold text-base text-rose-300">${entry.ru}</span>
+                    <span class="text-slate-400">—</span>
+                    <span class="font-semibold text-sm text-white">${entry.fi}</span>
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-950 text-rose-200 border border-rose-500/50">
+                        failattu ${entry.failCount || 1}×
+                    </span>
+                </div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Aihe: ${entry.cat || 'yleinen'}${modeInfo}${wrongInfo}</div>
+            `;
+        } else {
+            const revanssiBadge = entry.masteredAfterFail
+                ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-200 border border-amber-500/40">revanssi voitettu 🏆</span>`
+                : '';
+            left.innerHTML = `
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-mono text-slate-500">#${idx + 1}</span>
+                    <span class="font-extrabold text-base text-teal-300">${entry.ru}</span>
+                    <span class="text-slate-400">—</span>
+                    <span class="font-semibold text-sm text-white">${entry.fi}</span>
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-950 text-teal-200 border border-teal-500/40">
+                        osattu ${entry.count || 1}×
+                    </span>
+                    ${revanssiBadge}
+                </div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Aihe: ${entry.cat || 'yleinen'}</div>
+            `;
+        }
+
+        const right = document.createElement('div');
+        right.className = 'flex items-center gap-1.5 shrink-0';
+
+        if (isFailed) {
+            const practiceOneBtn = document.createElement('button');
+            practiceOneBtn.type = 'button';
+            practiceOneBtn.className = 'bg-amber-500/90 hover:bg-amber-400 text-slate-950 font-extrabold text-xs px-2.5 py-1 rounded-lg transition cursor-pointer';
+            practiceOneBtn.textContent = '🎯 Kertaa';
+            practiceOneBtn.title = 'Harjoittele tämä sana';
+            practiceOneBtn.onclick = () => startCabinDrill([entry]);
+            right.appendChild(practiceOneBtn);
+        }
+
+        right.appendChild(createRussianListenButton(entry.ru));
         card.appendChild(left);
-        card.appendChild(listenBtn);
+        card.appendChild(right);
         container.appendChild(card);
     });
+}
+
+/* --- SANAMÖKIN AKTIIVINEN PIKATREENI (FAILATUT SANAT) --- */
+function buildCabinCyrillicHelper() {
+    const helper = document.getElementById('cabin-cyrillic-helper');
+    if (!helper || helper.dataset.built === '1') return;
+    helper.dataset.built = '1';
+    CYRILLIC_CHARS.forEach(ch => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = ch;
+        btn.className = 'bg-slate-800 hover:bg-indigo-600 text-slate-100 font-bold text-xs px-2 py-1 rounded border border-slate-600 transition cursor-pointer';
+        btn.onclick = () => {
+            const inp = document.getElementById('cabin-drill-input');
+            if (!inp || inp.disabled) return;
+            const start = inp.selectionStart ?? inp.value.length;
+            const end = inp.selectionEnd ?? inp.value.length;
+            inp.value = inp.value.slice(0, start) + ch + inp.value.slice(end);
+            inp.focus();
+            inp.setSelectionRange(start + 1, start + 1);
+        };
+        helper.appendChild(btn);
+    });
+}
+
+function startCabinDrill(customList = null) {
+    const source = Array.isArray(customList) && customList.length > 0 ? customList : [...failedWords];
+    if (source.length === 0) {
+        showToast('Ei failattuja sanoja kerrattavaksi!', 'info');
+        return;
+    }
+
+    buildCabinCyrillicHelper();
+
+    // Järjestetään eniten failatut ensin
+    const queue = source
+        .slice()
+        .sort((a, b) => (b.failCount || 1) - (a.failCount || 1))
+        .map(w => ({ ...w }));
+
+    cabinDrillState = {
+        queue,
+        index: 0,
+        stepMode: 'mcq', // Aloitetaan helpommasta monivalinnasta ja halutessa siirrytään kirjoitukseen
+        selectedOption: null,
+        mcqOptions: [],
+        answered: false,
+        masteredInSession: 0
+    };
+
+    document.getElementById('vocab-filter-bar').classList.add('hidden');
+    document.getElementById('vocab-list-container').classList.add('hidden');
+    const panel = document.getElementById('cabin-drill-panel');
+    panel.classList.remove('hidden');
+    panel.classList.add('flex');
+
+    renderCabinDrillQuestion();
+}
+
+function exitCabinDrill(refreshList = true) {
+    cabinDrillState = null;
+    const panel = document.getElementById('cabin-drill-panel');
+    if (panel) {
+        panel.classList.add('hidden');
+        panel.classList.remove('flex');
+    }
+    const filterBar = document.getElementById('vocab-filter-bar');
+    const listContainer = document.getElementById('vocab-list-container');
+    if (filterBar) filterBar.classList.remove('hidden');
+    if (listContainer) listContainer.classList.remove('hidden');
+
+    if (refreshList) {
+        populateVocabCategories();
+        updateVocabCountBadges();
+        const q = document.getElementById('vocab-search-input')?.value || '';
+        renderVocabList(q);
+    }
+}
+
+function renderCabinDrillQuestion() {
+    if (!cabinDrillState) return;
+    const { queue, index, stepMode } = cabinDrillState;
+    if (index >= queue.length) {
+        const count = cabinDrillState.masteredInSession;
+        showToast(`Kertaus valmis! ${count} ${count === 1 ? 'sana' : 'sanaa'} siirretty osattuihin 🏆`, 'success');
+        exitCabinDrill(true);
+        return;
+    }
+
+    const item = queue[index];
+    cabinDrillState.answered = false;
+    cabinDrillState.selectedOption = null;
+
+    document.getElementById('cabin-drill-progress').textContent = `Kertaus ${index + 1} / ${queue.length} • Failattu aiemmin ${item.failCount || 1}×`;
+    document.getElementById('cabin-drill-mode-info').textContent = stepMode === 'mcq'
+        ? 'Vaihe 1/2: Kuuntele ja valitse oikea venäjän sana (helppo lämmittely)'
+        : 'Vaihe 2/2: Kirjoita sana venäjäksi kyrillisin kirjaimin';
+
+    const promptLabel = document.getElementById('cabin-drill-prompt-label');
+    const qEl = document.getElementById('cabin-drill-question');
+    const ttsSlot = document.getElementById('cabin-drill-tts-slot');
+    const metaEl = document.getElementById('cabin-drill-meta');
+    const mcqBox = document.getElementById('cabin-drill-mcq');
+    const writeBox = document.getElementById('cabin-drill-write');
+    const cyrBox = document.getElementById('cabin-cyrillic-helper');
+    const inputEl = document.getElementById('cabin-drill-input');
+    const fbEl = document.getElementById('cabin-drill-feedback');
+
+    ttsSlot.innerHTML = '';
+    fbEl.classList.add('hidden');
+    document.getElementById('btn-cabin-drill-check').classList.remove('hidden');
+    document.getElementById('btn-cabin-drill-next').classList.add('hidden');
+
+    qEl.textContent = item.fi;
+    metaEl.textContent = `Aihe: ${item.cat || 'yleinen'}${item.lastWrongAnswer ? ` • Aiempi virhe: "${item.lastWrongAnswer}"` : ''}`;
+
+    if (stepMode === 'mcq') {
+        promptLabel.textContent = 'Valitse oikea venäjänkielinen vastine:';
+        mcqBox.classList.remove('hidden');
+        writeBox.classList.add('hidden');
+        cyrBox.classList.add('hidden');
+
+        const distractors = [];
+        const used = new Set([normalizeAnswer(item.ru)]);
+        let guard = 0;
+        while (distractors.length < 3 && guard < 300) {
+            guard++;
+            const cand = RU_VOCAB[Math.floor(Math.random() * RU_VOCAB.length)];
+            const norm = normalizeAnswer(cand.ru);
+            if (!used.has(norm)) {
+                used.add(norm);
+                distractors.push(cand.ru);
+            }
+        }
+        const opts = [item.ru, ...distractors];
+        for (let i = opts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opts[i], opts[j]] = [opts[j], opts[i]];
+        }
+        cabinDrillState.mcqOptions = opts;
+        renderCabinDrillMcq();
+    } else {
+        promptLabel.textContent = 'Kirjoita sama sana nyt venäjäksi:';
+        mcqBox.classList.add('hidden');
+        writeBox.classList.remove('hidden');
+        writeBox.classList.add('flex');
+        cyrBox.classList.remove('hidden');
+        cyrBox.classList.add('flex');
+        inputEl.value = '';
+        inputEl.disabled = false;
+        inputEl.placeholder = 'Kirjoita venäjäksi...';
+        setTimeout(() => inputEl.focus(), 50);
+    }
+}
+
+function renderCabinDrillMcq() {
+    if (!cabinDrillState) return;
+    const container = document.getElementById('cabin-drill-mcq');
+    const item = cabinDrillState.queue[cabinDrillState.index];
+    container.innerHTML = '';
+
+    cabinDrillState.mcqOptions.forEach((opt, idx) => {
+        const row = document.createElement('div');
+        const isSelected = cabinDrillState.selectedOption === opt;
+        let cls = 'px-3 py-2 rounded-xl border font-bold text-sm transition flex items-center justify-between gap-2 ';
+        if (cabinDrillState.answered) {
+            if (opt === item.ru) cls += 'bg-emerald-900/80 border-emerald-400 text-emerald-100';
+            else if (isSelected) cls += 'bg-rose-900/80 border-rose-400 text-rose-100';
+            else cls += 'bg-slate-900/50 border-slate-800 text-slate-500';
+        } else if (isSelected) {
+            cls += 'bg-amber-500 border-amber-200 text-slate-950 shadow';
+        } else {
+            cls += 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-white';
+        }
+        row.className = cls;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'flex-1 text-left cursor-pointer';
+        btn.innerHTML = `<span class="opacity-65 mr-1.5">${idx + 1}.</span>${opt}`;
+        if (!cabinDrillState.answered) {
+            btn.onclick = () => {
+                cabinDrillState.selectedOption = opt;
+                renderCabinDrillMcq();
+                if (autoRussianSpeech) speakRussian(opt, { retryOnGesture: true });
+            };
+        }
+
+        row.appendChild(btn);
+        row.appendChild(createRussianListenButton(opt));
+        container.appendChild(row);
+    });
+}
+
+function checkCabinDrillAnswer() {
+    if (!cabinDrillState || cabinDrillState.answered) return;
+    const item = cabinDrillState.queue[cabinDrillState.index];
+    const { stepMode } = cabinDrillState;
+    let isRight = false;
+
+    if (stepMode === 'mcq') {
+        if (!cabinDrillState.selectedOption) {
+            showToast('Valitse vaihtoehto ensin!', 'warn');
+            return;
+        }
+        isRight = isRussianAnswerMatch(cabinDrillState.selectedOption, item.ru);
+    } else {
+        const inp = document.getElementById('cabin-drill-input');
+        const val = inp.value.trim();
+        if (!val) {
+            showToast('Kirjoita vastaus ensin!', 'warn');
+            inp.focus();
+            return;
+        }
+        inp.disabled = true;
+        isRight = isRussianAnswerMatch(val, item.ru);
+    }
+
+    cabinDrillState.answered = true;
+    const fbEl = document.getElementById('cabin-drill-feedback');
+    fbEl.classList.remove('hidden', 'bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100', 'bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+
+    if (stepMode === 'mcq') {
+        renderCabinDrillMcq();
+    }
+
+    if (isRight) {
+        sound.playSuccess();
+        if (stepMode === 'mcq') {
+            // Seuraavaksi kirjoitusvaihe samalle sanalle
+            fbEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+            fbEl.innerHTML = `✅ Oikein! <strong>${item.ru}</strong> — ${item.fi}. Seuraavaksi kokeillaan kirjoittaa se muistista!`;
+            cabinDrillState.nextAction = 'promote_to_write';
+        } else {
+            // Sana opittu! Siirretään osattuihin
+            recordLearnedWord(item);
+            cabinDrillState.masteredInSession++;
+            saveGameState();
+            fbEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
+            fbEl.innerHTML = `🏆 Mahtavaa! <strong>${item.ru}</strong> (${item.fi}) on nyt siirretty <strong>Osatut sanat</strong> -listalle!`;
+            cabinDrillState.nextAction = 'next_word';
+        }
+    } else {
+        sound.playError();
+        fbEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
+        fbEl.innerHTML = `❌ Vielä hieman harjoitusta! Oikea muoto on <strong class="text-amber-300">${item.ru}</strong> (${item.fi}). Kuuntele ja jatka.`;
+        // Laitetaan sana jonon hännille uudelleen kerrattavaksi
+        cabinDrillState.queue.push({ ...item });
+        cabinDrillState.nextAction = 'next_word';
+    }
+
+    if (autoRussianSpeech) {
+        setTimeout(() => speakRussian(item.ru, { force: true, retryOnGesture: true }), 120);
+    }
+
+    document.getElementById('btn-cabin-drill-check').classList.add('hidden');
+    const nextBtn = document.getElementById('btn-cabin-drill-next');
+    nextBtn.classList.remove('hidden');
+    nextBtn.textContent = cabinDrillState.nextAction === 'promote_to_write'
+        ? 'Kirjoita sana ▶'
+        : 'Seuraava ▶';
+}
+
+function advanceCabinDrill() {
+    if (!cabinDrillState) return;
+    if (cabinDrillState.nextAction === 'promote_to_write') {
+        cabinDrillState.stepMode = 'write';
+        renderCabinDrillQuestion();
+    } else {
+        cabinDrillState.index++;
+        cabinDrillState.stepMode = 'mcq';
+        renderCabinDrillQuestion();
+    }
 }
 
 function saveGameState() {
@@ -1681,6 +2254,7 @@ function saveGameState() {
             },
             usedSentenceIndices: Array.from(usedSentenceIndices),
             learnedWords,
+            failedWords,
             muted: sound.muted,
             autoRussianSpeech,
             gameOver
@@ -1738,6 +2312,7 @@ function loadGameState() {
 
         usedSentenceIndices = new Set(Array.isArray(data.usedSentenceIndices) ? data.usedSentenceIndices : []);
         learnedWords = Array.isArray(data.learnedWords) ? data.learnedWords : [];
+        failedWords = Array.isArray(data.failedWords) ? data.failedWords : [];
         sound.muted = !!data.muted;
         if (typeof data.autoRussianSpeech === 'boolean') {
             autoRussianSpeech = data.autoRussianSpeech;
@@ -1906,6 +2481,7 @@ function startNewGame(resetSaved = true) {
     floatingTexts = [];
     usedSentenceIndices.clear();
     learnedWords = [];
+    failedWords = [];
     currentQuiz = null;
     activeStation = null;
     resetJoystick();
@@ -1974,6 +2550,20 @@ function pickUnusedVocabItem() {
     if (!Array.isArray(RU_VOCAB) || RU_VOCAB.length === 0) {
         return { ru: 'дом', fi: 'talo / koti', cat: 'koti ja asuminen' };
     }
+
+    // Jos pelaajalla on failattuja sanoja, annetaan ~40% todennäköisyydellä revanssi (painottaen useimmin failattuja)
+    if (failedWords.length > 0 && Math.random() < 0.42) {
+        const weighted = [];
+        failedWords.forEach(fw => {
+            const weight = Math.min(5, Math.max(1, fw.failCount || 1));
+            for (let w = 0; w < weight; w++) weighted.push(fw);
+        });
+        const pickedFailed = weighted[Math.floor(Math.random() * weighted.length)];
+        const vocabMatch = RU_VOCAB.find(v => getWordKey(v.ru) === pickedFailed.key);
+        if (vocabMatch) return vocabMatch;
+        return { ru: pickedFailed.ru, fi: pickedFailed.fi, cat: pickedFailed.cat };
+    }
+
     const available = [];
     for (let i = 0; i < RU_VOCAB.length; i++) {
         if (!usedSentenceIndices.has(i)) available.push(i);
@@ -1999,6 +2589,7 @@ function triggerQuiz(options) {
 
     const item = pickUnusedVocabItem();
     const previouslyLearned = findLearnedWord(item.ru);
+    const previouslyFailed = findFailedWord(item.ru);
 
     let mode = 'mcq';
     if (options.isBoss || (options.block && options.block.requiresRussianWrite)) {
@@ -2042,12 +2633,22 @@ function triggerQuiz(options) {
 
     const alreadyKnownBanner = document.getElementById('quiz-already-known-banner');
     const alreadyKnownText = document.getElementById('quiz-already-known-text');
-    if (previouslyLearned) {
+    const prevFailedBanner = document.getElementById('quiz-previously-failed-banner');
+    const prevFailedText = document.getElementById('quiz-previously-failed-text');
+
+    if (previouslyFailed) {
+        const fails = previouslyFailed.failCount || 1;
+        prevFailedText.textContent = `Tämä sana meni aiemmin ohi (${fails}×) — kuuntele tarkkaan ja ota revanssi!`;
+        prevFailedBanner.classList.remove('hidden');
+        alreadyKnownBanner.classList.add('hidden');
+    } else if (previouslyLearned) {
         const times = previouslyLearned.count || 1;
         alreadyKnownText.textContent = `Hei! Olet osannut tämän sanan ("${item.ru}") jo aiemmin (${times} ${times === 1 ? 'kerran' : 'kertaa'}) — hyvä kertaus!`;
         alreadyKnownBanner.classList.remove('hidden');
+        prevFailedBanner.classList.add('hidden');
     } else {
         alreadyKnownBanner.classList.add('hidden');
+        prevFailedBanner.classList.add('hidden');
     }
 
     const badge = document.getElementById('quiz-ore-badge');
@@ -2273,6 +2874,11 @@ function checkQuizAnswer() {
             }
         } else {
             sound.playError();
+            recordFailedWord(item, {
+                wrongAnswer: displayUserAnswer,
+                mode: 'boss',
+                oreName: boss.name
+            });
             player.stats.streak = 0;
             player.hull = Math.max(0, player.hull - 35);
             player.vy = -210;
@@ -2325,13 +2931,18 @@ function checkQuizAnswer() {
             `;
         } else {
             sound.playError();
+            recordFailedWord(item, {
+                wrongAnswer: displayUserAnswer,
+                mode,
+                oreName: currentQuiz.block ? currentQuiz.block.name : ''
+            });
             player.stats.streak = 0;
             spawnParticles(wx, wy, '#64748b', 14, 90);
             addFloatingText(wx, wy - 10, 'Руда рассыпалась!', '#fb7185');
 
             feedbackEl.classList.add('bg-rose-950/90', 'border-rose-500', 'text-rose-100');
             feedbackEl.innerHTML = `
-                <div class="font-extrabold text-rose-300 text-base mb-1">❌ Неверно! Руда рассыпалась.</div>
+                <div class="font-extrabold text-rose-300 text-base mb-1">❌ Неверно! Руда рассыпалась • Sana tallennettu Sanamökkiin!</div>
                 <div class="text-xs text-rose-200 mb-1">Ваш ответ: <span class="mono line-through text-rose-300">${displayUserAnswer}</span></div>
                 <div class="mono text-sm bg-slate-900/90 px-2.5 py-1.5 rounded border border-rose-500/40 text-white flex flex-wrap items-center justify-between gap-2">
                     <span>Ответ: <span class="text-amber-300 font-bold">${expectedText}</span> (${item.ru} — ${item.fi})</span>
@@ -3049,8 +3660,10 @@ function draw() {
             ctx.fill();
             ctx.stroke();
 
-            // Ikkuna ja ovi
-            ctx.fillStyle = '#fde68a';
+            const hasFailedToReview = failedWords.length > 0;
+
+            // Ikkuna ja ovi (ikkuna hehkuu lämpimänä kun kertaus odottaa)
+            ctx.fillStyle = hasFailedToReview ? '#fb923c' : '#fde68a';
             ctx.fillRect(sx + 16, sy + 24, 14, 12);
             ctx.fillStyle = '#78350f';
             ctx.fillRect(sx + sw - 34, sy + 24, 16, sh - 34);
@@ -3059,6 +3672,21 @@ function draw() {
             ctx.font = 'bold 11px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(`${st.icon} ${st.name} (${learnedWords.length})`, sx + sw / 2, sy - 13);
+
+            if (hasFailedToReview) {
+                const bob = Math.sin(performance.now() * 0.006) * 2.5;
+                ctx.fillStyle = '#e11d48';
+                ctx.strokeStyle = '#fecdd3';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.roundRect(sx + sw / 2 - 46, sy - 37 + bob, 92, 18, 9);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px Inter, sans-serif';
+                ctx.fillText(`🎯 Kertaa: ${failedWords.length}`, sx + sw / 2, sy - 25 + bob);
+            }
         } else {
             ctx.fillStyle = '#1e293b';
             ctx.strokeStyle = st.color;
@@ -3384,6 +4012,24 @@ window.addEventListener('keydown', e => {
         if (e.code === 'Escape') {
             e.preventDefault();
             closeVocabModal();
+            return;
+        }
+        if (cabinDrillState) {
+            if (e.code === 'Enter') {
+                e.preventDefault();
+                if (!cabinDrillState.answered) checkCabinDrillAnswer();
+                else advanceCabinDrill();
+                return;
+            }
+            if (!cabinDrillState.answered && cabinDrillState.stepMode === 'mcq' && ['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code)) {
+                const idx = parseInt(e.code.replace('Digit', ''), 10) - 1;
+                if (cabinDrillState.mcqOptions && cabinDrillState.mcqOptions[idx]) {
+                    e.preventDefault();
+                    cabinDrillState.selectedOption = cabinDrillState.mcqOptions[idx];
+                    renderCabinDrillMcq();
+                    if (autoRussianSpeech) speakRussian(cabinDrillState.selectedOption, { retryOnGesture: true });
+                }
+            }
         }
         return;
     }
@@ -3437,28 +4083,35 @@ document.getElementById('btn-enter-station').onclick = () => {
 document.getElementById('btn-close-station').onclick = closeStationModal;
 document.getElementById('btn-close-station-bottom').onclick = closeStationModal;
 
-// Sanasto-modaalin tapahtumat
-document.getElementById('btn-learned-vocab').onclick = openVocabModal;
-document.getElementById('quiz-open-vocab-btn').onclick = openVocabModal;
+// Sanasto-modaalin (Sanamökki) tapahtumat
+document.getElementById('btn-learned-vocab').onclick = () => openVocabModal();
+document.getElementById('quiz-open-vocab-btn').onclick = () => openVocabModal();
 document.getElementById('btn-close-vocab').onclick = closeVocabModal;
 document.getElementById('btn-close-vocab-bottom').onclick = closeVocabModal;
+
+document.getElementById('tab-vocab-failed').onclick = () => setVocabTab('failed');
+document.getElementById('tab-vocab-learned').onclick = () => setVocabTab('learned');
+document.getElementById('tab-vocab-all').onclick = () => setVocabTab('all');
+
+document.getElementById('btn-start-cabin-drill').onclick = () => startCabinDrill();
+document.getElementById('btn-exit-cabin-drill').onclick = () => exitCabinDrill(true);
+document.getElementById('btn-cabin-drill-check').onclick = checkCabinDrillAnswer;
+document.getElementById('btn-cabin-drill-next').onclick = advanceCabinDrill;
 
 document.getElementById('vocab-search-input').addEventListener('input', (e) => {
     renderVocabList(e.target.value);
 });
 
+document.getElementById('vocab-cat-select').addEventListener('change', () => {
+    const q = document.getElementById('vocab-search-input').value;
+    renderVocabList(q);
+});
+
 document.getElementById('btn-vocab-speak-all').onclick = () => {
-    const q = normalizeAnswer(document.getElementById('vocab-search-input').value);
-    const firstMatch = learnedWords.find(entry => {
-        if (!q) return true;
-        return (
-            normalizeAnswer(entry.ru).includes(q) ||
-            normalizeAnswer(entry.fi).includes(q) ||
-            normalizeAnswer(entry.cat).includes(q)
-        );
-    });
-    if (firstMatch) {
-        speakRussian(firstMatch.ru, { force: true, showUnavailableToast: true });
+    const q = document.getElementById('vocab-search-input').value;
+    const matches = getFilteredVocabEntries(q);
+    if (matches.length > 0) {
+        speakRussian(matches[0].ru, { force: true, showUnavailableToast: true });
     } else {
         showToast('Ei kuunneltavaa sanaa.', 'warn');
     }
