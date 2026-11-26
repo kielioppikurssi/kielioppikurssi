@@ -127,6 +127,11 @@
 
         <!-- Oikea: Toimintonapit -->
         <div class="flex items-center gap-1.5 sm:gap-2">
+            <button id="btn-learned-vocab" class="bg-teal-700/80 hover:bg-teal-600 active:bg-teal-800 text-teal-100 border border-teal-400/50 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="Osatut sanat / Выученные слова">
+                <span>📖</span>
+                <span class="hidden sm:inline">Sanasto</span>
+                <span id="hud-vocab-count" class="mono bg-teal-950/80 text-teal-200 px-1.5 py-0.2 rounded text-xs">0</span>
+            </button>
             <button id="btn-auto-tts" class="bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-500/40 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1" title="Автоозвучка русских слов при открытии заданий / Automaattinen venäjän ääni">
                 <span id="auto-tts-icon">🗣️</span><span id="auto-tts-label" class="hidden md:inline">Автозвук: ВКЛ</span>
             </button>
@@ -146,24 +151,11 @@
     <main class="relative flex-1 w-full h-full overflow-hidden">
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Aseman toimintopainike -->
+        <!-- Aseman / mökin toimintopainike -->
         <div id="station-prompt" class="hidden absolute bottom-28 sm:bottom-10 left-1/2 -translate-x-1/2 z-10">
             <button id="btn-enter-station" class="glow-amber bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-2xl border-2 border-amber-200 text-sm sm:text-base flex items-center gap-2 transition transform hover:scale-105">
                 <span id="station-prompt-icon">🏪</span>
                 <span id="station-prompt-text">Открыть станцию (Enter)</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Pelialue (Canvas) -->
-    <main class="relative flex-1 w-full h-full overflow-hidden">
-        <canvas id="gameCanvas"></canvas>
-
-        <!-- Aseman toimintopainike -->
-        <div id="station-prompt" class="hidden absolute bottom-28 sm:bottom-10 left-1/2 -translate-x-1/2 z-10">
-            <button id="btn-enter-station" class="glow-amber bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-3 rounded-xl shadow-2xl border-2 border-amber-200 text-sm sm:text-base flex items-center gap-2 transition transform hover:scale-105">
-                <span id="station-prompt-icon">🏪</span>
-                <span id="station-prompt-text">Öppna station (Enter)</span>
             </button>
         </div>
 
@@ -191,7 +183,7 @@
     <div id="quiz-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6">
         <div class="bg-slate-900 border-2 border-slate-700 rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[95vh] overflow-y-auto">
             <!-- Yläotsikko & Löydetty malmi / Bossi -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-3">
                     <div id="quiz-ore-badge" class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-white/20">💎</div>
                     <div>
@@ -199,9 +191,20 @@
                         <h2 id="quiz-ore-name" class="text-lg sm:text-xl font-extrabold text-white">Золото (Au)</h2>
                     </div>
                 </div>
-                <button id="quiz-rule-hint-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-semibold transition">
-                    💡 Подсказка / Vinkki
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="quiz-open-vocab-btn" type="button" class="text-xs bg-teal-900/80 hover:bg-teal-800 text-teal-200 border border-teal-500/40 px-3 py-1.5 rounded-lg font-semibold transition">
+                        📖 Sanasto (<span id="quiz-vocab-badge-count">0</span>)
+                    </button>
+                    <button id="quiz-rule-hint-btn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/40 px-3 py-1.5 rounded-lg font-semibold transition">
+                        💡 Подсказка / Vinkki
+                    </button>
+                </div>
+            </div>
+
+            <!-- Huomautus jos sana on osattu aiemmin -->
+            <div id="quiz-already-known-banner" class="hidden bg-teal-950/85 border border-teal-400/60 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-teal-100 flex items-center gap-2.5 shadow">
+                <span class="text-lg">✨</span>
+                <span id="quiz-already-known-text" class="font-semibold">Hei! Olet osannut tämän sanan jo aiemmin.</span>
             </div>
 
             <!-- Pika-lunttilappu -->
@@ -265,14 +268,14 @@
 
             <!-- Toimintopainikkeet -->
             <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-800">
-                <button id="btn-quiz-clear" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl text-sm transition">
+                <button id="btn-quiz-clear" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl text-sm transition">
                     Очистить
                 </button>
                 <div class="flex items-center gap-2">
-                    <button id="btn-quiz-check" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
+                    <button id="btn-quiz-check" type="button" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
                         Проверить и бурить ⛏️
                     </button>
-                    <button id="btn-quiz-continue" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
+                    <button id="btn-quiz-continue" type="button" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-sm sm:text-base shadow-lg transition">
                         Продолжить ▶
                     </button>
                 </div>
@@ -281,7 +284,7 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- MODAALI 2: ASEMAT (MYYNTI, HUOLTO, PÄIVITYKSET)                       -->
+    <!-- MODAALI 2: ASEMAT & SANAMÖKKI (MYYNTI, HUOLTO, PÄIVITYKSET, SANASTO)   -->
     <!-- ===================================================================== -->
     <div id="station-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 flex items-center justify-center p-3 sm:p-6">
         <div class="bg-slate-900 border-2 border-slate-700 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
@@ -293,14 +296,59 @@
                         <p id="station-modal-subtitle" class="text-xs text-slate-400">Продажа добытой руды</p>
                     </div>
                 </div>
-                <button id="btn-close-station" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold flex items-center justify-center">✕</button>
+                <button id="btn-close-station" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold flex items-center justify-center">✕</button>
             </div>
 
             <div id="station-modal-body" class="flex flex-col gap-3"></div>
 
             <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
                 <div class="text-sm font-bold text-emerald-400">Баланс: <span id="station-money-display">150</span> ₽</div>
-                <button id="btn-close-station-bottom" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-xl text-sm">Закрыть (Esc)</button>
+                <button id="btn-close-station-bottom" type="button" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-xl text-sm">Закрыть (Esc)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAALI 2B: OIKEIN MENNEIDEN SANOJEN SANASTOLISTA (SANAMÖKKI & NAPPI)  -->
+    <!-- ===================================================================== -->
+    <div id="vocab-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-[60] flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-slate-900 border-2 border-teal-500/50 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🏡</span>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                            <span>Osatut sanat • Выученный словарь</span>
+                        </h2>
+                        <p id="vocab-modal-subtitle" class="text-xs text-teal-300">
+                            Kertynyt sanasto oikeista vastauksista: 0 sanaa
+                        </p>
+                    </div>
+                </div>
+                <button id="btn-close-vocab" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold flex items-center justify-center">✕</button>
+            </div>
+
+            <!-- Haku ja suodatus -->
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input
+                    id="vocab-search-input"
+                    type="text"
+                    placeholder="Hae sanasta (venäjä / suomi / aihe)... • Поиск слова..."
+                    class="flex-1 bg-slate-800 text-white placeholder-slate-400 border border-slate-700 focus:border-teal-400 focus:outline-none rounded-xl px-3.5 py-2 text-sm"
+                />
+                <button id="btn-vocab-speak-all" type="button" class="bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-500/40 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition">
+                    🔊 Kuuntele 1. osuma
+                </button>
+            </div>
+
+            <!-- Sanalistan sisältö -->
+            <div id="vocab-list-container" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+
+            <div class="pt-2 border-t border-slate-800 flex justify-between items-center gap-2">
+                <span class="text-xs text-slate-400">Avaa myös sanamökistä maan pinnalla tai tehtävän aikana!</span>
+                <button id="btn-close-vocab-bottom" type="button" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-5 py-2 rounded-xl text-sm transition">
+                    Sulje • Закрыть
+                </button>
             </div>
         </div>
     </div>
@@ -314,7 +362,7 @@
                 <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
                     <span>🇷🇺</span> Справка &amp; Sanasto (RU + FI)
                 </h2>
-                <button id="btn-close-help" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold">✕</button>
+                <button id="btn-close-help" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 w-9 h-9 rounded-xl font-bold">✕</button>
             </div>
 
             <div class="space-y-3 text-sm text-slate-200 leading-relaxed">
@@ -332,13 +380,13 @@
                     <ul class="list-disc list-inside space-y-1 text-slate-300 text-xs sm:text-sm">
                         <li><strong>ПК / Tietokone:</strong> Полёт и бурение — <strong>WASD</strong> или <strong>стрелки</strong> / nuolinäppäimet.</li>
                         <li><strong>Сенсорный экран / Mobiili:</strong> Аналоговый джойстик / analoginen tatti.</li>
-                        <li><strong>Станции наверху / Yläasemat:</strong> Переработка (продажа), Топливо и ремонт, Мастерская улучшений.</li>
-                        <li><strong>Автосохранение / Automaattitallennus:</strong> Прогресс сохраняется в браузере / Tallentuu selaimeen.</li>
+                        <li><strong>Станции и домик слов наверху:</strong> Переработка, Топливо и ремонт, Мастерская и <strong>Sanamökki</strong> (свой словарь).</li>
+                        <li><strong>Автосохранение / Automaattitallennus:</strong> Прогресс и выученные слова сохраняются в браузере.</li>
                     </ul>
                 </div>
             </div>
 
-            <button id="btn-close-help-bottom" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition">
+            <button id="btn-close-help-bottom" type="button" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition">
                 В шахту! • Takaisin kaivokseen!
             </button>
         </div>
@@ -357,10 +405,10 @@
                 <div>Верных слов: <strong id="go-solved" class="text-emerald-400">0</strong></div>
             </div>
             <div class="flex flex-col sm:flex-row gap-2 mt-2">
-                <button id="btn-rescue" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-sm transition">
+                <button id="btn-rescue" type="button" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-sm transition">
                     🚁 Эвакуация (-50 ₽)
                 </button>
-                <button id="btn-new-game" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition">
+                <button id="btn-new-game" type="button" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition">
                     Новая игра
                 </button>
             </div>
@@ -1357,7 +1405,7 @@ function buildCyrillicHelper() {
 
 /**
  * ============================================================================
- * 3. LOHKOT, ALKUAIHEET, PÄIVITYKSET JA ASEMAT (VAATIMUSTEN MUKAINEN JARJESTYS)
+ * 3. LOHKOT, ALKUAIHEET, PÄIVITYKSET JA ASEMAT + SANAMÖKKI
  * ============================================================================
  */
 const TILE_SIZE = 44;
@@ -1425,13 +1473,14 @@ const UPGRADES = {
 
 const STATIONS = [
     { id: 'sell', name: 'Переработка', subtitle: 'Продажа добытой руды', icon: '🏭', colStart: 7, colEnd: 11, color: '#10b981', roofColor: '#059669' },
-    { id: 'fuel', name: 'Топливо и ремонт', subtitle: 'Заправка и ремонт корпуса', icon: '⛽', colStart: 13, colEnd: 16, color: '#f59e0b', roofColor: '#d97706' },
+    { id: 'fuel', name: 'Топливо и ремонт', subtitle: 'Заправка и ремонт корпуса', icon: '⛽', colStart: 12, colEnd: 15, color: '#f59e0b', roofColor: '#d97706' },
+    { id: 'vocab', name: 'Sanamökki', subtitle: 'Osatut sanat • Выученные слова', icon: '🏡', colStart: 16, colEnd: 19, color: '#14b8a6', roofColor: '#0d9488', isCabin: true },
     { id: 'upgrade', name: 'Мастерская', subtitle: 'Улучшение бура, бака, трюма и корпуса', icon: '🔧', colStart: 21, colEnd: 25, color: '#6366f1', roofColor: '#4f46e5' }
 ];
 
 /**
  * ============================================================================
- * 4. PELITILA, TALLENNUS & APUFUNKTIOT
+ * 4. PELITILA, TALLENNUS, SANASTOLISTA & APUFUNKTIOT
  * ============================================================================
  */
 let grid = [];
@@ -1443,6 +1492,8 @@ let gameOver = false;
 let activeStation = null;
 let currentQuiz = null;
 let usedSentenceIndices = new Set();
+// Tallentaa oikein osatut sanat: { key, ru, fi, cat, count, lastLearnedAt }
+let learnedWords = [];
 let saveTimer = 0;
 
 const boss = {
@@ -1480,11 +1531,132 @@ function getMaxHull() { return UPGRADES.hull[player.upgrades.hull - 1].maxHull; 
 function getDrillPower() { return UPGRADES.drill[player.upgrades.drill - 1].power; }
 function getDrillSpeed() { return UPGRADES.drill[player.upgrades.drill - 1].speedMult; }
 
+function getWordKey(ruWord) {
+    return normalizeAnswer(ruWord);
+}
+
+function findLearnedWord(ruWord) {
+    const key = getWordKey(ruWord);
+    return learnedWords.find(w => w.key === key) || null;
+}
+
+function recordLearnedWord(item) {
+    if (!item || !item.ru) return;
+    const key = getWordKey(item.ru);
+    const existing = learnedWords.find(w => w.key === key);
+    if (existing) {
+        existing.count = (existing.count || 1) + 1;
+        existing.fi = item.fi || existing.fi;
+        existing.cat = item.cat || existing.cat;
+        existing.lastLearnedAt = Date.now();
+    } else {
+        learnedWords.unshift({
+            key,
+            ru: item.ru,
+            fi: item.fi || '',
+            cat: item.cat || '',
+            count: 1,
+            lastLearnedAt: Date.now()
+        });
+    }
+    updateVocabCountBadges();
+}
+
+function updateVocabCountBadges() {
+    const count = learnedWords.length;
+    const hudBadge = document.getElementById('hud-vocab-count');
+    const quizBadge = document.getElementById('quiz-vocab-badge-count');
+    const subEl = document.getElementById('vocab-modal-subtitle');
+    if (hudBadge) hudBadge.textContent = String(count);
+    if (quizBadge) quizBadge.textContent = String(count);
+    if (subEl) {
+        subEl.textContent = `Kertynyt sanasto oikeista vastauksista: ${count} ${count === 1 ? 'sana' : 'sanaa'} • Выучено слов: ${count}`;
+    }
+}
+
+function openVocabModal() {
+    const modal = document.getElementById('vocab-modal');
+    const searchInput = document.getElementById('vocab-search-input');
+    if (searchInput) searchInput.value = '';
+    renderVocabList('');
+    updateVocabCountBadges();
+    modal.classList.remove('hidden');
+    if (searchInput) {
+        setTimeout(() => searchInput.focus(), 50);
+    }
+}
+
+function closeVocabModal() {
+    document.getElementById('vocab-modal').classList.add('hidden');
+}
+
+function renderVocabList(filterQuery = '') {
+    const container = document.getElementById('vocab-list-container');
+    if (!container) return;
+    const q = normalizeAnswer(filterQuery);
+
+    const filtered = learnedWords.filter(entry => {
+        if (!q) return true;
+        return (
+            normalizeAnswer(entry.ru).includes(q) ||
+            normalizeAnswer(entry.fi).includes(q) ||
+            normalizeAnswer(entry.cat).includes(q)
+        );
+    });
+
+    container.innerHTML = '';
+
+    if (learnedWords.length === 0) {
+        container.innerHTML = `
+            <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-6 text-center text-slate-300 space-y-1.5">
+                <div class="text-3xl">🌱</div>
+                <p class="font-bold text-white">Sanalista on vielä tyhjä</p>
+                <p class="text-xs text-slate-400">Vastaa malmi- ja pomotehtäviin oikein, niin sanat kertyvät tähän ja omaan Sanamökkiisi maan pinnalle!</p>
+            </div>
+        `;
+        return;
+    }
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-5 text-center text-slate-400 text-sm">
+                Haulla <span class="text-white font-bold">"${filterQuery}"</span> ei löytynyt osumia.
+            </div>
+        `;
+        return;
+    }
+
+    filtered.forEach((entry, idx) => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-800/90 hover:bg-slate-800 border border-slate-700/90 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3 transition';
+
+        const left = document.createElement('div');
+        left.className = 'min-w-0 flex-1';
+        left.innerHTML = `
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-mono text-slate-500">#${idx + 1}</span>
+                <span class="font-extrabold text-base text-teal-300">${entry.ru}</span>
+                <span class="text-slate-400">—</span>
+                <span class="font-semibold text-sm text-white">${entry.fi}</span>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-950 text-teal-200 border border-teal-500/40">
+                    osattu ${entry.count || 1}×
+                </span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Aihe: ${entry.cat || 'yleinen'}</div>
+        `;
+
+        const listenBtn = createRussianListenButton(entry.ru);
+        card.appendChild(left);
+        card.appendChild(listenBtn);
+        container.appendChild(card);
+    });
+}
+
 function saveGameState() {
     try {
         if (typeof localStorage === 'undefined') return;
         const payload = {
-            version: 1,
+            version: 2,
             savedAt: Date.now(),
             grid,
             player: {
@@ -1508,6 +1680,7 @@ function saveGameState() {
                 row: boss.row
             },
             usedSentenceIndices: Array.from(usedSentenceIndices),
+            learnedWords,
             muted: sound.muted,
             autoRussianSpeech,
             gameOver
@@ -1564,12 +1737,14 @@ function loadGameState() {
         }
 
         usedSentenceIndices = new Set(Array.isArray(data.usedSentenceIndices) ? data.usedSentenceIndices : []);
+        learnedWords = Array.isArray(data.learnedWords) ? data.learnedWords : [];
         sound.muted = !!data.muted;
         if (typeof data.autoRussianSpeech === 'boolean') {
             autoRussianSpeech = data.autoRussianSpeech;
         }
         document.getElementById('btn-mute').textContent = sound.muted ? '🔇' : '🔊';
         updateAutoSpeechButton();
+        updateVocabCountBadges();
 
         particles = [];
         floatingTexts = [];
@@ -1730,9 +1905,11 @@ function startNewGame(resetSaved = true) {
     particles = [];
     floatingTexts = [];
     usedSentenceIndices.clear();
+    learnedWords = [];
     currentQuiz = null;
     activeStation = null;
     resetJoystick();
+    updateVocabCountBadges();
 
     player.x = 17 * TILE_SIZE;
     player.y = (SURFACE_ROW - 1) * TILE_SIZE;
@@ -1757,6 +1934,7 @@ function startNewGame(resetSaved = true) {
     document.getElementById('gameover-modal').classList.add('hidden');
     document.getElementById('quiz-modal').classList.add('hidden');
     document.getElementById('station-modal').classList.add('hidden');
+    document.getElementById('vocab-modal').classList.add('hidden');
     document.getElementById('help-modal').classList.add('hidden');
     updateHUD();
     saveGameState();
@@ -1817,8 +1995,10 @@ function triggerQuiz(options) {
     resetJoystick();
     sound.playOreFound();
     buildCyrillicHelper();
+    updateVocabCountBadges();
 
     const item = pickUnusedVocabItem();
+    const previouslyLearned = findLearnedWord(item.ru);
 
     let mode = 'mcq';
     if (options.isBoss || (options.block && options.block.requiresRussianWrite)) {
@@ -1859,6 +2039,16 @@ function triggerQuiz(options) {
         selectedOption: null,
         answered: false
     };
+
+    const alreadyKnownBanner = document.getElementById('quiz-already-known-banner');
+    const alreadyKnownText = document.getElementById('quiz-already-known-text');
+    if (previouslyLearned) {
+        const times = previouslyLearned.count || 1;
+        alreadyKnownText.textContent = `Hei! Olet osannut tämän sanan ("${item.ru}") jo aiemmin (${times} ${times === 1 ? 'kerran' : 'kertaa'}) — hyvä kertaus!`;
+        alreadyKnownBanner.classList.remove('hidden');
+    } else {
+        alreadyKnownBanner.classList.add('hidden');
+    }
 
     const badge = document.getElementById('quiz-ore-badge');
     const tagEl = document.getElementById('quiz-tag');
@@ -2050,6 +2240,7 @@ function checkQuizAnswer() {
 
         if (isCorrect) {
             sound.playSuccess();
+            recordLearnedWord(item);
             boss.hp = Math.max(0, boss.hp - 1);
             player.stats.solvedCount++;
             player.stats.streak++;
@@ -2105,6 +2296,7 @@ function checkQuizAnswer() {
 
         if (isCorrect) {
             sound.playSuccess();
+            recordLearnedWord(item);
             player.stats.solvedCount++;
             player.stats.streak++;
             const tierBonus = mode === 'write_ru' ? 150 : (mode === 'write_fi' ? 60 : 0);
@@ -2124,7 +2316,7 @@ function checkQuizAnswer() {
 
             feedbackEl.classList.add('bg-emerald-950/90', 'border-emerald-500', 'text-emerald-100');
             feedbackEl.innerHTML = `
-                <div class="font-extrabold text-emerald-300 text-base mb-1">✅ Верно! (+${streakBonus} ₽)</div>
+                <div class="font-extrabold text-emerald-300 text-base mb-1">✅ Верно! (+${streakBonus} ₽) • Sana lisätty sanastoon!</div>
                 <div class="mono text-sm bg-slate-900/80 px-2.5 py-1.5 rounded border border-emerald-500/30 text-white mb-1 flex flex-wrap items-center justify-between gap-2">
                     <span><span class="text-emerald-300 font-bold">${item.ru}</span> — ${item.fi}</span>
                     <span id="quiz-feedback-tts-slot"></span>
@@ -2193,10 +2385,15 @@ function closeQuizModal() {
 
 /**
  * ============================================================================
- * 7. ASEMAT (MYYNTI, HUOLTO, PÄIVITYKSET)
+ * 7. ASEMAT JA SANAMÖKKI (MYYNTI, HUOLTO, PÄIVITYKSET, SANASTO)
  * ============================================================================
  */
 function openStationModal(station) {
+    if (station.id === 'vocab') {
+        openVocabModal();
+        return;
+    }
+
     isPaused = true;
     keys = {};
     resetJoystick();
@@ -2713,6 +2910,7 @@ function updateHUD() {
     const currentDepth = Math.max(0, Math.floor((player.y + player.height - SURFACE_ROW * TILE_SIZE) / TILE_SIZE * 5));
     document.getElementById('hud-depth').textContent = `${currentDepth} м`;
     document.getElementById('hud-streak').textContent = `${player.stats.streak} 🔥`;
+    updateVocabCountBadges();
 
     const maxF = getMaxFuel();
     document.getElementById('hud-fuel-text').textContent = `${Math.ceil(player.fuel)}/${maxF}`;
@@ -2824,29 +3022,62 @@ function draw() {
 
     ctx.translate(-camX, -camY);
 
+    // Piirretään maan pinnan asemat ja oma Sanamökki
     STATIONS.forEach(st => {
         const sx = st.colStart * TILE_SIZE;
         const sw = (st.colEnd - st.colStart + 1) * TILE_SIZE;
-        const sh = TILE_SIZE * 1.45;
+        const sh = st.isCabin ? TILE_SIZE * 1.55 : TILE_SIZE * 1.45;
         const sy = SURFACE_ROW * TILE_SIZE - sh;
 
-        ctx.fillStyle = '#1e293b';
-        ctx.strokeStyle = st.color;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.roundRect(sx + 4, sy, sw - 8, sh, [8, 8, 0, 0]);
-        ctx.fill();
-        ctx.stroke();
+        if (st.isCabin) {
+            // Oma puinen/teemallinen mökki maan pinnalla sanastolle
+            ctx.fillStyle = '#291d14';
+            ctx.strokeStyle = st.color;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.roundRect(sx + 6, sy + 10, sw - 12, sh - 10, 6);
+            ctx.fill();
+            ctx.stroke();
 
-        ctx.fillStyle = st.roofColor;
-        ctx.beginPath();
-        ctx.roundRect(sx, sy - 10, sw, 14, 6);
-        ctx.fill();
+            // Harjakatto
+            ctx.fillStyle = st.roofColor;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy + 13);
+            ctx.lineTo(sx + sw / 2, sy - 8);
+            ctx.lineTo(sx + sw, sy + 13);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 12px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${st.icon} ${st.name}`, sx + sw / 2, sy + 24);
+            // Ikkuna ja ovi
+            ctx.fillStyle = '#fde68a';
+            ctx.fillRect(sx + 16, sy + 24, 14, 12);
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(sx + sw - 34, sy + 24, 16, sh - 34);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${st.icon} ${st.name} (${learnedWords.length})`, sx + sw / 2, sy - 13);
+        } else {
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = st.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(sx + 4, sy, sw - 8, sh, [8, 8, 0, 0]);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = st.roofColor;
+            ctx.beginPath();
+            ctx.roundRect(sx, sy - 10, sw, 14, 6);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${st.icon} ${st.name}`, sx + sw / 2, sy + 24);
+        }
 
         ctx.fillStyle = st.color + '44';
         ctx.fillRect(sx + 8, SURFACE_ROW * TILE_SIZE - 5, sw - 16, 5);
@@ -3148,6 +3379,15 @@ window.addEventListener('keydown', e => {
     }
     keys[e.code] = true;
 
+    const vocabOpen = !document.getElementById('vocab-modal').classList.contains('hidden');
+    if (vocabOpen) {
+        if (e.code === 'Escape') {
+            e.preventDefault();
+            closeVocabModal();
+        }
+        return;
+    }
+
     if (currentQuiz && !currentQuiz.answered) {
         if (e.code === 'Enter') {
             e.preventDefault();
@@ -3175,7 +3415,7 @@ window.addEventListener('keydown', e => {
         if (!document.getElementById('station-modal').classList.contains('hidden')) closeStationModal();
         if (!document.getElementById('help-modal').classList.contains('hidden')) {
             document.getElementById('help-modal').classList.add('hidden');
-            isPaused = false;
+            if (!currentQuiz && !gameOver) isPaused = false;
         }
     }
 });
@@ -3196,6 +3436,33 @@ document.getElementById('btn-enter-station').onclick = () => {
 };
 document.getElementById('btn-close-station').onclick = closeStationModal;
 document.getElementById('btn-close-station-bottom').onclick = closeStationModal;
+
+// Sanasto-modaalin tapahtumat
+document.getElementById('btn-learned-vocab').onclick = openVocabModal;
+document.getElementById('quiz-open-vocab-btn').onclick = openVocabModal;
+document.getElementById('btn-close-vocab').onclick = closeVocabModal;
+document.getElementById('btn-close-vocab-bottom').onclick = closeVocabModal;
+
+document.getElementById('vocab-search-input').addEventListener('input', (e) => {
+    renderVocabList(e.target.value);
+});
+
+document.getElementById('btn-vocab-speak-all').onclick = () => {
+    const q = normalizeAnswer(document.getElementById('vocab-search-input').value);
+    const firstMatch = learnedWords.find(entry => {
+        if (!q) return true;
+        return (
+            normalizeAnswer(entry.ru).includes(q) ||
+            normalizeAnswer(entry.fi).includes(q) ||
+            normalizeAnswer(entry.cat).includes(q)
+        );
+    });
+    if (firstMatch) {
+        speakRussian(firstMatch.ru, { force: true, showUnavailableToast: true });
+    } else {
+        showToast('Ei kuunneltavaa sanaa.', 'warn');
+    }
+};
 
 document.getElementById('btn-rule-help').onclick = () => {
     isPaused = true;
