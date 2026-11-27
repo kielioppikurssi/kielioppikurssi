@@ -73,6 +73,132 @@ a:hover {
     vertical-align: middle;
     margin-left: 6px;
 }
+
+/* Ruotsi-alaotsikon rivi ja kelluva vinkki-ikkuna */
+.section-header-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.vinkit-toggle-btn {
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f355e;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(31, 53, 94, 0.25);
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(31, 53, 94, 0.1);
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vinkit-toggle-btn:hover {
+    background: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(31, 53, 94, 0.16);
+}
+
+.vinkit-toggle-btn:focus-visible {
+    outline: 2px solid #0057b8;
+    outline-offset: 2px;
+}
+
+.floating-vinkit-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 220px;
+    width: min(540px, calc(100vw - 48px));
+    max-height: 75vh;
+    overflow-y: auto;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(8px);
+    color: #23324d;
+    border: 1px solid rgba(31, 53, 94, 0.2);
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 14px 36px rgba(24, 39, 75, 0.22);
+    text-align: left;
+}
+
+.floating-vinkit-panel.is-open {
+    display: block;
+}
+
+.vinkit-panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid rgba(31, 53, 94, 0.14);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+}
+
+.vinkit-panel-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.vinkit-close-btn {
+    background: #eef3fb;
+    color: #1f355e;
+    border: none;
+    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.vinkit-close-btn:hover {
+    background: #dce6f7;
+}
+
+.floating-vinkit-panel h4 {
+    margin: 16px 0 6px;
+    color: #1f355e;
+    font-size: 1rem;
+    border-left: 3px solid #5c85d6;
+    padding-left: 8px;
+}
+
+.floating-vinkit-panel h4:first-of-type {
+    margin-top: 4px;
+}
+
+.floating-vinkit-panel p {
+    margin: 6px 0 10px;
+    font-size: 0.94rem;
+    line-height: 1.45;
+}
+
+.floating-vinkit-panel ul {
+    margin: 6px 0 12px;
+    padding-left: 20px;
+    font-size: 0.94rem;
+    line-height: 1.45;
+}
+
+.floating-vinkit-panel li {
+    margin-bottom: 6px;
+}
+
+@media (max-width: 768px) {
+    .floating-vinkit-panel {
+        left: 0;
+        right: 0;
+        width: auto;
+    }
+}
 </style>
 
 </head>
@@ -85,7 +211,162 @@ Tervetuloa kielioppikurssille! <img src="skele-finger.gif" alt="Skele finger" cl
 Tälle sivulle on koottu erilaisia tehtäviä, jotka auttavat sinua eri kielioppiasioiden oppimisessa.
 </p>
 
-<h2>🇸🇪 Ruotsi</h2>
+<div class="section-header-row">
+    <h2>🇸🇪 Ruotsi</h2>
+    <button
+        type="button"
+        class="vinkit-toggle-btn"
+        id="ruotsiVinkitBtn"
+        aria-expanded="false"
+        aria-controls="ruotsiVinkitPanel"
+    >
+        💡 Ruotsin abikertausvinkit ja linkit
+    </button>
+
+    <aside
+        class="floating-vinkit-panel"
+        id="ruotsiVinkitPanel"
+        aria-label="Ruotsin abikertaus vinkkejä ja linkkejä"
+    >
+        <div class="vinkit-panel-header">
+            <h3>Ruotsin abikertaus vinkkejä ja linkkejä</h3>
+            <button
+                type="button"
+                class="vinkit-close-btn"
+                id="ruotsiVinkitClose"
+                aria-label="Sulje opiskeluvinkit"
+            >
+                ✕
+            </button>
+        </div>
+
+        <h4>Abikertaus ja tehtävät</h4>
+        <ul>
+            <li>
+                <a href="https://yle.fi/aihe/abitreenit/ruotsi" target="_blank" rel="noopener noreferrer">Abitreenit</a> – vanhat yo-kokeet ja paljon kertaustehtäviä.
+            </li>
+            <li>
+                Katso läpi vanhoja yo-kirjoitelmia ja niiden saamia pisteitä YTL:n sivuilta:
+                <a href="https://www.ylioppilastutkinto.fi/fi/ajankohtaista/blogi/maamerkkeja-arvostelun-tueksi-toisen-kotimaisen-kielen-ja-joidenkin-vieraiden" target="_blank" rel="noopener noreferrer">YTL:n maamerkkejä arvostelun tueksi</a>.
+            </li>
+            <li>
+                <a href="https://yle.fi/a/20-10006353" target="_blank" rel="noopener noreferrer">Koottuja tehtäviä Abitreenien sivuilla</a>.
+            </li>
+            <li>
+                <a href="https://yle.fi/aihe/artikkeli/2015/12/15/ruotsi" target="_blank" rel="noopener noreferrer">Muita Ylen tehtäviä</a>.
+            </li>
+            <li>
+                <a href="https://svenska.yle.fi/vetamix" target="_blank" rel="noopener noreferrer">Vetamix</a> – tietovisoja ja kaikkea pientä mielenkiintoista opittavaa.
+            </li>
+            <li>
+                <a href="https://sites.google.com/view/papegojan/framsidan" target="_blank" rel="noopener noreferrer">Papegojan</a> – kertaustehtäviä koko lukion oppimäärästä (kielioppia).
+            </li>
+        </ul>
+
+        <h4>Mediaa</h4>
+        <ul>
+            <li>
+                Instagramissa seuraa tiliä <strong>@abi_svenskanu</strong>.
+            </li>
+            <li>
+                Netflixissä voi (ainakin koneella) rajata valikoimaa kielen mukaan – valitse alkuperäiseksi kieleksi ruotsi. Tehokasta opiskelua on laittaa lisäksi tekstit ruotsiksi.
+            </li>
+            <li>
+                <a href="https://chromewebstore.google.com/detail/nflxmultisubs-2021-netfli/jepfhfjlkgobooomdgpcjikalfpcldmm" target="_blank" rel="noopener noreferrer">NflxMultiSubs</a> – tällä saat sekä suomen- että ruotsinkieliset tekstitykset Netflixiin.
+            </li>
+            <li>
+                <a href="https://arenan.yle.fi/tv" target="_blank" rel="noopener noreferrer">Yle Areena</a> ruotsiksi.
+            </li>
+            <li>
+                <a href="https://www.svtplay.se/" target="_blank" rel="noopener noreferrer">SVT Play</a> – Ruotsin yleisradio. Paljon sisältöä, tekstit ruotsiksi. Osa videoista ei toimi Suomessa ilman VPN:ää.
+            </li>
+            <li>
+                <a href="https://ll-bladet.fi/" target="_blank" rel="noopener noreferrer">Lätta bladet</a> – selkokieliset uutiset ruotsiksi. Lisäksi voit lainata kirjastostasi helppolukuisia / selkokielisiä ruotsinkielisiä kirjoja (<em>lättläst</em> = helppolukuinen).
+            </li>
+            <li>
+                <a href="https://svenska.yle.fi/" target="_blank" rel="noopener noreferrer">Svenska Yle</a> – Ylen uutissivusto ruotsiksi.
+            </li>
+            <li>
+                Ruotsin iltapäivälehdet ja kohu-uutiset:
+                <a href="https://www.expressen.se/" target="_blank" rel="noopener noreferrer">Expressen</a> ja
+                <a href="https://www.aftonbladet.se/" target="_blank" rel="noopener noreferrer">Aftonbladet</a>.
+            </li>
+        </ul>
+
+        <h4>Lukemista</h4>
+        <ul>
+            <li>
+                Reddit – keskusteluja ruotsiksi ja keskustelua ruotsin opiskelusta:
+                <a href="https://www.reddit.com/r/sweden/" target="_blank" rel="noopener noreferrer">r/sweden</a> ja
+                <a href="https://www.reddit.com/r/Svenska/" target="_blank" rel="noopener noreferrer">r/Svenska</a>.
+            </li>
+        </ul>
+
+        <h4>Pelejä</h4>
+        <ul>
+            <li>
+                <a href="https://babadum.com/" target="_blank" rel="noopener noreferrer">Ba Ba Dum</a> – sanastoharjoittelua eri pelimoodeilla, myös monia muita kieliä löytyy.
+            </li>
+            <li>
+                <a href="https://sv.bab.la/spraktest/svensk/" target="_blank" rel="noopener noreferrer">Bab.la sanastopelejä</a>.
+            </li>
+            <li>
+                <a href="https://glosor.eu/ovningar/fin-swe.finska-svenska.html" target="_blank" rel="noopener noreferrer">Glosor-pelejä</a>.
+            </li>
+        </ul>
+
+        <h4>Youtube-videoita</h4>
+        <ul>
+            <li>
+                <a href="https://www.youtube.com/playlist?list=PLTVt3y-LKnpZ3N7z3DKA06FqPFeKIBP7u" target="_blank" rel="noopener noreferrer">Reetta Pänkäläisen kielioppivideoita (soittolista)</a>.
+            </li>
+            <li>
+                <a href="https://www.youtube.com/playlist?list=PLvknrirtmMPIVQMJOTQZfXXT_IDXMBMtv" target="_blank" rel="noopener noreferrer">Ruotsin yo (soittolista)</a>.
+            </li>
+            <li>
+                <a href="https://www.youtube.com/c/Svenskaspr%C3%A5ket/videos" target="_blank" rel="noopener noreferrer">Opetusvideoita ruotsiksi (Svenska språket)</a>.
+            </li>
+            <li>
+                <a href="https://www.youtube.com/@swedishmadeeasy" target="_blank" rel="noopener noreferrer">Swedish Made Easy</a>.
+            </li>
+ <li>
+                <a href="https://www.youtube.com/watch?v=lW-pcO8dU-s" target="_blank" rel="noopener noreferrer">Swedish Slang is INSANE! (I couldn't believe this)</a>.
+            </li>
+        </ul>
+
+        <h4>Yo-koe vinkkejä</h4>
+        <ul>
+            <li>Vaikeat kysymykset ovat kokeen lopussa.</li>
+            <li>Älä vastaa liian pitkästi, kirjoita avokysymyksiin vain se minkä tiedät oikeaksi.</li>
+            <li>Älä kikkaile liikaa rakenteilla, kirjoita omalla kielitaidollasi.</li>
+            <li>Valitse kirjoitelman tehtävänanto siten, että pystyt oikeasti osoittamaan omaa kielitaitoasi (tartu vaikeampaan aiheeseen jos tunnet tietäväsi aiheesta; jos otat helpon aiheen, kannattaa pyrkiä vaihtelevaan kielenkäyttöön).</li>
+        </ul>
+
+        <h4>Luetunymmärtämisvinkkejä</h4>
+        <p><strong>Uuden tekstin haltuunotto:</strong></p>
+        <ul>
+            <li>Lue teksti ensin ilman että käytät sanastoa.</li>
+            <li>Yliviivaa kaikki oudot sanat.</li>
+            <li>Kirjoita sanojen käännös tekstiin tai erilliselle paperille/tiedostoon.</li>
+            <li>Lue teksti ja turvaudu omiin käännöksiisi jos et muista sanaa.</li>
+            <li>Lue teksti niin monta kertaa läpi että osaat sen ulkoa.</li>
+        </ul>
+
+        <h4>Muita vinkkejä</h4>
+        <ul>
+            <li>
+                Laita puhelimen ja tietokoneen selaimen aloitussivuksi ruotsinkielisen Wikipedian satunnainen artikkeli -sivu:
+                <a href="https://sv.wikipedia.org/wiki/Special:Slumpsida" target="_blank" rel="noopener noreferrer">sv.wikipedia.org/wiki/Special:Slumpsida</a>.
+            </li>
+            <li>Aseta puhelimesi ja tietokoneesi ruotsin kielelle.</li>
+            <li>Jos pelaat pelejä, vaihda niiden kieli asetuksista ruotsiksi (jos mahdollista).</li>
+            <li>Harjoittele säännöllisesti ja päivittäin ruotsia kaikin eri tavoin pienissä erissä. 10 minuuttia viikon ajan joka päivä on parempi kuin yhtenä päivänä 70 minuuttia.</li>
+            <li>Tuota outputtia: kirjoita kohdekielellä – älä välitä virheistä!</li>
+            <li>Muista pitää hauskaa kielen ja kielitaitosi kanssa!!!</li>
+        </ul>
+    </aside>
+</div>
+
 <ul>
     <strong>Sanajärjestys</strong>
     <li>
@@ -298,6 +579,47 @@ Tälle sivulle on koottu erilaisia tehtäviä, jotka auttavat sinua eri kieliopp
     Sivuston ohjelmakoodi on tuotettu osittain Microsoft Copilotin ja Google Geminin avulla. Sivustolla saattaa esiintyä virheitä. Tarkista tärkeät tiedot aina myös muista lähteistä, kuten painetuista ja sähköisistä kielten oppikirjoista!<br>
     Hauskoja hetkiä kieltenopiskeluun!
 </footer>
+
+<script>
+(function () {
+    const btn = document.getElementById("ruotsiVinkitBtn");
+    const panel = document.getElementById("ruotsiVinkitPanel");
+    const closeBtn = document.getElementById("ruotsiVinkitClose");
+
+    if (!btn || !panel || !closeBtn) return;
+
+    function setOpen(open) {
+        panel.classList.toggle("is-open", open);
+        btn.setAttribute("aria-expanded", String(open));
+    }
+
+    btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        const isOpen = panel.classList.contains("is-open");
+        setOpen(!isOpen);
+    });
+
+    closeBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setOpen(false);
+    });
+
+    panel.addEventListener("click", function (e) {
+        e.stopPropagation();
+    });
+
+    document.addEventListener("click", function () {
+        setOpen(false);
+    });
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && panel.classList.contains("is-open")) {
+            setOpen(false);
+            btn.focus();
+        }
+    });
+})();
+</script>
 
 </body>
 </html>
